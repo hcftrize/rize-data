@@ -2,16 +2,23 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>RIZE DATA HUB</title>
+  <title>RIZE Data Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
-      --bg: #07122b;
-      --panel: #0b1838;
-      --border: rgba(255,255,255,0.14);
-      --text: #f5f1e8;
-      --muted: #b7bfd3;
-      --accent: #7ee0ff;
-      --accent2: #ffd36b;
+      --bg-1: #061128;
+      --bg-2: #091a3d;
+      --panel: rgba(10, 24, 56, 0.82);
+      --panel-2: rgba(8, 18, 44, 0.88);
+      --border: rgba(255, 255, 255, 0.12);
+      --border-strong: rgba(126, 224, 255, 0.22);
+      --text: #f7f2e8;
+      --muted: #b6c1d8;
+      --cyan: #7ee0ff;
+      --gold: #ffd36b;
+      --green: #98ffb6;
+      --pink: #ff8ad8;
+      --shadow: 0 0 30px rgba(0, 0, 0, 0.35);
     }
 
     * {
@@ -20,164 +27,368 @@
 
     body {
       margin: 0;
-      padding: 36px;
-      background:
-        radial-gradient(circle at top left, rgba(126,224,255,0.08), transparent 28%),
-        radial-gradient(circle at top right, rgba(255,211,107,0.08), transparent 24%),
-        linear-gradient(180deg, #061022 0%, var(--bg) 100%);
       color: var(--text);
-      font-family: "Courier New", monospace;
+      font-family: "Trebuchet MS", "Verdana", sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(126, 224, 255, 0.10), transparent 28%),
+        radial-gradient(circle at 90% 10%, rgba(255, 211, 107, 0.10), transparent 25%),
+        radial-gradient(circle at 50% 100%, rgba(255, 138, 216, 0.08), transparent 30%),
+        linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+      min-height: 100vh;
+      padding: 28px;
+    }
+
+    .scanlines::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          rgba(255,255,255,0.02) 0px,
+          rgba(255,255,255,0.02) 1px,
+          transparent 2px,
+          transparent 4px
+        );
+      opacity: 0.18;
+      mix-blend-mode: soft-light;
     }
 
     .wrap {
-      max-width: 1240px;
+      max-width: 1380px;
       margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 28px 30px 26px;
+      margin-bottom: 28px;
+      border: 1px solid var(--border-strong);
+      background:
+        linear-gradient(135deg, rgba(126, 224, 255, 0.08), transparent 30%),
+        linear-gradient(225deg, rgba(255, 211, 107, 0.08), transparent 30%),
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)),
+        var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -80px;
+      top: -80px;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(126,224,255,0.18), transparent 65%);
+      filter: blur(8px);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      font-size: 12px;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(255, 211, 107, 0.3);
+      background: rgba(255, 211, 107, 0.06);
     }
 
     h1 {
-      margin: 0 0 28px 0;
-      font-size: 48px;
-      line-height: 1;
-      letter-spacing: 1px;
+      margin: 0;
+      font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+      font-size: clamp(38px, 6vw, 78px);
+      line-height: 0.95;
       text-transform: uppercase;
-      color: white;
-      text-shadow: 0 0 10px rgba(126,224,255,0.18);
+      letter-spacing: 1px;
+      color: #ffffff;
+      text-shadow:
+        0 0 18px rgba(126, 224, 255, 0.16),
+        0 0 36px rgba(255, 211, 107, 0.08);
     }
 
-    h2 {
-      margin: 0 0 10px 0;
-      font-size: 32px;
-      line-height: 1.1;
-      color: white;
-    }
-
-    .sub {
+    .hero-sub {
+      margin-top: 14px;
+      max-width: 880px;
       color: var(--muted);
       font-size: 18px;
-      margin-bottom: 24px;
-      line-height: 1.5;
+      line-height: 1.55;
     }
 
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border: 1px solid var(--border);
-      padding: 28px;
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 26px;
+      align-items: end;
+      margin-top: 18px;
+    }
+
+    .hero-right {
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+    }
+
+    .live-box {
+      min-width: 250px;
+      padding: 14px 16px;
+      border: 1px solid rgba(126, 224, 255, 0.18);
+      background: rgba(5, 14, 34, 0.6);
+      text-align: right;
+    }
+
+    .live-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .live-value {
+      font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+      font-size: 30px;
+      line-height: 1;
+      color: var(--cyan);
+    }
+
+    .section {
       margin-bottom: 28px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+      padding: 26px;
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.012)),
+        var(--panel-2);
+      box-shadow: var(--shadow);
+    }
+
+    .section-title {
+      margin: 0 0 8px 0;
+      font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+      font-size: 34px;
+      line-height: 1;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: white;
+    }
+
+    .section-sub {
+      margin: 0 0 20px 0;
+      font-size: 17px;
+      line-height: 1.5;
+      color: var(--muted);
+      max-width: 900px;
     }
 
     .metrics {
       display: grid;
-      grid-template-columns: repeat(2, minmax(260px, 1fr));
-      gap: 18px 28px;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 16px;
     }
 
     .metric {
-      padding: 14px 16px;
+      padding: 16px;
       border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.015);
+      background:
+        linear-gradient(180deg, rgba(126,224,255,0.04), transparent 60%),
+        rgba(255,255,255,0.018);
+      min-height: 115px;
     }
 
     .metric-label {
       display: block;
-      font-size: 16px;
+      margin-bottom: 10px;
       color: var(--muted);
-      margin-bottom: 8px;
+      font-size: 13px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 1.2px;
     }
 
     .metric-value {
-      font-size: 28px;
+      display: block;
+      font-family: Impact, Haettenschweiler, "Arial Black", sans-serif;
+      font-size: 30px;
+      line-height: 1.08;
       color: white;
-      font-weight: bold;
-      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    .metric-value.accent-cyan {
+      color: var(--cyan);
+    }
+
+    .metric-value.accent-gold {
+      color: var(--gold);
+    }
+
+    .metric-value.accent-green {
+      color: var(--green);
+    }
+
+    .metric-value.accent-pink {
+      color: var(--pink);
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.012);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 18px;
+      min-width: 840px;
     }
 
     th, td {
-      padding: 14px 12px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: 15px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
       text-align: left;
-      font-size: 18px;
+      vertical-align: middle;
     }
 
     th {
+      position: sticky;
+      top: 0;
+      background: rgba(9, 23, 55, 0.98);
       color: var(--muted);
-      font-size: 15px;
+      font-size: 13px;
       text-transform: uppercase;
-      letter-spacing: 0.6px;
+      letter-spacing: 1.1px;
+      z-index: 1;
     }
 
     td {
       color: white;
-    }
-
-    tr:hover td {
-      background: rgba(255,255,255,0.02);
-    }
-
-    .small {
-      color: var(--muted);
       font-size: 17px;
-      line-height: 1.5;
-      margin-top: 4px;
     }
 
-    @media (max-width: 900px) {
+    tbody tr:hover td {
+      background: rgba(126, 224, 255, 0.03);
+    }
+
+    .asset-tag {
+      display: inline-block;
+      padding: 4px 8px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.03);
+      font-weight: 700;
+      letter-spacing: 0.6px;
+    }
+
+    .footer-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 1100px) {
+      .metrics {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+      }
+
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-right {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 700px) {
       body {
-        padding: 20px;
+        padding: 16px;
       }
 
-      h1 {
-        font-size: 36px;
+      .hero,
+      .section {
+        padding: 18px;
       }
 
-      h2 {
-        font-size: 26px;
+      .section-title {
+        font-size: 28px;
       }
 
       .metrics {
         grid-template-columns: 1fr;
       }
 
-      th, td {
-        font-size: 15px;
-        padding: 10px 8px;
+      .metric-value {
+        font-size: 26px;
       }
 
-      .metric-value {
-        font-size: 24px;
+      td {
+        font-size: 15px;
       }
     }
   </style>
 </head>
-<body>
+<body class="scanlines">
   <div class="wrap">
-    <h1>MONITOR THE RIZE SITUATION</h1>
-
-    <div class="card">
-      <div id="main-data">Loading main data...</div>
-    </div>
-
-    <div class="card">
-      <h2>Price Comparison vs Other Crypto Market Caps</h2>
-      <div class="small">
-        Hypothetical RIZE price if RIZE market cap matched each asset’s current market cap.
+    <section class="hero">
+      <div class="eyebrow">RIZE Market Monitor</div>
+      <div class="hero-grid">
+        <div>
+          <h1>MONITOR THE RIZE SITUATION</h1>
+          <div class="hero-sub">
+            Real-time market data, RIZE-to-market-cap scenario analysis, and bag projections
+            against selected crypto assets — in one retro terminal.
+          </div>
+        </div>
+        <div class="hero-right">
+          <div class="live-box">
+            <div class="live-label">Live RIZE Price</div>
+            <div class="live-value" id="hero-price">Loading...</div>
+          </div>
+        </div>
       </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Core Metrics</h2>
+      <p class="section-sub">
+        Live snapshot of RIZE valuation metrics using CoinGecko market data and TVL.
+      </p>
+      <div id="main-data">Loading main data...</div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Price Comparison vs Other Crypto Market Caps</h2>
+      <p class="section-sub">
+        Hypothetical RIZE price if RIZE market cap matched each asset’s current market cap.
+      </p>
       <div id="comparisons">Loading comparisons...</div>
-    </div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">1,000,000 RIZE Bag Value Simulation</h2>
+      <p class="section-sub">
+        Hypothetical dollar value of a 1,000,000 RIZE bag if RIZE reached each simulated target price above.
+      </p>
+      <div id="bag-simulations">Loading bag simulations...</div>
+      <div class="footer-note">
+        Formula used: 1,000,000 RIZE × hypothetical RIZE price at same market cap.
+      </div>
+    </section>
   </div>
 
   <script>
     async function loadData() {
       const mainBox = document.getElementById("main-data");
       const comparisonBox = document.getElementById("comparisons");
+      const bagBox = document.getElementById("bag-simulations");
+      const heroPriceBox = document.getElementById("hero-price");
+
+      const bagAmount = 1000000;
 
       const compareCoins = [
         { label: "LINK", id: "chainlink" },
@@ -203,6 +414,8 @@
         if (!marketsRes.ok || !rizeDetailRes.ok) {
           mainBox.innerText = "Error loading data";
           comparisonBox.innerText = "Unable to load comparisons.";
+          bagBox.innerText = "Unable to load bag simulations.";
+          heroPriceBox.innerText = "Error";
           return;
         }
 
@@ -214,6 +427,8 @@
         if (!rize) {
           mainBox.innerText = "RIZE data not found.";
           comparisonBox.innerText = "";
+          bagBox.innerText = "";
+          heroPriceBox.innerText = "N/A";
           return;
         }
 
@@ -234,6 +449,14 @@
           });
         }
 
+        function fmtUsdFixed(value, digits = 2) {
+          if (value === null || value === undefined || Number.isNaN(value)) return "N/A";
+          return "$" + Number(value).toLocaleString(undefined, {
+            minimumFractionDigits: digits,
+            maximumFractionDigits: digits
+          });
+        }
+
         function fmtNumber(value, digits = 2) {
           if (value === null || value === undefined || Number.isNaN(value)) return "N/A";
           return Number(value).toLocaleString(undefined, {
@@ -242,11 +465,13 @@
           });
         }
 
+        heroPriceBox.textContent = fmtUsd(price, 8);
+
         mainBox.innerHTML = `
           <div class="metrics">
             <div class="metric">
               <span class="metric-label">Price</span>
-              <span class="metric-value">${fmtUsd(price, 8)}</span>
+              <span class="metric-value accent-cyan">${fmtUsd(price, 8)}</span>
             </div>
             <div class="metric">
               <span class="metric-label">Market Cap</span>
@@ -254,11 +479,11 @@
             </div>
             <div class="metric">
               <span class="metric-label">FDV</span>
-              <span class="metric-value">${fmtUsd(fdv, 0)}</span>
+              <span class="metric-value accent-gold">${fmtUsd(fdv, 0)}</span>
             </div>
             <div class="metric">
               <span class="metric-label">TVL</span>
-              <span class="metric-value">${fmtUsd(tvl, 0)}</span>
+              <span class="metric-value accent-green">${fmtUsd(tvl, 0)}</span>
             </div>
             <div class="metric">
               <span class="metric-label">MCAP / TVL</span>
@@ -270,21 +495,30 @@
             </div>
             <div class="metric">
               <span class="metric-label">Circulating Supply</span>
-              <span class="metric-value">${fmtNumber(circulatingSupply, 0)}</span>
+              <span class="metric-value accent-pink">${fmtNumber(circulatingSupply, 0)}</span>
             </div>
           </div>
         `;
 
-        let rows = "";
+        let comparisonRows = "";
+        let bagRows = "";
 
         for (const coin of compareCoins) {
           const target = byId[coin.id];
 
           if (!target || !target.market_cap || !circulatingSupply || !price || !mcap) {
-            rows += `
+            comparisonRows += `
               <tr>
-                <td>${coin.label}</td>
+                <td><span class="asset-tag">${coin.label}</span></td>
                 <td>N/A</td>
+                <td>N/A</td>
+                <td>N/A</td>
+              </tr>
+            `;
+
+            bagRows += `
+              <tr>
+                <td><span class="asset-tag">${coin.label}</span></td>
                 <td>N/A</td>
                 <td>N/A</td>
               </tr>
@@ -295,36 +529,66 @@
           const targetMcap = target.market_cap;
           const hypotheticalPrice = targetMcap / circulatingSupply;
           const relativeMcapPercent = (mcap / targetMcap) * 100;
+          const bagValue = bagAmount * hypotheticalPrice;
 
-          rows += `
+          comparisonRows += `
             <tr>
-              <td>${coin.label}</td>
+              <td><span class="asset-tag">${coin.label}</span></td>
               <td>${fmtUsd(targetMcap, 0)}</td>
-              <td>${fmtUsd(hypotheticalPrice, 6)}</td>
+              <td>${fmtUsdFixed(hypotheticalPrice, 6)}</td>
               <td>${fmtNumber(relativeMcapPercent, 2)}%</td>
+            </tr>
+          `;
+
+          bagRows += `
+            <tr>
+              <td><span class="asset-tag">${coin.label}</span></td>
+              <td>${fmtUsdFixed(hypotheticalPrice, 6)}</td>
+              <td>${fmtUsd(bagValue, 0)}</td>
             </tr>
           `;
         }
 
         comparisonBox.innerHTML = `
-          <table>
-            <thead>
-              <tr>
-                <th>Asset</th>
-                <th>Target Market Cap</th>
-                <th>RIZE Price at Same MCAP</th>
-                <th>RIZE MCAP vs Asset</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rows}
-            </tbody>
-          </table>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Asset</th>
+                  <th>Target Market Cap</th>
+                  <th>RIZE Price at Same MCAP</th>
+                  <th>RIZE MCAP vs Asset</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${comparisonRows}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        bagBox.innerHTML = `
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Asset</th>
+                  <th>Simulated RIZE Price</th>
+                  <th>1,000,000 RIZE Bag Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${bagRows}
+              </tbody>
+            </table>
+          </div>
         `;
 
       } catch (e) {
         mainBox.innerText = "Error loading data";
         comparisonBox.innerText = "Error loading comparisons";
+        bagBox.innerText = "Error loading bag simulations";
+        heroPriceBox.innerText = "Error";
         console.error(e);
       }
     }
