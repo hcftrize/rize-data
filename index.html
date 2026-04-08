@@ -4,65 +4,174 @@
   <meta charset="UTF-8" />
   <title>RIZE Data Hub</title>
   <style>
+    :root {
+      --bg: #07122b;
+      --panel: #0b1838;
+      --border: rgba(255,255,255,0.14);
+      --text: #f5f1e8;
+      --muted: #b7bfd3;
+      --accent: #7ee0ff;
+      --accent2: #ffd36b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: monospace;
-      background: #0a0f1c;
-      color: white;
-      padding: 40px;
-      max-width: 1100px;
+      margin: 0;
+      padding: 36px;
+      background:
+        radial-gradient(circle at top left, rgba(126,224,255,0.08), transparent 28%),
+        radial-gradient(circle at top right, rgba(255,211,107,0.08), transparent 24%),
+        linear-gradient(180deg, #061022 0%, var(--bg) 100%);
+      color: var(--text);
+      font-family: "Courier New", monospace;
+    }
+
+    .wrap {
+      max-width: 1240px;
       margin: 0 auto;
     }
 
     h1 {
-      margin-bottom: 30px;
+      margin: 0 0 28px 0;
+      font-size: 48px;
+      line-height: 1;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: white;
+      text-shadow: 0 0 10px rgba(126,224,255,0.18);
+    }
+
+    h2 {
+      margin: 0 0 10px 0;
+      font-size: 32px;
+      line-height: 1.1;
+      color: white;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 18px;
+      margin-bottom: 24px;
+      line-height: 1.5;
     }
 
     .card {
-      border: 1px solid rgba(255,255,255,0.15);
-      padding: 20px;
-      margin-bottom: 24px;
-      background: rgba(255,255,255,0.02);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border: 1px solid var(--border);
+      padding: 28px;
+      margin-bottom: 28px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(260px, 1fr));
+      gap: 18px 28px;
     }
 
     .metric {
-      margin: 8px 0;
+      padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.015);
+    }
+
+    .metric-label {
+      display: block;
+      font-size: 16px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .metric-value {
+      font-size: 28px;
+      color: white;
+      font-weight: bold;
+      line-height: 1.2;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 12px;
+      margin-top: 18px;
     }
 
     th, td {
+      padding: 14px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
       text-align: left;
-      padding: 10px 8px;
-      border-bottom: 1px solid rgba(255,255,255,0.12);
+      font-size: 18px;
     }
 
     th {
-      opacity: 0.85;
+      color: var(--muted);
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    td {
+      color: white;
+    }
+
+    tr:hover td {
+      background: rgba(255,255,255,0.02);
     }
 
     .small {
-      opacity: 0.75;
-      font-size: 14px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.5;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 36px;
+      }
+
+      h2 {
+        font-size: 26px;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      th, td {
+        font-size: 15px;
+        padding: 10px 8px;
+      }
+
+      .metric-value {
+        font-size: 24px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>RIZE DATA HUB</h1>
+  <div class="wrap">
+    <h1>RIZE DATA HUB</h1>
 
-  <div class="card">
-    <div id="main-data">Loading main data...</div>
-  </div>
-
-  <div class="card">
-    <h2>Price Comparison vs Other Crypto Market Caps</h2>
-    <div class="small">
-      Hypothetical RIZE price if RIZE market cap matched each asset's current market cap.
+    <div class="card">
+      <div id="main-data">Loading main data...</div>
     </div>
-    <div id="comparisons">Loading comparisons...</div>
+
+    <div class="card">
+      <h2>Price Comparison vs Other Crypto Market Caps</h2>
+      <div class="small">
+        Hypothetical RIZE price if RIZE market cap matched each asset’s current market cap.
+      </div>
+      <div id="comparisons">Loading comparisons...</div>
+    </div>
   </div>
 
   <script>
@@ -72,9 +181,9 @@
 
       const compareCoins = [
         { label: "LINK", id: "chainlink" },
-        { label: "CC", id: "canton" },
+        { label: "CC", id: "canton-network" },
         { label: "SHIB", id: "shiba-inu" },
-        { label: "QNT", id: "quant" },
+        { label: "QNT", id: "quant-network" },
         { label: "BONK", id: "bonk" },
         { label: "PENGU", id: "pudgy-penguins" },
         { label: "MANA", id: "decentraland" },
@@ -91,24 +200,17 @@
           fetch("https://api.coingecko.com/api/v3/coins/rize")
         ]);
 
-        if (!marketsRes.ok) {
-          mainBox.innerText = "HTTP error on /coins/markets: " + marketsRes.status;
-          comparisonBox.innerText = "Unable to load comparisons.";
-          return;
-        }
-
-        if (!rizeDetailRes.ok) {
-          mainBox.innerText = "HTTP error on /coins/rize: " + rizeDetailRes.status;
+        if (!marketsRes.ok || !rizeDetailRes.ok) {
+          mainBox.innerText = "Error loading data";
           comparisonBox.innerText = "Unable to load comparisons.";
           return;
         }
 
         const markets = await marketsRes.json();
         const rizeDetail = await rizeDetailRes.json();
-
         const byId = Object.fromEntries(markets.map(c => [c.id, c]));
-
         const rize = byId["rize"];
+
         if (!rize) {
           mainBox.innerText = "RIZE data not found.";
           comparisonBox.innerText = "";
@@ -141,19 +243,43 @@
         }
 
         mainBox.innerHTML = `
-          <div class="metric"><strong>Price:</strong> ${fmtUsd(price, 8)}</div>
-          <div class="metric"><strong>Market Cap:</strong> ${fmtUsd(mcap, 0)}</div>
-          <div class="metric"><strong>FDV:</strong> ${fmtUsd(fdv, 0)}</div>
-          <div class="metric"><strong>TVL:</strong> ${fmtUsd(tvl, 0)}</div>
-          <div class="metric"><strong>MCAP / TVL:</strong> ${mcapTvl ? fmtNumber(mcapTvl, 2) : "N/A"}</div>
-          <div class="metric"><strong>FDV / TVL:</strong> ${fdvTvl ? fmtNumber(fdvTvl, 2) : "N/A"}</div>
-          <div class="metric"><strong>Circulating Supply:</strong> ${fmtNumber(circulatingSupply, 0)}</div>
+          <div class="metrics">
+            <div class="metric">
+              <span class="metric-label">Price</span>
+              <span class="metric-value">${fmtUsd(price, 8)}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Market Cap</span>
+              <span class="metric-value">${fmtUsd(mcap, 0)}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">FDV</span>
+              <span class="metric-value">${fmtUsd(fdv, 0)}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">TVL</span>
+              <span class="metric-value">${fmtUsd(tvl, 0)}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">MCAP / TVL</span>
+              <span class="metric-value">${mcapTvl ? fmtNumber(mcapTvl, 2) : "N/A"}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">FDV / TVL</span>
+              <span class="metric-value">${fdvTvl ? fmtNumber(fdvTvl, 2) : "N/A"}</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Circulating Supply</span>
+              <span class="metric-value">${fmtNumber(circulatingSupply, 0)}</span>
+            </div>
+          </div>
         `;
 
         let rows = "";
 
         for (const coin of compareCoins) {
           const target = byId[coin.id];
+
           if (!target || !target.market_cap || !circulatingSupply || !price || !mcap) {
             rows += `
               <tr>
@@ -169,7 +295,6 @@
           const targetMcap = target.market_cap;
           const hypotheticalPrice = targetMcap / circulatingSupply;
           const relativeMcapPercent = (mcap / targetMcap) * 100;
-          const upsideMultiple = hypotheticalPrice / price;
 
           rows += `
             <tr>
