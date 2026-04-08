@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8" />
   <title>RIZE Data Hub</title>
   <style>
     body {
@@ -9,6 +10,10 @@
       color: white;
       padding: 40px;
     }
+    .box {
+      margin-top: 20px;
+      line-height: 1.8;
+    }
   </style>
 </head>
 
@@ -16,16 +21,42 @@
 
 <h1>RIZE DATA HUB</h1>
 
-<div id="price">Loading price...</div>
+<div class="box" id="data">Loading...</div>
 
 <script>
-async function loadPrice() {
-  const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=rize&vs_currencies=usd');
-  const data = await res.json();
-  document.getElementById('price').innerText = "RIZE: $" + data.rize.usd;
+async function loadData() {
+  const box = document.getElementById("data");
+
+  try {
+    const res = await fetch(
+      "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=rize"
+    );
+
+    const data = await res.json();
+    const r = data[0];
+
+    const price = r.current_price;
+    const mcap = r.market_cap;
+    const fdv = r.fully_diluted_valuation;
+    const supply = r.circulating_supply;
+
+    const ratio = mcap / fdv;
+
+    box.innerHTML = `
+      Price: $${price} <br>
+      Market Cap: $${mcap.toLocaleString()} <br>
+      FDV: $${fdv.toLocaleString()} <br>
+      Circulating Supply: ${Math.round(supply).toLocaleString()} <br>
+      MCAP / FDV: ${ratio.toFixed(2)}
+    `;
+
+  } catch (e) {
+    box.innerText = "Error loading data";
+    console.error(e);
+  }
 }
 
-loadPrice();
+loadData();
 </script>
 
 </body>
