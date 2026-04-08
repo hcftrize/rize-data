@@ -9,55 +9,202 @@
       background: #0a0f1c;
       color: white;
       padding: 40px;
+      max-width: 1100px;
+      margin: 0 auto;
     }
-    .box {
-      margin-top: 20px;
-      line-height: 1.8;
+
+    h1 {
+      margin-bottom: 30px;
+    }
+
+    .card {
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 20px;
+      margin-bottom: 24px;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .metric {
+      margin: 8px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+
+    th {
+      opacity: 0.85;
+    }
+
+    .small {
+      opacity: 0.75;
+      font-size: 14px;
     }
   </style>
 </head>
-
 <body>
+  <h1>RIZE DATA HUB</h1>
 
-<h1>RIZE DATA HUB</h1>
+  <div class="card">
+    <div id="main-data">Loading main data...</div>
+  </div>
 
-<div class="box" id="data">Loading...</div>
+  <div class="card">
+    <h2>Price Comparison vs Other Crypto Market Caps</h2>
+    <div class="small">
+      Hypothetical RIZE price if RIZE market cap matched each asset's current market cap.
+    </div>
+    <div id="comparisons">Loading comparisons...</div>
+  </div>
 
-<script>
-async function loadData() {
-  const box = document.getElementById("data");
+  <script>
+    async function loadData() {
+      const mainBox = document.getElementById("main-data");
+      const comparisonBox = document.getElementById("comparisons");
 
-  try {
-    const res = await fetch(
-      "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=rize"
-    );
+      const compareCoins = [
+        { label: "LINK", id: "chainlink" },
+        { label: "CC", id: "canton" },
+        { label: "SHIB", id: "shiba-inu" },
+        { label: "QNT", id: "quant" },
+        { label: "BONK", id: "bonk" },
+        { label: "PENGU", id: "pudgy-penguins" },
+        { label: "MANA", id: "decentraland" },
+        { label: "THETA", id: "theta-token" },
+        { label: "ZK", id: "zksync" },
+        { label: "MANTRA", id: "mantra" }
+      ];
 
-    const data = await res.json();
-    const r = data[0];
+      const allIds = ["rize", ...compareCoins.map(c => c.id)].join(",");
 
-    const price = r.current_price;
-    const mcap = r.market_cap;
-    const fdv = r.fully_diluted_valuation;
-    const supply = r.circulating_supply;
+      try {
+        const [marketsRes, rizeDetailRes] = await Promise.all([
+          fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${allIds}`),
+          fetch("https://api.coingecko.com/api/v3/coins/rize")
+        ]);
 
-    const ratio = mcap / fdv;
+        if (!marketsRes.ok) {
+          mainBox.innerText = "HTTP error on /coins/markets: " + marketsRes.status;
+          comparisonBox.innerText = "Unable to load comparisons.";
+          return;
+        }
 
-    box.innerHTML = `
-      Price: $${price} <br>
-      Market Cap: $${mcap.toLocaleString()} <br>
-      FDV: $${fdv.toLocaleString()} <br>
-      Circulating Supply: ${Math.round(supply).toLocaleString()} <br>
-      MCAP / FDV: ${ratio.toFixed(2)}
-    `;
+        if (!rizeDetailRes.ok) {
+          mainBox.innerText = "HTTP error on /coins/rize: " + rizeDetailRes.status;
+          comparisonBox.innerText = "Unable to load comparisons.";
+          return;
+        }
 
-  } catch (e) {
-    box.innerText = "Error loading data";
-    console.error(e);
-  }
-}
+        const markets = await marketsRes.json();
+        const rizeDetail = await rizeDetailRes.json();
 
-loadData();
-</script>
+        const byId = Object.fromEntries(markets.map(c => [c.id, c]));
 
+        const rize = byId["rize"];
+        if (!rize) {
+          mainBox.innerText = "RIZE data not found.";
+          comparisonBox.innerText = "";
+          return;
+        }
+
+        const price = rize.current_price ?? null;
+        const mcap = rize.market_cap ?? null;
+        const fdv = rize.fully_diluted_valuation ?? null;
+        const circulatingSupply = rize.circulating_supply ?? null;
+        const tvl = rizeDetail?.market_data?.total_value_locked?.usd ?? null;
+
+        const mcapTvl = (mcap && tvl) ? (mcap / tvl) : null;
+        const fdvTvl = (fdv && tvl) ? (fdv / tvl) : null;
+
+        function fmtUsd(value, digits = 2) {
+          if (value === null || value === undefined || Number.isNaN(value)) return "N/A";
+          return "$" + Number(value).toLocaleString(undefined, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: digits
+          });
+        }
+
+        function fmtNumber(value, digits = 2) {
+          if (value === null || value === undefined || Number.isNaN(value)) return "N/A";
+          return Number(value).toLocaleString(undefined, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: digits
+          });
+        }
+
+        mainBox.innerHTML = `
+          <div class="metric"><strong>Price:</strong> ${fmtUsd(price, 8)}</div>
+          <div class="metric"><strong>Market Cap:</strong> ${fmtUsd(mcap, 0)}</div>
+          <div class="metric"><strong>FDV:</strong> ${fmtUsd(fdv, 0)}</div>
+          <div class="metric"><strong>TVL:</strong> ${fmtUsd(tvl, 0)}</div>
+          <div class="metric"><strong>MCAP / TVL:</strong> ${mcapTvl ? fmtNumber(mcapTvl, 2) : "N/A"}</div>
+          <div class="metric"><strong>FDV / TVL:</strong> ${fdvTvl ? fmtNumber(fdvTvl, 2) : "N/A"}</div>
+          <div class="metric"><strong>Circulating Supply:</strong> ${fmtNumber(circulatingSupply, 0)}</div>
+        `;
+
+        let rows = "";
+
+        for (const coin of compareCoins) {
+          const target = byId[coin.id];
+          if (!target || !target.market_cap || !circulatingSupply || !price || !mcap) {
+            rows += `
+              <tr>
+                <td>${coin.label}</td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td>N/A</td>
+              </tr>
+            `;
+            continue;
+          }
+
+          const targetMcap = target.market_cap;
+          const hypotheticalPrice = targetMcap / circulatingSupply;
+          const relativeMcapPercent = (mcap / targetMcap) * 100;
+          const upsideMultiple = hypotheticalPrice / price;
+
+          rows += `
+            <tr>
+              <td>${coin.label}</td>
+              <td>${fmtUsd(targetMcap, 0)}</td>
+              <td>${fmtUsd(hypotheticalPrice, 6)}</td>
+              <td>${fmtNumber(relativeMcapPercent, 2)}%</td>
+            </tr>
+          `;
+        }
+
+        comparisonBox.innerHTML = `
+          <table>
+            <thead>
+              <tr>
+                <th>Asset</th>
+                <th>Target Market Cap</th>
+                <th>RIZE Price at Same MCAP</th>
+                <th>RIZE MCAP vs Asset</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows}
+            </tbody>
+          </table>
+        `;
+
+      } catch (e) {
+        mainBox.innerText = "Error loading data";
+        comparisonBox.innerText = "Error loading comparisons";
+        console.error(e);
+      }
+    }
+
+    loadData();
+  </script>
 </body>
 </html>
