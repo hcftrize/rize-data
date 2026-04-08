@@ -493,6 +493,18 @@ async function loadData() {
       return Number(v).toFixed(2) + "%";
     }
 
+    function formatMarketCap(value) {
+  if (!value) return "N/A";
+
+  if (value >= 1e12) {
+    return (value / 1e12).toFixed(2) + "T";
+  } else if (value >= 1e9) {
+    return (value / 1e9).toFixed(2) + "B";
+  } else {
+    return "$" + Number(value).toLocaleString();
+  }
+}
+
     heroPriceBox.textContent = "$" + price;
 
     // CORE METRICS
@@ -559,7 +571,7 @@ async function loadData() {
       <div class="metrics">
         <div class="metric"><span class="metric-label">BTC Dominance</span><span class="metric-value accent-cyan">${fmtPct(btcDom)}</span></div>
         <div class="metric"><span class="metric-label">ETH Dominance</span><span class="metric-value">${fmtPct(ethDom)}</span></div>
-        <div class="metric"><span class="metric-label">Total Market Cap</span><span class="metric-value accent-gold">${fmtUsd(totalCap)}</span></div>
+        <div class="metric"><span class="metric-label">Total Market Cap</span><span class="metric-value accent-gold">${formatMarketCap(totalMcap)}</span></div>
         <div class="metric"><span class="metric-label">Fear & Greed</span><span class="metric-value">${fear} (${fearText})</span></div>
       </div>
 
