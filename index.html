@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RIZE Data Hub</title>
+  <style>
+    body {
+      font-family: monospace;
+      background: #0a0f1c;
+      color: white;
+      padding: 40px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>RIZE DATA HUB</h1>
+
+<div id="price">Loading price...</div>
+
+<script>
+async function loadPrice() {
+  const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=rize&vs_currencies=usd');
+  const data = await res.json();
+  document.getElementById('price').innerText = "RIZE: $" + data.rize.usd;
+}
+
+loadPrice();
+</script>
+
+</body>
+</html>
