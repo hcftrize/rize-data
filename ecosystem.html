@@ -88,6 +88,17 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
   border-bottom: 1px solid rgba(255,255,255,0.08);
   margin-bottom: 48px;
 }
+.back-to-hub {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.6); text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 6px 16px; margin-bottom: 24px;
+  background: rgba(255,255,255,0.04);
+  transition: background 0.2s, color 0.2s;
+}
+.back-to-hub:hover { background: rgba(255,255,255,0.12); color: #fff; }
 .eco-eyebrow {
   font-family: 'Rajdhani', sans-serif; font-size: 11px; font-weight: 700;
   letter-spacing: 3px; text-transform: uppercase;
@@ -307,6 +318,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 
 <div class="eco-hero">
   <div style="max-width:1200px;margin:0 auto">
+    <a href="/hub" class="back-to-hub">&larr; Back to RIZE Data Hub</a>
     <span class="eco-eyebrow" style="font-size:14px;letter-spacing:2px">RIZE Community Learn Center</span>
     <h1>RIZE Ecosystem Hub</h1>
     <p>Explore the full institutional ecosystem behind T-RIZE — partners, Canton Network members, Foundation board, and live RWA deals. Click on any entity to learn more.</p>
