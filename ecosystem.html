@@ -427,20 +427,30 @@ function buildSlider(key, data, isPerson, darkBg) {
   const pages = [];
   for(let i=0;i<data.length;i+=PER_PAGE) pages.push(data.slice(i,i+PER_PAGE));
 
-  track.innerHTML = pages.map(page => `
-    <div class="slider-page">
-      ${page.map(item => `
-        <div class="bubble ${darkBg?'canton-bubble ':\''}" id="b-${key}-${item.id}" onclick="pick('${key}','${item.id}')">
-          <div class="b-avatar ${isPerson?'person':''}${!item.img?' initials':''}" ${!item.img?`style="background:var(--navy)"`:''} >
-            ${item.img ? `<img src="${item.img}" alt="${item.name}" onerror="this.parentElement.innerHTML='${(item.name||'').split(' ').map(w=>w[0]).join('').slice(0,2)}'"/>` : (item.name||'').split(' ').map(w=>w[0]).join('').slice(0,2)}
-          </div>
-          <div class="b-name">${item.name}</div>
-          ${item.tag?`<div class="b-tag">${item.tag}</div>`:item.role?`<div class="b-tag">${item.role.split('—')[0].trim()}</div>`:''}
-        </div>`).join('')}
-    </div>`).join('');
+  track.innerHTML = pages.map(page => {
+    const bubblesHtml = page.map(item => {
+      const extraClass = darkBg ? 'canton-bubble ' : '';
+      const hasImg = item.img && item.img !== '';
+      const initials = (item.name||'').split(' ').map(w=>w[0]).join('').slice(0,2);
+      const avatarContent = hasImg
+        ? '<img src="' + item.img + '" alt="' + item.name + '" onerror="this.parentElement.innerHTML=\'' + initials + '\'" />'
+        : initials;
+      const avatarClass = 'b-avatar' + (isPerson ? ' person' : '') + (!hasImg ? ' initials' : '');
+      const avatarStyle = !hasImg ? 'style="background:var(--navy)"' : '';
+      const tagHtml = item.tag
+        ? '<div class="b-tag">' + item.tag + '</div>'
+        : (item.role ? '<div class="b-tag">' + item.role.split('—')[0].trim() + '</div>' : '');
+      return '<div class="bubble ' + extraClass + '" id="b-' + key + '-' + item.id + '" onclick="pick(\'' + key + '\',\'' + item.id + '\')">'
+        + '<div class="' + avatarClass + '" ' + avatarStyle + '>' + avatarContent + '</div>'
+        + '<div class="b-name">' + item.name + '</div>'
+        + tagHtml
+        + '</div>';
+    }).join('');
+    return '<div class="slider-page">' + bubblesHtml + '</div>';
+  }).join('');
 
   dots.innerHTML = pages.map((_,i) =>
-    `<div class="s-dot ${i===0?'on':''}" onclick="goPage('${key}',${i})"></div>`
+    '<div class="s-dot ' + (i===0?'on':'') + '" onclick="goPage(\'' + key + '\',' + i + ')"></div>'
   ).join('');
   updateBtns(key, pages.length);
 }
