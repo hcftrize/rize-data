@@ -557,7 +557,7 @@ function fmtSupply(v){if(!v)return "N/A";const n=Number(v);if(n>=1e12)return(n/1
 function formatLargeNum(v){if(!v)return "N/A";if(v>=1e12)return"$"+(v/1e12).toFixed(2)+"T";if(v>=1e9)return"$"+(v/1e9).toFixed(2)+"B";if(v>=1e6)return"$"+(v/1e6).toFixed(2)+"M";if(v>=1000)return"$"+Math.round(v).toLocaleString();return"$"+fmtPrice(v);}
 
 // ── Static RIZE coin
-const RIZE_ID   = "rizenet";
+const RIZE_ID   = "rize";
 const RIZE_NAME = "RIZENET";
 const RIZE_SYM  = "RIZE";
 
