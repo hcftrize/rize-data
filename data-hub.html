@@ -90,8 +90,8 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     --muted:     #777;
     --cyan:      #7ee0ff;
     --gold:      #ffd36b;
-    --green:     #3DBE47;
-    --pink:      #ff8ad8;
+    --green:     #2e7d4f;
+    --pink:      #b94040;
     --shadow:    0 0 40px rgba(0,0,0,0.8);
   }
   body { background: #030810; }
@@ -101,41 +101,33 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
   .hub-wrap { max-width: 1200px; margin: 0 auto; padding: 28px; }
 
   /* ── HERO ── */
-  .hub-hero {
-    position: relative; overflow: hidden;
-    padding: 40px 40px 36px;
-    margin-bottom: 24px;
+    .hub-hero {
     background: var(--black);
-    border-left: 4px solid #0d2d4e;
+    padding: 48px 40px 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 24px;
   }
-  .hub-hero::after {
-    content: "RIZE";
-    position: absolute; right: -20px; top: -20px;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 180px; font-weight: 700;
-    color: rgba(255,255,255,0.03);
-    letter-spacing: -5px; pointer-events: none; line-height: 1;
+  .hub-eyebrow { display: none; }
+  .back-to-hub {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(255,255,255,0.6); text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 6px 16px; margin-bottom: 24px; display: inline-flex;
+    transition: background 0.2s, color 0.2s;
+    background: rgba(255,255,255,0.04);
   }
-  .hub-eyebrow {
-    display: inline-block;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 3px; text-transform: uppercase;
-    color: rgba(255,255,255,0.4);
-    padding: 4px 10px;
-    border: 1px solid rgba(13,45,78,0.6);
-    background: rgba(13,45,78,0.3);
-    margin-bottom: 16px;
-  }
+  .back-to-hub:hover { background: rgba(255,255,255,0.12); color: #fff; }
   .hub-title {
-    margin: 0;
+    margin: 0 0 16px;
     font-family: 'Rajdhani', sans-serif;
     font-weight: 700;
     font-size: clamp(28px, 4vw, 52px);
     line-height: 1.0; text-transform: uppercase; letter-spacing: 2px;
-    color: #ffffff; margin-bottom: 20px;
+    color: #ffffff;
   }
-  .hub-title span { color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.4); }
+
   .hub-grid { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: end; }
   .hub-right { display: flex; justify-content: flex-end; align-items: flex-end; }
   .hub-sub {
@@ -362,10 +354,10 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 
 <div class="hub-wrap">
   <div class="hub-hero">
-    <span class="hub-eyebrow">RIZE Data Hub</span>
+    <a href="/hub" class="back-to-hub">&larr; Back to RIZE Data Hub</a>
     <div class="hub-grid">
       <div>
-        <h2 class="hub-title">RIZE <span>Market</span> Monitor</h2>
+        <h2 class="hub-title">RIZE MARKET MONITOR</h2>
         <p class="hub-sub">Live RIZE price data, market cap scenario analysis, bag projections and TradingView chart &mdash; updated in real time.</p>
       </div>
       <div class="hub-right">
@@ -479,7 +471,7 @@ async function renderChart(coinId,coinName,coinSym,tickers){
   tvWidget=new TradingView.widget({container_id:"tv-chart",width:"100%",height:520,symbol:tvSym,interval:"60",timezone:"Etc/UTC",theme:"dark",style:"1",locale:"en",toolbar_bg:"#060818",enable_publishing:false,hide_top_toolbar:false,hide_legend:false,save_image:false});
 }
 
-function fmtPct(v){const n=Number(v);const c=n>=0?"var(--green)":"var(--pink)";return`<span style="color:${c}">${n>=0?"+":""}${n.toFixed(2)}%</span>`;}
+function fmtPct(v){const n=Number(v);const c=n>=0?"#2e7d4f":"#b94040";return`<span style="color:${c}">${n>=0?"+":""}${n.toFixed(2)}%</span>`;}
 function fmtPrice(v){if(!v&&v!==0)return"N/A";const n=Number(v);if(n===0)return"0";if(n>=10000)return n.toLocaleString(undefined,{maximumFractionDigits:2,minimumFractionDigits:2});if(n>=10)return n.toLocaleString(undefined,{maximumFractionDigits:2,minimumFractionDigits:2});if(n>=1)return n.toLocaleString(undefined,{maximumFractionDigits:4,minimumFractionDigits:2});if(n>=0.01)return n.toLocaleString(undefined,{maximumFractionDigits:4,minimumFractionDigits:4});if(n>=0.0001)return n.toLocaleString(undefined,{maximumFractionDigits:6,minimumFractionDigits:6});return n.toFixed(8).replace(/\.?0+$/,"");}
 function fmtSupply(v){if(!v)return"N/A";const n=Number(v);if(n>=1e12)return(n/1e12).toFixed(2)+"T";if(n>=1e9)return(n/1e9).toFixed(2)+"B";if(n>=1e6)return(n/1e6).toFixed(2)+"M";return n.toLocaleString(undefined,{maximumFractionDigits:0});}
 function formatLargeNum(v){if(!v)return"N/A";if(v>=1e12)return"$"+(v/1e12).toFixed(2)+"T";if(v>=1e9)return"$"+(v/1e9).toFixed(2)+"B";if(v>=1e6)return"$"+(v/1e6).toFixed(2)+"M";if(v>=1000)return"$"+Math.round(v).toLocaleString();return"$"+fmtPrice(v);}
