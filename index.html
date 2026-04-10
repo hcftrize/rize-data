@@ -53,7 +53,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 .section-label::after{content:"";flex:1;height:1px;background:var(--border);}
 .featured{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--border);margin-bottom:48px;}
 .featured-img{background:#111;overflow:hidden;min-height:320px;}
-.featured-img img{width:100%;height:100%;object-fit:cover;display:block;opacity:0.85;transition:opacity 0.3s;}
+.featured-img img{width:100%;height:100%;object-fit:contain;display:block;opacity:0.95;transition:opacity 0.3s;background:#000;}
 .featured:hover .featured-img img{opacity:1;}
 .featured-body{padding:40px 36px;display:flex;flex-direction:column;justify-content:space-between;border-left:1px solid var(--border);}
 .article-tag{display:inline-block;font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#fff;background:var(--navy);padding:4px 10px;margin-bottom:20px;}
