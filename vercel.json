@@ -17,6 +17,14 @@
       "dest": "/data-hub.html"
     },
     {
+      "src": "/hub",
+      "dest": "/hub.html"
+    },
+    {
+      "src": "/ecosystem",
+      "dest": "/ecosystem.html"
+    },
+    {
       "src": "/admin",
       "dest": "/admin.html"
     }
