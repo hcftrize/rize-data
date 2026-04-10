@@ -1,0 +1,24 @@
+{
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/about",
+      "dest": "/about.html"
+    },
+    {
+      "src": "/article",
+      "dest": "/article.html"
+    },
+    {
+      "src": "/data-hub",
+      "dest": "/data-hub.html"
+    },
+    {
+      "src": "/admin",
+      "dest": "/admin.html"
+    }
+  ]
+}
