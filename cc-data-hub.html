@@ -934,9 +934,9 @@
   /* ═══════════════════════════════════════════════════════════
      CONSTANTS
   ═══════════════════════════════════════════════════════════ */
-const RIZE_ID   = "canton-network";
-const RIZE_SYM  = "CC";
-const RIZE_NAME = "CANTON";
+const CC_ID   = "canton-network";
+const CC_SYM  = "CC";
+const CC_NAME = "CANTON";
 
 
   /* ═══════════════════════════════════════════════════════════
@@ -1157,8 +1157,8 @@ const RIZE_NAME = "CANTON";
   let currentPrice    = null;
 
   // Fixed: CC is always the monitored asset
-  const currentCoinId = RIZE_ID;
-  const currentSym    = RIZE_SYM;
+  const currentCoinId = CC_ID;
+  const currentSym    = CC_SYM;
 
   // Perf data: { coinId: { p7d, p30d, p90d } }
   let currentPerfData = {};
@@ -1810,7 +1810,7 @@ const RIZE_NAME = "CANTON";
   ═══════════════════════════════════════════════════════════ */
   async function loadData() {
     const compareIds = compareCoins.map(c => c.id);
-    const allIds = [RIZE_ID, ...compareIds, "chainlink"]
+    const allIds = [CC_ID, ...compareIds, "chainlink"]
       .filter((v, i, a) => a.indexOf(v) === i)
       .join(",");
 
@@ -1818,7 +1818,7 @@ const RIZE_NAME = "CANTON";
       // Parallel fetch: markets, detail (for tickers), global, fear&greed, perf
       const [markets, detail, globalData, fearGreed, perfData, altSeasonData] = await Promise.all([
         cgFetch("/coins/markets", { vs_currency: "usd", ids: allIds, price_change_percentage: "7d,30d,90d" }),
-        cgFetch(`/coins/${RIZE_ID}`).catch(() => null),
+        cgFetch(`/coins/${CC_ID}`).catch(() => null),
         cgFetch("/global").catch(() => null),
        fetch("https://api.alternative.me/fng/?limit=1").then(r => r.json()).catch(() => null),
 cgFetch("/coins/markets", { vs_currency: "usd", ids: allIds, price_change_percentage: "7d,30d,90d" }).catch(() => []),
@@ -1827,11 +1827,11 @@ cgFetch("/coins/markets", { vs_currency: "usd", ids: allIds, price_change_percen
 
       const byId     = Object.fromEntries(markets.map(c => [c.id, c]));
       const perfById = Object.fromEntries((perfData || []).map(c => [c.id, c]));
-      const main     = byId[RIZE_ID];
+      const main     = byId[CC_ID];
       if (!main) throw new Error("CC data not found");
 
       // Launch TV chart (needs tickers from detail for exchange resolution)
-      renderChart(RIZE_ID, RIZE_NAME, RIZE_SYM, detail?.tickers || null);
+      renderChart(CC_ID, CC_NAME, CC_SYM, detail?.tickers || null);
 
       // Destructure main coin data
       const {
@@ -1848,7 +1848,7 @@ cgFetch("/coins/markets", { vs_currency: "usd", ids: allIds, price_change_percen
         ? Math.floor((Date.now() - new Date(ath_date)) / (1000 * 60 * 60 * 24))
         : null;
 
-      const mainPerf = perfById[RIZE_ID] || main;
+      const mainPerf = perfById[CC_ID] || main;
       const pct7d    = mainPerf.price_change_percentage_7d_in_currency  ?? null;
       const pct30d   = mainPerf.price_change_percentage_30d_in_currency ?? null;
 
@@ -1899,7 +1899,7 @@ cgFetch("/coins/markets", { vs_currency: "usd", ids: allIds, price_change_percen
 
       // Build perf data for all loaded coins
       currentPerfData = {};
-      [...compareCoins, { id: RIZE_ID }].forEach(c => {
+      [...compareCoins, { id: CC_ID }].forEach(c => {
         const p = byId[c.id] || perfById[c.id];
         if (p) currentPerfData[c.id] = {
           p7d:  p.price_change_percentage_7d_in_currency  ?? null,
@@ -1912,7 +1912,7 @@ cgFetch("/coins/markets", { vs_currency: "usd", ids: allIds, price_change_percen
       document.getElementById("comparisons").innerHTML = `
         <div class="table-wrap"><table>
           <thead id="comp-table-head">
-            <tr><th>Asset</th><th>MCAP</th><th>${RIZE_SYM} Price</th><th>% Change</th><th>% of MCAP</th></tr>
+            <tr><th>Asset</th><th>MCAP</th><th>${CC_SYM} Price</th><th>% Change</th><th>% of MCAP</th></tr>
           </thead>
           <tbody id="comp-table-body"></tbody>
         </table></div>`;
@@ -1920,7 +1920,7 @@ cgFetch("/coins/markets", { vs_currency: "usd", ids: allIds, price_change_percen
       document.getElementById("bag-simulations").innerHTML = `
         <div class="table-wrap"><table>
           <thead id="bag-table-head">
-            <tr><th>Asset</th><th>${RIZE_SYM} Hyp. Price</th><th>Bag Value</th><th>Bag Gain/Loss</th></tr>
+            <tr><th>Asset</th><th>${CC_SYM} Hyp. Price</th><th>Bag Value</th><th>Bag Gain/Loss</th></tr>
           </thead>
           <tbody id="bag-table-body"></tbody>
         </table></div>`;
@@ -1935,18 +1935,18 @@ cgFetch("/coins/markets", { vs_currency: "usd", ids: allIds, price_change_percen
           const v = parseFloat(freshBag.value);
           if (!isNaN(v) && v > 0) {
             currentBagAmount = v;
-            if (bagDisplay) bagDisplay.textContent = `= ${Number(v).toLocaleString()} ${RIZE_SYM}`;
+            if (bagDisplay) bagDisplay.textContent = `= ${Number(v).toLocaleString()} ${CC_SYM}`;
             // Sync to Ratio bag input
             const ratioBag     = document.getElementById("ratio-bag-input");
             const ratioBagDisp = document.getElementById("ratio-bag-display");
             if (ratioBag)     ratioBag.value = v;
-            if (ratioBagDisp) ratioBagDisp.textContent = `= ${Number(v).toLocaleString()} ${RIZE_SYM}`;
+            if (ratioBagDisp) ratioBagDisp.textContent = `= ${Number(v).toLocaleString()} ${CC_SYM}`;
             renderTables();
             renderRatioTable();
           }
         });
       }
-      if (bagDisplay) bagDisplay.textContent = `= ${currentBagAmount.toLocaleString()} ${RIZE_SYM}`;
+      if (bagDisplay) bagDisplay.textContent = `= ${currentBagAmount.toLocaleString()} ${CC_SYM}`;
 
       // Initial renders
       renderTables();
@@ -1964,7 +1964,7 @@ cgFetch("/coins/markets", { vs_currency: "usd", ids: allIds, price_change_percen
       const ratioBagDisplay = document.getElementById("ratio-bag-display");
       if (ratioBagInput) {
         ratioBagInput.value = currentBagAmount;
-        if (ratioBagDisplay) ratioBagDisplay.textContent = `= ${Number(currentBagAmount).toLocaleString()} ${RIZE_SYM}`;
+        if (ratioBagDisplay) ratioBagDisplay.textContent = `= ${Number(currentBagAmount).toLocaleString()} ${CC_SYM}`;
         const freshRatioBag = ratioBagInput.cloneNode(true);
         ratioBagInput.parentNode.replaceChild(freshRatioBag, ratioBagInput);
         freshRatioBag.value = currentBagAmount;
@@ -1972,12 +1972,12 @@ cgFetch("/coins/markets", { vs_currency: "usd", ids: allIds, price_change_percen
           const v = parseFloat(freshRatioBag.value);
           if (!isNaN(v) && v >= 0) {
             currentBagAmount = v;
-            if (ratioBagDisplay) ratioBagDisplay.textContent = `= ${Number(v).toLocaleString()} ${RIZE_SYM}`;
+            if (ratioBagDisplay) ratioBagDisplay.textContent = `= ${Number(v).toLocaleString()} ${CC_SYM}`;
             // Sync to main bag
             const mainBag     = document.getElementById("bag-amount-input");
             const mainDisplay = document.getElementById("bag-amount-display");
             if (mainBag)     mainBag.value = v;
-            if (mainDisplay) mainDisplay.textContent = `= ${Number(v).toLocaleString()} ${RIZE_SYM}`;
+            if (mainDisplay) mainDisplay.textContent = `= ${Number(v).toLocaleString()} ${CC_SYM}`;
             renderTables();
             renderRatioTable();
           }
