@@ -1821,8 +1821,8 @@
         cgFetch(`/coins/${RIZE_ID}`).catch(() => null),
         cgFetch("/global").catch(() => null),
        fetch("https://api.alternative.me/fng/?limit=1").then(r => r.json()).catch(() => null),
-fetch("https://api.coin-stats.com/v2/markets/chart/altcoin_season_index?type=3m").then(r => r.json()).catch(() => null),
-        cgFetch("/coins/markets", { vs_currency: "usd", ids: allIds, price_change_percentage: "7d,30d,90d" }).catch(() => [])
+cgFetch("/coins/markets", { vs_currency: "usd", ids: allIds, price_change_percentage: "7d,30d,90d" }).catch(() => []),
+      fetch("https://api.coin-stats.com/v2/markets/chart/altcoin_season_index?type=3m").then(r => r.json()).catch(() => null),
       ]);
 
       const byId     = Object.fromEntries(markets.map(c => [c.id, c]));
