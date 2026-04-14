@@ -1346,46 +1346,52 @@
     } catch(e) { return null; }
   }
 
-  // Load 90D for all coins and re-render (called async after initial render)
-  async function load90dForAll() {
-    const allCoins = [
-      { id: currentCoinId },
-      ...compareCoins,
-      ...extraCompareCoins,
-      ...ratioExtraCoins,
-    ].filter((c, i, a) => a.findIndex(x => x.id === c.id) === i);
-
-    await Promise.all(allCoins.map(async coin => {
-      if (currentPerfData[coin.id] && currentPerfData[coin.id].p90d !== null) return;
-      const p90d = await fetch90dPerf(coin.id);
-      if (currentPerfData[coin.id]) {
-        currentPerfData[coin.id].p90d = p90d;
-      } else {
-        currentPerfData[coin.id] = { p7d: null, p30d: null, p90d };
+async function load90dForAll() {
+  // Fetch top 50 avec 90D — remplace les 6 appels fetch90dPerf individuels
+  try {
+    const top50 = await cgFetch("/coins/markets", {
+      vs_currency: "usd",
+      order: "market_cap_desc",
+      per_page: "50",
+      page: "1",
+      price_change_percentage: "90d"
+    });
+    // Injecte le 90D dans currentPerfData pour tous les coins du top 50
+    top50.forEach(c => {
+      if (currentPerfData[c.id]) {
+        currentPerfData[c.id].p90d = c.price_change_percentage_90d_in_currency ?? null;
       }
+    });
+    // Pour les coins ajoutés dynamiquement hors top 50, fetch individuel
+    const allCoins = [...compareCoins, ...extraCompareCoins, ...ratioExtraCoins, {id: currentCoinId}]
+      .filter((c, i, a) => a.findIndex(x => x.id === c.id) === i);
+    const missing = allCoins.filter(c =>
+      currentPerfData[c.id] && currentPerfData[c.id].p90d === null &&
+      !top50.find(t => t.id === c.id)
+    );
+    await Promise.all(missing.map(async coin => {
+      const p90d = await fetch90dPerf(coin.id);
+      if (currentPerfData[coin.id]) currentPerfData[coin.id].p90d = p90d;
     }));
-
+    // Calcule Alt Season Score sur le top 50
+    const excluded = ["bitcoin","tether","usd-coin","binance-usd","dai","true-usd","frax","usdd","staked-ether","wrapped-bitcoin","wrapped-steth","coinbase-wrapped-staked-eth"];
+    const btc = top50.find(c => c.id === "bitcoin");
+    if (btc) {
+      const btcPerf = btc.price_change_percentage_90d_in_currency ?? null;
+      if (btcPerf !== null) {
+        const altcoins = top50.filter(c => !excluded.includes(c.id));
+        const score = Math.round(
+          (altcoins.filter(c => (c.price_change_percentage_90d_in_currency ?? -999) > btcPerf).length / altcoins.length) * 100
+        );
+        document.querySelectorAll(".alt-season-score").forEach(el => {
+          el.textContent = score + "/100";
+          el.style.color = score >= 75 ? "var(--green)" : score >= 25 ? "var(--muted)" : "var(--gold)";
+        });
+      }
+    }
+  } catch(e) { console.error("load90dForAll failed:", e); }
   renderPerfTable();
   renderRatioTable();
-  updateAltSeasonScore();
-  }
-
-    function updateAltSeasonScore() {
-  const btcPerf90  = currentPerfData["bitcoin"]?.p90d ?? null;
-  const allCoins   = typeof compareCoins !== "undefined" ? [...compareCoins] : [];
-  const extraCoins = typeof extraCompareCoins !== "undefined" ? [...extraCompareCoins] : [];
-  const coinId     = typeof currentCoinId !== "undefined" ? currentCoinId : null;
-  const altCoins90 = [...allCoins, ...extraCoins]
-    .filter(c => c.id !== "bitcoin" && c.id !== coinId)
-    .filter(c => currentPerfData[c.id]?.p90d !== null && currentPerfData[c.id]?.p90d !== undefined);
-  if (btcPerf90 === null || altCoins90.length === 0) return;
-  const score = Math.round(
-    (altCoins90.filter(c => (currentPerfData[c.id].p90d ?? -999) > btcPerf90).length / altCoins90.length) * 100
-  );
-  document.querySelectorAll(".alt-season-score").forEach(el => {
-    el.textContent = score + "/100";
-    el.style.color = score >= 75 ? "var(--green)" : score >= 25 ? "var(--muted)" : "var(--gold)";
-  });
 }
 
   function renderPerfTable() {
@@ -2017,15 +2023,9 @@
         const coinDomPct  = mcap && totalCap ? (mcap / totalCap * 100) : null;
         const fear        = fearGreed?.data?.[0]?.value || "N/A";
         const fearText    = fearGreed?.data?.[0]?.value_classification || "";
-        const btcPerf90   = currentPerfData["bitcoin"]?.p90d ?? null;
-const altCoins90  = [...compareCoins, ...extraCompareCoins]
-  .filter(c => c.id !== "bitcoin" && c.id !== currentCoinId)
-  .filter(c => currentPerfData[c.id]?.p90d !== null && currentPerfData[c.id]?.p90d !== undefined);
-const altScore    = (btcPerf90 !== null && altCoins90.length > 0)
-  ? Math.round((altCoins90.filter(c => (currentPerfData[c.id].p90d ?? -999) > btcPerf90).length / altCoins90.length) * 100)
-  : null;
-const altLabel    = altScore !== null ? altScore + "/100" : "Loading…";
-
+    const altScore = null; // Calculé async dans load90dForAll via top 50
+const altLabel = "Loading…";
+        
         ctx += `<div class="metrics">
           <div class="metric"><span class="metric-label">BTC Dominance</span><span class="metric-value accent-cyan">${Number(btcDom).toFixed(2)}%</span></div>
           <div class="metric"><span class="metric-label">ETH Dominance</span><span class="metric-value">${Number(ethDom).toFixed(2)}%</span></div>
@@ -2035,7 +2035,7 @@ const altLabel    = altScore !== null ? altScore + "/100" : "Loading…";
         <div class="metrics">
           <div class="metric"><span class="metric-label">Total Market Cap</span><span class="metric-value accent-gold">${formatLargeNum(totalCap)}</span></div>
           <div class="metric"><span class="metric-label">Fear &amp; Greed</span><span class="metric-value">${fear} <span style="font-size:18px;font-family:inherit">(${fearText})</span></span></div>
-        <div class="metric"><span class="metric-label">Alt Season Score</span><span class="metric-value alt-season-score" style="color:${altScore>=75?"var(--green)":altScore>=25?"var(--muted)":"var(--gold)"}">${altLabel}</span></div>
+        <div class="metric"><span class="metric-label">Alt Season Score</span><span class="metric-value alt-season-score" style="color:var(--muted)">${altLabel}</span></div>
         </div><br>`;
 
         // 7D/30D perf mini table
