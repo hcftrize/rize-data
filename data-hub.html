@@ -2012,7 +2012,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         <div class="metrics">
           <div class="metric"><span class="metric-label">Total Market Cap</span><span class="metric-value accent-gold">${formatLargeNum(totalCap)}</span></div>
           <div class="metric"><span class="metric-label">Fear &amp; Greed</span><span class="metric-value">${fear} <span style="font-size:18px;font-family:inherit">(${fearText})</span></span></div>
-          <<div class="metric"><span class="metric-label">Alt Season Score</span><span class="metric-value alt-season-score" style="color:${altScore>=75?"var(--green)":altScore>=25?"var(--muted)":"var(--gold)"}">${altLabel}</span></div>
+          <div class="metric"><span class="metric-label">Alt Season Score</span><span class="metric-value alt-season-score" style="color:${altScore>=75?"var(--green)":altScore>=25?"var(--muted)":"var(--gold)"}">${altLabel}</span></div>
         </div><br>`;
 
         // 7D/30D perf mini table
