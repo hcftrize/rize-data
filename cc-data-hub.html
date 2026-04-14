@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <title>RIZE Market Data Hub &mdash; Tokerize</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Live RIZE market data — price, market cap, bag simulation, scenario analysis and TradingView chart."/>
+  <meta name="description" content="Live CC market data — price, market cap, bag simulation, scenario analysis and TradingView chart."/>
 
   <style>
 
@@ -709,12 +709,12 @@
       <span class="eco-eyebrow">RIZE Community — Live Market Data</span>
       <div class="hub-grid">
         <div>
-          <h2 class="hub-title">RIZE Market Data Hub</h2>
-          <p class="hub-sub">Explore live RIZE price data, market cap scenario analysis, portfolio simulations, performance comparisons and ratio analysis — updated in real time from CoinGecko.</p>
+          <h2 class="hub-title">CC Market Data Hub</h2>
+          <p class="hub-sub">Explore live CC price data, market cap scenario analysis, portfolio simulations, performance comparisons and ratio analysis — updated in real time from CoinGecko.</p>
         </div>
         <div class="hub-right">
           <div class="live-box">
-            <div class="live-label">Live RIZE Price</div>
+            <div class="live-label">Live CC Price</div>
             <div class="live-value" id="hero-price">Loading&hellip;</div>
           </div>
         </div>
@@ -732,7 +732,7 @@
     <!-- ── SECTION 1 : RIZE / USD CHART ── -->
     <section class="section" id="chart-section" style="display:none">
       <div class="section-titlebar">
-        <span class="section-title" id="chart-title">RIZE / USD Chart</span>
+        <span class="section-title" id="chart-title">CC / USD Chart</span>
       </div>
       <p class="section-sub" id="chart-sub">Live TradingView chart.</p>
       <div id="tv-chart" style="height:520px;"></div>
@@ -750,7 +750,7 @@
         </div>
         <button class="screenshot-btn" onclick="takeScreenshot('metrics-section','core-metrics')">&#128247; Screenshot</button>
       </div>
-      <p class="section-sub">Live snapshot of RIZE valuation metrics from CoinGecko.</p>
+      <p class="section-sub">Live snapshot of CC valuation metrics from CoinGecko.</p>
       <div id="main-data"><div class="loading-text">Loading data&hellip;</div></div>
     </section>
 
@@ -775,14 +775,14 @@
     <section class="section" id="comp-section">
       <div class="section-titlebar-row">
         <div class="section-titlebar" style="margin:0">
-          <span class="section-title">RIZE Price Simulation</span>
+          <span class="section-title">CC Price Simulation</span>
         </div>
         <div class="wm-badge">
           <span class="wm-text-tokerize">TOKERIZE.TOP</span>
         </div>
         <button class="screenshot-btn" onclick="takeScreenshot('comp-section','comparison')">&#128247; Screenshot</button>
       </div>
-      <p class="section-sub">What would RIZE be worth if it had each asset's market cap?</p>
+      <p class="section-sub">What would CC be worth if it had each asset's market cap?</p>
 
       <!-- Add compare search bar -->
       <div class="add-row">
@@ -819,13 +819,13 @@
         </div>
         <button class="screenshot-btn" onclick="takeScreenshot('bag-section','bag-simulation')">&#128247; Screenshot</button>
       </div>
-      <p class="section-sub">Estimated value of your RIZE holdings at each simulated target price.</p>
+      <p class="section-sub">Estimated value of your CC holdings at each simulated target price.</p>
 
       <!-- Bag size input -->
       <div class="bag-input-row">
         <label class="bag-label">Your position size</label>
         <input type="number" id="bag-amount-input" class="bag-input" value="1" min="1" placeholder="Enter your bag&hellip;"/>
-        <span class="bag-display" id="bag-amount-display">= 1 RIZE</span>
+        <span class="bag-display" id="bag-amount-display">= 1 CC</span>
       </div>
 
       <!-- Table rendered by JS -->
@@ -893,7 +893,7 @@
         </div>
         <button class="screenshot-btn" onclick="takeScreenshot('ratio-section','ratio-analysis')">&#128247; Screenshot</button>
       </div>
-      <p class="section-sub">Compare the performance of your asset against others and calculate your gains &amp; losses, expressed in compared asset units.</p>
+      <p class="section-sub">Compare the performance of CC against others and calculate your gains &amp; losses, expressed in compared asset units.</p>
 
       <!-- Controls row: search + position size -->
       <div style="display:flex;gap:10px;align-items:stretch;margin-bottom:18px;flex-wrap:wrap">
@@ -908,7 +908,7 @@
         <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
           <label class="bag-label" style="white-space:nowrap">Position size</label>
           <input type="number" id="ratio-bag-input" class="bag-input" style="width:130px" value="1" min="0"/>
-          <span class="bag-display" id="ratio-bag-display" style="white-space:nowrap">= 1 RIZE</span>
+          <span class="bag-display" id="ratio-bag-display" style="white-space:nowrap">= 1 CC</span>
         </div>
       </div>
       <div id="add-ratio-error" style="margin-bottom:10px;font-size:13px;color:var(--pink);display:none"></div>
@@ -2007,7 +2007,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           <div class="metric"><span class="metric-label">BTC Dominance</span><span class="metric-value accent-cyan">${Number(btcDom).toFixed(2)}%</span></div>
           <div class="metric"><span class="metric-label">ETH Dominance</span><span class="metric-value">${Number(ethDom).toFixed(2)}%</span></div>
           <div class="metric"><span class="metric-label">LINK Dominance</span><span class="metric-value accent-gold">${linkDom !== null ? Number(linkDom).toFixed(3) + "%" : "N/A"}</span></div>
-          <div class="metric"><span class="metric-label">RIZE Dominance</span><span class="metric-value accent-pink">${coinDomPct !== null ? coinDomPct.toFixed(4) + "%" : "N/A"}</span></div>
+          <div class="metric"><span class="metric-label">CC Dominance</span><span class="metric-value accent-pink">${coinDomPct !== null ? coinDomPct.toFixed(4) + "%" : "N/A"}</span></div>
         </div><br>
         <div class="metrics">
           <div class="metric"><span class="metric-label">Total Market Cap</span><span class="metric-value accent-gold">${formatLargeNum(totalCap)}</span></div>
