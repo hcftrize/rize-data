@@ -1365,9 +1365,28 @@
       }
     }));
 
-    renderPerfTable();
-    renderRatioTable();
+  renderPerfTable();
+  renderRatioTable();
+  updateAltSeasonScore();
   }
+
+    function updateAltSeasonScore() {
+  const btcPerf90  = currentPerfData["bitcoin"]?.p90d ?? null;
+  const allCoins   = typeof compareCoins !== "undefined" ? [...compareCoins] : [];
+  const extraCoins = typeof extraCompareCoins !== "undefined" ? [...extraCompareCoins] : [];
+  const coinId     = typeof currentCoinId !== "undefined" ? currentCoinId : null;
+  const altCoins90 = [...allCoins, ...extraCoins]
+    .filter(c => c.id !== "bitcoin" && c.id !== coinId)
+    .filter(c => currentPerfData[c.id]?.p90d !== null && currentPerfData[c.id]?.p90d !== undefined);
+  if (btcPerf90 === null || altCoins90.length === 0) return;
+  const score = Math.round(
+    (altCoins90.filter(c => (currentPerfData[c.id].p90d ?? -999) > btcPerf90).length / altCoins90.length) * 100
+  );
+  document.querySelectorAll(".alt-season-score").forEach(el => {
+    el.textContent = score + "/100";
+    el.style.color = score >= 75 ? "var(--green)" : score >= 25 ? "var(--muted)" : "var(--gold)";
+  });
+}
 
   function renderPerfTable() {
     const wrap = document.getElementById("perf-table-wrap");
@@ -1998,10 +2017,14 @@
         const coinDomPct  = mcap && totalCap ? (mcap / totalCap * 100) : null;
         const fear        = fearGreed?.data?.[0]?.value || "N/A";
         const fearText    = fearGreed?.data?.[0]?.value_classification || "";
-        const altScore    = btcDom ? Math.max(0, Math.min(100, Math.round((1 - btcDom / 65) * 100))) : null;
-        const altLabel    = altScore !== null
-          ? (altScore >= 75 ? "Altcoin Season 🟢" : altScore >= 50 ? "Neutral ⚪" : "Bitcoin Season 🟠")
-          : "N/A";
+        const btcPerf90   = currentPerfData["bitcoin"]?.p90d ?? null;
+const altCoins90  = [...compareCoins, ...extraCompareCoins]
+  .filter(c => c.id !== "bitcoin" && c.id !== currentCoinId)
+  .filter(c => currentPerfData[c.id]?.p90d !== null && currentPerfData[c.id]?.p90d !== undefined);
+const altScore    = (btcPerf90 !== null && altCoins90.length > 0)
+  ? Math.round((altCoins90.filter(c => (currentPerfData[c.id].p90d ?? -999) > btcPerf90).length / altCoins90.length) * 100)
+  : null;
+const altLabel    = altScore !== null ? altScore + "/100" : "Loading…";
 
         ctx += `<div class="metrics">
           <div class="metric"><span class="metric-label">BTC Dominance</span><span class="metric-value accent-cyan">${Number(btcDom).toFixed(2)}%</span></div>
@@ -2012,8 +2035,7 @@
         <div class="metrics">
           <div class="metric"><span class="metric-label">Total Market Cap</span><span class="metric-value accent-gold">${formatLargeNum(totalCap)}</span></div>
           <div class="metric"><span class="metric-label">Fear &amp; Greed</span><span class="metric-value">${fear} <span style="font-size:18px;font-family:inherit">(${fearText})</span></span></div>
-          <div class="metric"><span class="metric-label">BTC/Alt Season</span><span class="metric-value" style="font-size:20px">${altLabel}</span></div>
-          <div class="metric"><span class="metric-label">Alt Season Score</span><span class="metric-value" style="color:${altScore >= 75 ? "var(--green)" : altScore >= 50 ? "var(--muted)" : "var(--gold)"}">${altScore !== null ? altScore + "/100" : "N/A"}</span></div>
+        <div class="metric"><span class="metric-label">Alt Season Score</span><span class="metric-value alt-season-score" style="color:${altScore>=75?"var(--green)":altScore>=25?"var(--muted)":"var(--gold)"}">${altLabel}</span></div>
         </div><br>`;
 
         // 7D/30D perf mini table
