@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>RIZE Market Data Hub &mdash; Tokerize</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Live RIZE market data — price, market cap, bag simulation, scenario analysis and TradingView chart."/>
+
+  <style>
+
+    /* ═══════════════════════════════════════════════════════════
+       FONTS
+    ═══════════════════════════════════════════════════════════ */
+    @font-face {
+      font-family: 'Rajdhani';
+      src: url('data:font/truetype;base64,PLACEHOLDER') format('truetype');
+      font-weight: 600;
+      font-style: normal;
+    }
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap');
+
+
+    /* ═══════════════════════════════════════════════════════════
+       TOKERIZE SHELL VARIABLES (header/footer/hero)
+    ═══════════════════════════════════════════════════════════ */
+    :root {
+      --black:        #000;
+      --navy:         #0d2d4e;
+      --navy2:        #1a3a5c;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       MTS APP VARIABLES (all sections inside the hub)
+    ═══════════════════════════════════════════════════════════ */
+    :root {
+      --bg:            #000000;
+      --panel:         #060818;
+      --panel-2:       #060818;
+      --border:        rgba(255,255,255,0.10);
+      --border-strong: rgba(126,224,255,0.20);
+      --text:          #f7f2e8;
+      --muted:         #b6c1d8;
+      --cyan:          #7ee0ff;
+      --gold:          #ffd36b;
+      --green:         #3DBE47;
+      --pink:          #ff8ad8;
+      --shadow:        0 0 32px rgba(0,0,0,0.7);
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════════════════════ */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Rajdhani', "Trebuchet MS", "Verdana", sans-serif;
+      background: #030810;
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       TOKERIZE HEADER
+    ═══════════════════════════════════════════════════════════ */
+    .site-header {
+      width: 100%;
+      background: var(--black);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 96px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .site-header-logo img {
+      height: 72px;
+      display: block;
+    }
+
+    .site-nav {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .site-nav a {
+      color: rgba(255,255,255,1.0);
+      text-decoration: none;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 6px 20px;
+      transition: color 0.2s;
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .site-nav a:first-child { border-left: 1px solid rgba(255,255,255,0.1); }
+    .site-nav a:hover { color: #fff; }
+
+    .site-nav a.nav-hub {
+      color: #fff;
+      background: var(--navy);
+      border: none;
+      padding: 8px 20px;
+      margin-left: 16px;
+      letter-spacing: 1.5px;
+      transition: background 0.2s;
+    }
+    .site-nav a.nav-hub:hover { background: var(--navy2); }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       TOKERIZE FOOTER
+    ═══════════════════════════════════════════════════════════ */
+    .site-footer {
+      background: var(--black);
+      color: rgba(255,255,255,0.5);
+      padding: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 80px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .footer-logo img { height: 60px; opacity: 1; }
+
+    .footer-nav { display: flex; gap: 24px; }
+
+    .footer-nav a {
+      color: rgba(255,255,255,1.0);
+      text-decoration: none;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .footer-nav a:hover { color: #fff; }
+
+    .footer-copy {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 11px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       HERO BOX  (Tokerize DA style — white, readable)
+    ═══════════════════════════════════════════════════════════ */
+    .hub-hero {
+      background: var(--black);
+      padding: 48px 40px 40px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 24px;
+    }
+
+    .back-to-hub {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #fff;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.35);
+      padding: 6px 16px;
+      margin-bottom: 24px;
+      background: rgba(255,255,255,0.07);
+      transition: background 0.2s, color 0.2s;
+    }
+    .back-to-hub:hover { background: rgba(255,255,255,0.16); color: #fff; }
+
+    .eco-eyebrow {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .hub-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: clamp(28px, 4vw, 52px);
+      line-height: 1.0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .hub-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 26px;
+      align-items: end;
+    }
+
+    .hub-right {
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+    }
+
+    .hub-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 14px;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.7;
+      max-width: 600px;
+    }
+
+    .live-box {
+      min-width: 220px;
+      padding: 16px 18px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.05);
+      text-align: right;
+    }
+
+    .live-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 6px;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .live-value {
+      font-family: 'Rajdhani', 'Arial Black', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       HUB WRAP — main content container
+    ═══════════════════════════════════════════════════════════ */
+    .hub-wrap {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       MTS SECTIONS  (pixel perfect from MTS V3)
+    ═══════════════════════════════════════════════════════════ */
+    .section {
+      margin-bottom: 28px;
+      padding: 26px;
+      border: 1px solid var(--border);
+      background: var(--panel-2);
+      box-shadow: var(--shadow);
+    }
+
+    /* Section title bar — with left cyan bar */
+    .section-titlebar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .section-titlebar::before {
+      content: "";
+      display: block;
+      width: 4px;
+      height: 32px;
+      background: var(--cyan);
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-family: 'Rajdhani', "Helvetica Neue", Arial, sans-serif;
+      font-weight: 700;
+      font-size: 32px;
+      line-height: 1.1;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: white;
+    }
+
+    .section-titlebar .section-title { margin: 0; }
+
+    /* Section title row — with screenshot button and watermark */
+    .section-titlebar-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: nowrap;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .section-sub {
+      margin: 0 0 20px;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--muted);
+      max-width: 900px;
+      font-family: "Trebuchet MS", "Verdana", sans-serif;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       METRICS GRID  (4 columns, MTS pixel perfect)
+    ═══════════════════════════════════════════════════════════ */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .metric {
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: linear-gradient(180deg, rgba(126,224,255,0.03), transparent 60%), rgba(255,255,255,0.015);
+      min-height: 115px;
+    }
+
+    .metric-label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      font-family: "Trebuchet MS", "Verdana", sans-serif;
+    }
+
+    .metric-value {
+      display: block;
+      font-family: 'Rajdhani', 'Arial Black', sans-serif;
+      font-size: 30px;
+      line-height: 1.08;
+      color: white;
+      word-break: break-word;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .metric-value.accent-cyan  { color: var(--cyan); }
+    .metric-value.accent-gold  { color: var(--gold); }
+    .metric-value.accent-green { color: #98ffb6; }
+    .metric-value.accent-pink  { color: var(--pink); }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       TABLES  (MTS pixel perfect)
+    ═══════════════════════════════════════════════════════════ */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid rgba(255,255,255,0.05);
+      background: rgba(255,255,255,0.008);
+    }
+
+    table { width: 100%; border-collapse: collapse; min-width: 640px; }
+
+    th, td {
+      padding: 14px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      text-align: left;
+      vertical-align: middle;
+      font-family: 'Rajdhani', monospace;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: rgba(6,8,24,0.99);
+      color: rgba(255,255,255,0.92);
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      z-index: 1;
+      font-weight: 700;
+    }
+
+    td { color: white; font-size: 20px; font-weight: 600; }
+    tbody tr:hover td { background: rgba(126,224,255,0.03); }
+
+    /* Asset tags — color per token */
+    .asset-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.04);
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      font-size: 14px;
+    }
+    .asset-tag.tag-btc  { color: #f7931a; border-color: rgba(247,147,26,0.5);  background: rgba(247,147,26,0.08); }
+    .asset-tag.tag-eth  { color: #a78bfa; border-color: rgba(167,139,250,0.5); background: rgba(167,139,250,0.08); }
+    .asset-tag.tag-link { color: #2a5ada; border-color: rgba(42,90,218,0.6);   background: rgba(42,90,218,0.1); }
+    .asset-tag.tag-sol  { color: #c77dff; border-color: rgba(199,125,255,0.5); background: rgba(199,125,255,0.08); }
+    .asset-tag.tag-xrp  { color: #adb5bd; border-color: rgba(173,181,189,0.4); background: rgba(173,181,189,0.06); }
+    .asset-tag.tag-extra{ color: #3DBE47; border-color: rgba(61,190,71,0.5);   background: rgba(61,190,71,0.08); }
+
+    /* Table cell color helpers */
+    .td-price      { color: #98ffb6 !important; font-weight: 700; }
+    .td-price-down { color: var(--pink) !important; font-weight: 700; }
+    .td-price-hyp  { color: white !important; font-weight: 700; }
+    .td-bag        { color: #98ffb6 !important; font-weight: 700; }
+    .td-pct-up     { color: #3DBE47 !important; font-weight: 700; }
+    .td-pct-down   { color: #e05555 !important; font-weight: 700; }
+
+    .footer-note {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      font-family: "Trebuchet MS", "Verdana", sans-serif;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       REMOVE BUTTON (✕ next to asset tags)
+    ═══════════════════════════════════════════════════════════ */
+    .remove-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(180,190,210,0.85);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      margin-right: 8px;
+      flex-shrink: 0;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      vertical-align: middle;
+      font-family: 'Rajdhani', monospace;
+    }
+    .remove-btn:hover {
+      background: rgba(255,255,255,0.14);
+      border-color: rgba(255,255,255,0.45);
+      color: #fff;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       SCREENSHOT BUTTON & WATERMARK BADGE
+    ═══════════════════════════════════════════════════════════ */
+    .screenshot-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      background: rgba(126,224,255,0.06);
+      border: 1px solid rgba(126,224,255,0.22);
+      color: var(--cyan);
+      font-family: 'Rajdhani', monospace;
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .screenshot-btn:hover { background: rgba(126,224,255,0.18); color: #fff; }
+
+    /* Watermark — hidden by default, visible only during screenshot capture */
+    .wm-badge {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0 14px 0 0;
+      margin-left: auto;
+      opacity: 0;
+      overflow: hidden;
+      min-width: 0;
+      text-align: right;
+      pointer-events: none;
+    }
+    .screenshot-mode .wm-badge { opacity: 0.52; }
+
+    .wm-text-tokerize {
+      font-family: 'Rajdhani', monospace;
+      font-size: 21px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       ADD COMPARE — search row above tables
+    ═══════════════════════════════════════════════════════════ */
+    .add-row {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    /* Shared autocomplete dropdown style */
+    .autocomplete-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: #060818;
+      border: 1px solid rgba(126,224,255,0.25);
+      border-top: none;
+      max-height: 240px;
+      overflow-y: auto;
+    }
+
+    .autocomplete-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-family: "Trebuchet MS", "Verdana", sans-serif;
+      transition: background 0.12s;
+    }
+    .autocomplete-item:hover { background: rgba(126,224,255,0.06); }
+    .autocomplete-item img { width: 18px; height: 18px; border-radius: 50%; }
+    .autocomplete-symbol { font-family: 'Rajdhani', monospace; font-size: 13px; font-weight: 700; color: var(--gold); min-width: 44px; }
+    .autocomplete-name   { font-size: 13px; color: var(--muted); }
+
+    /* Shared add button style */
+    .add-btn {
+      padding: 10px 22px;
+      background: rgba(126,224,255,0.08);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      font-family: "Trebuchet MS", sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s, color 0.2s;
+    }
+    .add-btn:hover    { background: rgba(126,224,255,0.22); color: white; }
+    .add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       BAG INPUT
+    ═══════════════════════════════════════════════════════════ */
+    .bag-input-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .bag-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--muted);
+    }
+
+    .bag-input {
+      width: 180px;
+      padding: 10px 14px;
+      background: rgba(5,14,34,0.8);
+      border: 1px solid rgba(126,224,255,0.28);
+      color: var(--cyan);
+      font-family: "Trebuchet MS", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .bag-display {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       MISC — placeholders, loading, errors, toasts
+    ═══════════════════════════════════════════════════════════ */
+    .chart-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 120px;
+      border: 1px dashed rgba(126,224,255,0.15);
+      color: var(--muted);
+      font-size: 14px;
+      font-family: "Trebuchet MS", "Verdana", sans-serif;
+    }
+
+    .loading-text {
+      color: var(--muted);
+      font-size: 14px;
+      font-family: "Trebuchet MS", "Verdana", sans-serif;
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .error-box {
+      padding: 18px 20px;
+      border: 1px solid rgba(255,138,216,0.28);
+      background: rgba(255,138,216,0.05);
+      color: var(--pink);
+      font-size: 15px;
+      font-family: "Trebuchet MS", "Verdana", sans-serif;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       SCROLLBAR
+    ═══════════════════════════════════════════════════════════ */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: #1a1a1a; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(126,224,255,0.3); }
+
+
+    /* ═══════════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════════ */
+    @media(max-width:900px) {
+      .hub-grid          { grid-template-columns: 1fr; }
+      .hub-right         { justify-content: flex-start; }
+      .hub-wrap          { padding: 16px; }
+      .metrics           { grid-template-columns: repeat(2,1fr); }
+      .site-header       { padding: 0 16px; height: 68px; }
+      .site-header-logo img { height: 48px; }
+      .site-nav a        { font-size: 11px; padding: 5px 10px; letter-spacing: 1.2px; }
+      .site-nav a.nav-hub{ margin-left: 8px; padding: 6px 12px; }
+      .site-footer       { flex-direction: column; align-items: flex-start; padding: 28px 16px; gap: 16px; }
+    }
+
+    @media(max-width:600px) {
+      .metrics  { grid-template-columns: 1fr; }
+      .hub-hero { padding: 32px 16px; }
+    }
+
+  </style>
+</head>
+<body>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       TOKERIZE HEADER
+  ═══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <a href="/" class="site-header-logo">
+      <img src="data:image/png;base64,PLACEHOLDER" alt="Tokerize"/>
+    </a>
+    <nav class="site-nav">
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/hub" class="nav-hub">RIZE Data Hub</a>
+    </nav>
+  </header>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       HERO BOX
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="hub-hero">
+    <div style="max-width:1380px;margin:0 auto">
+      <a href="/hub" class="back-to-hub">&larr; Back to RIZE Data Hub</a>
+      <span class="eco-eyebrow">RIZE Community — Live Market Data</span>
+      <div class="hub-grid">
+        <div>
+          <h2 class="hub-title">RIZE Market Data Hub</h2>
+          <p class="hub-sub">Explore live RIZE price data, market cap scenario analysis, portfolio simulations, performance comparisons and ratio analysis — updated in real time from CoinGecko.</p>
+        </div>
+        <div class="hub-right">
+          <div class="live-box">
+            <div class="live-label">Live RIZE Price</div>
+            <div class="live-value" id="hero-price">Loading&hellip;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       APP CONTENT WRAPPER
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="hub-wrap">
+
+
+    <!-- ── SECTION 1 : RIZE / USD CHART ── -->
+    <section class="section" id="chart-section" style="display:none">
+      <div class="section-titlebar">
+        <span class="section-title" id="chart-title">RIZE / USD Chart</span>
+      </div>
+      <p class="section-sub" id="chart-sub">Live TradingView chart.</p>
+      <div id="tv-chart" style="height:520px;"></div>
+    </section>
+
+
+    <!-- ── SECTION 2 : CORE METRICS ── -->
+    <section class="section" id="metrics-section">
+      <div class="section-titlebar-row">
+        <div class="section-titlebar" style="margin:0">
+          <span class="section-title">Core Metrics</span>
+        </div>
+        <div class="wm-badge">
+          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
+        </div>
+        <button class="screenshot-btn" onclick="takeScreenshot('metrics-section','core-metrics')">&#128247; Screenshot</button>
+      </div>
+      <p class="section-sub">Live snapshot of RIZE valuation metrics from CoinGecko.</p>
+      <div id="main-data"><div class="loading-text">Loading data&hellip;</div></div>
+    </section>
+
+
+    <!-- ── SECTION 3 : MARKET CONTEXT ── -->
+    <section class="section" id="mktctx-section">
+      <div class="section-titlebar-row">
+        <div class="section-titlebar" style="margin:0">
+          <span class="section-title">Market Context</span>
+        </div>
+        <div class="wm-badge">
+          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
+        </div>
+        <button class="screenshot-btn" onclick="takeScreenshot('mktctx-section','market-context')">&#128247; Screenshot</button>
+      </div>
+      <p class="section-sub">Broader market positioning, relative performance, and valuation signal.</p>
+      <div id="market-context"><div class="loading-text">Loading data&hellip;</div></div>
+    </section>
+
+
+    <!-- ── SECTION 4 : RIZE PRICE SIMULATION ── -->
+    <section class="section" id="comp-section">
+      <div class="section-titlebar-row">
+        <div class="section-titlebar" style="margin:0">
+          <span class="section-title">RIZE Price Simulation</span>
+        </div>
+        <div class="wm-badge">
+          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
+        </div>
+        <button class="screenshot-btn" onclick="takeScreenshot('comp-section','comparison')">&#128247; Screenshot</button>
+      </div>
+      <p class="section-sub">What would RIZE be worth if it had each asset's market cap?</p>
+
+      <!-- Add compare search bar -->
+      <div class="add-row">
+        <div class="search-wrap">
+          <input type="text" id="add-compare-input"
+            placeholder="Add any crypto to compare&hellip;"
+            autocomplete="off" spellcheck="false"
+            style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
+          <div class="autocomplete-dropdown" id="add-compare-autocomplete"></div>
+        </div>
+        <button id="add-compare-btn" class="add-btn" disabled>+ Add</button>
+      </div>
+      <div id="add-compare-error" style="margin-bottom:10px;font-size:13px;color:var(--pink);display:none"></div>
+
+      <!-- Table rendered by JS -->
+      <div id="comparisons"><div class="loading-text">Loading data&hellip;</div></div>
+    </section>
+
+
+    <!-- ── SECTION 5 : PORTFOLIO SIMULATION ── -->
+    <section class="section" id="bag-section">
+      <div class="section-titlebar-row">
+        <div class="section-titlebar" style="margin:0">
+          <span class="section-title">Portfolio Simulation</span>
+          <!-- Privacy info toggle -->
+          <button onclick="const t=document.getElementById('privacy-tip');t.style.display=t.style.display==='none'?'inline':'none'"
+            style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-left:8px;padding:0;">ⓘ</button>
+          <span id="privacy-tip" style="display:none;font-size:12px;color:var(--muted);margin-left:8px;">
+            Your input is processed locally in your browser only — nothing is stored or transmitted.
+          </span>
+        </div>
+        <div class="wm-badge">
+          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
+        </div>
+        <button class="screenshot-btn" onclick="takeScreenshot('bag-section','bag-simulation')">&#128247; Screenshot</button>
+      </div>
+      <p class="section-sub">Estimated value of your RIZE holdings at each simulated target price.</p>
+
+      <!-- Bag size input -->
+      <div class="bag-input-row">
+        <label class="bag-label">Your position size</label>
+        <input type="number" id="bag-amount-input" class="bag-input" value="1" min="1" placeholder="Enter your bag&hellip;"/>
+        <span class="bag-display" id="bag-amount-display">= 1 RIZE</span>
+      </div>
+
+      <!-- Table rendered by JS -->
+      <div id="bag-simulations"><div class="loading-text">Loading data&hellip;</div></div>
+      <div class="footer-note">Formula: your position size &times; hypothetical price at same market cap.</div>
+
+      <!-- Mobile duplicate search bar -->
+      <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
+        <div class="add-row">
+          <div class="search-wrap">
+            <input type="text" id="add-compare-input-bag"
+              placeholder="Add any crypto to compare&hellip;"
+              autocomplete="off" spellcheck="false"
+              style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
+            <div class="autocomplete-dropdown" id="add-compare-autocomplete-bag"></div>
+          </div>
+          <button id="add-compare-btn-bag" class="add-btn" disabled>+ Add</button>
+        </div>
+        <div id="add-compare-error-bag" style="margin-top:6px;font-size:13px;color:var(--pink);display:none"></div>
+      </div>
+    </section>
+
+
+    <!-- ── SECTION 6 : PERFORMANCE COMPARISON ── -->
+    <section class="section" id="perf-section">
+      <div class="section-titlebar-row">
+        <div class="section-titlebar" style="margin:0">
+          <span class="section-title">Performance Comparison</span>
+        </div>
+        <div class="wm-badge">
+          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
+        </div>
+        <button class="screenshot-btn" onclick="takeScreenshot('perf-section','perf')">&#128247; Screenshot</button>
+      </div>
+      <p class="section-sub" id="perf-sub">7D, 30D and 90D price performance of selected tokens against USD.</p>
+
+      <!-- Table rendered by JS -->
+      <div id="perf-table-wrap"><div class="loading-text">Loading data&hellip;</div></div>
+
+      <!-- Mobile duplicate search bar -->
+      <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
+        <div class="add-row">
+          <div class="search-wrap">
+            <input type="text" id="add-compare-input-footer"
+              placeholder="Add any crypto to compare&hellip;"
+              autocomplete="off" spellcheck="false"
+              style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
+            <div class="autocomplete-dropdown" id="add-compare-autocomplete-footer"></div>
+          </div>
+          <button id="add-compare-btn-footer" class="add-btn" disabled>+ Add</button>
+        </div>
+        <div id="add-compare-error-footer" style="margin-top:6px;font-size:13px;color:var(--pink);display:none"></div>
+      </div>
+    </section>
+
+
+    <!-- ── SECTION 7 : RATIO ANALYSIS ── -->
+    <section class="section" id="ratio-section">
+      <div class="section-titlebar-row">
+        <div class="section-titlebar" style="margin:0">
+          <span class="section-title">Ratio Analysis</span>
+        </div>
+        <div class="wm-badge">
+          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
+        </div>
+        <button class="screenshot-btn" onclick="takeScreenshot('ratio-section','ratio-analysis')">&#128247; Screenshot</button>
+      </div>
+      <p class="section-sub">Compare the performance of your asset against others and calculate your gains &amp; losses, expressed in compared asset units.</p>
+
+      <!-- Controls row: search + position size -->
+      <div style="display:flex;gap:10px;align-items:stretch;margin-bottom:18px;flex-wrap:wrap">
+        <div class="search-wrap">
+          <input type="text" id="add-ratio-input"
+            placeholder="Add any crypto to compare&hellip;"
+            autocomplete="off" spellcheck="false"
+            style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
+          <div class="autocomplete-dropdown" id="add-ratio-autocomplete"></div>
+        </div>
+        <button id="add-ratio-btn" class="add-btn" disabled>+ Add</button>
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+          <label class="bag-label" style="white-space:nowrap">Position size</label>
+          <input type="number" id="ratio-bag-input" class="bag-input" style="width:130px" value="1" min="0"/>
+          <span class="bag-display" id="ratio-bag-display" style="white-space:nowrap">= 1 RIZE</span>
+        </div>
+      </div>
+      <div id="add-ratio-error" style="margin-bottom:10px;font-size:13px;color:var(--pink);display:none"></div>
+
+      <!-- Table rendered by JS -->
+      <div id="ratio-table-wrap"><div class="loading-text">Loading data&hellip;</div></div>
+      <div class="footer-note" style="margin-top:10px">
+        Ratios calculated from USD prices — synthetic pairs. Gain/loss expressed in units of the compared asset.
+      </div>
+    </section>
+
+
+  </div><!-- end .hub-wrap -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       TRADINGVIEW SCRIPT
+  ═══════════════════════════════════════════════════════════ -->
+  <script src="https://s3.tradingview.com/tv.js"></script>
+
+
+  <script>
+  /* ═══════════════════════════════════════════════════════════
+     CONSTANTS
+  ═══════════════════════════════════════════════════════════ */
+const RIZE_ID   = "canton";
+const RIZE_SYM  = "CC";
+const RIZE_NAME = "CANTON";
+
+
+  /* ═══════════════════════════════════════════════════════════
+     COINGECKO API PROXY
+  ═══════════════════════════════════════════════════════════ */
+  function cgFetch(path, params = {}) {
+    const qs = new URLSearchParams({ path, ...params }).toString();
+    return fetch(`/api/coingecko?${qs}`).then(r => {
+      if (!r.ok) throw new Error(`API error (${r.status})`);
+      return r.json();
+    });
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     TRADINGVIEW — Exchange resolution
+     Priority: try CoinGecko tickers first, then TV search API
+  ═══════════════════════════════════════════════════════════ */
+  const CG_TO_TV_EXCHANGE = {
+    "binance": "BINANCE", "coinbase exchange": "COINBASE", "coinbase": "COINBASE",
+    "gdax": "COINBASE", "kraken": "KRAKEN", "okex": "OKX", "okx": "OKX",
+    "bybit": "BYBIT", "bybit_spot": "BYBIT", "bitstamp": "BITSTAMP",
+    "kucoin": "KUCOIN", "huobi": "HUOBI", "bitfinex": "BITFINEX",
+    "gemini": "GEMINI", "mexc": "MEXC", "gate": "GATEIO", "gate.io": "GATEIO",
+    "whitebit": "WHITEBIT", "bitget": "BITGET", "htx": "HTX",
+    "bingx": "BINGX", "lbank": "LBANK", "phemex": "PHEMEX",
+    "crypto.com exchange": "CRYPTO", "crypto.com": "CRYPTO",
+  };
+
+  const EXCHANGE_PRIORITY = [
+    "BINANCE","COINBASE","KRAKEN","OKX","BYBIT","BITSTAMP","KUCOIN",
+    "BITFINEX","GEMINI","MEXC","WHITEBIT","GATEIO","BITGET","HTX","CRYPTO"
+  ];
+
+  const QUOTE_PRIORITY = ["USD","USDT","USDC","EUR","BTC"];
+
+  // Method 1: resolve from CoinGecko tickers (no extra request)
+  function resolveFromCGTickers(tickers, coinSymbol) {
+    if (!tickers || !tickers.length) return null;
+    const base = coinSymbol.toUpperCase();
+    const candidates = [];
+    for (const t of tickers) {
+      const tickerBase  = (t.base   || "").toUpperCase();
+      const tickerQuote = (t.target || "").toUpperCase();
+      const exchName    = (t.market?.name || "").toLowerCase().trim();
+      const tvExch      = CG_TO_TV_EXCHANGE[exchName] || null;
+      if (!tvExch) continue;
+      if (tickerBase !== base) continue;
+      if (t.market?.identifier?.includes("_futures")) continue;
+      if (t.market?.identifier?.includes("_perp"))    continue;
+      candidates.push({
+        symbol:     `${tvExch}:${tickerBase}${tickerQuote}`,
+        exchScore:  EXCHANGE_PRIORITY.indexOf(tvExch)  === -1 ? 99 : EXCHANGE_PRIORITY.indexOf(tvExch),
+        quoteScore: QUOTE_PRIORITY.indexOf(tickerQuote) === -1 ? 99 : QUOTE_PRIORITY.indexOf(tickerQuote),
+        volume:     t.converted_volume?.usd || 0,
+      });
+    }
+    if (!candidates.length) return null;
+    candidates.sort((a, b) =>
+      a.exchScore  !== b.exchScore  ? a.exchScore  - b.exchScore  :
+      a.quoteScore !== b.quoteScore ? a.quoteScore - b.quoteScore :
+      b.volume - a.volume
+    );
+    return candidates[0].symbol;
+  }
+
+  // Method 2: fallback TV search API
+  async function resolveFromTVSearch(coinSymbol) {
+    const s = coinSymbol.toUpperCase();
+    try {
+      const res = await fetch(
+        `https://symbol-search.tradingview.com/symbol_search/v3/?text=${s}&hl=false&exchange=&lang=en&type=crypto&domain=production`,
+        { headers: { "Accept": "application/json" } }
+      );
+      if (!res.ok) return null;
+      const data = await res.json();
+      const symbols = data?.symbols || [];
+      const exact = symbols.filter(item => {
+        const raw  = (item.symbol || "").toUpperCase();
+        const base = raw.replace(/USDT$|USD$|USDC$|BTC$|ETH$|EUR$/g, "");
+        return base === s;
+      });
+      const pool     = exact.length > 0 ? exact : symbols.slice(0, 10);
+      const filtered = pool.filter(item => {
+        const sym = (item.symbol || "").toUpperCase();
+        return !sym.includes("_PERP") && !sym.endsWith(".P");
+      });
+      const finalPool = filtered.length > 0 ? filtered : pool;
+      const scored = finalPool.map(item => ({
+        item,
+        exchScore:  EXCHANGE_PRIORITY.indexOf((item.exchange || "").toUpperCase()) === -1 ? 99 : EXCHANGE_PRIORITY.indexOf((item.exchange || "").toUpperCase()),
+        quoteScore: QUOTE_PRIORITY.findIndex(q => (item.symbol || "").toUpperCase().endsWith(q)) === -1 ? 99 : QUOTE_PRIORITY.findIndex(q => (item.symbol || "").toUpperCase().endsWith(q)),
+      }));
+      scored.sort((a, b) =>
+        a.exchScore !== b.exchScore ? a.exchScore - b.exchScore : a.quoteScore - b.quoteScore
+      );
+      if (!scored.length) return null;
+      const best = scored[0].item;
+      return `${(best.exchange || "").toUpperCase()}:${(best.symbol || "").toUpperCase()}`;
+    } catch(e) { return null; }
+  }
+
+  // Session cache + widget reference
+  const tvSymbolCache = {};
+  let tvWidget = null;
+
+  async function renderChart(coinId, coinName, coinSymbol, cgTickers) {
+    const section   = document.getElementById("chart-section");
+    const container = document.getElementById("tv-chart");
+    document.getElementById("chart-title").textContent = `${coinName.toUpperCase()} / USD Chart`;
+    section.style.display = "block";
+    container.innerHTML = `<div class="loading-text" style="display:flex;align-items:center;justify-content:center;height:520px">Looking for chart&hellip;</div>`;
+
+    // Resolution chain
+    let tvSym = tvSymbolCache[coinId] || null;
+    if (!tvSym && cgTickers) {
+      tvSym = resolveFromCGTickers(cgTickers, coinSymbol);
+      if (tvSym) tvSymbolCache[coinId] = tvSym;
+    }
+    if (!tvSym) {
+      tvSym = await resolveFromTVSearch(coinSymbol);
+      if (tvSym) tvSymbolCache[coinId] = tvSym;
+    }
+
+    if (!tvSym) {
+      container.innerHTML = `<div class="chart-placeholder">No chart found for ${coinName} on any supported exchange.</div>`;
+      document.getElementById("chart-sub").textContent = "No TradingView data available.";
+      return;
+    }
+
+    document.getElementById("chart-sub").textContent = `Live TradingView chart — ${tvSym}`;
+    container.innerHTML = "";
+    if (tvWidget) { try { tvWidget.remove(); } catch(e) {} tvWidget = null; }
+    tvWidget = new TradingView.widget({
+      container_id: "tv-chart", width: "100%", height: 520,
+      symbol: tvSym, interval: "60", timezone: "Etc/UTC",
+      theme: "dark", style: "1", locale: "en",
+      toolbar_bg: "#061128",
+      enable_publishing: false, hide_top_toolbar: false,
+      hide_legend: false, save_image: false,
+    });
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     FORMAT HELPERS
+  ═══════════════════════════════════════════════════════════ */
+  function fmtPct(v) {
+    const n = Number(v);
+    const c = n >= 0 ? "#98ffb6" : "var(--pink)";
+    return `<span style="color:${c}">${n >= 0 ? "+" : ""}${n.toFixed(2)}%</span>`;
+  }
+
+  function fmtPrice(v) {
+    if (!v && v !== 0) return "N/A";
+    const n = Number(v);
+    if (n === 0)      return "0";
+    if (n >= 10000)   return n.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+    if (n >= 10)      return n.toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+    if (n >= 1)       return n.toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 2 });
+    if (n >= 0.01)    return n.toLocaleString(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 4 });
+    if (n >= 0.0001)  return n.toLocaleString(undefined, { maximumFractionDigits: 6, minimumFractionDigits: 6 });
+    return n.toFixed(8).replace(/\.?0+$/, "");
+  }
+
+  function fmtSupply(v) {
+    if (!v) return "N/A";
+    const n = Number(v);
+    if (n >= 1e12) return (n / 1e12).toFixed(2) + "T";
+    if (n >= 1e9)  return (n / 1e9).toFixed(2)  + "B";
+    if (n >= 1e6)  return (n / 1e6).toFixed(2)  + "M";
+    return n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+  }
+
+  function formatLargeNum(v) {
+    if (!v) return "N/A";
+    if (v >= 1e12) return "$" + (v / 1e12).toFixed(2) + "T";
+    if (v >= 1e9)  return "$" + (v / 1e9).toFixed(2)  + "B";
+    if (v >= 1e6)  return "$" + (v / 1e6).toFixed(2)  + "M";
+    if (v >= 1000) return "$" + Math.round(v).toLocaleString();
+    return "$" + fmtPrice(v);
+  }
+
+  // Directional arrow with color
+  function pctArrow(val) {
+    if (val === null || val === undefined) return "";
+    const up  = val >= 0;
+    const col = up ? "#98ffb6" : "var(--pink)";
+    const arr = up ? "↑" : "↓";
+    return `<span style="color:${col};font-size:18px;line-height:1;margin-left:3px;vertical-align:middle">${arr}</span>`;
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     APP STATE
+  ═══════════════════════════════════════════════════════════ */
+
+  // Fixed comparison coins (always present, can be removed by user)
+  const compareCoins = [
+    { label: "BTC",  id: "bitcoin"   },
+    { label: "ETH",  id: "ethereum"  },
+    { label: "LINK", id: "chainlink" },
+    { label: "SOL",  id: "solana"    },
+    { label: "XRP",  id: "ripple"    },
+  ];
+
+  // Dynamically added coins (via search bars)
+  let extraCompareCoins = [];
+
+  // Coins specific to Ratio Analysis section
+  let ratioExtraCoins = [];
+
+  // Current data references
+  let currentByIdRef  = {};
+  let currentSupply   = null;
+  let currentMcap     = null;
+  let currentBagAmount = 1;
+  let currentPrice    = null;
+
+  // Fixed: CC is always the monitored asset
+  const currentCoinId = RIZE_ID;
+  const currentSym    = RIZE_SYM;
+
+  // Perf data: { coinId: { p7d, p30d, p90d } }
+  let currentPerfData = {};
+
+  // Sort states for each table
+  let sortComp  = { col: "mcap", dir: "desc" };
+  let sortBag   = { col: "price", dir: "desc" };
+  let sortPerf  = { col: "7d",   dir: "desc" };
+  let sortRatio = { col: "7d",   dir: "desc" };
+
+
+  /* ═══════════════════════════════════════════════════════════
+     ASSET TAG CLASS HELPERS
+  ═══════════════════════════════════════════════════════════ */
+  function assetTagClass(coinId, isExtra) {
+    if (isExtra) return "asset-tag tag-extra";
+    const map = {
+      "bitcoin":   "tag-btc",
+      "ethereum":  "tag-eth",
+      "chainlink": "tag-link",
+      "solana":    "tag-sol",
+      "ripple":    "tag-xrp",
+    };
+    return "asset-tag " + (map[coinId] || "");
+  }
+
+  function assetTagClass2(coinId) {
+    const map = {
+      "bitcoin":   "tag-btc",
+      "ethereum":  "tag-eth",
+      "chainlink": "tag-link",
+      "solana":    "tag-sol",
+      "ripple":    "tag-xrp",
+    };
+    return "asset-tag " + (map[coinId] || "");
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     SECTION 4 + 5 — Price Simulation & Portfolio Simulation
+     renderTables() builds both tables from shared state
+  ═══════════════════════════════════════════════════════════ */
+  function renderTables() {
+    const allCoins = [...compareCoins, ...extraCompareCoins]
+      .filter(c => c.id !== currentCoinId && currentByIdRef[c.id]?.market_cap && currentSupply);
+
+    // Build row data
+    let rows = allCoins.map(coin => {
+      const t          = currentByIdRef[coin.id];
+      const ps         = t.market_cap / currentSupply;           // hypothetical price
+      const bag        = currentBagAmount * ps;                   // bag value at that price
+      const pct        = currentMcap ? (currentMcap / t.market_cap * 100) : null;
+      const priceDelta = currentPrice ? ((ps - currentPrice) / currentPrice * 100) : null;
+      return { coin, mcap: t.market_cap, ps, bag, pct, priceDelta };
+    });
+
+    // Sort Price Simulation table
+    rows.sort((a, b) => {
+      const v = r =>
+        sortComp.col === "mcap"     ? r.mcap :
+        sortComp.col === "price"    ? r.ps :
+        sortComp.col === "pricepct" ? (r.priceDelta ?? -9999) :
+        r.pct || 0;
+      return sortComp.dir === "desc" ? v(b) - v(a) : v(a) - v(b);
+    });
+
+    // ── Price Simulation table headers
+    const thComp = ["Asset", "MCAP", `${currentSym} Price`, "% Change", "% of MCAP"]
+      .map((label, i) => {
+        if (i === 0) return `<th>Asset</th>`;
+        const colKey = ["mcap", "price", "pricepct", "pct"][i - 1];
+        const arrow  = sortComp.col === colKey ? (sortComp.dir === "desc" ? " ↓" : " ↑") : " ↕";
+        return `<th style="cursor:pointer;user-select:none" onclick="sortCompTable('${colKey}')">${label}${arrow}</th>`;
+      }).join("");
+
+    // ── Price Simulation table rows
+    const upColor   = "#98ffb6";
+    const downColor = "var(--pink)";
+
+    const compRows = rows.map(({ coin, mcap, ps, pct, priceDelta }) => {
+      const removable    = `<button class="remove-btn" onclick="removeExtraCoin('${coin.id}')" title="Remove">✕</button>`;
+      const pctStr       = pct !== null ? pct.toFixed(2) + "%" : "N/A";
+      const tagClass     = assetTagClass(coin.id, !!coin.removable);
+      const priceUp      = priceDelta !== null ? priceDelta >= 0 : null;
+      const priceCol     = priceUp === null ? "td-price" : priceUp ? "td-price" : "td-price-down";
+      const pricePctStr  = priceDelta !== null
+        ? `${priceDelta >= 0 ? "+" : ""}${priceDelta.toFixed(2)}%${pctArrow(priceDelta)}`
+        : "N/A";
+      return `<tr>
+        <td style="white-space:nowrap">${removable}<span class="${tagClass}">${coin.label}</span></td>
+        <td>${formatLargeNum(mcap)}</td>
+        <td class="${priceCol}" style="color:${priceUp === null ? "#98ffb6" : priceUp ? upColor : downColor}">
+          $${fmtPrice(ps)}${pctArrow(priceDelta)}
+        </td>
+        <td>${pricePctStr}</td>
+        <td>${pctStr}</td>
+      </tr>`;
+    }).join("") || `<tr><td colspan="5" style="color:var(--muted)">No data.</td></tr>`;
+
+    // Sort Portfolio Simulation table
+    const currentBagValForSort = currentPrice ? currentBagAmount * currentPrice : 0;
+    const bagRowsSorted = [...rows].sort((a, b) => {
+      const v = r =>
+        sortBag.col === "price"    ? r.ps :
+        sortBag.col === "bagdelta" ? (r.bag - currentBagValForSort) :
+        r.bag;
+      return sortBag.dir === "desc" ? v(b) - v(a) : v(a) - v(b);
+    });
+
+    // ── Portfolio Simulation table headers
+    const thBag = ["Asset", `${currentSym} Hyp. Price`, "Bag Value", "Bag Gain/Loss"]
+      .map((label, i) => {
+        if (i === 0) return `<th>Asset</th>`;
+        const colKey = ["price", "bag", "bagdelta"][i - 1];
+        const arrow  = sortBag.col === colKey ? (sortBag.dir === "desc" ? " ↓" : " ↑") : " ↕";
+        return `<th style="cursor:pointer;user-select:none" onclick="sortBagTable('${colKey}')">${label}${arrow}</th>`;
+      }).join("");
+
+    // ── Portfolio Simulation table rows
+    const bagRows = bagRowsSorted.map(({ coin, ps, bag, priceDelta }) => {
+      const removable    = `<button class="remove-btn" onclick="removeExtraCoin('${coin.id}')" title="Remove">✕</button>`;
+      const tagClass     = assetTagClass(coin.id, !!coin.removable);
+      const currentBagVal = currentPrice ? currentBagAmount * currentPrice : null;
+      const bagDelta      = currentBagVal ? (bag - currentBagVal) : null;
+      const bagDeltaStr   = bagDelta !== null
+        ? `${bagDelta >= 0 ? "+" : "-"}${formatLargeNum(Math.abs(bagDelta))} (${priceDelta >= 0 ? "+" : ""}${priceDelta.toFixed(2)}%)${pctArrow(priceDelta)}`
+        : "N/A";
+      const bagColor = priceDelta === null ? upColor : priceDelta >= 0 ? upColor : downColor;
+      return `<tr>
+        <td style="white-space:nowrap">${removable}<span class="${tagClass}">${coin.label}</span></td>
+        <td class="td-price-hyp">$${fmtPrice(ps)}</td>
+        <td style="color:${bagColor};font-weight:700">${formatLargeNum(bag)}${pctArrow(priceDelta)}</td>
+        <td>${bagDeltaStr}</td>
+      </tr>`;
+    }).join("") || `<tr><td colspan="4" style="color:var(--muted)">No data.</td></tr>`;
+
+    // Inject into DOM
+    const compBody = document.getElementById("comp-table-body");
+    const bagBody  = document.getElementById("bag-table-body");
+    const compHead = document.getElementById("comp-table-head");
+    const bagHead  = document.getElementById("bag-table-head");
+    if (compBody) compBody.innerHTML = compRows;
+    if (bagBody)  bagBody.innerHTML  = bagRows;
+    if (compHead) compHead.innerHTML = `<tr>${thComp}</tr>`;
+    if (bagHead)  bagHead.innerHTML  = `<tr>${thBag}</tr>`;
+  }
+
+  // Sort handlers
+  function sortCompTable(col) {
+    sortComp = sortComp.col === col && sortComp.dir === "desc" ? { col, dir: "asc" } : { col, dir: "desc" };
+    renderTables();
+  }
+  function sortBagTable(col) {
+    sortBag = sortBag.col === col && sortBag.dir === "desc" ? { col, dir: "asc" } : { col, dir: "desc" };
+    renderTables();
+  }
+
+  // Remove a coin from all tables
+  function removeExtraCoin(id) {
+    const fixedIdx = compareCoins.findIndex(c => c.id === id);
+    if (fixedIdx !== -1) compareCoins.splice(fixedIdx, 1);
+    extraCompareCoins = extraCompareCoins.filter(c => c.id !== id);
+    ratioExtraCoins   = ratioExtraCoins.filter(c => c.id !== id);
+    renderTables();
+    renderPerfTable();
+    renderRatioTable();
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     SECTION 6 — Performance Comparison
+     90D performance fetched async via market_chart endpoint
+  ═══════════════════════════════════════════════════════════ */
+  async function fetch90dPerf(coinId) {
+    try {
+      const data = await cgFetch(`/coins/${coinId}/market_chart`, {
+        vs_currency: "usd", days: "90", interval: "daily"
+      });
+      const prices = data?.prices;
+      if (!prices || prices.length < 2) return null;
+      const first = prices[0][1];
+      const last  = prices[prices.length - 1][1];
+      if (!first || first === 0) return null;
+      return ((last - first) / first) * 100;
+    } catch(e) { return null; }
+  }
+
+  // Load 90D for all coins and re-render (called async after initial render)
+  async function load90dForAll() {
+    const allCoins = [
+      { id: currentCoinId },
+      ...compareCoins,
+      ...extraCompareCoins,
+      ...ratioExtraCoins,
+    ].filter((c, i, a) => a.findIndex(x => x.id === c.id) === i);
+
+    await Promise.all(allCoins.map(async coin => {
+      if (currentPerfData[coin.id] && currentPerfData[coin.id].p90d !== null) return;
+      const p90d = await fetch90dPerf(coin.id);
+      if (currentPerfData[coin.id]) {
+        currentPerfData[coin.id].p90d = p90d;
+      } else {
+        currentPerfData[coin.id] = { p7d: null, p30d: null, p90d };
+      }
+    }));
+
+    renderPerfTable();
+    renderRatioTable();
+  }
+
+  function renderPerfTable() {
+    const wrap = document.getElementById("perf-table-wrap");
+    if (!wrap) return;
+
+    const allCoins = [
+      { id: currentCoinId, label: currentSym, removable: false },
+      ...compareCoins,
+      ...extraCompareCoins,
+    ].filter((c, i, a) => a.findIndex(x => x.id === c.id) === i);
+
+    let rows = allCoins
+      .map(coin => {
+        const p = currentPerfData[coin.id];
+        if (!p) return null;
+        return { coin, p7d: p.p7d, p30d: p.p30d, p90d: p.p90d };
+      })
+      .filter(Boolean);
+
+    // Sort
+    rows.sort((a, b) => {
+      const v = r =>
+        sortPerf.col === "7d"  ? r.p7d  ?? -999 :
+        sortPerf.col === "30d" ? r.p30d ?? -999 :
+        r.p90d ?? -999;
+      return sortPerf.dir === "desc" ? v(b) - v(a) : v(a) - v(b);
+    });
+
+    const mkTh = (label, col) => {
+      const arrow = sortPerf.col === col ? (sortPerf.dir === "desc" ? " ↓" : " ↑") : " ↕";
+      return `<th style="cursor:pointer;user-select:none" onclick="sortPerfTable('${col}')">${label}${arrow}</th>`;
+    };
+
+    const thead = `<tr><th>Asset</th>${mkTh("7D Perf.","7d")}${mkTh("30D Perf.","30d")}${mkTh("90D Perf.","90d")}</tr>`;
+
+    const tbody = rows.map(({ coin, p7d, p30d, p90d }) => {
+      const removable = coin.id === currentCoinId
+        ? ""
+        : `<button class="remove-btn" onclick="removeExtraCoin('${coin.id}')" title="Remove">✕</button>`;
+      const tagClass  = coin.id === currentCoinId ? "asset-tag" : assetTagClass(coin.id, !!coin.removable);
+      const p90str    = p90d !== null && p90d !== undefined
+        ? fmtPct(p90d)
+        : `<span style="color:var(--muted);font-size:12px">loading…</span>`;
+      return `<tr>
+        <td style="white-space:nowrap">${removable}<span class="${tagClass}">${coin.label}</span></td>
+        <td>${p7d  !== null ? fmtPct(p7d)  : "N/A"}</td>
+        <td>${p30d !== null ? fmtPct(p30d) : "N/A"}</td>
+        <td>${p90str}</td>
+      </tr>`;
+    }).join("") || `<tr><td colspan="4" style="color:var(--muted)">No data.</td></tr>`;
+
+    wrap.innerHTML = `<div class="table-wrap"><table><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
+  }
+
+  function sortPerfTable(col) {
+    sortPerf = sortPerf.col === col && sortPerf.dir === "desc" ? { col, dir: "asc" } : { col, dir: "desc" };
+    renderPerfTable();
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     SECTION 7 — Ratio Analysis
+     Formula: ratio = priceA / priceB
+     Ratio % change over N days computed from stored perf data
+     (no extra API calls — uses currentByIdRef + currentPerfData)
+     Gain/loss expressed in units of asset B
+  ═══════════════════════════════════════════════════════════ */
+  function calcRatioPct(priceA, priceB, pctA, pctB) {
+    if (priceA == null || priceB == null || pctA == null || pctB == null) return null;
+    const priceA_old = priceA / (1 + pctA / 100);
+    const priceB_old = priceB / (1 + pctB / 100);
+    if (!priceB_old || !priceA_old) return null;
+    const ratioNow = priceA / priceB;
+    const ratioOld = priceA_old / priceB_old;
+    return ((ratioNow - ratioOld) / ratioOld) * 100;
+  }
+
+  function renderRatioTable() {
+    const wrap = document.getElementById("ratio-table-wrap");
+    if (!wrap) return;
+
+    if (!currentPrice) {
+      wrap.innerHTML = '<div class="loading-text">Loading data&hellip;</div>';
+      return;
+    }
+
+    const allCoins = [
+      ...compareCoins,
+      ...extraCompareCoins,
+      ...ratioExtraCoins,
+    ]
+      .filter((c, i, a) => a.findIndex(x => x.id === c.id) === i)
+      .filter(c => c.id !== currentCoinId);
+
+    if (!allCoins.length) {
+      wrap.innerHTML = '<div class="chart-placeholder">Add assets to compare using the search bar above.</div>';
+      return;
+    }
+
+    const bagAmt = currentBagAmount || 1;
+    const priceA = currentPrice;
+    const perfA  = currentPerfData[currentCoinId] || {};
+
+    const thead = `<tr>
+      <th>Pair</th>
+      <th style="cursor:pointer;user-select:none" onclick="sortRatioTable('ratio')">Ratio (${currentSym}/X) ↕</th>
+      <th style="cursor:pointer;user-select:none" onclick="sortRatioTable('7d')">7D ↕</th>
+      <th style="cursor:pointer;user-select:none" onclick="sortRatioTable('30d')">30D ↕</th>
+      <th style="cursor:pointer;user-select:none" onclick="sortRatioTable('90d')">90D ↕</th>
+    </tr>`;
+
+    // Build row data
+    let rows = allCoins.map(coin => {
+      const d      = currentByIdRef[coin.id];
+      const priceB = d?.current_price ?? null;
+      const perfB  = currentPerfData[coin.id] || {};
+      const ratioNow = priceA && priceB ? priceA / priceB : null;
+      const r7d  = calcRatioPct(priceA, priceB, perfA.p7d,  perfB.p7d);
+      const r30d = calcRatioPct(priceA, priceB, perfA.p30d, perfB.p30d);
+      const r90d = calcRatioPct(priceA, priceB, perfA.p90d, perfB.p90d);
+      return { coin, priceB, ratioNow, r7d, r30d, r90d };
+    });
+
+    // Sort
+    rows.sort((a, b) => {
+      const v = r =>
+        sortRatio.col === "ratio" ? (r.ratioNow ?? -9999) :
+        sortRatio.col === "7d"   ? (r.r7d  ?? -9999) :
+        sortRatio.col === "30d"  ? (r.r30d ?? -9999) :
+        (r.r90d ?? -9999);
+      return sortRatio.dir === "desc" ? v(b) - v(a) : v(a) - v(b);
+    });
+
+    // Cell formatter — shows % + delta in asset B units
+    function fmtRatioCell(ratioPct, priceB, coinLabel) {
+      if (ratioPct == null) return `<span style="color:var(--muted);font-size:12px">loading…</span>`;
+      const col  = ratioPct >= 0 ? "#98ffb6" : "var(--pink)";
+      const arr  = ratioPct >= 0 ? "↑" : "↓";
+      const sign = ratioPct >= 0 ? "+" : "";
+      if (priceB == null) return `<span style="color:${col};font-weight:700">${sign}${ratioPct.toFixed(2)}%</span>`;
+      // Delta in units of B
+      const deltaUSD = bagAmt * priceA * (ratioPct / 100);
+      const deltaB   = deltaUSD / priceB;
+      const abs      = Math.abs(deltaB);
+      const formatted =
+        abs >= 10000 ? abs.toLocaleString(undefined, { maximumFractionDigits: 0 }) :
+        abs >= 100   ? abs.toLocaleString(undefined, { maximumFractionDigits: 1 }) :
+        abs >= 1     ? abs.toLocaleString(undefined, { maximumFractionDigits: 2 }) :
+        abs >= 0.01  ? abs.toFixed(3) :
+        abs.toFixed(4);
+      const dsign = deltaB >= 0 ? "+" : "-";
+      return `<span style="color:${col};font-weight:700">${sign}${ratioPct.toFixed(2)}% <span style="font-size:16px;vertical-align:middle">${arr}</span></span> <span style="color:#ffffff;font-size:14px">(${dsign}${formatted} ${coinLabel})</span>`;
+    }
+
+    const tbody = rows.map(({ coin, priceB, ratioNow, r7d, r30d, r90d }) => {
+      const removable = `<button class="remove-btn" onclick="removeRatioCoin('${coin.id}')" title="Remove">✕</button>`;
+      const tagClass  = assetTagClass(coin.id, !!coin.removable);
+      const ratioStr  = ratioNow != null ? fmtPrice(ratioNow) : "N/A";
+      return `<tr>
+        <td style="white-space:nowrap">${removable}<span class="${tagClass}">${currentSym}/${coin.label}</span></td>
+        <td style="color:var(--cyan);font-weight:700">${ratioStr}</td>
+        <td>${fmtRatioCell(r7d,  priceB, coin.label)}</td>
+        <td>${fmtRatioCell(r30d, priceB, coin.label)}</td>
+        <td>${fmtRatioCell(r90d, priceB, coin.label)}</td>
+      </tr>`;
+    }).join("") || `<tr><td colspan="5" style="color:var(--muted)">No data.</td></tr>`;
+
+    wrap.innerHTML = `<div class="table-wrap"><table><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
+  }
+
+  function sortRatioTable(col) {
+    sortRatio = sortRatio.col === col && sortRatio.dir === "desc" ? { col, dir: "asc" } : { col, dir: "desc" };
+    renderRatioTable();
+  }
+
+  function removeRatioCoin(id) {
+    ratioExtraCoins   = ratioExtraCoins.filter(c => c.id !== id);
+    extraCompareCoins = extraCompareCoins.filter(c => c.id !== id);
+    const fixedIdx    = compareCoins.findIndex(c => c.id === id);
+    if (fixedIdx !== -1) compareCoins.splice(fixedIdx, 1);
+    renderTables();
+    renderPerfTable();
+    renderRatioTable();
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     GENERIC SEARCH BAR WIRING
+     Reused by all 3 compare search bars (comp / bag / footer)
+     onAdd: optional extra callback after a coin is added
+  ═══════════════════════════════════════════════════════════ */
+  function wireSearchBar(inputId, acId, btnId, errId, onAdd) {
+    const inputEl = document.getElementById(inputId);
+    const acEl    = document.getElementById(acId);
+    const btnEl   = document.getElementById(btnId);
+    const errEl   = document.getElementById(errId);
+    if (!inputEl || !btnEl) return;
+
+    // Clone to reset listeners
+    const freshInput = inputEl.cloneNode(true);
+    inputEl.parentNode.replaceChild(freshInput, inputEl);
+    const freshBtn = btnEl.cloneNode(true);
+    btnEl.parentNode.replaceChild(freshBtn, btnEl);
+    freshBtn.disabled = true;
+
+    let wResults = [], wDebounce = null, wSelected = null;
+
+    // Autocomplete on input
+    freshInput.addEventListener("input", () => {
+      clearTimeout(wDebounce);
+      const q = freshInput.value.trim();
+      if (q.length < 2) { acEl.style.display = "none"; acEl.innerHTML = ""; return; }
+      wDebounce = setTimeout(async () => {
+        try {
+          const data = await cgFetch("/search", { query: q });
+          wResults = (data.coins || []).slice(0, 6);
+          if (!wResults.length) { acEl.style.display = "none"; return; }
+          acEl.innerHTML = wResults.map((c, i) => `
+            <div class="autocomplete-item" data-i="${i}">
+              <img src="${c.thumb}" alt="" onerror="this.style.display='none'">
+              <span class="autocomplete-symbol">${c.symbol.toUpperCase()}</span>
+              <span class="autocomplete-name">${c.name}</span>
+            </div>`).join("");
+          acEl.querySelectorAll(".autocomplete-item").forEach((el, i) => {
+            el.addEventListener("mousedown", e => {
+              e.preventDefault();
+              wSelected = wResults[i];
+              freshInput.value = `${wSelected.name} (${wSelected.symbol.toUpperCase()})`;
+              freshBtn.disabled = false;
+              acEl.style.display = "none";
+            });
+          });
+          acEl.style.display = "block";
+        } catch { acEl.style.display = "none"; }
+      }, 320);
+    });
+
+    // Add button click — fetch + inject + re-render
+    freshBtn.addEventListener("click", async () => {
+      if (!wSelected) return;
+      const existingIds = [...compareCoins, ...extraCompareCoins].map(c => c.id);
+      if (existingIds.includes(wSelected.id) || wSelected.id === currentCoinId) {
+        if (errEl) { errEl.textContent = "Already in comparison."; errEl.style.display = "block"; }
+        return;
+      }
+      if (errEl) errEl.style.display = "none";
+      freshBtn.disabled = true;
+      freshBtn.textContent = "Loading…";
+      try {
+        const res = await cgFetch("/coins/markets", {
+          vs_currency: "usd", ids: wSelected.id, price_change_percentage: "7d,30d,90d"
+        });
+        if (!res || !res[0]?.market_cap) throw new Error("No market data");
+        currentByIdRef[wSelected.id] = res[0];
+        currentPerfData[wSelected.id] = {
+          p7d:  res[0].price_change_percentage_7d_in_currency  ?? null,
+          p30d: res[0].price_change_percentage_30d_in_currency ?? null,
+          p90d: res[0].price_change_percentage_90d_in_currency ?? null,
+        };
+        extraCompareCoins.push({ label: wSelected.symbol.toUpperCase(), id: wSelected.id, removable: true });
+        if (onAdd) onAdd();
+        renderTables();
+        renderPerfTable();
+        load90dForAll();
+        freshInput.value = ""; wSelected = null; freshBtn.disabled = true;
+      } catch {
+        if (errEl) { errEl.textContent = "Could not fetch data."; errEl.style.display = "block"; }
+      } finally {
+        freshBtn.textContent = "+ Add";
+      }
+    });
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     RATIO SEARCH BAR WIRING
+     Separate logic: coins added here also go into extraCompareCoins
+     for cross-section sync, but display only in ratio table
+  ═══════════════════════════════════════════════════════════ */
+  function wireRatioSearchBar() {
+    const inputEl = document.getElementById("add-ratio-input");
+    const acEl    = document.getElementById("add-ratio-autocomplete");
+    const btnEl   = document.getElementById("add-ratio-btn");
+    const errEl   = document.getElementById("add-ratio-error");
+    if (!inputEl || !btnEl) return;
+
+    const freshInput = inputEl.cloneNode(true);
+    inputEl.parentNode.replaceChild(freshInput, inputEl);
+    const freshBtn = btnEl.cloneNode(true);
+    btnEl.parentNode.replaceChild(freshBtn, btnEl);
+    freshBtn.disabled = true;
+
+    let rResults = [], rDebounce = null, rSelected = null;
+
+    freshInput.addEventListener("input", () => {
+      clearTimeout(rDebounce);
+      const q = freshInput.value.trim();
+      if (q.length < 2) { acEl.style.display = "none"; acEl.innerHTML = ""; return; }
+      rDebounce = setTimeout(async () => {
+        try {
+          const data = await cgFetch("/search", { query: q });
+          rResults = (data.coins || []).slice(0, 6);
+          if (!rResults.length) { acEl.style.display = "none"; return; }
+          acEl.innerHTML = rResults.map((c, i) => `
+            <div class="autocomplete-item" data-i="${i}">
+              <img src="${c.thumb}" alt="" onerror="this.style.display='none'">
+              <span class="autocomplete-symbol">${c.symbol.toUpperCase()}</span>
+              <span class="autocomplete-name">${c.name}</span>
+            </div>`).join("");
+          acEl.querySelectorAll(".autocomplete-item").forEach((el, i) => {
+            el.addEventListener("mousedown", e => {
+              e.preventDefault();
+              rSelected = rResults[i];
+              freshInput.value = `${rSelected.name} (${rSelected.symbol.toUpperCase()})`;
+              freshBtn.disabled = false;
+              acEl.style.display = "none";
+            });
+          });
+          acEl.style.display = "block";
+        } catch { acEl.style.display = "none"; }
+      }, 320);
+    });
+
+    freshBtn.addEventListener("click", async () => {
+      if (!rSelected) return;
+
+      // If coin already loaded in other sections, just add to ratioExtraCoins
+      const allIds = [...compareCoins, ...extraCompareCoins, ...ratioExtraCoins].map(c => c.id);
+      if (allIds.includes(rSelected.id) || rSelected.id === currentCoinId) {
+        const alreadyInRatio = ratioExtraCoins.find(c => c.id === rSelected.id)
+          || compareCoins.find(c => c.id === rSelected.id)
+          || extraCompareCoins.find(c => c.id === rSelected.id);
+        if (!alreadyInRatio) {
+          ratioExtraCoins.push({ label: rSelected.symbol.toUpperCase(), id: rSelected.id, removable: true });
+        }
+        renderRatioTable();
+        freshInput.value = ""; rSelected = null; freshBtn.disabled = true;
+        return;
+      }
+
+      if (errEl) errEl.style.display = "none";
+      freshBtn.disabled = true; freshBtn.textContent = "Loading…";
+      try {
+        const res = await cgFetch("/coins/markets", {
+          vs_currency: "usd", ids: rSelected.id, price_change_percentage: "7d,30d,90d"
+        });
+        if (!res || !res[0]?.market_cap) throw new Error("No market data");
+        currentByIdRef[rSelected.id] = res[0];
+        currentPerfData[rSelected.id] = {
+          p7d:  res[0].price_change_percentage_7d_in_currency  ?? null,
+          p30d: res[0].price_change_percentage_30d_in_currency ?? null,
+          p90d: res[0].price_change_percentage_90d_in_currency ?? null,
+        };
+        // Add to both ratio and extra compare for cross-section sync
+        ratioExtraCoins.push({ label: rSelected.symbol.toUpperCase(), id: rSelected.id, removable: true });
+        extraCompareCoins.push({ label: rSelected.symbol.toUpperCase(), id: rSelected.id, removable: true });
+        renderTables();
+        renderPerfTable();
+        renderRatioTable();
+        load90dForAll();
+        freshInput.value = ""; rSelected = null; freshBtn.disabled = true;
+      } catch {
+        if (errEl) { errEl.textContent = "Could not fetch data."; errEl.style.display = "block"; }
+      } finally { freshBtn.textContent = "+ Add"; }
+    });
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     SCREENSHOT
+     Uses html2canvas — loaded lazily on first use
+     Watermark (TOKERIZE.TOP) revealed via .screenshot-mode class
+     Result: copied to clipboard or downloaded as PNG
+  ═══════════════════════════════════════════════════════════ */
+  function takeScreenshot(sectionId, filename) {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+    if (typeof html2canvas === "undefined") {
+      const s = document.createElement("script");
+      s.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+      s.onload = () => doScreenshot(section, filename);
+      document.head.appendChild(s);
+    } else {
+      doScreenshot(section, filename);
+    }
+  }
+
+  async function doScreenshot(el, filename) {
+    el.classList.add("screenshot-mode");
+    await new Promise(r => setTimeout(r, 50));
+    try {
+      const canvas = await html2canvas(el, {
+        backgroundColor: "#060818",
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+      finishDownload(canvas, filename);
+    } finally {
+      el.classList.remove("screenshot-mode");
+    }
+  }
+
+  async function finishDownload(finalCanvas, filename) {
+    try {
+      finalCanvas.toBlob(async blob => {
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+          showToast("📋 Screenshot copied to clipboard!");
+        } catch(e) {
+          const link = document.createElement("a");
+          link.download = `tokerize-${filename}-${Date.now()}.png`;
+          link.href = URL.createObjectURL(blob);
+          link.click();
+          showToast("💾 Screenshot downloaded!");
+        }
+      }, "image/png");
+    } catch(e) { showToast("⚠ Screenshot failed."); }
+  }
+
+  function showToast(msg) {
+    let t = document.getElementById("tkz-toast");
+    if (!t) {
+      t = document.createElement("div");
+      t.id = "tkz-toast";
+      t.style.cssText = "position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#060818;border:1px solid rgba(126,224,255,0.35);color:#7ee0ff;font-family:Rajdhani,monospace;font-size:15px;font-weight:700;letter-spacing:1px;padding:12px 28px;z-index:9999;pointer-events:none;transition:opacity 0.4s";
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.style.opacity = "1";
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = "0"; }, 2800);
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     MAIN DATA LOAD
+     Called once on DOMContentLoaded — loads CC + compare coins
+     then renders all sections
+  ═══════════════════════════════════════════════════════════ */
+  async function loadData() {
+    const compareIds = compareCoins.map(c => c.id);
+    const allIds = [RIZE_ID, ...compareIds, "chainlink"]
+      .filter((v, i, a) => a.indexOf(v) === i)
+      .join(",");
+
+    try {
+      // Parallel fetch: markets, detail (for tickers), global, fear&greed, perf
+      const [markets, detail, globalData, fearGreed, perfData, altSeasonData] = await Promise.all([
+        cgFetch("/coins/markets", { vs_currency: "usd", ids: allIds, price_change_percentage: "7d,30d,90d" }),
+        cgFetch(`/coins/${RIZE_ID}`).catch(() => null),
+        cgFetch("/global").catch(() => null),
+       fetch("https://api.alternative.me/fng/?limit=1").then(r => r.json()).catch(() => null),
+cgFetch("/coins/markets", { vs_currency: "usd", ids: allIds, price_change_percentage: "7d,30d,90d" }).catch(() => []),
+      fetch("https://api.coin-stats.com/v2/markets/chart/altcoin_season_index?type=3m").then(r => r.json()).catch(() => null),
+      ]);
+
+      const byId     = Object.fromEntries(markets.map(c => [c.id, c]));
+      const perfById = Object.fromEntries((perfData || []).map(c => [c.id, c]));
+      const main     = byId[RIZE_ID];
+      if (!main) throw new Error("CC data not found");
+
+      // Launch TV chart (needs tickers from detail for exchange resolution)
+      renderChart(RIZE_ID, RIZE_NAME, RIZE_SYM, detail?.tickers || null);
+
+      // Destructure main coin data
+      const {
+        current_price:          price,
+        market_cap:             mcap,
+        fully_diluted_valuation: fdv,
+        circulating_supply:     supply,
+        price_change_percentage_24h: pct24h,
+        ath, ath_date,
+        market_cap_rank: rank,
+      } = main;
+
+      const daysSinceAth = ath_date
+        ? Math.floor((Date.now() - new Date(ath_date)) / (1000 * 60 * 60 * 24))
+        : null;
+
+      const mainPerf = perfById[RIZE_ID] || main;
+      const pct7d    = mainPerf.price_change_percentage_7d_in_currency  ?? null;
+      const pct30d   = mainPerf.price_change_percentage_30d_in_currency ?? null;
+
+      // Update hero live price
+      document.getElementById("hero-price").textContent = price ? "$" + fmtPrice(price) : "N/A";
+
+      // % to ATH block
+      const pctToAth  = ath && price ? ((ath - price) / price * 100) : null;
+      const athBlock  = pctToAth !== null
+        ? `<div class="metric"><span class="metric-label">% to ATH</span><span class="metric-value" style="color:${pctToAth > 0 ? "var(--gold)" : "var(--green)"}">${pctToAth > 0 ? "+" : ""}${pctToAth.toFixed(1)}%</span></div>`
+        : "";
+
+      // TVS / TVL block (optional, if available)
+      const tvsRaw  = detail?.market_data?.total_value_secured?.usd;
+      const tvlRaw  = detail?.market_data?.total_value_locked?.usd;
+      const tvMetric = tvsRaw || tvlRaw || null;
+      const tvLabel  = tvsRaw ? "TVS" : "TVL";
+      let tvBlock = "";
+      if (tvMetric) {
+        tvBlock = `
+          <div class="metric"><span class="metric-label">${tvLabel}</span><span class="metric-value accent-green">${formatLargeNum(tvMetric)}</span></div>
+          <div class="metric"><span class="metric-label">MCAP / ${tvLabel}</span><span class="metric-value">${(mcap / tvMetric).toFixed(2)}</span></div>
+          <div class="metric"><span class="metric-label">FDV / ${tvLabel}</span><span class="metric-value">${(fdv / tvMetric).toFixed(2)}</span></div>`;
+      }
+
+      // ── Render Core Metrics
+      document.getElementById("main-data").innerHTML = `<div class="metrics">
+        <div class="metric"><span class="metric-label">Price</span><span class="metric-value accent-cyan">$${fmtPrice(price)}</span></div>
+        <div class="metric"><span class="metric-label">Rank</span><span class="metric-value accent-cyan">${rank ? "#" + rank : "N/A"}</span></div>
+        <div class="metric"><span class="metric-label">Market Cap</span><span class="metric-value">${formatLargeNum(mcap)}</span></div>
+        <div class="metric"><span class="metric-label">FDV</span><span class="metric-value accent-gold">${formatLargeNum(fdv)}</span></div>
+        <div class="metric"><span class="metric-label">Circ. Supply</span><span class="metric-value accent-pink">${fmtSupply(supply)}</span></div>
+        <div class="metric"><span class="metric-label">Total Supply</span><span class="metric-value accent-pink">${main.total_supply ? fmtSupply(main.total_supply) : "N/A"}</span></div>
+        <div class="metric"><span class="metric-label">24h Change</span><span class="metric-value">${fmtPct(pct24h)}</span></div>
+        <div class="metric"><span class="metric-label">7D Change</span><span class="metric-value">${pct7d  !== null ? fmtPct(pct7d)  : "N/A"}</span></div>
+        <div class="metric"><span class="metric-label">1M Change</span><span class="metric-value">${pct30d !== null ? fmtPct(pct30d) : "N/A"}</span></div>
+        <div class="metric"><span class="metric-label">ATH</span><span class="metric-value">$${fmtPrice(ath)}</span></div>
+        ${athBlock}
+        ${daysSinceAth !== null ? `<div class="metric"><span class="metric-label">Last ATH</span><span class="metric-value" style="color:var(--muted)">${daysSinceAth}d ago</span></div>` : ""}
+        ${tvBlock}
+      </div>`;
+
+      // Update global state
+      currentByIdRef  = { ...byId };
+      currentSupply   = supply;
+      currentMcap     = mcap;
+      currentPrice    = price;
+
+      // Build perf data for all loaded coins
+      currentPerfData = {};
+      [...compareCoins, { id: RIZE_ID }].forEach(c => {
+        const p = byId[c.id] || perfById[c.id];
+        if (p) currentPerfData[c.id] = {
+          p7d:  p.price_change_percentage_7d_in_currency  ?? null,
+          p30d: p.price_change_percentage_30d_in_currency ?? null,
+          p90d: p.price_change_percentage_90d_in_currency ?? null,
+        };
+      });
+
+      // Initialise table HTML containers
+      document.getElementById("comparisons").innerHTML = `
+        <div class="table-wrap"><table>
+          <thead id="comp-table-head">
+            <tr><th>Asset</th><th>MCAP</th><th>${RIZE_SYM} Price</th><th>% Change</th><th>% of MCAP</th></tr>
+          </thead>
+          <tbody id="comp-table-body"></tbody>
+        </table></div>`;
+
+      document.getElementById("bag-simulations").innerHTML = `
+        <div class="table-wrap"><table>
+          <thead id="bag-table-head">
+            <tr><th>Asset</th><th>${RIZE_SYM} Hyp. Price</th><th>Bag Value</th><th>Bag Gain/Loss</th></tr>
+          </thead>
+          <tbody id="bag-table-body"></tbody>
+        </table></div>`;
+
+      // Bag input — clone to reset listeners
+      const bagInput   = document.getElementById("bag-amount-input");
+      const bagDisplay = document.getElementById("bag-amount-display");
+      if (bagInput) {
+        const freshBag = bagInput.cloneNode(true);
+        bagInput.parentNode.replaceChild(freshBag, bagInput);
+        freshBag.addEventListener("input", () => {
+          const v = parseFloat(freshBag.value);
+          if (!isNaN(v) && v > 0) {
+            currentBagAmount = v;
+            if (bagDisplay) bagDisplay.textContent = `= ${Number(v).toLocaleString()} ${RIZE_SYM}`;
+            // Sync to Ratio bag input
+            const ratioBag     = document.getElementById("ratio-bag-input");
+            const ratioBagDisp = document.getElementById("ratio-bag-display");
+            if (ratioBag)     ratioBag.value = v;
+            if (ratioBagDisp) ratioBagDisp.textContent = `= ${Number(v).toLocaleString()} ${RIZE_SYM}`;
+            renderTables();
+            renderRatioTable();
+          }
+        });
+      }
+      if (bagDisplay) bagDisplay.textContent = `= ${currentBagAmount.toLocaleString()} ${RIZE_SYM}`;
+
+      // Initial renders
+      renderTables();
+      renderPerfTable();
+      load90dForAll(); // async — fills 90D perf after initial render
+
+      // Wire all search bars
+      wireSearchBar("add-compare-input",        "add-compare-autocomplete",        "add-compare-btn",        "add-compare-error");
+      wireSearchBar("add-compare-input-bag",     "add-compare-autocomplete-bag",    "add-compare-btn-bag",    "add-compare-error-bag");
+      wireSearchBar("add-compare-input-footer",  "add-compare-autocomplete-footer", "add-compare-btn-footer", "add-compare-error-footer");
+      wireRatioSearchBar();
+
+      // Ratio bag input — clone + sync to main bag
+      const ratioBagInput   = document.getElementById("ratio-bag-input");
+      const ratioBagDisplay = document.getElementById("ratio-bag-display");
+      if (ratioBagInput) {
+        ratioBagInput.value = currentBagAmount;
+        if (ratioBagDisplay) ratioBagDisplay.textContent = `= ${Number(currentBagAmount).toLocaleString()} ${RIZE_SYM}`;
+        const freshRatioBag = ratioBagInput.cloneNode(true);
+        ratioBagInput.parentNode.replaceChild(freshRatioBag, ratioBagInput);
+        freshRatioBag.value = currentBagAmount;
+        freshRatioBag.addEventListener("input", () => {
+          const v = parseFloat(freshRatioBag.value);
+          if (!isNaN(v) && v >= 0) {
+            currentBagAmount = v;
+            if (ratioBagDisplay) ratioBagDisplay.textContent = `= ${Number(v).toLocaleString()} ${RIZE_SYM}`;
+            // Sync to main bag
+            const mainBag     = document.getElementById("bag-amount-input");
+            const mainDisplay = document.getElementById("bag-amount-display");
+            if (mainBag)     mainBag.value = v;
+            if (mainDisplay) mainDisplay.textContent = `= ${Number(v).toLocaleString()} ${RIZE_SYM}`;
+            renderTables();
+            renderRatioTable();
+          }
+        });
+      }
+
+      // Initial ratio render
+      renderRatioTable();
+
+      // ── Market Context
+      let ctx = "";
+      if (globalData) {
+        const mcapPcts    = globalData.data.market_cap_percentage;
+        const btcDom      = mcapPcts.btc;
+        const ethDom      = mcapPcts.eth;
+        const totalCap    = globalData.data.total_market_cap.usd;
+        const linkMcap    = byId["chainlink"]?.market_cap || null;
+        const linkDom     = linkMcap && totalCap ? (linkMcap / totalCap * 100) : null;
+        const coinDomPct  = mcap && totalCap ? (mcap / totalCap * 100) : null;
+        const fear        = fearGreed?.data?.[0]?.value || "N/A";
+        const fearText    = fearGreed?.data?.[0]?.value_classification || "";
+        const lastEntry = altSeasonData?.altcoinSeasonIndexChart?.slice(-1)[0];
+const altScore = lastEntry?.altcoinSeasonIndex ?? null;
+const altLabel = altScore !== null ? altScore + "/100" : "N/A";
+
+        ctx += `<div class="metrics">
+          <div class="metric"><span class="metric-label">BTC Dominance</span><span class="metric-value accent-cyan">${Number(btcDom).toFixed(2)}%</span></div>
+          <div class="metric"><span class="metric-label">ETH Dominance</span><span class="metric-value">${Number(ethDom).toFixed(2)}%</span></div>
+          <div class="metric"><span class="metric-label">LINK Dominance</span><span class="metric-value accent-gold">${linkDom !== null ? Number(linkDom).toFixed(3) + "%" : "N/A"}</span></div>
+          <div class="metric"><span class="metric-label">RIZE Dominance</span><span class="metric-value accent-pink">${coinDomPct !== null ? coinDomPct.toFixed(4) + "%" : "N/A"}</span></div>
+        </div><br>
+        <div class="metrics">
+          <div class="metric"><span class="metric-label">Total Market Cap</span><span class="metric-value accent-gold">${formatLargeNum(totalCap)}</span></div>
+          <div class="metric"><span class="metric-label">Fear &amp; Greed</span><span class="metric-value">${fear} <span style="font-size:18px;font-family:inherit">(${fearText})</span></span></div>
+         <div class="metric"><span class="metric-label">BTC/Alt Season</span><span class="metric-value" style="font-size:20px">${altScore>=75?"Altcoin Season 🟢":(altScore>=45&&altScore<=55)?"Neutral ⚪":"Bitcoin Season 🟠"}</span></div>
+<div class="metric"><span class="metric-label">Alt Season Score</span><span class="metric-value alt-season-score" style="color:${altScore>=75?"var(--green)":altScore>=25?"var(--muted)":"var(--gold)"}">${altLabel}</span></div>
+        </div><br>`;
+        
+      }
+
+      // Valuation zone (if TVS/TVL available) or fallback to rank
+      if (tvMetric && mcap) {
+        const r = mcap / tvMetric;
+        const l = r < 0.3 ? "Undervalued 🟢" : r <= 1 ? "Fair Value 🟡" : "Overvalued 🔴";
+        ctx += `<div class="metric"><span class="metric-label">Valuation Zone (MCAP/${tvLabel})</span><span class="metric-value">${l}</span></div>`;
+      } else if (rank) {
+        ctx += `<div class="metric"><span class="metric-label">Market Cap Rank</span><span class="metric-value accent-cyan">#${rank}</span></div>`;
+      }
+
+      document.getElementById("market-context").innerHTML = ctx || '<div class="chart-placeholder">No context data.</div>';
+
+    } catch(e) {
+      // Show error in all sections
+      const b = `<div class="error-box">⚠ ${e.message}</div>`;
+      ["main-data","comparisons","bag-simulations","market-context","perf-table-wrap","ratio-table-wrap"]
+        .forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = b; });
+      document.getElementById("hero-price").textContent = "Error";
+    }
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     INIT — load data on page ready
+  ═══════════════════════════════════════════════════════════ */
+  document.addEventListener("DOMContentLoaded", loadData);
+
+  </script>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       TOKERIZE FOOTER
+  ═══════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="footer-logo">
+      <img src="data:image/png;base64,PLACEHOLDER" alt="Tokerize"/>
+    </div>
+    <nav class="footer-nav">
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/hub">RIZE Data Hub</a>
+    </nav>
+    <p class="footer-copy">&copy; 2026 Tokerize &mdash; RIZE Community Tokenization Hub</p>
+  </footer>
+
+</body>
+</html>
