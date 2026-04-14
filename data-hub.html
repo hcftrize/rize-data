@@ -2015,27 +2015,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
          <div class="metric"><span class="metric-label">BTC/Alt Season</span><span class="metric-value" style="font-size:20px">${altScore>=75?"Altcoin Season 🟢":(altScore>=45&&altScore<=55)?"Neutral ⚪":"Bitcoin Season 🟠"}</span></div>
 <div class="metric"><span class="metric-label">Alt Season Score</span><span class="metric-value alt-season-score" style="color:${altScore>=75?"var(--green)":altScore>=25?"var(--muted)":"var(--gold)"}">${altLabel}</span></div>
         </div><br>`;
-
-        // 7D/30D perf mini table
-        const perfTokens = [
-          { id: RIZE_ID,      label: "RIZE" },
-          { id: "bitcoin",    label: "BTC"  },
-          { id: "ethereum",   label: "ETH"  },
-          { id: "chainlink",  label: "LINK" },
-        ];
-        const perfRows = perfTokens
-          .filter(t => perfById[t.id] || byId[t.id])
-          .map(t => {
-            const p   = perfById[t.id] || byId[t.id];
-            const p7  = p.price_change_percentage_7d_in_currency;
-            const p30 = p.price_change_percentage_30d_in_currency;
-            return `<tr>
-              <td><span class="${assetTagClass2(t.id)}">${t.label}</span></td>
-              <td>${p7  != null ? fmtPct(p7)  : "N/A"}</td>
-              <td>${p30 != null ? fmtPct(p30) : "N/A"}</td>
-            </tr>`;
-          }).join("");
-        if (perfRows) ctx += `<div class="table-wrap"><table><tr><th>Asset</th><th>7D Perf.</th><th>30D Perf.</th></tr>${perfRows}</table></div><br>`;
+        
       }
 
       // Valuation zone (if TVS/TVL available) or fallback to rank
