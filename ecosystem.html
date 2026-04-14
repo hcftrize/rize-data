@@ -95,38 +95,27 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 @media(max-width:600px){.eco-wrap{padding:20px 12px 60px;}.eco-hero{padding:32px 16px;}.lc-header{padding:18px 16px 0;}.slider-wrap{padding:14px 16px 0;}.slider-controls{padding:10px 16px 0;}.info-box{margin:14px 16px 20px;padding:18px 16px;}.team-section{padding:14px 16px 0;}.team-grid{grid-template-columns:repeat(2,1fr);}.deals-grid{padding:14px 16px 0;}.photo-credit{padding:8px 16px 12px;}}
 
 /* ═══════ RIZE NETWORK MAP STYLES ═══════ */
-.rn-map-area{margin:20px 32px 0;background:#fff;border:1px solid #dde4ed;position:relative;overflow:hidden;}
+.rn-map-area{margin:20px 0 0;background:#fff;border-top:1px solid #dde4ed;position:relative;overflow:hidden;}
 #rn-svg{display:block;width:100%;}
-/* node hover/active */
 .rn-node{cursor:pointer;}
 .rn-box{fill:#fff;stroke:#b8cce0;stroke-width:1;transition:stroke 0.2s,fill 0.15s;}
 .rn-node:hover .rn-box,.rn-node.rn-on .rn-box{stroke:#0d2d4e;stroke-width:1.5;fill:#eef3f8;}
 .rn-box-c{fill:#eef3f8;stroke:#0d2d4e;stroke-width:1.5;}
 .rn-node:hover .rn-box-c,.rn-node.rn-on .rn-box-c{fill:#dce8f2;stroke:#0a2240;stroke-width:2;}
-/* connector labels */
+.rn-box-gold{fill:#fffbef;stroke:#c8960a;stroke-width:1.5;}
+.rn-node:hover .rn-box-gold,.rn-node.rn-on .rn-box-gold{fill:#fff3cc;stroke:#a07000;stroke-width:2;}
 .rn-conn{cursor:pointer;}
 .rn-conn-bg{fill:#fff;stroke:#b8cce0;stroke-width:1;}
 .rn-conn:hover .rn-conn-bg{stroke:#0d2d4e;fill:#eef3f8;}
-.rn-conn-txt{font-family:'Rajdhani',sans-serif;font-size:8px;font-weight:700;letter-spacing:1px;fill:#0d2d4e;text-anchor:middle;}
-.rn-conn-txt-gold{font-family:'Rajdhani',sans-serif;font-size:8px;font-weight:700;letter-spacing:1px;fill:#8a6200;text-anchor:middle;}
-/* token utility cards */
-.rn-util-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid #e0e0e0;margin-top:0;}
-.rn-util-card{padding:24px 24px 20px;border-right:1px solid #e0e0e0;cursor:pointer;transition:background 0.15s;}
-.rn-util-card:last-child{border-right:none;}
-.rn-util-card:hover,.rn-util-card.rn-on{background:#eef3f8;}
-.rn-util-num{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(13,45,78,0.35);display:block;margin-bottom:8px;}
-.rn-util-title{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#0d2d4e;margin-bottom:0;line-height:1.25;}
-/* shared info box */
+.rn-conn-txt{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;fill:#0d2d4e;text-anchor:middle;}
+.rn-conn-txt-gold{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;fill:#8a6200;text-anchor:middle;}
 .rn-info-box{margin:0 32px 32px;border:1px solid #e0e0e0;border-left:3px solid var(--navy);background:#f7f9fc;padding:22px 26px;min-height:80px;}
 .rn-prompt{font-family:'DM Mono',monospace;font-size:13px;color:#888;font-style:italic;}
 .rn-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);margin-bottom:12px;display:none;}
 .rn-body{font-family:'DM Mono',monospace;font-size:13px;color:#222;line-height:1.85;display:none;}
-.rn-map-hint{text-align:center;padding:8px;font-family:'DM Mono',monospace;font-size:10px;color:#aaa;letter-spacing:0.5px;border-top:1px solid #f0f0f0;}
+.rn-map-hint{text-align:center;padding:8px 0 4px;font-family:'DM Mono',monospace;font-size:10px;color:#aaa;letter-spacing:0.5px;}
 @media(max-width:900px){
-  .rn-util-grid{grid-template-columns:1fr;}
-  .rn-util-card{border-right:none;border-bottom:1px solid #e0e0e0;}
-  .rn-util-card:last-child{border-bottom:none;}
-  .rn-map-area{margin:14px 16px 0;}
+  .rn-map-area{margin:14px 0 0;}
   .rn-info-box{margin:0 16px 20px;padding:16px;}
 }
 </style>
@@ -162,160 +151,176 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     <p>The full technical architecture of the RIZE ecosystem — click any node or connector to learn more.</p>
   </div>
 
-  <!-- SVG MAP -->
+  <!-- SVG MAP — full width, larger nodes, merged FL, gold utility nodes inside SVG -->
   <div class="rn-map-area">
-    <svg id="rn-svg" viewBox="0 0 960 500" xmlns="http://www.w3.org/2000/svg">
+    <svg id="rn-svg" viewBox="0 0 1060 740" xmlns="http://www.w3.org/2000/svg">
 
-      <!-- ░░ CONNECTORS — drawn first (behind nodes) ░░ -->
+      <!-- ░░ BACKGROUND GRID ░░ -->
+      <defs>
+        <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse">
+          <path d="M 36 0 L 0 0 0 36" fill="none" stroke="rgba(13,45,78,0.04)" stroke-width="0.5"/>
+        </pattern>
+      </defs>
+      <rect width="1060" height="740" fill="url(#grid)"/>
 
-      <!-- Canton ↔ T-RIZE platform (curved) -->
-      <path d="M226,127 Q280,108 330,108" fill="none" stroke="#b8cce0" stroke-width="1"/>
+      <!-- ░░ CONNECTORS ░░ -->
+
+      <!-- Canton ↔ T-RIZE -->
+      <path d="M248,152 Q295,128 340,128" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
       <!-- T-RIZE ↔ Fireblocks -->
-      <path d="M530,108 Q600,90 660,88" fill="none" stroke="#b8cce0" stroke-width="1"/>
+      <path d="M564,122 Q634,104 696,102" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
       <!-- T-RIZE ↔ Base -->
-      <path d="M530,125 Q610,160 660,175" fill="none" stroke="#b8cce0" stroke-width="1"/>
-      <!-- T-RIZE ↔ Rizenet (vertical) -->
-      <line x1="430" y1="152" x2="430" y2="220" stroke="#b8cce0" stroke-width="1"/>
+      <path d="M564,138 Q634,175 696,185" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
       <!-- T-RIZE ↔ ATS -->
-      <path d="M380,152 Q280,190 230,220" fill="none" stroke="#b8cce0" stroke-width="1"/>
-      <!-- Rizenet ↔ T-RIZE platform (already above) -->
-      <!-- Rizenet ↔ Base -->
-      <path d="M536,252 Q610,240 660,210" fill="none" stroke="#7aa8c4" stroke-width="1.3"/>
-      <!-- CCIP label on Rizenet–Base -->
+      <path d="M404,168 Q310,205 248,232" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
+      <!-- T-RIZE ↔ Rizenet (vertical) -->
+      <line x1="460" y1="168" x2="460" y2="238" stroke="#b8cce0" stroke-width="1.4"/>
+
+      <!-- Rizenet ↔ Base (CCIP arc) -->
+      <path d="M578,278 Q650,250 696,218" fill="none" stroke="#7aa8c4" stroke-width="1.6"/>
       <g class="rn-conn" id="conn-ccip">
-        <rect class="rn-conn-bg" x="576" y="224" width="36" height="14" rx="2"/>
-        <text class="rn-conn-txt" x="594" y="234">CCIP</text>
+        <rect class="rn-conn-bg" x="622" y="240" width="48" height="18" rx="2"/>
+        <text class="rn-conn-txt" x="646" y="253">CCIP</text>
       </g>
-      <!-- Rizenet ↔ Chainlink oracle -->
-      <path d="M536,258 Q610,275 660,282" fill="none" stroke="#b8cce0" stroke-width="1"/>
-      <!-- Rizenet ↔ Proof node (via Chainlink) -->
-      <line x1="726" y1="312" x2="726" y2="360" stroke="#b8cce0" stroke-width="1"/>
-      <!-- Rizenet ↔ Insurance Claims (dashed gold) -->
-      <path d="M400,310 Q320,345 262,360" fill="none" stroke="#c8960a" stroke-width="1" stroke-dasharray="5 4"/>
-      <!-- Wrap Messaging label 1 -->
+
+      <!-- Rizenet ↔ Chainlink -->
+      <path d="M578,286 Q648,295 696,302" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
+      <!-- Chainlink ↔ Proof -->
+      <line x1="778" y1="352" x2="778" y2="388" stroke="#b8cce0" stroke-width="1.2"/>
+
+      <!-- Rizenet ↔ FL (dashed gold) — single merged node -->
+      <path d="M440,340 Q380,378 340,398" fill="none" stroke="#c8960a" stroke-width="1.2" stroke-dasharray="6 4"/>
       <g class="rn-conn" id="conn-wrap1">
-        <rect class="rn-conn-bg" x="290" y="327" width="88" height="14" rx="2" style="stroke:#c8960a"/>
-        <text class="rn-conn-txt-gold" x="334" y="337">WRAP MESSAGING</text>
+        <rect class="rn-conn-bg" x="356" y="364" width="104" height="18" rx="2" style="stroke:#c8960a"/>
+        <text class="rn-conn-txt-gold" x="408" y="377">WRAP MESSAGING</text>
       </g>
-      <!-- Rizenet ↔ Default Risks (dashed gold) -->
-      <path d="M430,310 Q430,338 430,360" fill="none" stroke="#c8960a" stroke-width="1" stroke-dasharray="5 4"/>
-      <!-- Wrap Messaging label 2 -->
-      <g class="rn-conn" id="conn-wrap2">
-        <rect class="rn-conn-bg" x="386" y="327" width="88" height="14" rx="2" style="stroke:#c8960a"/>
-        <text class="rn-conn-txt-gold" x="430" y="337">WRAP MESSAGING</text>
-      </g>
+
+      <!-- ░░ UTILITY SECTION SEPARATOR ░░ -->
+      <line x1="40" y1="524" x2="1020" y2="524" stroke="#e8c44a" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4"/>
+
+      <!-- RIZE TOKEN UTILITY header band -->
+      <rect x="0" y="530" width="1060" height="28" fill="rgba(200,150,10,0.06)"/>
+      <text x="530" y="549" text-anchor="middle" font-family="Rajdhani,sans-serif" font-size="13" font-weight="700" letter-spacing="3" fill="#8a6200">RIZE TOKEN UTILITY</text>
 
       <!-- ░░ NODES ░░ -->
 
-      <!-- CANTON — top left, 190×120 -->
+      <!-- CANTON — top left, 208×138 -->
       <g class="rn-node" id="nd-canton">
-        <rect class="rn-box" x="30" y="62" width="196" height="130" rx="2"/>
-        <text x="42" y="82" font-family="Rajdhani,sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.5" fill="#4a7ca0">DISTRIBUTED LEDGER</text>
-        <text x="42" y="100" font-family="Rajdhani,sans-serif" font-size="14" font-weight="700" fill="#0d2d4e">Canton Network</text>
-        <text x="42" y="116" font-family="DM Mono,monospace" font-size="9" fill="#666">Institutional DLT</text>
-        <line x1="42" y1="126" x2="215" y2="126" stroke="#dde4ed" stroke-width="0.8"/>
-        <text x="42" y="142" font-family="DM Mono,monospace" font-size="8.5" fill="#999">Members:</text>
-        <text id="canton-member" x="102" y="142" font-family="DM Mono,monospace" font-size="8.5" fill="#0d2d4e">BNY Mellon</text>
-        <text x="42" y="157" font-family="DM Mono,monospace" font-size="7.5" fill="#bbb">(click for full list)</text>
-        <text x="214" y="142" font-family="Rajdhani,sans-serif" font-size="11" fill="#b8cce0" text-anchor="middle">↓</text>
+        <rect class="rn-box" x="30" y="70" width="218" height="142" rx="2"/>
+        <text x="46" y="94" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">DISTRIBUTED LEDGER</text>
+        <text x="46" y="118" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Canton Network</text>
+        <text x="46" y="138" font-family="DM Mono,monospace" font-size="11" fill="#666">Institutional DLT</text>
+        <line x1="46" y1="150" x2="236" y2="150" stroke="#dde4ed" stroke-width="0.8"/>
+        <text x="46" y="167" font-family="DM Mono,monospace" font-size="10" fill="#999">Members:</text>
+        <text id="canton-member" x="116" y="167" font-family="DM Mono,monospace" font-size="10" fill="#0d2d4e">BNY Mellon</text>
+        <text x="46" y="184" font-family="DM Mono,monospace" font-size="9" fill="#bbb">(click for full list)</text>
       </g>
 
-      <!-- T-RIZE PLATFORM — center top, 200×92 -->
+      <!-- T-RIZE PLATFORM — center top, 224×100 -->
       <g class="rn-node" id="nd-trize">
-        <rect class="rn-box-c" x="330" y="62" width="200" height="90" rx="2"/>
-        <text x="342" y="95" font-family="Rajdhani,sans-serif" font-size="16" font-weight="700" fill="#0d2d4e">T-RIZE platform</text>
-        <text x="342" y="114" font-family="DM Mono,monospace" font-size="9" fill="#4a7ca0">Institutional Tokenization Platform</text>
+        <rect class="rn-box-c" x="340" y="68" width="240" height="100" rx="2"/>
+        <text x="358" y="108" font-family="Rajdhani,sans-serif" font-size="20" font-weight="700" fill="#0d2d4e">T-RIZE platform</text>
+        <text x="358" y="130" font-family="DM Mono,monospace" font-size="11" fill="#4a7ca0">Institutional Tokenization Platform</text>
       </g>
 
-      <!-- FIREBLOCKS — top right, 190×74 -->
+      <!-- FIREBLOCKS — top right, 210×86 -->
       <g class="rn-node" id="nd-fireblocks">
-        <rect class="rn-box" x="660" y="50" width="192" height="76" rx="2"/>
-        <text x="672" y="70" font-family="Rajdhani,sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.5" fill="#4a7ca0">WALLET PROVIDER</text>
-        <text x="672" y="90" font-family="Rajdhani,sans-serif" font-size="14" font-weight="700" fill="#0d2d4e">Fireblocks</text>
-        <text x="672" y="108" font-family="DM Mono,monospace" font-size="9" fill="#666">Multi-Party Computation wallets</text>
+        <rect class="rn-box" x="696" y="60" width="320" height="88" rx="2"/>
+        <text x="714" y="82" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">WALLET PROVIDER</text>
+        <text x="714" y="106" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Fireblocks</text>
+        <text x="714" y="128" font-family="DM Mono,monospace" font-size="11" fill="#666">Multi-Party Computation wallets</text>
       </g>
 
-      <!-- BASE — right mid, 192×72 -->
+      <!-- BASE — right mid, 320×84 -->
       <g class="rn-node" id="nd-base">
-        <rect class="rn-box" x="660" y="162" width="192" height="72" rx="2"/>
-        <text x="672" y="182" font-family="Rajdhani,sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.5" fill="#4a7ca0">BLOCKCHAIN</text>
-        <text x="672" y="202" font-family="Rajdhani,sans-serif" font-size="14" font-weight="700" fill="#0d2d4e">Base</text>
-        <text x="672" y="220" font-family="DM Mono,monospace" font-size="9" fill="#666">Coinbase's ETH L2</text>
+        <rect class="rn-box" x="696" y="176" width="320" height="84" rx="2"/>
+        <text x="714" y="198" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">BLOCKCHAIN</text>
+        <text x="714" y="222" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Base</text>
+        <text x="714" y="244" font-family="DM Mono,monospace" font-size="11" fill="#666">Coinbase's ETH L2</text>
       </g>
 
-      <!-- ATS — left mid, 192×72 -->
+      <!-- ATS — left mid, 218×84 -->
       <g class="rn-node" id="nd-ats">
-        <rect class="rn-box" x="30" y="220" width="200" height="72" rx="2"/>
-        <text x="42" y="240" font-family="Rajdhani,sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.5" fill="#4a7ca0">SEC-REGISTERED ATS</text>
-        <text x="42" y="260" font-family="Rajdhani,sans-serif" font-size="14" font-weight="700" fill="#0d2d4e">Texture Capital</text>
-        <text x="42" y="278" font-family="DM Mono,monospace" font-size="9" fill="#666">Compliant US Distribution</text>
+        <rect class="rn-box" x="30" y="228" width="218" height="84" rx="2"/>
+        <text x="46" y="250" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">SEC-REGISTERED ATS</text>
+        <text x="46" y="274" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Texture Capital</text>
+        <text x="46" y="296" font-family="DM Mono,monospace" font-size="11" fill="#666">Compliant US Distribution</text>
       </g>
 
-      <!-- RIZENET — center mid, 206×92 -->
+      <!-- RIZENET — center mid, 238×102 -->
       <g class="rn-node" id="nd-rizenet">
-        <rect class="rn-box-c" x="328" y="220" width="208" height="92" rx="2"/>
-        <text x="340" y="242" font-family="Rajdhani,sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.5" fill="#4a7ca0">BLOCKCHAIN</text>
-        <text x="340" y="264" font-family="Rajdhani,sans-serif" font-size="16" font-weight="700" fill="#0d2d4e">Rizenet</text>
-        <text x="340" y="283" font-family="DM Mono,monospace" font-size="9" fill="#4a7ca0">Business Intelligence Chain</text>
+        <rect class="rn-box-c" x="342" y="238" width="236" height="102" rx="2"/>
+        <text x="358" y="262" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">BLOCKCHAIN</text>
+        <text x="358" y="292" font-family="Rajdhani,sans-serif" font-size="22" font-weight="700" fill="#0d2d4e">Rizenet</text>
+        <text x="358" y="316" font-family="DM Mono,monospace" font-size="11" fill="#4a7ca0">Business Intelligence Chain</text>
       </g>
 
-      <!-- CHAINLINK ORACLE — right mid-low, 192×80 -->
+      <!-- CHAINLINK ORACLE — right mid, 320×88 -->
       <g class="rn-node" id="nd-chainlink">
-        <rect class="rn-box" x="660" y="258" width="192" height="80" rx="2"/>
-        <text x="672" y="278" font-family="Rajdhani,sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.5" fill="#4a7ca0">ORACLE</text>
-        <text x="672" y="298" font-family="Rajdhani,sans-serif" font-size="13" font-weight="700" fill="#0d2d4e">Real Time Data</text>
-        <text x="672" y="314" font-family="DM Mono,monospace" font-size="8.5" fill="#666">Provider: Chainlink</text>
+        <rect class="rn-box" x="696" y="278" width="320" height="88" rx="2"/>
+        <text x="714" y="300" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">ORACLE</text>
+        <text x="714" y="326" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Real Time Data</text>
+        <text x="714" y="348" font-family="DM Mono,monospace" font-size="11" fill="#666">Provider: Chainlink</text>
       </g>
 
-      <!-- PROOF (rotating) — bottom right, 192×72 -->
+      <!-- PROOF (rotating) — bottom right, 320×80 -->
       <g class="rn-node" id="nd-proof">
-        <rect class="rn-box" x="660" y="360" width="192" height="72" rx="2"/>
-        <text x="672" y="380" font-family="Rajdhani,sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.5" fill="#4a7ca0">ORACLE</text>
-        <text id="proof-lbl" x="672" y="400" font-family="Rajdhani,sans-serif" font-size="13" font-weight="700" fill="#0d2d4e" style="transition:opacity 0.3s">Proof of Origin</text>
-        <text x="672" y="417" font-family="DM Mono,monospace" font-size="8.5" fill="#666">Provider: Chainlink</text>
+        <rect class="rn-box" x="696" y="388" width="320" height="84" rx="2"/>
+        <text x="714" y="410" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">ORACLE</text>
+        <text id="proof-lbl" x="714" y="436" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e" style="transition:opacity 0.3s">Proof of Origin</text>
+        <text x="714" y="458" font-family="DM Mono,monospace" font-size="11" fill="#666">Provider: Chainlink</text>
       </g>
 
-      <!-- INSURANCE CLAIMS — bottom left, 192×90 -->
-      <g class="rn-node" id="nd-insurance">
-        <rect class="rn-box" x="160" y="360" width="204" height="92" rx="2"/>
-        <text x="172" y="380" font-family="Rajdhani,sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.5" fill="#4a7ca0">FEDERATED LEARNING</text>
-        <text x="172" y="400" font-family="Rajdhani,sans-serif" font-size="13" font-weight="700" fill="#0d2d4e">Insurance Claims</text>
-        <text x="172" y="418" font-family="DM Mono,monospace" font-size="8.5" fill="#c8960a">Status: In Development</text>
-        <text x="172" y="434" font-family="DM Mono,monospace" font-size="8" fill="#bbb">Privacy-preserving model</text>
+      <!-- FEDERATED LEARNING — merged, bottom center-left, 340×100 -->
+      <g class="rn-node" id="nd-fl">
+        <rect class="rn-box" x="30" y="388" width="624" height="100" rx="2"/>
+        <text x="48" y="412" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">FEDERATED LEARNING</text>
+        <text x="48" y="440" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Insurance Claims &amp; Default Risks</text>
+        <text x="48" y="462" font-family="DM Mono,monospace" font-size="11" fill="#666">Privacy-preserving models · Active development</text>
+        <!-- divider -->
+        <line x1="330" y1="405" x2="330" y2="478" stroke="#dde4ed" stroke-width="0.8"/>
+        <!-- second column info -->
+        <text x="348" y="432" font-family="DM Mono,monospace" font-size="10" fill="#888">Use cases: default risk scoring, construction cost</text>
+        <text x="348" y="448" font-family="DM Mono,monospace" font-size="10" fill="#888">prediction, anomaly detection, LTV optimisation</text>
+        <text x="348" y="464" font-family="DM Mono,monospace" font-size="10" fill="#c8960a">RIZE required for inference access &amp; contributor rewards</text>
       </g>
 
-      <!-- DEFAULT RISKS — bottom center, 192×90 -->
-      <g class="rn-node" id="nd-default">
-        <rect class="rn-box" x="380" y="360" width="204" height="92" rx="2"/>
-        <text x="392" y="380" font-family="Rajdhani,sans-serif" font-size="8.5" font-weight="700" letter-spacing="1.5" fill="#4a7ca0">FEDERATED LEARNING</text>
-        <text x="392" y="400" font-family="Rajdhani,sans-serif" font-size="13" font-weight="700" fill="#0d2d4e">Default Risks</text>
-        <text x="392" y="418" font-family="DM Mono,monospace" font-size="8.5" fill="#c8960a">Status: In Development</text>
-        <text x="392" y="434" font-family="DM Mono,monospace" font-size="8" fill="#bbb">Privacy-preserving model</text>
+      <!-- ░░ GOLD UTILITY NODES (bottom band) ░░ -->
+
+      <!-- UTILITY 1 -->
+      <g class="rn-node" id="nd-util1">
+        <rect class="rn-box-gold" x="30" y="572" width="320" height="110" rx="2"/>
+        <text x="46" y="594" font-family="Rajdhani,sans-serif" font-size="9.5" font-weight="700" letter-spacing="2" fill="#c8960a">UTILITY 1</text>
+        <text x="46" y="618" font-family="Rajdhani,sans-serif" font-size="16" font-weight="700" fill="#6b4800" xml:space="preserve">Canton Incentives</text>
+        <text x="46" y="638" font-family="Rajdhani,sans-serif" font-size="16" font-weight="700" fill="#6b4800">&amp; Vote by Bonding</text>
+        <text x="46" y="664" font-family="DM Mono,monospace" font-size="9.5" fill="#a07000">Bond RIZE · Governance · Canton revenue flows</text>
+      </g>
+
+      <!-- UTILITY 2 -->
+      <g class="rn-node" id="nd-util2">
+        <rect class="rn-box-gold" x="370" y="572" width="320" height="110" rx="2"/>
+        <text x="386" y="594" font-family="Rajdhani,sans-serif" font-size="9.5" font-weight="700" letter-spacing="2" fill="#c8960a">UTILITY 2</text>
+        <text x="386" y="618" font-family="Rajdhani,sans-serif" font-size="16" font-weight="700" fill="#6b4800">Gateway to the</text>
+        <text x="386" y="638" font-family="Rajdhani,sans-serif" font-size="16" font-weight="700" fill="#6b4800">Canton Ecosystem</text>
+        <text x="386" y="664" font-family="DM Mono,monospace" font-size="9.5" fill="#a07000">Platform access · Priority allocations · RWA deals</text>
+      </g>
+
+      <!-- UTILITY 3 -->
+      <g class="rn-node" id="nd-util3">
+        <rect class="rn-box-gold" x="710" y="572" width="320" height="110" rx="2"/>
+        <text x="726" y="594" font-family="Rajdhani,sans-serif" font-size="9.5" font-weight="700" letter-spacing="2" fill="#c8960a">UTILITY 3</text>
+        <text x="726" y="618" font-family="Rajdhani,sans-serif" font-size="16" font-weight="700" fill="#6b4800">Power Decentralized</text>
+        <text x="726" y="638" font-family="Rajdhani,sans-serif" font-size="16" font-weight="700" fill="#6b4800">Machine Learning</text>
+        <text x="726" y="664" font-family="DM Mono,monospace" font-size="9.5" fill="#a07000">DML inference fees · AI model access · Rewards</text>
       </g>
 
     </svg>
   </div>
   <div class="rn-map-hint">Click any node or connector to learn more about its role in the RIZE ecosystem</div>
 
-  <!-- TOKEN UTILITY CARDS -->
-  <div class="rn-util-grid">
-    <div class="rn-util-card" id="util-canton">
-      <span class="rn-util-num">01</span>
-      <div class="rn-util-title">Canton Incentives &amp; Vote by Bonding</div>
-    </div>
-    <div class="rn-util-card" id="util-gateway">
-      <span class="rn-util-num">02</span>
-      <div class="rn-util-title">Gateway to the Canton Ecosystem</div>
-    </div>
-    <div class="rn-util-card" id="util-dml">
-      <span class="rn-util-num">03</span>
-      <div class="rn-util-title">Power Decentralized Machine Learning</div>
-    </div>
-  </div>
-
   <!-- SHARED INFO BOX -->
   <div class="rn-info-box" id="rn-info">
-    <p class="rn-prompt" id="rn-prompt">Click on any node, connector, or token utility block to read a detailed explanation.</p>
+    <p class="rn-prompt" id="rn-prompt">Click on any node, connector, or RIZE Token Utility block to read a detailed explanation.</p>
     <div class="rn-title" id="rn-title"></div>
     <div class="rn-body"  id="rn-body"></div>
   </div>
@@ -462,8 +467,10 @@ const RN_INFO = {
     title: "Chainlink Proof Mechanisms — Asset Verification",
     body: `Chainlink's proof infrastructure provides the on-chain verification backbone for T-RIZE's asset authenticity guarantees — three distinct mechanisms ensuring every tokenized instrument is backed by verifiable, tamper-proof real-world evidence:\n\n• PROOF OF RESERVE — Verifies the physical existence and availability of tangible assets. Regular independent third-party audits confirm that actual reserves correspond precisely with amounts represented by on-chain digital tokens.\n\n• PROOF OF ORIGIN — Certifies the provenance and authenticity of assets. For carbon credits, this verifies sourcing from certified renewable energy projects. For real estate and construction loans, it verifies title, ownership chain, and builder credentials.\n\n• PROOF OF PROCESS — Ensures adherence to predefined quality standards across the asset lifecycle. In construction projects, real-time monitoring tools document daily progress and milestone completion, with oracle data feeding directly into smart contracts that control capital release.\n\nThese mechanisms feed directly into Rizenet smart contracts via Chainlink oracle nodes, making every T-RIZE instrument independently verifiable without relying on any centralised data source.`
   },
-  insurance: {
-    title: "Federated Learning — Insurance Claims Model",
+  fl: {
+    title: "Federated Learning — Insurance Claims & Default Risks",
+    body: `Rizenet hosts two Decentralized Machine Learning (DML) applications currently in active development by T-RIZE Labs at ÉTS University under Professor Kaiwen Zhang's Industrial Research Chair, backed by the Government of Canada.\n\nThe core challenge both models solve: financial institutions hold vast datasets on claims patterns, credit risk, and default signals — but these are bound by NDAs and privacy regulations that make direct data sharing impossible. Rizenet's federated learning infrastructure solves this by allowing each institution to train a local model on its own private data, then contribute only encrypted mathematical gradient updates to a global supermodel — the raw data never leaves the institution.\n\nINSURANCE CLAIMS MODEL — On-chain risk scoring for tokenized assets backed by insurance receivables (such as the KAI18-1 UK motor finance claims instrument), automated fraud and anomaly detection, and AI-powered risk parameter adjustment for RWA lending markets.\n\nDEFAULT RISK MODEL — Personalised loan-to-value (LTV) ratios for RWA lending markets on Rizenet, construction cost prediction (addressing the fragmented dataset problem where each contractor holds only partial project data), anomaly detection for malicious transactions, and trade execution optimisation.\n\nRIZE is structurally required for both models: smart contracts pay RIZE inference fees to access model outputs. Data-contributing institutions earn RIZE proportional to their verified training contribution, calculated via the Shapley Value game-theoretic formula — ensuring fair compensation based on actual model improvement driven by each contributor's dataset.`
+  },
     body: `The Insurance Claims model is one of Rizenet's Decentralized Machine Learning applications — currently in active development by T-RIZE Labs at ÉTS University under Professor Kaiwen Zhang's Industrial Research Chair, backed by the Government of Canada.\n\nThe core problem: insurance institutions hold vast datasets on claims patterns, fraud signals, and risk profiles — but these are bound by NDAs and privacy regulations, making direct data sharing impossible. Rizenet's federated learning infrastructure solves this by allowing each institution to train a local model on its own private data, then contribute only encrypted mathematical gradient updates to a global supermodel — the raw data never leaves the institution.\n\nApplications include: on-chain risk scoring for tokenized assets backed by insurance receivables (such as the KAI18-1 UK motor finance claims instrument), automated fraud and anomaly detection, and AI-powered risk parameter adjustment for RWA lending markets.\n\nRIZE is structurally required: smart contracts pay RIZE to query this model. Data-contributing institutions earn RIZE proportional to their training contribution, calculated via the Shapley Value game-theoretic formula.`
   },
   default: {
@@ -519,8 +526,10 @@ const nodeMap = {
   "nd-rizenet":   "rizenet",
   "nd-chainlink": "chainlink",
   "nd-proof":     "proof",
-  "nd-insurance": "insurance",
-  "nd-default":   "default",
+  "nd-fl":        "fl",
+  "nd-util1":     "util_canton",
+  "nd-util2":     "util_gateway",
+  "nd-util3":     "util_dml",
 };
 Object.entries(nodeMap).forEach(([id,key]) => {
   const el = document.getElementById(id);
@@ -537,21 +546,9 @@ Object.entries(nodeMap).forEach(([id,key]) => {
 document.getElementById("conn-ccip").addEventListener("click", e => {
   e.stopPropagation(); rnDeselect(); rnShow("ccip");
 });
-["conn-wrap1","conn-wrap2"].forEach(id => {
+["conn-wrap1"].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.addEventListener("click", e => { e.stopPropagation(); rnDeselect(); rnShow("wrap"); });
-});
-
-/* Token utility cards */
-const utilMap = {"util-canton":"util_canton","util-gateway":"util_gateway","util-dml":"util_dml"};
-Object.entries(utilMap).forEach(([id,key]) => {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.addEventListener("click", () => {
-    rnDeselect();
-    el.classList.add("rn-on");
-    rnShow(key);
-  });
 });
 
 /* Click SVG background = deselect */
@@ -605,7 +602,7 @@ function buildSlider(key,data,isPerson,darkBg){
       const avatarClass='b-avatar'+(isPerson?' person':'')+((!hasImg)?' initials':'');
       const avatarStyle=!hasImg?'style="background:var(--navy)"':'';
       const tagHtml=item.tag?'<div class="b-tag">'+item.tag+'</div>':(item.role?'<div class="b-tag">'+item.role.split('—')[0].trim()+'</div>':'');
-      return '<div class="bubble '+extraClass+'" id="b-'+key+'-'+item.id+'" onclick="pick(\''+key+'\',\''+item.id+\')">'+'<div class="'+avatarClass+'" '+avatarStyle+'>'+avatarContent+'</div>'+'<div class="b-name">'+item.name+'</div>'+tagHtml+'</div>';
+      return '<div class="bubble '+extraClass+'" id="b-'+key+'-'+item.id+'" onclick="pick(\''+key+'\',\''+item.id+'\')">'+'<div class="'+avatarClass+'" '+avatarStyle+'>'+avatarContent+'</div>'+'<div class="b-name">'+item.name+'</div>'+tagHtml+'</div>';
     }).join('');
     return '<div class="slider-page">'+bubblesHtml+'</div>';
   }).join('');
