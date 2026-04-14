@@ -1,32 +1,12 @@
 {
   "routes": [
-    {
-      "src": "/",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/about",
-      "dest": "/about.html"
-    },
-    {
-      "src": "/article",
-      "dest": "/article.html"
-    },
-    {
-      "src": "/data-hub",
-      "dest": "/data-hub.html"
-    },
-    {
-      "src": "/hub",
-      "dest": "/hub.html"
-    },
-    {
-      "src": "/ecosystem",
-      "dest": "/ecosystem.html"
-    },
-    {
-      "src": "/admin",
-      "dest": "/admin.html"
-    }
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/about", "dest": "/about.html" },
+    { "src": "/article", "dest": "/article.html" },
+    { "src": "/data-hub", "dest": "/data-hub.html" },
+    { "src": "/cc-data-hub", "dest": "/cc-data-hub.html" },
+    { "src": "/hub", "dest": "/hub.html" },
+    { "src": "/ecosystem", "dest": "/ecosystem.html" },
+    { "src": "/admin", "dest": "/admin.html" }
   ]
 }
