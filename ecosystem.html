@@ -153,7 +153,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 
   <!-- SVG MAP — full width, larger nodes, merged FL, gold utility nodes inside SVG -->
   <div class="rn-map-area">
-    <svg id="rn-svg" viewBox="0 0 1060 640" xmlns="http://www.w3.org/2000/svg">
+    <svg id="rn-svg" viewBox="0 0 1060 652" xmlns="http://www.w3.org/2000/svg">
 
       <!-- ░░ BACKGROUND GRID ░░ -->
       <defs>
@@ -174,7 +174,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
       <!-- T-RIZE ↔ ATS -->
       <path d="M404,168 Q310,205 248,220" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
       <!-- T-RIZE ↔ Rizenet (vertical) -->
-      <line x1="460" y1="168" x2="460" y2="238" stroke="#b8cce0" stroke-width="1.4"/>
+      <line x1="465" y1="170" x2="465" y2="242" stroke="#b8cce0" stroke-width="1.4"/>
 
       <!-- Rizenet ↔ Base (CCIP arc) -->
       <path d="M578,278 Q650,250 696,218" fill="none" stroke="#7aa8c4" stroke-width="1.6"/>
@@ -188,23 +188,18 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
       <!-- Chainlink ↔ Proof -->
       <line x1="778" y1="352" x2="778" y2="388" stroke="#b8cce0" stroke-width="1.2"/>
 
-      <!-- Rizenet ↔ FL (dashed gold) — single merged node -->
-      <path d="M440,340 Q380,378 340,398" fill="none" stroke="#c8960a" stroke-width="1.2" stroke-dasharray="6 4"/>
+      <!-- Rizenet ↔ FL (dashed gold) -->
+      <path d="M440,350 Q320,372 139,388" fill="none" stroke="#c8960a" stroke-width="1.2" stroke-dasharray="6 4"/>
       <g class="rn-conn" id="conn-wrap1">
-        <rect class="rn-conn-bg" x="356" y="364" width="104" height="18" rx="2" style="stroke:#c8960a"/>
-        <text class="rn-conn-txt-gold" x="408" y="377">WRAP MESSAGING</text>
+        <rect class="rn-conn-bg" x="264" y="358" width="104" height="18" rx="2" style="stroke:#c8960a"/>
+        <text class="rn-conn-txt-gold" x="316" y="371">WRAP MESSAGING</text>
       </g>
 
-      <!-- ░░ UTILITY SECTION SEPARATOR ░░ -->
-      <line x1="40" y1="524" x2="1020" y2="524" stroke="#e8c44a" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4"/>
-
-      <!-- RIZE TOKEN UTILITY header band -->
-      <rect x="0" y="530" width="1060" height="28" fill="rgba(200,150,10,0.06)"/>
-      <text x="530" y="549" text-anchor="middle" font-family="Rajdhani,sans-serif" font-size="13" font-weight="700" letter-spacing="3" fill="#8a6200">RIZE TOKEN UTILITY</text>
+      <!-- ░░ OLD UTILITY SEPARATOR/HEADER removed — replaced below ░░ -->
 
       <!-- ░░ NODES ░░ -->
 
-      <!-- CANTON — top left, 208×120 (no "click for full list") -->
+      <!-- CANTON — top left, 218×120 + logo placeholder -->
       <g class="rn-node" id="nd-canton">
         <rect class="rn-box" x="30" y="70" width="218" height="120" rx="2"/>
         <text x="46" y="94" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">DISTRIBUTED LEDGER</text>
@@ -213,107 +208,120 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
         <line x1="46" y1="150" x2="236" y2="150" stroke="#dde4ed" stroke-width="0.8"/>
         <text x="46" y="167" font-family="DM Mono,monospace" font-size="10" fill="#999">Members:</text>
         <text id="canton-member" x="116" y="167" font-family="DM Mono,monospace" font-size="10" fill="#0d2d4e">BNY Mellon</text>
+        <!-- logo slot: replace image src when assets ready -->
+        <image id="logo-canton" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/canton.png" x="196" y="76" width="40" height="40" opacity="0.9"/>
       </g>
 
-      <!-- T-RIZE PLATFORM — center top, 224×100 -->
+      <!-- T-RIZE PLATFORM — enlarged to 270×108 so subtitle fits, logo slot -->
       <g class="rn-node" id="nd-trize">
-        <rect class="rn-box-c" x="340" y="68" width="240" height="100" rx="2"/>
-        <text x="358" y="108" font-family="Rajdhani,sans-serif" font-size="20" font-weight="700" fill="#0d2d4e">T-RIZE platform</text>
-        <text x="358" y="130" font-family="DM Mono,monospace" font-size="11" fill="#4a7ca0">Institutional Tokenization Platform</text>
+        <rect class="rn-box-c" x="330" y="62" width="270" height="108" rx="2"/>
+        <text x="348" y="100" font-family="Rajdhani,sans-serif" font-size="20" font-weight="700" fill="#0d2d4e">T-RIZE platform</text>
+        <text x="348" y="122" font-family="DM Mono,monospace" font-size="11" fill="#4a7ca0">Institutional Tokenization Platform</text>
+        <image id="logo-trize" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/trize.png" x="554" y="68" width="38" height="38" opacity="0.9"/>
       </g>
 
-      <!-- FIREBLOCKS — top right, 210×86 -->
+      <!-- FIREBLOCKS — top right, 300×88 + logo slot -->
       <g class="rn-node" id="nd-fireblocks">
         <rect class="rn-box" x="696" y="60" width="320" height="88" rx="2"/>
         <text x="714" y="82" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">WALLET PROVIDER</text>
         <text x="714" y="106" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Fireblocks</text>
         <text x="714" y="128" font-family="DM Mono,monospace" font-size="11" fill="#666">Multi-Party Computation wallets</text>
+        <image id="logo-fireblocks" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/fireblocks.png" x="968" y="66" width="38" height="38" opacity="0.9"/>
       </g>
 
-      <!-- BASE — right mid, 320×84 -->
+      <!-- BASE — right mid, 320×84 + logo slot -->
       <g class="rn-node" id="nd-base">
         <rect class="rn-box" x="696" y="176" width="320" height="84" rx="2"/>
         <text x="714" y="198" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">BLOCKCHAIN</text>
         <text x="714" y="222" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Base</text>
         <text x="714" y="244" font-family="DM Mono,monospace" font-size="11" fill="#666">Coinbase's ETH L2</text>
+        <image id="logo-base" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/base.png" x="968" y="182" width="38" height="38" opacity="0.9"/>
       </g>
 
-      <!-- ATS — left mid, 218×84 -->
+      <!-- ATS — left mid, 218×84 + logo slot -->
       <g class="rn-node" id="nd-ats">
         <rect class="rn-box" x="30" y="228" width="218" height="84" rx="2"/>
         <text x="46" y="250" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">SEC-REGISTERED ATS</text>
         <text x="46" y="274" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Texture Capital</text>
         <text x="46" y="296" font-family="DM Mono,monospace" font-size="11" fill="#666">Compliant US Distribution</text>
+        <image id="logo-ats" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/texture.png" x="214" y="234" width="28" height="28" opacity="0.9"/>
       </g>
 
-      <!-- RIZENET — center mid, 238×102 -->
+      <!-- RIZENET — enlarged to 270×108 matching T-RIZE, + logo slot -->
       <g class="rn-node" id="nd-rizenet">
-        <rect class="rn-box-c" x="342" y="238" width="236" height="102" rx="2"/>
-        <text x="358" y="262" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">BLOCKCHAIN</text>
-        <text x="358" y="292" font-family="Rajdhani,sans-serif" font-size="22" font-weight="700" fill="#0d2d4e">Rizenet</text>
-        <text x="358" y="316" font-family="DM Mono,monospace" font-size="11" fill="#4a7ca0">Business Intelligence Chain</text>
+        <rect class="rn-box-c" x="330" y="242" width="270" height="108" rx="2"/>
+        <text x="348" y="266" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">BLOCKCHAIN</text>
+        <text x="348" y="296" font-family="Rajdhani,sans-serif" font-size="22" font-weight="700" fill="#0d2d4e">Rizenet</text>
+        <text x="348" y="320" font-family="DM Mono,monospace" font-size="11" fill="#4a7ca0">Business Intelligence Chain</text>
+        <image id="logo-rizenet" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" x="554" y="250" width="38" height="38" opacity="0.9"/>
       </g>
 
-      <!-- CHAINLINK ORACLE — right mid, 320×88 -->
+      <!-- CHAINLINK ORACLE — right mid, 320×88 + logo slot -->
       <g class="rn-node" id="nd-chainlink">
         <rect class="rn-box" x="696" y="278" width="320" height="88" rx="2"/>
         <text x="714" y="300" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">ORACLE</text>
         <text x="714" y="326" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Real Time Data</text>
         <text x="714" y="348" font-family="DM Mono,monospace" font-size="11" fill="#666">Provider: Chainlink</text>
+        <image id="logo-chainlink1" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/chainlink.png" x="968" y="284" width="38" height="38" opacity="0.9"/>
       </g>
 
-      <!-- PROOF (rotating) — bottom right, 320×80 -->
+      <!-- PROOF (rotating) — bottom right, 320×84 + logo slot -->
       <g class="rn-node" id="nd-proof">
         <rect class="rn-box" x="696" y="388" width="320" height="84" rx="2"/>
         <text x="714" y="410" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">ORACLE</text>
         <text id="proof-lbl" x="714" y="436" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e" style="transition:opacity 0.3s">Proof of Origin</text>
         <text x="714" y="458" font-family="DM Mono,monospace" font-size="11" fill="#666">Provider: Chainlink</text>
+        <image id="logo-chainlink2" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/chainlink.png" x="968" y="394" width="38" height="38" opacity="0.9"/>
       </g>
 
-      <!-- FEDERATED LEARNING — merged, compact, 624×80 -->
+      <!-- FEDERATED LEARNING — same format as Texture Capital, alternating title -->
       <g class="rn-node" id="nd-fl">
-        <rect class="rn-box" x="30" y="388" width="624" height="80" rx="2"/>
-        <text x="48" y="410" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">FEDERATED LEARNING</text>
-        <text x="48" y="436" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Insurance Claims &amp; Default Risks</text>
-        <text x="48" y="456" font-family="DM Mono,monospace" font-size="11" fill="#666">Privacy-preserving models</text>
+        <rect class="rn-box" x="30" y="388" width="218" height="84" rx="2"/>
+        <text x="46" y="410" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">FEDERATED LEARNING</text>
+        <text id="fl-lbl" x="46" y="436" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e" style="transition:opacity 0.3s">Insurance Claims</text>
+        <text x="46" y="458" font-family="DM Mono,monospace" font-size="11" fill="#666">Privacy-preserving models</text>
       </g>
 
       <!-- ░░ UTILITY SEPARATOR ░░ -->
-      <line x1="0" y1="490" x2="1060" y2="490" stroke="#b8cce0" stroke-width="1" opacity="0.6"/>
+      <line x1="0" y1="492" x2="1060" y2="492" stroke="#dde4ed" stroke-width="1.5"/>
 
-      <!-- RIZE TOKEN UTILITY header band — navy fill, gold text -->
-      <rect x="0" y="491" width="1060" height="30" fill="#0d2d4e"/>
-      <text x="530" y="511" text-anchor="middle" font-family="Rajdhani,sans-serif" font-size="13" font-weight="700" letter-spacing="3" fill="rgba(200,150,10,0.9)">RIZE TOKEN UTILITY</text>
+      <!-- RIZE TOKEN UTILITY header — white bg, large black text, gold underline accent -->
+      <rect x="0" y="493" width="1060" height="44" fill="#f7f9fc"/>
+      <line x1="0" y1="536" x2="1060" y2="536" stroke="#c8960a" stroke-width="2"/>
+      <text x="530" y="524" text-anchor="middle" font-family="Rajdhani,sans-serif" font-size="22" font-weight="700" letter-spacing="4" fill="#0d2d4e">RIZE TOKEN UTILITY</text>
 
-      <!-- ░░ UTILITY NODES — blue fill (rn-box-c), gold border override ░░ -->
+      <!-- ░░ UTILITY NODES ░░ -->
 
-      <!-- UTILITY 1 -->
+      <!-- UTILITY 1 + RIZE logo slot -->
       <g class="rn-node" id="nd-util1">
-        <rect class="rn-box-gold" x="30" y="534" width="320" height="84" rx="2"/>
-        <text x="46" y="558" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" letter-spacing="2.5" fill="#c8960a">UTILITY 1</text>
-        <text x="46" y="581" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">Canton Incentives</text>
-        <text x="46" y="603" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">&amp; Vote by Bonding</text>
+        <rect class="rn-box-gold" x="30" y="548" width="320" height="84" rx="2"/>
+        <text x="46" y="572" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" letter-spacing="2.5" fill="#c8960a">UTILITY 1</text>
+        <text x="46" y="595" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">Canton Incentives</text>
+        <text x="46" y="617" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">&amp; Vote by Bonding</text>
+        <image id="logo-rize1" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" x="302" y="554" width="38" height="38" opacity="0.9"/>
       </g>
 
-      <!-- UTILITY 2 -->
+      <!-- UTILITY 2 + RIZE logo slot -->
       <g class="rn-node" id="nd-util2">
-        <rect class="rn-box-gold" x="370" y="534" width="320" height="84" rx="2"/>
-        <text x="386" y="558" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" letter-spacing="2.5" fill="#c8960a">UTILITY 2</text>
-        <text x="386" y="581" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">Gateway to the</text>
-        <text x="386" y="603" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">Canton Ecosystem</text>
+        <rect class="rn-box-gold" x="370" y="548" width="320" height="84" rx="2"/>
+        <text x="386" y="572" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" letter-spacing="2.5" fill="#c8960a">UTILITY 2</text>
+        <text x="386" y="595" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">Gateway to the</text>
+        <text x="386" y="617" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">Canton Ecosystem</text>
+        <image id="logo-rize2" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" x="642" y="554" width="38" height="38" opacity="0.9"/>
       </g>
 
-      <!-- UTILITY 3 -->
+      <!-- UTILITY 3 + RIZE logo slot -->
       <g class="rn-node" id="nd-util3">
-        <rect class="rn-box-gold" x="710" y="534" width="320" height="84" rx="2"/>
-        <text x="726" y="558" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" letter-spacing="2.5" fill="#c8960a">UTILITY 3</text>
-        <text x="726" y="581" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">Power Decentralized</text>
-        <text x="726" y="603" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">Machine Learning</text>
+        <rect class="rn-box-gold" x="710" y="548" width="320" height="84" rx="2"/>
+        <text x="726" y="572" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" letter-spacing="2.5" fill="#c8960a">UTILITY 3</text>
+        <text x="726" y="595" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">Power Decentralized</text>
+        <text x="726" y="617" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">Machine Learning</text>
+        <image id="logo-rize3" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" x="982" y="554" width="38" height="38" opacity="0.9"/>
       </g>
 
     </svg>
   </div>
-  <div class="rn-map-hint">Click any node or connector to learn more about its role in the RIZE ecosystem</div>
+  
 
   <!-- SHARED INFO BOX -->
   <div class="rn-info-box" id="rn-info">
@@ -572,6 +580,15 @@ document.addEventListener("DOMContentLoaded", function() {
     const el = document.getElementById("proof-lbl");
     if (el) { el.style.opacity="0"; setTimeout(function(){ el.textContent=proofWords[pi]; el.style.opacity="1"; },300); }
   }, 2500);
+
+  /* Animated FL label */
+  const flWords = ["Insurance Claims","Default Risks"];
+  let fi = 0;
+  setInterval(function() {
+    fi = (fi + 1) % flWords.length;
+    const el = document.getElementById("fl-lbl");
+    if (el) { el.style.opacity="0"; setTimeout(function(){ el.textContent=flWords[fi]; el.style.opacity="1"; },300); }
+  }, 2800);
 
   /* ── EXISTING ECO HUB LOGIC ── */
   const PER_PAGE=6;
