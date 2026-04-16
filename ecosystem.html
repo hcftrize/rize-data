@@ -828,10 +828,8 @@ document.addEventListener("DOMContentLoaded", function() {
   let cebActiveBubble = null;
 
   function cebSlugMatch(slug, priorities) {
-    // fuzzy match: slug contains priority key or vice versa
-    return priorities.some(function(p) {
-      return slug.includes(p) || p.includes(slug);
-    });
+    // Exact match only — prevents 'sbc' matching 'hsbc', 'tradeweb' matching 'tradeweb-24x7', etc.
+    return priorities.indexOf(slug) !== -1;
   }
 
   function cebCleanText(raw) {
@@ -868,10 +866,10 @@ document.addEventListener("DOMContentLoaded", function() {
       if (cebSlugMatch(e.slug, CEB_PRIORITY)) priority.push(e);
       else rest.push(e);
     });
-    // Sort priority by CEB_PRIORITY order
+    // Sort priority by CEB_PRIORITY order — exact match only
     priority.sort(function(a,b) {
-      var ai = CEB_PRIORITY.findIndex(function(p){ return a.slug.includes(p)||p.includes(a.slug); });
-      var bi = CEB_PRIORITY.findIndex(function(p){ return b.slug.includes(p)||p.includes(b.slug); });
+      var ai = CEB_PRIORITY.indexOf(a.slug);
+      var bi = CEB_PRIORITY.indexOf(b.slug);
       return ai - bi;
     });
     // Sort rest alphabetically
@@ -957,12 +955,23 @@ document.addEventListener("DOMContentLoaded", function() {
     var grid = document.getElementById('ceb-grid');
     grid.innerHTML = slice.map(function(e) {
       var isPriority = cebSlugMatch(e.slug, CEB_PRIORITY);
-      // Build logo URL from slug directly (matches filenames in canton-ecosystem/logos/)
-      // logo_local contains Windows backslashes so we use slug + CDN fallback instead
+      // Extension map for slugs whose logo_local is null (scraper missed them)
+      var EXT = {"broadridge":"svg","deloitte":"svg","dtcc":"svg","goldman-sachs":"svg",
+        "lloyds-banking-group":"svg","luxembourg-stock-exchange":"svg","robinhood":"svg",
+        "gs-dap":"svg","hkex":"svg","jp-morgan":"svg","mufg":"svg","oliver-wyman":"svg",
+        "société-générale":"svg","societe-generale":"svg","sbc":"svg","splice-an-lfdt-lab":"svg",
+        "liquidity-tech-ltp":"svg","agentic-ledger":"svg","bigoo":"svg","brikly":"svg",
+        "bron-wallet":"svg","c8-wallet":"svg","cantex":"svg","cc-explorer":"svg","cc-view":"svg",
+        "chata---sync-insights":"svg","crypto-treasury-connector":"svg","da-registry-app":"png",
+        "dedge-security":"svg","desyn":"svg","dfns":"png","ea-finance":"svg","edgevana":"svg",
+        "g-20-group":"svg","hashnote-now-circle":"svg","hashrupt":"svg","haven-digital-partners":"svg",
+        "k2f-labs":"svg","kairo":"svg","lab6174":"svg","layerzero":"svg","memora":"svg",
+        "mesh":"svg","p2p":"svg","pixelplex":"svg","polychain":"svg","posthuman":"svg",
+        "registerlabs":"svg","rocklik":"svg","stakecraft":"svg","wormhole":"svg","zenith":"svg",
+        "7ridge":"svg","bitalpha-dba-bitwave":"svg"};
       var logoLocal = e.logo_local ? e.logo_local.split(/[\\\/]/).pop() : null;
-      var logoUrl = logoLocal
-        ? CEB_LOGO_BASE + logoLocal
-        : (e.logo_cdn || '');
+      var logoFile = logoLocal || (e.slug + '.' + (EXT[e.slug] || 'png'));
+      var logoUrl = CEB_LOGO_BASE + logoFile;
       var initials = e.name.split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
       var logoHtml = logoUrl
         ? '<div class="ceb-logo"><img src="' + logoUrl + '" alt="' + e.name + '" onerror="this.parentElement.className=\'ceb-logo initials\';this.parentElement.textContent=\'' + initials + '\'"/></div>'
