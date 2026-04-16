@@ -5,7 +5,7 @@
 <title>Canton Ecosystem Hub - Tokerize</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <style>
-@font-face{font-family:'Rajdhani';src:url('data:font/truetype;base64,PLACEHOLDER') format('truetype');font-weight:600;font-style:normal;}
+@font-face{font-family:'Rajdhani';src:url('/assets/fonts/rajdhani.semibold.ttf') format('truetype');font-weight:600;font-style:normal;}
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap');
 :root{--black:#000;--navy:#0d2d4e;--navy2:#1a3a5c;--bluelt:#e8f0f7;--white:#fff;--off:#f7f7f5;--text:#111;--muted:#666;--border:#e0e0e0;--shadow:0 2px 20px rgba(0,0,0,0.08);}
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -221,7 +221,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 <body>
 
 <header class="site-header">
-  <a href="/" class="site-header-logo"><img src="data:image/png;base64,PLACEHOLDER" alt="Tokerize"/></a>
+  <a href="/" class="site-header-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></a>
   <nav class="site-nav">
     <a href="/" class="nav-home">Home</a>
     <a href="/about">About</a>
@@ -357,8 +357,10 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
       </div>
 
     </div>
-    <div class="ceb-count" id="cip-count"></div>
+    <div id="cip-count" style="display:none"></div>
+    <div class="ceb-pagination" id="cip-pagination-top"></div>
     <div class="cip-grid" id="cip-grid"></div>
+    <div class="ceb-pagination" id="cip-pagination-bot"></div>
     <div class="info-box" id="cip-box" style="display:none">
       <div class="ib-title" id="cip-detail-title"></div>
       <div id="cip-detail-body"></div>
@@ -435,7 +437,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 </div><!-- end eco-wrap -->
 
 <footer class="site-footer">
-  <div class="footer-logo"><img src="data:image/png;base64,PLACEHOLDER" alt="Tokerize"/></div>
+  <div class="footer-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></div>
   <nav class="footer-nav">
     <a href="/">Home</a><a href="/about">About</a><a href="/hub">RIZE Data Hub</a>
   </nav>
@@ -874,8 +876,9 @@ document.addEventListener("DOMContentLoaded", function() {
   window.cipFilter = function() { cipApplyFilter(); };
 
   function cipApplyFilter() {
+    cipPage = 0;
     var q = (document.getElementById('cip-search').value||'').toLowerCase().trim();
-    cipFiltered = CIPS.filter(function(c) {
+    cipFiltered = CIPS.slice().reverse().filter(function(c) {
       var matchType = cipActiveType === 'ALL' || c.type === cipActiveType;
       var matchStatus = cipActiveStatus === 'ALL' || c.status === cipActiveStatus;
       var matchQ = !q ||
@@ -887,11 +890,37 @@ document.addEventListener("DOMContentLoaded", function() {
     cipRender();
   }
 
+  var cipPage = 0;
+  var CIP_PER_PAGE = 12;
+
+  function cipBuildPag(pages) {
+    if (pages <= 1) return '';
+    var h = '<button class="ceb-pg-btn" onclick="cipGoPage('+(cipPage-1)+')" '+(cipPage===0?'disabled':'')+'>&#8592;</button>';
+    for (var i=0;i<pages;i++) {
+      h += '<button class="ceb-pg-btn'+(i===cipPage?' on':'')+'" onclick="cipGoPage('+i+')">'+(i+1)+'</button>';
+    }
+    h += '<button class="ceb-pg-btn" onclick="cipGoPage('+(cipPage+1)+')" '+(cipPage>=pages-1?'disabled':'')+'>&#8594;</button>';
+    return h;
+  }
+
+  window.cipGoPage = function(p) { cipPage = p; cipRender(); };
+
   function cipRender() {
     var count = cipFiltered.length;
-    document.getElementById('cip-count').textContent = count + ' CIP' + (count !== 1 ? 's' : '');
+    document.getElementById('cip-count').textContent = '';
+    var pages = Math.max(1, Math.ceil(count / CIP_PER_PAGE));
+    if (cipPage >= pages) cipPage = pages - 1;
+    var start = cipPage * CIP_PER_PAGE;
+    var slice = cipFiltered.slice(start, start + CIP_PER_PAGE);
+
+    var pagHtml = cipBuildPag(pages);
+    var topEl = document.getElementById('cip-pagination-top');
+    var botEl = document.getElementById('cip-pagination-bot');
+    if (topEl) topEl.innerHTML = pagHtml;
+    if (botEl) botEl.innerHTML = pagHtml;
+
     var grid = document.getElementById('cip-grid');
-    grid.innerHTML = cipFiltered.map(function(c) {
+    grid.innerHTML = slice.map(function(c) {
       var sc = cipStatusClass(c.status);
       return '<div class="cip-bubble" data-cipid="'+c.id+'" id="cip-b-'+c.number+'">'+
         '<div class="cip-id">'+c.id+'</div>'+
