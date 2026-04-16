@@ -355,13 +355,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
         <button class="ceb-tag" data-filter="Standards Track" data-group="type" onclick="cipSetFilter(this,'type')">Standards</button>
         <button class="ceb-tag" data-filter="Process" data-group="type" onclick="cipSetFilter(this,'type')">Process</button>
       </div>
-      <div class="cip-filter-btns" id="cip-status-filters">
-        <button class="ceb-tag on" data-filter="ALL" data-group="status" onclick="cipSetFilter(this,'status')">All Statuses</button>
-        <button class="ceb-tag" data-filter="Final" data-group="status" onclick="cipSetFilter(this,'status')">Final</button>
-        <button class="ceb-tag" data-filter="Approved" data-group="status" onclick="cipSetFilter(this,'status')">Approved</button>
-        <button class="ceb-tag" data-filter="Active" data-group="status" onclick="cipSetFilter(this,'status')">Active</button>
-        <button class="ceb-tag" data-filter="Proposed" data-group="status" onclick="cipSetFilter(this,'status')">Proposed</button>
-      </div>
+
     </div>
     <div class="ceb-count" id="cip-count"></div>
     <div class="cip-grid" id="cip-grid"></div>
@@ -937,23 +931,39 @@ document.addEventListener("DOMContentLoaded", function() {
 
     var sc = cipStatusClass(c.status);
     var box = document.getElementById('cip-box');
-    document.getElementById('cip-detail-title').textContent = c.id + ' — ' + c.title;
-    document.getElementById('cip-detail-body').innerHTML =
-      '<div style="margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;">'+
-        '<span class="cip-status-badge cip-status-'+sc+'">'+c.status+'</span>'+
-        (c.type ? '<span class="cip-type">'+c.type+'</span>' : '')+
-      '</div>'+
-      '<p class="ib-text" style="display:block;margin-bottom:16px;">'+c.summary.replace(/
-/g,'<br>')+'</p>'+
-      '<div style="font-family:'DM Mono',monospace;font-size:12px;color:#888;line-height:2;">'+
-        (c.created ? '<div>Created: <span style="color:#333">'+c.created+'</span></div>' : '')+
-        '<div>Reference: <span style="color:#333"><a href="https://github.com/canton-foundation/cips/tree/main/'+c.id.toLowerCase()+'" target="_blank" style="color:var(--navy);">github.com/canton-foundation/cips</a></span></div>'+
-      '</div>';
+    var titleEl = document.getElementById('cip-detail-title');
+    var bodyEl = document.getElementById('cip-detail-body');
+
+    titleEl.textContent = c.id + ' — ' + c.title;
+
+    var summaryText = document.createElement('p');
+    summaryText.className = 'ib-text';
+    summaryText.style.display = 'block';
+    summaryText.style.marginBottom = '16px';
+    summaryText.textContent = c.summary;
+
+    var metaDiv = document.createElement('div');
+    metaDiv.style.fontFamily = 'DM Mono, monospace';
+    metaDiv.style.fontSize = '12px';
+    metaDiv.style.color = '#888';
+    metaDiv.style.lineHeight = '2';
+
+    var sc2 = cipStatusClass(c.status);
+    var badge = '<span class="cip-status-badge cip-status-'+sc2+'">'+c.status+'</span>';
+    var typeTag = c.type ? ' <span class="cip-type">'+c.type+'</span>' : '';
+    var created = c.created ? '<div>Created: <span style="color:#333">'+c.created+'</span></div>' : '';
+    var ref = '<div>Source: <span style="color:#333"><a href="https://github.com/canton-foundation/cips/tree/main/'+c.id.toLowerCase()+'" target="_blank" style="color:var(--navy)">github.com/canton-foundation/cips</a></span></div>';
+    metaDiv.innerHTML = created + ref;
+
+    bodyEl.innerHTML = '<div style="margin-bottom:14px">'+badge+typeTag+'</div>';
+    bodyEl.appendChild(summaryText);
+    bodyEl.appendChild(metaDiv);
+
     box.style.display = 'block';
     box.scrollIntoView({behavior:'smooth', block:'nearest'});
   };
 
-  cipRender();
+    cipRender();
 
   /* ── CANTON GOVERNANCE ── */
   const GOV_API = 'https://lighthouse.cantonloop.com/api';
