@@ -839,7 +839,7 @@ document.addEventListener("DOMContentLoaded", function() {
   function govApplyFilter() {
     var q = (document.getElementById('gov-search').value||'').toLowerCase().trim();
     govFiltered = govAll.filter(function(r) {
-      var matchStatus = govStatus === 'ALL' || (r.status||'').toLowerCase() === govStatus.toLowerCase();
+      var matchStatus = govStatus === 'ALL' || (r.status||'') === govStatus;
       var matchQ = !q ||
         (r.title||'').toLowerCase().includes(q) ||
         (r.description||'').toLowerCase().includes(q) ||
@@ -883,9 +883,9 @@ document.addEventListener("DOMContentLoaded", function() {
       var rejectBar = totalVotes > 0
         ? '<div class="gov-vote-bar"><div class="gov-bar"><div class="gov-bar-fill reject" style="width:'+(100-pct)+'%"></div></div><span style="color:#a02020;font-weight:700">'+(100-pct)+'%</span></div>'
         : '<span style="color:#ccc">—</span>';
-      return '<tr id="gov-row-'+r.id+'" onclick="govPick(\''+r.id+'\')">'+
+      return '<tr data-id="'+r.id+'" onclick="govPick(\''+r.id+'\')">'
         '<td>'+r.id+'</td>'+
-        '<td style="max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(r.title||r.description||'Proposal #'+r.id)+'</td>'+
+        '<td style="max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="color:#888;font-size:11px;margin-right:6px;">'+(r.requester||'')+'</span>'+(r.title||'—')+'</td>'+
         '<td><span class="gov-status '+sc+'">'+(r.status||'—')+'</span></td>'+
         '<td>'+barHtml+'</td>'+
         '<td>'+rejectBar+'</td>'+
@@ -909,7 +909,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     govActive = id;
     document.querySelectorAll('#gov-tbody tr').forEach(function(r){r.classList.remove('on');});
-    var row = document.getElementById('gov-row-'+id);
+    var row = document.querySelector('#gov-tbody tr[data-id="'+id+'"]');
     if (row) row.classList.add('on');
 
     // Load detail
@@ -973,14 +973,31 @@ document.addEventListener("DOMContentLoaded", function() {
       document.getElementById('gs-accept').textContent = (stats.total_accept_votes||0).toLocaleString();
       document.getElementById('gs-reject').textContent = (stats.total_reject_votes||0).toLocaleString();
 
-      // List - handle both array and {results:[...]} shapes
-      govAll = Array.isArray(data) ? data : (data.results || data.items || data.data || []);
+      // List - handle both array and {vote_requests:[...]} shapes
+      govAll = Array.isArray(data) ? data : (data.vote_requests || data.results || data.items || data.data || []);
+      // Map fields - reason_body is the title, id is the hash
+      govAll = govAll.map(function(r) {
+        return {
+          id: r.id,
+          title: (r.reason_body||'').slice(0,120) + ((r.reason_body||'').length>120?'…':''),
+          description: r.reason_body || '',
+          status: r.status ? (r.status==='in_progress'?'InProgress': r.status.charAt(0).toUpperCase()+r.status.slice(1)) : '',
+          accept_votes: r.accept_votes||0,
+          reject_votes: r.reject_votes||0,
+          total_votes: r.total_votes||0,
+          created_at: r.created_at||'',
+          requester: r.requester||'',
+          reason_url: r.reason_url||'',
+          vote_before: r.vote_before||'',
+          target_effective_at: r.target_effective_at||''
+        };
+      });
       // Sort: in_progress first, then by id desc
       govAll.sort(function(a,b){
         var ap = (a.status||'').toLowerCase()==='inprogress'?0:1;
         var bp = (b.status||'').toLowerCase()==='inprogress'?0:1;
         if (ap !== bp) return ap - bp;
-        return (b.id||0) - (a.id||0);
+        return (b.created_at||'').localeCompare(a.created_at||'');
       });
       govFiltered = govAll.slice();
       if (loadEl) loadEl.style.display = 'none';
