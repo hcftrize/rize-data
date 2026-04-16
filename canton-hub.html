@@ -341,7 +341,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
   <div class="lc-header" onclick="toggleLc('cip-lc')">
     <div class="lc-header-text">
       <h2>Canton Improvement Proposals (CIPs)</h2>
-      <p>Proposals shaping the Canton Network — governance, tokenomics, standards and process</p>
+      <p>104 proposals shaping the Canton Network — governance, tokenomics, standards and process</p>
     </div>
     <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
@@ -358,9 +358,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 
     </div>
     <div class="ceb-count" id="cip-count"></div>
-    <div class="ceb-pagination" id="cip-pagination-top"></div>
     <div class="cip-grid" id="cip-grid"></div>
-    <div class="ceb-pagination" id="cip-pagination"></div>
     <div class="info-box" id="cip-box" style="display:none">
       <div class="ib-title" id="cip-detail-title"></div>
       <div id="cip-detail-body"></div>
@@ -889,39 +887,11 @@ document.addEventListener("DOMContentLoaded", function() {
     cipRender();
   }
 
-  var CIP_PER_PAGE = 12;
-  var cipPage = 0;
-
-  function cipBuildPag(pages) {
-    if (pages <= 1) return '';
-    var h = '<button class="ceb-pg-btn" onclick="cipGoPage('+(cipPage-1)+')" '+(cipPage===0?'disabled':'')+'>&#8592;</button>';
-    for (var i=0;i<pages;i++) {
-      h += '<button class="ceb-pg-btn'+(i===cipPage?' on':'')+'" onclick="cipGoPage('+i+')">'+(i+1)+'</button>';
-    }
-    h += '<button class="ceb-pg-btn" onclick="cipGoPage('+(cipPage+1)+')" '+(cipPage>=pages-1?'disabled':'')+'>&#8594;</button>';
-    return h;
-  }
-
-  window.cipGoPage = function(p) {
-    cipPage = p;
-    cipRender();
-  };
-
   function cipRender() {
-    var sorted = cipFiltered.slice().sort(function(a,b){ return b.number - a.number; });
-    var total = sorted.length;
-    var pages = Math.max(1, Math.ceil(total / CIP_PER_PAGE));
-    if (cipPage >= pages) cipPage = pages - 1;
-    var start = cipPage * CIP_PER_PAGE;
-    var slice = sorted.slice(start, start + CIP_PER_PAGE);
-
-    document.getElementById('cip-count').textContent = total + ' CIP' + (total !== 1 ? 's' : '');
-
-    var pagTopEl = document.getElementById('cip-pagination-top');
-    if (pagTopEl) pagTopEl.innerHTML = cipBuildPag(pages);
-
+    var count = cipFiltered.length;
+    document.getElementById('cip-count').textContent = count + ' CIP' + (count !== 1 ? 's' : '');
     var grid = document.getElementById('cip-grid');
-    grid.innerHTML = slice.map(function(c) {
+    grid.innerHTML = cipFiltered.map(function(c) {
       var sc = cipStatusClass(c.status);
       return '<div class="cip-bubble" data-cipid="'+c.id+'" id="cip-b-'+c.number+'">'+
         '<div class="cip-id">'+c.id+'</div>'+
@@ -932,17 +902,16 @@ document.addEventListener("DOMContentLoaded", function() {
         '</div>'+
         '</div>';
     }).join('');
+    // Attach click handlers via event delegation
     grid.onclick = function(e) {
       var bubble = e.target.closest('[data-cipid]');
       if (bubble) cipPick(bubble.dataset.cipid);
     };
+    // Restore active state
     if (cipActiveBubble) {
       var el = grid.querySelector('[data-cipid="'+cipActiveBubble+'"]');
       if (el) el.classList.add('on');
     }
-
-    var pagEl = document.getElementById('cip-pagination');
-    if (pagEl) pagEl.innerHTML = cipBuildPag(pages);
   }
 
   window.cipPick = function(id) {
