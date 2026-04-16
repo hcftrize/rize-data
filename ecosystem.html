@@ -1168,101 +1168,86 @@ document.addEventListener("DOMContentLoaded", function() {
     box.scrollIntoView({behavior:'smooth', block:'nearest'});
   };
 
-  /* Bonding widget — probe multiple selectors, use first that responds */
-  (function() {
-    var CONTRACT = '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE';
-    var RIZE_TOKEN = '0x9818B6c09f5ECc843060927E8587c427C7C93583';
-    var RPC = 'https://mainnet.base.org';
-    var DECIMALS = 18;
 
   /* ── RIZENET BONDING WIDGET ── */
-  (function() {
-    var CONTRACT  = '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE';
-    var RIZE_TOKEN= '0x9818B6c09f5ECc843060927E8587c427C7C93583';
-    var RPC       = 'https://mainnet.base.org';
-    var DECIMALS  = 18;
+  var RIP_CONTRACT  = '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE';
+  var RIP_TOKEN     = '0x9818B6c09f5ECc843060927E8587c427C7C93583';
+  var RIP_RPC       = 'https://mainnet.base.org';
 
-    function rpcCall(method, params) {
-      return fetch(RPC, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({jsonrpc:'2.0', method:method, params:params, id:1})
-      }).then(function(r){ return r.json(); });
+  function ripRpc(method, params) {
+    return fetch(RIP_RPC, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({jsonrpc:'2.0', method:method, params:params, id:1})
+    }).then(function(r){ return r.json(); });
+  }
+
+  function ripHexToTokens(hex) {
+    if (!hex || hex === '0x') return null;
+    try {
+      var raw = BigInt(hex);
+      if (raw === BigInt(0)) return null;
+      return Number(raw / BigInt('1000000000000000000'));
+    } catch(e) { return null; }
+  }
+
+  function ripGetPrice() {
+    return fetch('https://api.coingecko.com/api/v3/simple/price?ids=rizenet&vs_currencies=usd')
+      .then(function(r){ return r.json(); })
+      .then(function(d){ return (d.rizenet && d.rizenet.usd) ? d.rizenet.usd : null; })
+      .catch(function(){ return null; });
+  }
+
+  function ripBalanceOf() {
+    var padded = '000000000000000000000000' + RIP_CONTRACT.slice(2).toLowerCase();
+    return ripRpc('eth_call', [{to: RIP_TOKEN, data: '0x70a08231' + padded}, 'latest'])
+      .then(function(res){ return ripHexToTokens(res.result); })
+      .catch(function(){ return null; });
+  }
+
+  function ripTrySelector(sel) {
+    return ripRpc('eth_call', [{to: RIP_CONTRACT, data: sel}, 'latest'])
+      .then(function(res){
+        var r = res.result;
+        if (!r || r === '0x' || /^0x0+$/.test(r)) return null;
+        return ripHexToTokens(r);
+      })
+      .catch(function(){ return null; });
+  }
+
+  function ripUpdateWidget(tokens, price) {
+    var tokEl = document.getElementById('rip-bonded-tokens');
+    var usdEl = document.getElementById('rip-bonded-usd');
+    var subEl = document.getElementById('rip-bonding-status');
+    if (!tokEl) return;
+    var t = (tokens !== null && tokens > 0) ? tokens : 938507545;
+    var live = (tokens !== null && tokens > 0);
+    tokEl.textContent = t.toLocaleString('en-US') + ' RIZE';
+    if (price) {
+      usdEl.textContent = '$' + (t * price).toLocaleString('en-US', {maximumFractionDigits:0}) + ' USD value';
+    } else {
+      usdEl.textContent = live ? '' : ',589,791 USD value';
     }
+    subEl.textContent = live
+      ? 'Live · Base Mainnet · ' + new Date().toLocaleTimeString('en-GB')
+      : 'Cached · Base Mainnet';
+  }
 
-    function hexToTokens(hex) {
-      if (!hex || hex === '0x') return null;
-      try {
-        var raw = BigInt(hex);
-        if (raw === 0n) return null;
-        var divisor = BigInt('1' + '0'.repeat(DECIMALS));
-        return Number(raw / divisor);
-      } catch(e) { return null; }
-    }
-
-    function fmtTokens(n) { return n.toLocaleString('en-US') + ' RIZE'; }
-    function fmtUsd(n, price) { return '$' + (n * price).toLocaleString('en-US', {maximumFractionDigits:0}) + ' USD value'; }
-
-    function getRizePrice() {
-      return fetch('https://api.coingecko.com/api/v3/simple/price?ids=rizenet&vs_currencies=usd')
-        .then(function(r){ return r.json(); })
-        .then(function(d){ return (d.rizenet && d.rizenet.usd) ? d.rizenet.usd : null; })
-        .catch(function(){ return null; });
-    }
-
-    // Primary: balanceOf(bondingContract) on RIZE token — most reliable
-    function getBalanceOf() {
-      var padded = '0x000000000000000000000000' + CONTRACT.slice(2).toLowerCase();
-      return rpcCall('eth_call', [{to: RIZE_TOKEN, data: '0x70a08231' + padded.slice(2)}, 'latest'])
-        .then(function(res){ return hexToTokens(res.result); })
-        .catch(function(){ return null; });
-    }
-
-    // Fallbacks: try common view function selectors
-    function trySelector(sel) {
-      return rpcCall('eth_call', [{to: CONTRACT, data: sel}, 'latest'])
-        .then(function(res){
-          var r = res.result;
-          if (!r || r === '0x' || /^0x0+$/.test(r)) return null;
-          return hexToTokens(r);
-        })
-        .catch(function(){ return null; });
-    }
-
-    function updateWidget(tokens, price) {
-      var tokEl = document.getElementById('rip-bonded-tokens');
-      var usdEl = document.getElementById('rip-bonded-usd');
-      var subEl = document.getElementById('rip-bonding-status');
-      if (!tokEl) return;
-      if (tokens !== null && tokens > 0) {
-        tokEl.textContent = fmtTokens(tokens);
-        usdEl.textContent = price ? fmtUsd(tokens, price) : '';
-        subEl.textContent = 'Live · Base Mainnet · ' + new Date().toLocaleTimeString('en-GB');
-      } else {
-        tokEl.textContent = '938,507,545 RIZE';
-        usdEl.textContent = price ? fmtUsd(938507545, price) : '$3,589,791 USD value';
-        subEl.textContent = 'Cached · Base Mainnet';
-      }
-    }
-
-    function loadBonding() {
-      var SELECTORS = ['0x6c8c2b8b','0x817b1cd2','0x0d10a163','0x56891412','0x6f307dc3'];
-      var chain = getBalanceOf();
-      SELECTORS.forEach(function(sel) {
-        chain = chain.then(function(prev) {
-          return prev !== null ? prev : trySelector(sel);
-        });
+  function ripLoad() {
+    var SELS = ['0x6c8c2b8b','0x817b1cd2','0x0d10a163','0x56891412','0x6f307dc3'];
+    var chain = ripBalanceOf();
+    SELS.forEach(function(sel) {
+      chain = chain.then(function(prev) {
+        return prev !== null ? prev : ripTrySelector(sel);
       });
-      Promise.all([chain, getRizePrice()]).then(function(res) {
-        updateWidget(res[0], res[1]);
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      loadBonding();
-      setInterval(loadBonding, 60000);
     });
-  })();
+    Promise.all([chain, ripGetPrice()]).then(function(res) {
+      ripUpdateWidget(res[0], res[1]);
+    });
+  }
+
+  ripLoad();
+  setInterval(ripLoad, 60000);
 
 }); // end DOMContentLoaded
 </script>
