@@ -341,7 +341,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
   <div class="lc-header" onclick="toggleLc('cip-lc')">
     <div class="lc-header-text">
       <h2>Canton Improvement Proposals (CIPs)</h2>
-      <p>104 proposals shaping the Canton Network — governance, tokenomics, standards and process</p>
+      <p>Proposals shaping the Canton Network — governance, tokenomics, standards and process</p>
     </div>
     <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
@@ -855,7 +855,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
   /* ── CANTON CIPs ── */
-  var cipFiltered = CIPS.slice();
+  var cipFiltered = CIPS.slice().reverse();
   var cipActiveType = 'ALL';
   var cipActiveStatus = 'ALL';
   var cipActiveBubble = null;
