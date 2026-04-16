@@ -77,8 +77,8 @@ async def scrape_listing(page) -> list[dict]:
       { name, slug, logo_cdn_url, short_desc, roles[], utilities[] }
     """
     print(f"\n📄 Loading listing page…")
-    await page.goto(LIST_URL, wait_until="networkidle")
-    await page.wait_for_timeout(LIST_WAIT_MS)
+    await page.goto(LIST_URL, wait_until="domcontentloaded", timeout=60_000)
+    await page.wait_for_timeout(12_000)  # wait for Webflow JS to render all cards
 
     # Each entity card — Webflow CMS collection items
     # Structure observed:
@@ -162,8 +162,8 @@ async def scrape_detail(page, slug: str) -> dict:
     """
     url = DETAIL_PREFIX + slug
     try:
-        await page.goto(url, wait_until="networkidle", timeout=20_000)
-        await page.wait_for_timeout(1_500)
+        await page.goto(url, wait_until="domcontentloaded", timeout=30_000)
+        await page.wait_for_timeout(2_500)
 
         # Detail description — longest paragraph on page
         paras = await page.query_selector_all("p, [class*='body'], [class*='description']")
