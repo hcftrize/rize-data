@@ -958,15 +958,22 @@ document.addEventListener("DOMContentLoaded", function() {
     grid.innerHTML = slice.map(function(e) {
       var isPriority = cebSlugMatch(e.slug, CEB_PRIORITY);
       // Logo cascade:
-      // 1. CEB_FILES map — exact filenames for all 283 known entities (png/jpg/jpeg/svg via jsDelivr)
-      // 2. logo_local from JSON — new entities added after scrape (CI converts SVGs to PNG first)
-      // 3. Initials fallback
+      // 1. CEB_FILES map via jsDelivr (283 known entities)
+      // 2. Webflow CDN entities path (696a7c = real logos, not the yellow arrow)
+      // 3. logo_local for new entities post-scrape
+      // 4. Initials fallback
       var logoFile = CEB_FILES[e.slug];
-      if (!logoFile && e.logo_local) {
-        var localName = e.logo_local.split(/[\\\/]/).pop();
-        if (/\.(png|jpg|jpeg)$/i.test(localName)) logoFile = localName;
-      }
       var logoUrl = logoFile ? CEB_LOGO_BASE + logoFile : null;
+      // If jsDelivr file is likely the yellow arrow SVG, fallback to real Webflow CDN
+      if (!logoUrl || (logoFile && logoFile.endsWith('.svg'))) {
+        var cdnReal = e.logo_cdn && e.logo_cdn.indexOf('696a7c934170f11ec9d70eee') !== -1 ? e.logo_cdn : null;
+        if (cdnReal) logoUrl = cdnReal;
+      }
+      // New entities not in map
+      if (!logoUrl && e.logo_local) {
+        var localName = e.logo_local.split(/[\\\/]/).pop();
+        if (/\.(png|jpg|jpeg)$/i.test(localName)) logoUrl = CEB_LOGO_BASE + localName;
+      }
       var initials = e.name.split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
       var logoHtml = logoUrl
         ? '<div class="ceb-logo"><img src="' + logoUrl + '" alt="' + e.name + '" onerror="this.parentElement.className=\'ceb-logo initials\';this.parentElement.textContent=\'' + initials + '\'"/></div>'
