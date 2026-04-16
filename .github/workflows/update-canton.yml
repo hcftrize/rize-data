@@ -1,0 +1,51 @@
+name: Update Canton Ecosystem
+
+on:
+  schedule:
+    # Every Monday at 08:00 UTC
+    - cron: '0 8 * * 1'
+  # Allow manual trigger from GitHub UI
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install playwright cairosvg
+          playwright install chromium
+          playwright install-deps chromium
+
+      - name: Run scraper (diff mode — new entities only)
+        run: python scrape_canton.py --diff
+
+      - name: Convert any new SVG logos to PNG
+        run: python convert_svgs.py
+
+      - name: Check for changes
+        id: changes
+        run: |
+          git diff --quiet canton-ecosystem/ || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push if changes
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "canton-bot"
+          git config user.email "bot@tokerize.com"
+          git add canton-ecosystem/
+          TIMESTAMP=$(date +"%Y-%m-%d")
+          COUNT=$(python -c "import json; data=json.load(open('canton-ecosystem/entities.json')); print(len(data))")
+          git commit -m "chore: update Canton ecosystem — $COUNT entities ($TIMESTAMP)"
+          git push origin dev
