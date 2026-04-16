@@ -957,9 +957,11 @@ document.addEventListener("DOMContentLoaded", function() {
     var grid = document.getElementById('ceb-grid');
     grid.innerHTML = slice.map(function(e) {
       var isPriority = cebSlugMatch(e.slug, CEB_PRIORITY);
-      // Use logo_local from JSON (GitHub repo), fallback to CDN Webflow
-      var logoUrl = e.logo_local
-        ? CEB_LOGO_BASE + e.logo_local.replace(/\\\\/g, '/').replace(/\\/g, '/')
+      // Build logo URL from slug directly (matches filenames in canton-ecosystem/logos/)
+      // logo_local contains Windows backslashes so we use slug + CDN fallback instead
+      var logoLocal = e.logo_local ? e.logo_local.split(/[\\\/]/).pop() : null;
+      var logoUrl = logoLocal
+        ? CEB_LOGO_BASE + logoLocal
         : (e.logo_cdn || '');
       var initials = e.name.split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
       var logoHtml = logoUrl
