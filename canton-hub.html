@@ -169,14 +169,14 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
   <div style="max-width:1200px;margin:0 auto">
     <a href="/hub" class="back-to-hub">&larr; Back to RIZE Data Hub</a>
     <span class="eco-eyebrow" style="font-size:14px;letter-spacing:2px">RIZE Community Learn Center</span>
-    <h1>RIZE Ecosystem Hub</h1>
+    <h1>Canton Ecosystem Hub</h1>
     <p>Explore the full institutional ecosystem behind T-RIZE — partners, Canton Network members, Foundation board, and live RWA deals. Click on any entity to learn more.</p>
   </div>
 </div>
 
 <div class="eco-wrap">
 
-<div class="lc collapsed" id="ceb-lc">
+<div class="lc" id="ceb-lc">
   <div class="lc-header" onclick="toggleLc('ceb-lc')">
     <div class="lc-header-text">
       <h2>Canton Network Ecosystem</h2>
@@ -184,7 +184,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     </div>
     <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
-  <div class="lc-body collapsed" id="ceb-lc-body">
+  <div class="lc-body" id="ceb-lc-body">
 
     <!-- Search + Filters -->
     <div class="ceb-controls">
@@ -216,7 +216,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
   </div><!-- end lc-body -->
 </div>
 
-<div class="lc collapsed" id="canton-lc">
+<div class="lc" id="canton-lc">
   <div class="lc-header" onclick="toggleLc('canton-lc')">
     <div class="lc-header-text">
       <h2>Canton Network Premier Members</h2>
@@ -224,7 +224,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     </div>
     <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
-  <div class="lc-body collapsed" id="canton-lc-body">
+  <div class="lc-body" id="canton-lc-body">
   <div class="slider-wrap">
     <div class="slider-viewport">
       <div class="slider-track" id="canton-track"></div>
@@ -243,7 +243,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
   </div><!-- end lc-body -->
 </div>
 
-<div class="lc collapsed" id="board-lc">
+<div class="lc" id="board-lc">
   <div class="lc-header" onclick="toggleLc('board-lc')">
     <div class="lc-header-text">
       <h2>Canton Foundation Board Members</h2>
@@ -251,7 +251,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     </div>
     <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
-  <div class="lc-body collapsed" id="board-lc-body">
+  <div class="lc-body" id="board-lc-body">
   <div class="slider-wrap">
     <div class="slider-viewport">
       <div class="slider-track" id="board-track"></div>
@@ -380,7 +380,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (el) { el.style.opacity="0"; setTimeout(function(){ el.textContent=flWords[fi]; el.style.opacity="1"; },300); }
   }, 2800);
 
-  /* ── EXISTING ECO HUB LOGIC ── */
+  /* SLIDER LOGIC */
   const PER_PAGE=6;
   const state={eco:0,canton:0,board:0};
 
@@ -416,8 +416,8 @@ document.addEventListener("DOMContentLoaded", function() {
   function applySlide(key,pages){document.getElementById(key+'-track').style.transform='translateX(-'+state[key]*100+'%)';document.querySelectorAll('#'+key+'-dots .s-dot').forEach(function(d,i){d.classList.toggle('on',i===state[key]);});updateBtns(key,pages);}
   function updateBtns(key,pages){const p=document.getElementById(key+'-prev');const n=document.getElementById(key+'-next');if(p)p.disabled=state[key]===0;if(n)n.disabled=state[key]>=pages-1;}
 
-  const active={eco:null,canton:null,board:null,deals:null};
-  const dataMap={eco:ECO,canton:CANTON,board:BOARD,deals:DEALS};
+  const active={canton:null,board:null};
+  const dataMap={canton:CANTON,board:BOARD};
 
   window.pick=function(key,id){
     const item=dataMap[key].find(function(x){return x.id===id;});
