@@ -111,13 +111,20 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 .rn-conn-txt-gold{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;fill:#8a6200;text-anchor:middle;}
 .rn-info-box{margin:0 32px 32px;border:1px solid #e0e0e0;border-left:3px solid var(--navy);background:#f7f9fc;padding:22px 26px;min-height:80px;}
 .rn-prompt{font-family:'DM Mono',monospace;font-size:13px;color:#888;font-style:italic;}
-.rn-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);margin-bottom:12px;display:none;}
-.rn-body{font-family:'DM Mono',monospace;font-size:13px;color:#222;line-height:1.85;display:none;}
+.rn-title{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);margin-bottom:14px;display:none;}
+.rn-body{font-family:'DM Mono',monospace;font-size:15px;color:#111;line-height:1.85;text-align:justify;display:none;}
 .rn-map-hint{text-align:center;padding:8px 0 4px;font-family:'DM Mono',monospace;font-size:10px;color:#aaa;letter-spacing:0.5px;}
-@media(max-width:900px){
-  .rn-map-area{margin:14px 0 0;}
-  .rn-info-box{margin:0 16px 20px;padding:16px;}
-}
+
+/* ═══════ COLLAPSE / EXPAND ═══════ */
+.lc-header{padding:28px 32px 0;display:flex;align-items:flex-start;justify-content:space-between;cursor:pointer;user-select:none;}
+.lc-header-text{flex:1;}
+.lc-toggle{width:32px;height:32px;border:1px solid #dde4ed;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:16px;margin-top:2px;transition:background 0.15s,border-color 0.15s;}
+.lc-toggle svg{transition:transform 0.28s ease;}
+.lc-toggle:hover{background:#eef3f8;border-color:var(--navy);}
+.lc-body{overflow:hidden;transition:max-height 0.35s ease, opacity 0.28s ease;max-height:4000px;opacity:1;}
+.lc-body.collapsed{max-height:0;opacity:0;}
+.lc.collapsed .lc-toggle svg{transform:rotate(-90deg);}
+.lc-header{padding-bottom:20px;}
 </style>
 </head>
 <body>
@@ -146,14 +153,18 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 <!-- ║  CONTAINER 0 : RIZE NETWORK MAP          ║ -->
 <!-- ╚══════════════════════════════════════════╝ -->
 <div class="lc" id="rn-lc">
-  <div class="lc-header">
-    <h2>Explore the RIZE Network</h2>
-    <p>The full technical architecture of the RIZE ecosystem — click any node or connector to learn more.</p>
+  <div class="lc-header" onclick="toggleLc('rn-lc')">
+    <div class="lc-header-text">
+      <h2>Explore the RIZE Network</h2>
+      <p>The full technical architecture of the RIZE ecosystem — click any node or connector to learn more.</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
+  <div class="lc-body" id="rn-lc-body">
 
   <!-- SVG MAP — full width, larger nodes, merged FL, gold utility nodes inside SVG -->
   <div class="rn-map-area">
-    <svg id="rn-svg" viewBox="0 0 1060 700" xmlns="http://www.w3.org/2000/svg">
+    <svg id="rn-svg" viewBox="0 0 1060 615" xmlns="http://www.w3.org/2000/svg">
 
       <!-- ░░ BACKGROUND GRID ░░ -->
       <defs>
@@ -166,156 +177,160 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
       <!-- ░░ CONNECTORS ░░ -->
 
       <!-- Canton ↔ T-RIZE -->
-      <path d="M248,152 Q295,128 340,128" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
+      <path d="M248,112 Q295,96 330,96" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
       <!-- T-RIZE ↔ Fireblocks -->
-      <path d="M600,122 Q648,104 696,102" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
+      <path d="M600,96 Q648,80 696,80" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
       <!-- T-RIZE ↔ Base -->
-      <path d="M600,138 Q648,175 696,185" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
-      <!-- T-RIZE ↔ ATS — extended to actually reach the box -->
-      <path d="M404,168 Q270,210 248,260" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
+      <path d="M570,128 Q634,168 696,178" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
+      <!-- T-RIZE ↔ ATS -->
+      <path d="M404,128 Q300,218 248,240" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
       <!-- T-RIZE ↔ Rizenet (vertical) -->
-      <line x1="465" y1="170" x2="465" y2="242" stroke="#b8cce0" stroke-width="1.4"/>
+      <line x1="465" y1="158" x2="465" y2="218" stroke="#b8cce0" stroke-width="1.4"/>
 
       <!-- Rizenet ↔ Base (CCIP arc) -->
-      <path d="M600,278 Q650,250 696,218" fill="none" stroke="#7aa8c4" stroke-width="1.6"/>
+      <path d="M600,262 Q650,232 696,218" fill="none" stroke="#7aa8c4" stroke-width="1.6"/>
       <g class="rn-conn" id="conn-ccip">
-        <rect class="rn-conn-bg" x="622" y="240" width="48" height="18" rx="2"/>
-        <text class="rn-conn-txt" x="646" y="253">CCIP</text>
+        <rect class="rn-conn-bg" x="618" y="234" width="48" height="18" rx="2"/>
+        <text class="rn-conn-txt" x="642" y="247">CCIP</text>
       </g>
 
       <!-- Rizenet ↔ Chainlink -->
-      <path d="M600,286 Q648,295 696,302" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
+      <path d="M600,278 Q650,316 696,328" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
       <!-- Chainlink ↔ Proof -->
-      <line x1="778" y1="366" x2="778" y2="388" stroke="#b8cce0" stroke-width="1.2"/>
+      <line x1="856" y1="356" x2="856" y2="380" stroke="#b8cce0" stroke-width="1.2"/>
 
-      <!-- Rizenet ↔ FL (dashed gold) -->
-      <path d="M440,350 Q320,372 139,388" fill="none" stroke="#c8960a" stroke-width="1.2" stroke-dasharray="6 4"/>
+      <!-- Rizenet ↔ FL (dashed gold, WRAP MESSAGING) -->
+      <path d="M440,318 Q300,352 248,368" fill="none" stroke="#c8960a" stroke-width="1.2" stroke-dasharray="6 4"/>
       <g class="rn-conn" id="conn-wrap1">
-        <rect class="rn-conn-bg" x="264" y="358" width="104" height="18" rx="2" style="stroke:#c8960a"/>
-        <text class="rn-conn-txt-gold" x="316" y="371">WRAP MESSAGING</text>
+        <rect class="rn-conn-bg" x="292" y="346" width="104" height="18" rx="2" style="stroke:#c8960a"/>
+        <text class="rn-conn-txt-gold" x="344" y="359">WRAP MESSAGING</text>
       </g>
 
-      <!-- T-RIZE ↔ RIZE TOKEN UTILITY (vertical line down center) -->
-      <line x1="465" y1="170" x2="465" y2="498" stroke="#b8cce0" stroke-width="1" stroke-dasharray="4 3"/>
+      <!-- Rizenet ↔ Utilities — tronc depuis le bas exact de Rizenet y=318 -->
+      <line x1="465" y1="318" x2="465" y2="445" stroke="#b8cce0" stroke-width="1.2"/>
+      <!-- Branche gauche vers Util-01 (centre x=182) -->
+      <path d="M465,445 Q380,445 182,500" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
+      <!-- Branche centre vers Util-02 (centre x=465, droite parfaite) -->
+      <line x1="465" y1="445" x2="465" y2="500" stroke="#b8cce0" stroke-width="1.2"/>
+      <!-- Branche droite vers Util-03 (centre x=738) -->
+      <path d="M465,445 Q550,445 738,500" fill="none" stroke="#b8cce0" stroke-width="1.2"/>
 
-      <!-- ░░ NODES ░░ -->
+      <!-- ░░ ROW 1 — Canton | T-RIZE | Fireblocks ░░ -->
 
-      <!-- CANTON — top left, 218×120 + logo -->
+      <!-- CANTON -->
       <g class="rn-node" id="nd-canton">
-        <rect class="rn-box" x="30" y="70" width="218" height="120" rx="2"/>
-        <text x="46" y="94" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">DISTRIBUTED LEDGER</text>
-        <text x="46" y="118" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Canton Network</text>
-        <text x="46" y="138" font-family="DM Mono,monospace" font-size="11" fill="#666">Institutional DLT</text>
-        <line x1="46" y1="150" x2="236" y2="150" stroke="#dde4ed" stroke-width="0.8"/>
-        <text x="46" y="167" font-family="DM Mono,monospace" font-size="10" fill="#999">Members:</text>
-        <text id="canton-member" x="116" y="167" font-family="DM Mono,monospace" font-size="10" fill="#0d2d4e">BNY Mellon</text>
-        <image id="logo-canton" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/canton.png" x="196" y="76" width="40" height="40" opacity="0.9"/>
+        <rect class="rn-box" x="30" y="50" width="218" height="118" rx="2"/>
+        <text x="46" y="74" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">DISTRIBUTED LEDGER</text>
+        <text x="46" y="98" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Canton Network</text>
+        <text x="46" y="118" font-family="DM Mono,monospace" font-size="11" fill="#666">Institutional DLT</text>
+        <line x1="46" y1="130" x2="236" y2="130" stroke="#dde4ed" stroke-width="0.8"/>
+        <text x="46" y="147" font-family="DM Mono,monospace" font-size="10" fill="#999">Members:</text>
+        <text id="canton-member" x="116" y="147" font-family="DM Mono,monospace" font-size="10" fill="#0d2d4e">BNY Mellon</text>
+        <image id="logo-canton" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/canton.png" x="196" y="56" width="40" height="40" opacity="0.9"/>
       </g>
 
-      <!-- T-RIZE PLATFORM — center top + logo -->
+      <!-- T-RIZE PLATFORM -->
       <g class="rn-node" id="nd-trize">
-        <rect class="rn-box-c" x="330" y="62" width="270" height="108" rx="2"/>
-        <text x="348" y="100" font-family="Rajdhani,sans-serif" font-size="20" font-weight="700" fill="#0d2d4e">T-RIZE platform</text>
-        <text x="348" y="122" font-family="DM Mono,monospace" font-size="11" fill="#4a7ca0">Institutional Tokenization Platform</text>
-        <image id="logo-trize" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/trize.png" x="554" y="68" width="38" height="38" opacity="0.9"/>
+        <rect class="rn-box-c" x="330" y="50" width="270" height="108" rx="2"/>
+        <text x="348" y="74" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">TOKENIZATION</text>
+        <text x="348" y="98" font-family="Rajdhani,sans-serif" font-size="20" font-weight="700" fill="#0d2d4e">T-RIZE platform</text>
+        <text x="348" y="120" font-family="DM Mono,monospace" font-size="11" fill="#4a7ca0">Institutional Tokenization Platform</text>
+        <image id="logo-trize" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/trize.png" x="556" y="56" width="36" height="36" opacity="0.9"/>
       </g>
 
-      <!-- FIREBLOCKS — top right + logo -->
+      <!-- FIREBLOCKS -->
       <g class="rn-node" id="nd-fireblocks">
-        <rect class="rn-box" x="696" y="60" width="320" height="88" rx="2"/>
-        <text x="714" y="82" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">WALLET PROVIDER</text>
-        <text x="714" y="106" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Fireblocks</text>
-        <text x="714" y="128" font-family="DM Mono,monospace" font-size="11" fill="#666">Multi-Party Computation wallets</text>
-        <image id="logo-fireblocks" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/fireblocks.png" x="968" y="66" width="38" height="38" opacity="0.9"/>
+        <rect class="rn-box" x="696" y="50" width="320" height="88" rx="2"/>
+        <text x="714" y="72" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">WALLET PROVIDER</text>
+        <text x="714" y="96" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Fireblocks</text>
+        <text x="714" y="118" font-family="DM Mono,monospace" font-size="11" fill="#666">Multi-Party Computation wallets</text>
+        <image id="logo-fireblocks" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/fireblocks.png" x="968" y="56" width="38" height="38" opacity="0.9"/>
       </g>
 
-      <!-- BASE — right mid + logo -->
-      <g class="rn-node" id="nd-base">
-        <rect class="rn-box" x="696" y="176" width="320" height="84" rx="2"/>
-        <text x="714" y="198" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">BLOCKCHAIN</text>
-        <text x="714" y="222" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Base</text>
-        <text x="714" y="244" font-family="DM Mono,monospace" font-size="11" fill="#666">Coinbase's ETH L2</text>
-        <image id="logo-base" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/base.png" x="968" y="182" width="38" height="38" opacity="0.9"/>
-      </g>
+      <!-- ░░ ROW 2 — y=210 : ATS | Rizenet | Base ░░ -->
 
-      <!-- ATS — left mid + logo same size/position as Canton -->
+      <!-- ATS -->
       <g class="rn-node" id="nd-ats">
-        <rect class="rn-box" x="30" y="228" width="218" height="84" rx="2"/>
-        <text x="46" y="250" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">SEC-REGISTERED ATS</text>
-        <text x="46" y="274" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Texture Capital</text>
-        <text x="46" y="296" font-family="DM Mono,monospace" font-size="11" fill="#666">Compliant US Distribution</text>
-        <image id="logo-ats" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/texture.png" x="196" y="234" width="40" height="40" opacity="0.9"/>
+        <rect class="rn-box" x="30" y="210" width="218" height="84" rx="2"/>
+        <text x="46" y="232" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">SEC-REGISTERED ATS</text>
+        <text x="46" y="256" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Texture Capital</text>
+        <text x="46" y="278" font-family="DM Mono,monospace" font-size="11" fill="#666">Compliant US Distribution</text>
+        <image id="logo-ats" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/texture.png" x="196" y="216" width="40" height="40" opacity="0.9"/>
       </g>
 
-      <!-- RIZENET — center mid + logo -->
+      <!-- RIZENET -->
       <g class="rn-node" id="nd-rizenet">
-        <rect class="rn-box-c" x="330" y="242" width="270" height="108" rx="2"/>
-        <text x="348" y="266" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">BLOCKCHAIN</text>
-        <text x="348" y="296" font-family="Rajdhani,sans-serif" font-size="22" font-weight="700" fill="#0d2d4e">Rizenet</text>
-        <text x="348" y="320" font-family="DM Mono,monospace" font-size="11" fill="#4a7ca0">Business Intelligence Chain</text>
-        <image id="logo-rizenet" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" x="554" y="250" width="38" height="38" opacity="0.9"/>
+        <rect class="rn-box-c" x="330" y="210" width="270" height="108" rx="2"/>
+        <text x="348" y="234" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">BLOCKCHAIN</text>
+        <text x="348" y="264" font-family="Rajdhani,sans-serif" font-size="22" font-weight="700" fill="#0d2d4e">Rizenet</text>
+        <text x="348" y="288" font-family="DM Mono,monospace" font-size="11" fill="#4a7ca0">Business Intelligence Chain</text>
+        <image id="logo-rizenet" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" x="556" y="218" width="36" height="36" opacity="0.9"/>
       </g>
 
-      <!-- CHAINLINK ORACLE — right mid + logo -->
-      <g class="rn-node" id="nd-chainlink">
-        <rect class="rn-box" x="696" y="278" width="320" height="88" rx="2"/>
-        <text x="714" y="300" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">ORACLE</text>
-        <text x="714" y="326" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Real Time Data</text>
-        <text x="714" y="348" font-family="DM Mono,monospace" font-size="11" fill="#666">Provider: Chainlink</text>
-        <image id="logo-chainlink1" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/chainlink.png" x="968" y="284" width="38" height="38" opacity="0.9"/>
+      <!-- BASE -->
+      <g class="rn-node" id="nd-base">
+        <rect class="rn-box" x="696" y="160" width="320" height="84" rx="2"/>
+        <text x="714" y="182" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">BLOCKCHAIN</text>
+        <text x="714" y="206" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Base</text>
+        <text x="714" y="228" font-family="DM Mono,monospace" font-size="11" fill="#666">Coinbase's ETH L2</text>
+        <image id="logo-base" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/base.png" x="968" y="166" width="38" height="38" opacity="0.9"/>
       </g>
 
-      <!-- PROOF (rotating) — bottom right + logo -->
-      <g class="rn-node" id="nd-proof">
-        <rect class="rn-box" x="696" y="388" width="320" height="84" rx="2"/>
-        <text x="714" y="410" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">ORACLE</text>
-        <text id="proof-lbl" x="714" y="436" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e" style="transition:opacity 0.3s">Proof of Origin</text>
-        <text x="714" y="458" font-family="DM Mono,monospace" font-size="11" fill="#666">Provider: Chainlink</text>
-        <image id="logo-chainlink2" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/chainlink.png" x="968" y="394" width="38" height="38" opacity="0.9"/>
-      </g>
+      <!-- ░░ ROW 3 — y=360 : FL | Chainlink | Proof ░░ -->
 
-      <!-- FEDERATED LEARNING — same format as Texture Capital, alternating title -->
+      <!-- FEDERATED LEARNING -->
       <g class="rn-node" id="nd-fl">
-        <rect class="rn-box" x="30" y="388" width="218" height="84" rx="2"/>
-        <text x="46" y="410" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">FEDERATED LEARNING</text>
-        <text id="fl-lbl" x="46" y="436" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e" style="transition:opacity 0.3s">Insurance Claims</text>
-        <text x="46" y="458" font-family="DM Mono,monospace" font-size="11" fill="#666">Privacy-preserving models</text>
+        <rect class="rn-box" x="30" y="360" width="218" height="84" rx="2"/>
+        <text x="46" y="382" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">FEDERATED LEARNING</text>
+        <text id="fl-lbl" x="46" y="408" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e" style="transition:opacity 0.3s">Insurance Claims</text>
+        <text x="46" y="430" font-family="DM Mono,monospace" font-size="11" fill="#666">Privacy-preserving models</text>
       </g>
 
-      <!-- ░░ RIZE TOKEN UTILITY — full-width box integrated in diagram ░░ -->
+      <!-- CHAINLINK ORACLE -->
+      <g class="rn-node" id="nd-chainlink">
+        <rect class="rn-box" x="696" y="272" width="320" height="84" rx="2"/>
+        <text x="714" y="294" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">ORACLE</text>
+        <text x="714" y="318" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Real Time Data</text>
+        <text x="714" y="340" font-family="DM Mono,monospace" font-size="11" fill="#666">Provider: Chainlink</text>
+        <image id="logo-chainlink1" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/chainlink.png" x="968" y="278" width="38" height="38" opacity="0.9"/>
+      </g>
 
-      <!-- Outer container box -->
-      <rect x="30" y="498" width="996" height="170" fill="#eef3f8" stroke="#0d2d4e" stroke-width="1.5" rx="2"/>
+      <!-- PROOF (rotating) -->
+      <g class="rn-node" id="nd-proof">
+        <rect class="rn-box" x="696" y="380" width="320" height="84" rx="2"/>
+        <text x="714" y="402" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">ORACLE</text>
+        <text id="proof-lbl" x="714" y="426" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e" style="transition:opacity 0.3s">Proof of Origin</text>
+        <text x="714" y="448" font-family="DM Mono,monospace" font-size="11" fill="#666">Provider: Chainlink</text>
+        <image id="logo-chainlink2" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/chainlink.png" x="968" y="386" width="38" height="38" opacity="0.9"/>
+      </g>
 
-      <!-- Header label inside box — navy eyebrow style + gold underline accent -->
-      <text x="530" y="522" text-anchor="middle" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" letter-spacing="3.5" fill="#4a7ca0">RIZE TOKEN UTILITY</text>
-      <line x1="380" y1="528" x2="680" y2="528" stroke="#c8960a" stroke-width="1.5"/>
+      <!-- ░░ ROW 4 — UTILITY — util-02 aligné avec T-RIZE/Rizenet (x=330) ░░ -->
 
-      <!-- UTILITY 1 -->
+      <!-- UTILITY 01 — x=52, centre=182 -->
       <g class="rn-node" id="nd-util1">
-        <rect class="rn-box-gold" x="42" y="536" width="308" height="118" rx="2"/>
-        <text x="58" y="558" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" letter-spacing="2" fill="#4a7ca0">RIZE TOKEN — 01</text>
-        <text x="58" y="582" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">Canton Incentives</text>
-        <text x="58" y="604" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">&amp; Vote by Bonding</text>
-        <image id="logo-rize1" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" x="312" y="542" width="36" height="36" opacity="0.9"/>
+        <rect class="rn-box" x="52" y="500" width="260" height="84" rx="2"/>
+        <text x="68" y="522" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">UTILITY</text>
+        <text x="68" y="546" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Rize Token Utility — 01</text>
+        <text x="68" y="568" font-family="DM Mono,monospace" font-size="11" fill="#666">Canton Incentives &amp; Bonding</text>
+        <image id="logo-rize1" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" x="274" y="526" width="26" height="26" opacity="0.9"/>
       </g>
 
-      <!-- UTILITY 2 -->
+      <!-- UTILITY 02 — x=335 so centre=465, aligned with T-RIZE/Rizenet -->
       <g class="rn-node" id="nd-util2">
-        <rect class="rn-box-gold" x="376" y="536" width="308" height="118" rx="2"/>
-        <text x="392" y="558" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" letter-spacing="2" fill="#4a7ca0">RIZE TOKEN — 02</text>
-        <text x="392" y="582" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">Gateway to the</text>
-        <text x="392" y="604" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">Canton Ecosystem</text>
-        <image id="logo-rize2" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" x="646" y="542" width="36" height="36" opacity="0.9"/>
+        <rect class="rn-box" x="335" y="500" width="260" height="84" rx="2"/>
+        <text x="351" y="522" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">UTILITY</text>
+        <text x="351" y="546" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Rize Token Utility — 02</text>
+        <text x="351" y="568" font-family="DM Mono,monospace" font-size="11" fill="#666">Gateway to Canton Ecosystem</text>
+        <image id="logo-rize2" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" x="557" y="526" width="26" height="26" opacity="0.9"/>
       </g>
 
-      <!-- UTILITY 3 -->
+      <!-- UTILITY 03 — x=618, centre=748 -->
       <g class="rn-node" id="nd-util3">
-        <rect class="rn-box-gold" x="710" y="536" width="308" height="118" rx="2"/>
-        <text x="726" y="558" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" letter-spacing="2" fill="#4a7ca0">RIZE TOKEN — 03</text>
-        <text x="726" y="582" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">Power Decentralized</text>
-        <text x="726" y="604" font-family="Rajdhani,sans-serif" font-size="17" font-weight="700" fill="#0d2d4e">Machine Learning</text>
-        <image id="logo-rize3" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" x="980" y="542" width="36" height="36" opacity="0.9"/>
+        <rect class="rn-box" x="618" y="500" width="260" height="84" rx="2"/>
+        <text x="634" y="522" font-family="Rajdhani,sans-serif" font-size="10" font-weight="700" letter-spacing="1.8" fill="#4a7ca0">UTILITY</text>
+        <text x="634" y="546" font-family="Rajdhani,sans-serif" font-size="18" font-weight="700" fill="#0d2d4e">Rize Token Utility — 03</text>
+        <text x="634" y="568" font-family="DM Mono,monospace" font-size="11" fill="#666">Decentralized Machine Learning</text>
+        <image id="logo-rize3" href="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" x="840" y="526" width="26" height="26" opacity="0.9"/>
       </g>
 
     </svg>
@@ -329,15 +344,20 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     <div class="rn-body"  id="rn-body"></div>
   </div>
 
+  </div><!-- end lc-body -->
 </div><!-- end lc #0 -->
 
 
 <!-- ── CONTAINER 1: T-RIZE ECOSYSTEM ── -->
-<div class="lc">
-  <div class="lc-header">
-    <h2>T-RIZE Ecosystem</h2>
-    <p>Key partners and infrastructure providers in the T-RIZE ecosystem</p>
+<div class="lc" id="eco-lc">
+  <div class="lc-header" onclick="toggleLc('eco-lc')">
+    <div class="lc-header-text">
+      <h2>T-RIZE Ecosystem</h2>
+      <p>Key partners and infrastructure providers in the T-RIZE ecosystem</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
+  <div class="lc-body" id="eco-lc-body">
   <div class="slider-wrap">
     <div class="slider-viewport">
       <div class="slider-track" id="eco-track"></div>
@@ -362,14 +382,19 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     </div>
     <p class="photo-credit">Team photography: Patrice Tremblay</p>
   </div>
+  </div><!-- end lc-body -->
 </div>
 
 <!-- ── CONTAINER 2: CANTON PREMIER MEMBERS ── -->
-<div class="lc">
-  <div class="lc-header">
-    <h2>Canton Network Premier Members</h2>
-    <p>The institutional founders and premier members of the Canton Network</p>
+<div class="lc" id="canton-lc">
+  <div class="lc-header" onclick="toggleLc('canton-lc')">
+    <div class="lc-header-text">
+      <h2>Canton Network Premier Members</h2>
+      <p>The institutional founders and premier members of the Canton Network</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
+  <div class="lc-body" id="canton-lc-body">
   <div class="slider-wrap">
     <div class="slider-viewport">
       <div class="slider-track" id="canton-track"></div>
@@ -385,14 +410,19 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     <div class="ib-title" id="canton-title"></div>
     <div class="ib-text"  id="canton-text"></div>
   </div>
+  </div><!-- end lc-body -->
 </div>
 
 <!-- ── CONTAINER 3: BOARD MEMBERS ── -->
-<div class="lc">
-  <div class="lc-header">
-    <h2>Canton Foundation Board Members</h2>
-    <p>The governance leaders steering the Canton Network foundation</p>
+<div class="lc" id="board-lc">
+  <div class="lc-header" onclick="toggleLc('board-lc')">
+    <div class="lc-header-text">
+      <h2>Canton Foundation Board Members</h2>
+      <p>The governance leaders steering the Canton Network foundation</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
+  <div class="lc-body" id="board-lc-body">
   <div class="slider-wrap">
     <div class="slider-viewport">
       <div class="slider-track" id="board-track"></div>
@@ -408,20 +438,26 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     <div class="ib-title" id="board-title"></div>
     <div class="ib-text"  id="board-text"></div>
   </div>
+  </div><!-- end lc-body -->
 </div>
 
 <!-- ── CONTAINER 4: RWA DEALS ── -->
-<div class="lc">
-  <div class="lc-header">
-    <h2>T-RIZE RWA Deals</h2>
-    <p>Live and structured real-world asset tokenization deals by T-RIZE Group</p>
+<div class="lc" id="deals-lc">
+  <div class="lc-header" onclick="toggleLc('deals-lc')">
+    <div class="lc-header-text">
+      <h2>T-RIZE RWA Deals</h2>
+      <p>Live and structured real-world asset tokenization deals by T-RIZE Group</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
+  <div class="lc-body" id="deals-lc-body">
   <div class="deals-grid" id="deals-grid"></div>
   <div class="info-box" style="margin-top:20px" id="deals-box">
     <p class="ib-prompt">Click on a deal to read a detailed breakdown.</p>
     <div class="ib-title" id="deals-title"></div>
     <div class="ib-text"  id="deals-text"></div>
   </div>
+  </div><!-- end lc-body -->
 </div>
 
 </div><!-- end eco-wrap -->
@@ -443,7 +479,7 @@ const DEALS=[{"id":"kairos","name":"Kairos Digital Loan Notes","subtitle":"KAI18
 const RN_INFO = {
   canton: {
     title: "Canton Network — Institutional DLT",
-    body: `The Canton Network is the world's largest institutional blockchain ecosystem, with 45+ premier members including Goldman Sachs, BNP Paribas, DTCC, Euroclear, BNY Mellon, and HSBC, processing over $3 trillion in monthly transaction volume.\n\nCanton was built around a founding principle: every application maintains its own privacy controls and governance down to the sub-transaction level, while preserving full native composability with every other application on the network. This eliminates the classical trade-off between institutional privacy and blockchain interoperability.\n\nT-RIZE operates as a Premier Member, Validator, and RWA issuer on Canton — leveraging its privacy-enabled rails for compliant issuance, registry, and post-trade lifecycle management of tokenized real-world assets. Madani Boukalba (T-RIZE CEO) was announced as a board member of the Canton Foundation in December 2025.\n\nCore members include: Bank of America · BNY Mellon · Citi · Deutsche Bank · DTCC · Goldman Sachs · HSBC · J.P. Morgan · Morgan Stanley · NASDAQ · S&P Global · Euroclear · Broadridge · Cumberland · SBI Digital Asset Holdings`
+    body: `The Canton Network is the world's largest institutional blockchain ecosystem, with 45+ premier members including Goldman Sachs, BNP Paribas, DTCC, Euroclear, BNY Mellon, and HSBC, processing over $3 trillion in monthly transaction volume. Canton was built around a founding principle: every application maintains its own privacy controls and governance down to the sub-transaction level, while preserving full native composability with every other application on the network. This eliminates the classical trade-off between institutional privacy and blockchain interoperability.\n\nT-RIZE operates as a Premier Member, Validator, and RWA issuer on Canton — leveraging its privacy-enabled rails for compliant issuance, registry, and post-trade lifecycle management of tokenized real-world assets. Madani Boukalba (T-RIZE CEO) was announced as a board member of the Canton Foundation in December 2025.\n\nCore members include: Bank of America · BNY Mellon · Citi · Deutsche Bank · DTCC · Goldman Sachs · HSBC · J.P. Morgan · Morgan Stanley · NASDAQ · S&P Global · Euroclear · Broadridge · Cumberland · SBI Digital Asset Holdings`
   },
   trize: {
     title: "T-RIZE Platform — Institutional Tokenization",
@@ -455,7 +491,7 @@ const RN_INFO = {
   },
   base: {
     title: "Base — Ethereum L2 Public Deployment",
-    body: `Base is a secure, low-cost Ethereum Layer 2 incubated by Coinbase, offering fast transaction finality, minimal gas costs, and full EVM compatibility. It provides T-RIZE with a public, DeFi-accessible deployment chain alongside its institutional Canton infrastructure.\n\nT-RIZE uses Base for tokenized real estate offerings including Vision 60, allowing retail and accredited investors to access RWA tokens through Base's growing ecosystem. Base connects to Rizenet via Chainlink's CCIP (Cross-Chain Interoperability Protocol), enabling compliant cross-chain token transfers, oracle data relay, and liquidity bridging.\n\nOn Base, the RIZE token is accessible through Aerodrome (the primary DEX on Base) with liquidity managed by Arrakis, providing deep on-chain trading with tight spreads. This dual-chain architecture — Canton for institutional privacy, Base for DeFi openness — is central to T-RIZE's strategy of bridging TradFi and decentralized markets.`
+    body: `Base is a secure, low-cost Ethereum Layer 2 incubated by Coinbase, offering fast transaction finality, minimal gas costs, and full EVM compatibility. It provides T-RIZE with a public, DeFi-accessible deployment chain alongside its institutional Canton infrastructure.\n\nT-RIZE uses Base for tokenized real estate offerings including Vision 60, allowing retail and accredited investors to access RWA tokens through Base's growing ecosystem. Base connects to Rizenet via Chainlink's CCIP (Cross-Chain Interoperability Protocol), enabling compliant cross-chain token transfers, oracle data relay, and liquidity bridging.\n\nThis dual-chain architecture — Canton for institutional privacy, Base for DeFi openness — is central to T-RIZE's strategy of bridging TradFi and decentralized markets.`
   },
   ats: {
     title: "Texture Capital — SEC-Registered ATS",
@@ -471,11 +507,11 @@ const RN_INFO = {
   },
   proof: {
     title: "Chainlink Proof Mechanisms — Asset Verification",
-    body: `Chainlink's proof infrastructure provides the on-chain verification backbone for T-RIZE's asset authenticity guarantees — three distinct mechanisms ensuring every tokenized instrument is backed by verifiable, tamper-proof real-world evidence:\n\n• PROOF OF RESERVE — Verifies the physical existence and availability of tangible assets. Regular independent third-party audits confirm that actual reserves correspond precisely with amounts represented by on-chain digital tokens.\n\n• PROOF OF ORIGIN — Certifies the provenance and authenticity of assets. For carbon credits, this verifies sourcing from certified renewable energy projects. For real estate and construction loans, it verifies title, ownership chain, and builder credentials.\n\n• PROOF OF PROCESS — Ensures adherence to predefined quality standards across the asset lifecycle. In construction projects, real-time monitoring tools document daily progress and milestone completion, with oracle data feeding directly into smart contracts that control capital release.\n\nThese mechanisms feed directly into Rizenet smart contracts via Chainlink oracle nodes, making every T-RIZE instrument independently verifiable without relying on any centralised data source.`
+    body: `Chainlink's proof infrastructure provides the on-chain verification backbone for T-RIZE's asset authenticity guarantees — three distinct mechanisms ensuring every tokenized instrument is backed by verifiable, tamper-proof real-world evidence:\n\n• PROOF OF RESERVE — Verifies the physical existence and availability of tangible assets. Regular independent third-party audits confirm that actual reserves correspond precisely with amounts represented by on-chain digital tokens.\n• PROOF OF ORIGIN — Certifies the provenance and authenticity of assets. For carbon credits, this verifies sourcing from certified renewable energy projects. For real estate and construction loans, it verifies title, ownership chain, and builder credentials.\n• PROOF OF PROCESS — Ensures adherence to predefined quality standards across the asset lifecycle. In construction projects, real-time monitoring tools document daily progress and milestone completion, with oracle data feeding directly into smart contracts that control capital release.\n\nThese mechanisms feed directly into Rizenet smart contracts via Chainlink oracle nodes, making every T-RIZE instrument independently verifiable without relying on any centralised data source.`
   },
   fl: {
     title: "Federated Learning — Insurance Claims & Default Risks",
-    body: `Rizenet hosts two Decentralized Machine Learning (DML) applications currently in active development by T-RIZE Labs at ÉTS University under Professor Kaiwen Zhang's Industrial Research Chair, backed by the Government of Canada.\n\nThe core challenge both models solve: financial institutions hold vast datasets on claims patterns, credit risk, and default signals — but these are bound by NDAs and privacy regulations that make direct data sharing impossible. Rizenet's federated learning infrastructure solves this by allowing each institution to train a local model on its own private data, then contribute only encrypted mathematical gradient updates to a global supermodel — the raw data never leaves the institution.\n\nINSURANCE CLAIMS MODEL — On-chain risk scoring for tokenized assets backed by insurance receivables (such as the KAI18-1 UK motor finance claims instrument), automated fraud and anomaly detection, and AI-powered risk parameter adjustment for RWA lending markets.\n\nDEFAULT RISK MODEL — Personalised loan-to-value (LTV) ratios for RWA lending markets on Rizenet, construction cost prediction (addressing the fragmented dataset problem where each contractor holds only partial project data), anomaly detection for malicious transactions, and trade execution optimisation.\n\nRIZE is structurally required for both models: smart contracts pay RIZE inference fees to access model outputs. Data-contributing institutions earn RIZE proportional to their verified training contribution, calculated via the Shapley Value game-theoretic formula.`
+    body: `Rizenet hosts two Decentralized Machine Learning (DML) applications currently in active development by T-RIZE Labs at ÉTS University under Professor Kaiwen Zhang's Industrial Research Chair, backed by the Government of Canada. The core challenge both models solve: financial institutions hold vast datasets on claims patterns, credit risk, and default signals — but these are bound by NDAs and privacy regulations that make direct data sharing impossible. Rizenet's federated learning infrastructure solves this by allowing each institution to train a local model on its own private data, then contribute only encrypted mathematical gradient updates to a global supermodel — the raw data never leaves the institution.\n\nINSURANCE CLAIMS MODEL — On-chain risk scoring for tokenized assets backed by insurance receivables (such as the KAI18-1 UK motor finance claims instrument), automated fraud and anomaly detection, and AI-powered risk parameter adjustment for RWA lending markets.\nDEFAULT RISK MODEL — Personalised loan-to-value (LTV) ratios for RWA lending markets on Rizenet, construction cost prediction (addressing the fragmented dataset problem where each contractor holds only partial project data), anomaly detection for malicious transactions, and trade execution optimisation.\n\nRIZE is structurally required for both models: smart contracts pay RIZE inference fees to access model outputs. Data-contributing institutions earn RIZE proportional to their verified training contribution, calculated via the Shapley Value game-theoretic formula.`
   },
   ccip: {
     title: "Chainlink CCIP — Cross-Chain Interoperability",
@@ -495,7 +531,7 @@ const RN_INFO = {
   },
   util_dml: {
     title: "Power Decentralized Machine Learning",
-    body: `Rizenet is purpose-built for Decentralized Machine Learning (DML) — a privacy-preserving federated AI infrastructure where institutions train shared AI models on distributed datasets without ever exposing their raw data. RIZE is structurally required to make this layer function.\n\nSmart contracts on Rizenet pay RIZE inference fees to query trained AI models — for real-time risk scoring, default prediction, construction cost estimation, and anomaly detection. This creates direct on-chain demand for RIZE that scales with the volume of tokenized assets under management on the network.\n\nData-contributing institutions earn RIZE in proportion to their training contribution, calculated via the Shapley Value game-theoretic methodology — ensuring fair compensation based on actual model improvement driven by each contributor's dataset, not just participation. This incentive structure is what makes the federated learning network self-sustaining and grows in intelligence as more institutional participants join.\n\nModel ownership is tokenized: contributors receive fractional ownership in the trained supermodel, which can be held to earn ongoing inference fee revenue or traded on secondary markets — creating a new asset class built on collective institutional intelligence.`
+    body: `Rizenet is purpose-built for Decentralized Machine Learning (DML) — a privacy-preserving federated AI infrastructure where institutions train shared AI models on distributed datasets without ever exposing their raw data. RIZE is structurally required to make this layer function. Smart contracts on Rizenet pay RIZE inference fees to query trained AI models — for real-time risk scoring, default prediction, construction cost estimation, and anomaly detection. This creates direct on-chain demand for RIZE that scales with the volume of tokenized assets under management on the network.\n\nData-contributing institutions earn RIZE in proportion to their training contribution, calculated via the Shapley Value game-theoretic methodology — ensuring fair compensation based on actual model improvement driven by each contributor's dataset, not just participation. This incentive structure is what makes the federated learning network self-sustaining and grows in intelligence as more institutional participants join. Model ownership is tokenized: contributors receive fractional ownership in the trained supermodel, which can be held to earn ongoing inference fee revenue or traded on secondary markets — creating a new asset class built on collective institutional intelligence.`
   }
 };
 
@@ -503,6 +539,15 @@ const RN_INFO = {
    ALL INTERACTIVE LOGIC — wrapped in DOMContentLoaded
 ═══════════════════════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", function() {
+
+  /* ── MODULE COLLAPSE / EXPAND ── */
+  window.toggleLc = function(id) {
+    const lc = document.getElementById(id);
+    const body = document.getElementById(id + '-body');
+    if (!lc || !body) return;
+    const collapsed = lc.classList.toggle('collapsed');
+    body.classList.toggle('collapsed', collapsed);
+  };
 
   /* ── NETWORK MAP ── */
   function rnShow(key) {
