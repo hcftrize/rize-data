@@ -8,10 +8,6 @@
     { "src": "/hub", "dest": "/hub.html" },
     { "src": "/rize-ecosystem", "dest": "/rize-ecosystem.html" },
     { "src": "/canton-ecosystem", "dest": "/canton-ecosystem.html" },
-    { "src": "/admin", "dest": "/admin.html" },
-
-    { "src": "/data-hub", "status": 301, "headers": { "Location": "/rize-data-hub" } },
-    { "src": "/ecosystem", "status": 301, "headers": { "Location": "/rize-ecosystem" } },
-    { "src": "/canton-hub", "status": 301, "headers": { "Location": "/canton-ecosystem" } }
+    { "src": "/admin", "dest": "/admin.html" }
   ]
 }
