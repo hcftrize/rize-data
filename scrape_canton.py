@@ -105,11 +105,15 @@ async def scrape_listing(page) -> list[dict]:
             if not name:
                 continue
 
-            # Short description — first <p> or div with text
+            # Short description — try multiple selectors Webflow might use
             desc = ""
-            p_el = await card.query_selector("p")
-            if p_el:
-                desc = (await p_el.inner_text()).strip()
+            for sel in ["p", "[class*='desc']", "[class*='text']", "[class*='body']", "[class*='summary']"]:
+                p_el = await card.query_selector(sel)
+                if p_el:
+                    t = (await p_el.inner_text()).strip()
+                    if t and len(t) > 20 and t != name:
+                        desc = t
+                        break
 
             # Logo — second img (first is the blank placeholder)
             imgs = await card.query_selector_all("img")
@@ -165,7 +169,13 @@ async def scrape_detail(page, slug: str) -> dict:
         await page.goto(url, wait_until="domcontentloaded", timeout=30_000)
         await page.wait_for_timeout(2_500)
 
-        # Detail description — longest paragraph on page
+        # Detail description — skip if 404 page
+        page_text = await page.inner_text("body")
+        if "Page Not Found" in page_text or "doesn't exist or has been moved" in page_text:
+            print(f"   ⚠ 404 page: {slug} — will use short_desc from listing")
+            return {"detail_text": "", "tags_detail": [], "logo_cdn_detail": ""}
+
+        # Longest meaningful paragraph
         paras = await page.query_selector_all("p, [class*='body'], [class*='description']")
         texts = []
         for p in paras:
@@ -250,9 +260,10 @@ async def main():
             slug = entity["slug"]
             print(f"\n[{i}/{total}] {entity['name']} ({slug})")
 
-            # Detail page
+            # Detail page — fallback to short_desc if 404
             detail = await scrape_detail(page, slug)
-            entity["detail_text"] = detail.get("detail_text", entity.get("short_desc", ""))
+            detail_text = detail.get("detail_text", "")
+            entity["detail_text"] = detail_text if detail_text else entity.get("short_desc", "")
 
             # Merge tags
             all_tags = list(dict.fromkeys(entity.get("tags", []) + detail.get("tags_detail", [])))
