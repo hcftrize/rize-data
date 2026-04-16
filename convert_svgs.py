@@ -1,35 +1,50 @@
 """
 convert_svgs.py
 ===============
-Converts all SVG logos in canton-ecosystem/logos/ to PNG.
-Requires: pip install cairosvg
+Lit les SVG dans canton-ecosystem/logos/
+Ecrit les PNG dans un dossier de sortie séparé (pas le même dossier)
 
 Usage: python convert_svgs.py
 """
 
-import os
+import os, sys
 from pathlib import Path
 
+# Source : dossier logos dans le repo
 LOGOS_DIR = Path("canton-ecosystem/logos")
 
+PNG_OUTPUT = Path("canton-ecosystem/logos-png")
+PNG_OUTPUT.mkdir(parents=True, exist_ok=True)
+
 try:
-    import cairosvg
+    from svglib.svglib import svg2rlg
+    from reportlab.graphics import renderPM
 except ImportError:
-    print("Installing cairosvg...")
-    os.system("pip install cairosvg")
-    import cairosvg
+    print("Installing svglib + reportlab...")
+    os.system(f"{sys.executable} -m pip install svglib reportlab")
+    from svglib.svglib import svg2rlg
+    from reportlab.graphics import renderPM
 
 svgs = list(LOGOS_DIR.glob("*.svg"))
-print(f"Found {len(svgs)} SVG files to convert")
+print(f"Found {len(svgs)} SVG files\n")
 
+ok, failed = 0, 0
 for svg_path in svgs:
-    png_path = svg_path.with_suffix(".png")
+    png_path = PNG_OUTPUT / (svg_path.stem + ".png")
     try:
-        cairosvg.svg2png(url=str(svg_path), write_to=str(png_path), output_width=128, output_height=128)
-        os.remove(svg_path)  # remove original SVG
-        print(f"  ✓ {svg_path.name} → {png_path.name}")
+        drawing = svg2rlg(str(svg_path))
+        if drawing:
+            renderPM.drawToFile(drawing, str(png_path), fmt="PNG")
+            print(f"  OK  {svg_path.name} -> {png_path}")
+            ok += 1
+        else:
+            print(f"  SKIP {svg_path.name} - could not parse")
+            failed += 1
     except Exception as e:
-        print(f"  ⚠ {svg_path.name} failed: {e}")
+        print(f"  FAIL {svg_path.name} - {e}")
+        failed += 1
 
-print(f"\nDone. {len(svgs)} SVGs converted to PNG.")
-print("Now run: git add canton-ecosystem/logos/ && git commit -m 'chore: convert SVG logos to PNG' && git push origin dev")
+print(f"\nDone - {ok} converted, {failed} skipped")
+print(f"PNG files are in: {PNG_OUTPUT.resolve()}")
+print("\nUpload the contents of that folder to GitHub:")
+print("  canton-ecosystem/logos/ (replace SVGs with PNGs)")
