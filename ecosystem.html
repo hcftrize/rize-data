@@ -177,12 +177,13 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 .gov-status.rejected{background:#faeaea;color:#a02020;border:1px solid #e0b0b0;}
 .gov-status.pending{background:#f5f0e8;color:#7a5a1a;border:1px solid #d8c8a0;}
 /* BONDED STAT HERO — between header and table */
-.rip-bonded-hero{margin:20px 32px 0;background:var(--navy);padding:32px 36px;border-left:4px solid #4a7ca0;display:flex;flex-direction:column;gap:8px;}
-.rip-bonded-hero-label{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.5);}
-.rip-bonded-hero-icon{font-size:22px;line-height:1;margin:4px 0;}
-.rip-bonded-hero-val{font-family:'Rajdhani',sans-serif;font-size:clamp(36px,5vw,58px);font-weight:700;color:#fff;letter-spacing:1px;line-height:1;}
+.rip-bonded-hero{margin:20px 32px 0;background:var(--navy);padding:32px 36px;border-left:4px solid #4a7ca0;display:flex;flex-direction:column;gap:10px;}
+.rip-bonded-hero-label{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.75);}
+.rip-bonded-hero-main{display:flex;align-items:center;gap:16px;}
+.rip-bonded-hero-val{font-family:'Rajdhani',sans-serif;font-size:clamp(40px,5.5vw,64px);font-weight:700;color:#fff;letter-spacing:1px;line-height:1;}
+.rip-bonded-hero-logo{width:40px;height:40px;opacity:0.9;flex-shrink:0;margin-top:4px;}
 .rip-bonded-hero-usd{font-family:'DM Mono',monospace;font-size:18px;color:rgba(255,255,255,0.7);margin-top:2px;}
-.rip-bonded-hero-sub{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:0.5px;margin-top:4px;}
+.rip-bonded-hero-sub{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:0.5px;}
 @media(max-width:900px){.gov-stats{grid-template-columns:repeat(3,1fr);}.gov-table-wrap{padding-left:16px;padding-right:16px;}}
 @media(max-width:600px){.gov-stats{grid-template-columns:repeat(2,1fr);}.rip-bonded-hero{margin:14px 16px 0;padding:22px 18px;}.gov-table-wrap{padding-left:16px;padding-right:16px;}}
 </style>
@@ -520,6 +521,58 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
   </div><!-- end lc-body -->
 </div>
 
+<!-- ── CONTAINER 6: RIZENET GOVERNANCE ── -->
+<div class="lc" id="rip-lc">
+  <div class="lc-header" onclick="toggleLc('rip-lc')">
+    <div class="lc-header-text">
+      <h2>Rizenet Governance</h2>
+      <p>Community governance proposals shaping the Rizenet ecosystem</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="lc-body" id="rip-lc-body">
+
+    <!-- BONDED HERO STAT -->
+    <div class="rip-bonded-hero">
+      <div class="rip-bonded-hero-label">RIZE bonded by the community so far</div>
+      <div class="rip-bonded-hero-main">
+        <div class="rip-bonded-hero-val" id="rip-bonded-tokens">—</div>
+        <img src="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" alt="RIZE" class="rip-bonded-hero-logo"/>
+      </div>
+      <div class="rip-bonded-hero-usd" id="rip-bonded-usd"></div>
+      <div class="rip-bonded-hero-sub" id="rip-bonding-status">Loading live data…</div>
+    </div>
+
+    <!-- Proposals table -->
+    <div class="gov-table-wrap">
+      <table class="gov-table">
+        <thead>
+          <tr>
+            <th>Proposal</th>
+            <th style="width:120px">Status</th>
+            <th style="width:200px">Category</th>
+          </tr>
+        </thead>
+        <tbody id="rip-tbody">
+          <tr onclick="ripPick('rip-01')">
+            <td>Proposal 01 — Canton Incentives &amp; Ecosystem Alignment</td>
+            <td><span class="gov-status pending">Pending</span></td>
+            <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:#888">Governance · Tokenomics</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Learn box -->
+    <div class="info-box" id="rip-box" style="margin-bottom:32px">
+      <p class="ib-prompt" id="rip-prompt">Click on any governance proposal to learn more about it.</p>
+      <div class="ib-title" id="rip-detail-title" style="display:none"></div>
+      <div class="ib-text" id="rip-detail-body" style="display:none"></div>
+    </div>
+
+  </div>
+</div>
+
 <!-- ── CONTAINER 5: CANTON ECOSYSTEM BROWSER ── -->
 <div class="lc" id="ceb-lc">
   <div class="lc-header" onclick="toggleLc('ceb-lc')">
@@ -561,55 +614,6 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
   </div><!-- end lc-body -->
 </div>
 
-
-<!-- ── CONTAINER 6: RIZENET GOVERNANCE ── -->
-<div class="lc" id="rip-lc">
-  <div class="lc-header" onclick="toggleLc('rip-lc')">
-    <div class="lc-header-text">
-      <h2>Rizenet Governance</h2>
-      <p>Community governance proposals shaping the Rizenet ecosystem</p>
-    </div>
-    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-  </div>
-  <div class="lc-body" id="rip-lc-body">
-
-    <!-- BONDED HERO STAT -->
-    <div class="rip-bonded-hero">
-      <div class="rip-bonded-hero-label">RIZE bonded by the community so far</div>
-      <div class="rip-bonded-hero-icon"><img src="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" alt="RIZE" style="width:28px;height:28px;opacity:0.85;vertical-align:middle;"/></div>
-      <div class="rip-bonded-hero-val" id="rip-bonded-tokens">—</div>
-      <div class="rip-bonded-hero-usd" id="rip-bonded-usd"></div>
-      <div class="rip-bonded-hero-sub" id="rip-bonding-status">Loading live data…</div>
-    </div>
-
-    <!-- Proposals table -->
-    <div class="gov-table-wrap">
-      <table class="gov-table">
-        <thead>
-          <tr>
-            <th>Proposal</th>
-            <th style="width:120px">Status</th>
-            <th style="width:200px">Category</th>
-          </tr>
-        </thead>
-        <tbody id="rip-tbody">
-          <tr onclick="ripPick('rip-01')">
-            <td>Proposal 01 — Canton Incentives &amp; Ecosystem Alignment</td>
-            <td><span class="gov-status pending">Pending</span></td>
-            <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:#888">Governance · Tokenomics</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Detail box -->
-    <div class="info-box" id="rip-box" style="display:none;margin-top:0;margin-bottom:32px">
-      <div class="ib-title" id="rip-detail-title" style="display:block"></div>
-      <div id="rip-detail-body"></div>
-    </div>
-
-  </div>
-</div>
 
 </div><!-- end eco-wrap -->
 
@@ -1142,29 +1146,36 @@ document.addEventListener("DOMContentLoaded", function() {
     var p = RIP_PROPOSALS.find(function(x){ return x.id === id; });
     if (!p) return;
 
+    var box      = document.getElementById('rip-box');
+    var prompt   = document.getElementById('rip-prompt');
+    var titleEl  = document.getElementById('rip-detail-title');
+    var textEl   = document.getElementById('rip-detail-body');
+
     if (ripActive === id) {
       ripActive = null;
       document.querySelectorAll('#rip-tbody tr').forEach(function(r){ r.classList.remove('on'); });
-      document.getElementById('rip-box').style.display = 'none';
+      prompt.style.display  = '';
+      titleEl.style.display = 'none';
+      textEl.style.display  = 'none';
       return;
     }
+
     ripActive = id;
     document.querySelectorAll('#rip-tbody tr').forEach(function(r){ r.classList.remove('on'); });
     var row = document.querySelector('#rip-tbody tr[onclick*="' + id + '"]');
     if (row) row.classList.add('on');
 
-    var box = document.getElementById('rip-box');
-    var titleEl = document.getElementById('rip-detail-title');
-    var bodyEl = document.getElementById('rip-detail-body');
+    prompt.style.display  = 'none';
+    titleEl.style.display = 'block';
+    textEl.style.display  = 'block';
 
     titleEl.textContent = p.title;
-    bodyEl.innerHTML = '<p style="font-family:DM Mono,monospace;font-size:13px;color:#222;line-height:1.8;text-align:justify;">' + p.body + '</p>'
-      + '<div style="font-family:DM Mono,monospace;font-size:11px;color:#888;margin-top:12px;line-height:2;">'
-      + '<div>Status: <span style="color:#7a5a1a;font-weight:700">Pending</span></div>'
+    textEl.innerHTML = '<p style="font-family:\'DM Mono\',monospace;font-size:13px;color:#222;line-height:1.85;text-align:justify;">' + p.body + '</p>'
+      + '<div style="font-family:\'DM Mono\',monospace;font-size:11px;color:#888;margin-top:14px;line-height:2;">'
+      + '<div>Status: <span style="color:#7a5a1a;font-weight:700">' + p.status + '</span></div>'
       + '<div>Category: <span style="color:#333">' + p.category + '</span></div>'
       + '</div>';
 
-    box.style.display = 'block';
     box.scrollIntoView({behavior:'smooth', block:'nearest'});
   };
 
