@@ -980,7 +980,6 @@ document.addEventListener("DOMContentLoaded", function() {
   window.cebGoPage = function(p) {
     cebPage = p;
     cebRender();
-    document.getElementById('ceb-grid').scrollIntoView({behavior:'smooth',block:'start'});
   };
 
   window.cebPick = function(slug) {
@@ -1016,6 +1015,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
     titleEl.textContent = e.name;
     var bodyText = cebCleanText(e.detail_text || '') || (e.short_desc || '');
+    // Remove entity name if it appears at start of text (duplicate with title)
+    if (bodyText.toLowerCase().startsWith(e.name.toLowerCase())) {
+      bodyText = bodyText.slice(e.name.length).replace(/^[\s\n\r]+/, '');
+    }
     textEl.innerHTML = tagLine + bodyText.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
 
     box.scrollIntoView({behavior:'smooth', block:'nearest'});
