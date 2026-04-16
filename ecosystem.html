@@ -1203,9 +1203,9 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   function ripGetPrice() {
-    return fetch('/api/coingecko?path=/simple/price&ids=rizenet&vs_currencies=usd')
+    return fetch('/api/coingecko?path=/simple/price&ids=rize&vs_currencies=usd')
       .then(function(r){ return r.json(); })
-      .then(function(d){ return (d.rizenet && d.rizenet.usd) ? d.rizenet.usd : null; })
+      .then(function(d){ return (d.rize && d.rize.usd) ? d.rize.usd : null; })
       .catch(function(){ return null; });
   }
 
