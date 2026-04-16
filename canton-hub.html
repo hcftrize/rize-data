@@ -121,6 +121,48 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 @media(max-width:900px){.ceb-grid{grid-template-columns:repeat(3,1fr);}.ceb-controls,.ceb-count,.ceb-grid,.ceb-pagination{padding-left:16px;padding-right:16px;}}
 @media(max-width:600px){.ceb-grid{grid-template-columns:repeat(2,1fr);}}
 
+/* GOVERNANCE MODULE */
+.gov-stats{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#e0e0e0;border:1px solid #e0e0e0;margin:20px 32px 0;}
+.gov-stat{background:#fff;padding:16px 12px;text-align:center;}
+.gov-stat-val{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--navy);}
+.gov-stat-label{font-family:'DM Mono',monospace;font-size:10px;color:#888;letter-spacing:0.5px;margin-top:2px;text-transform:uppercase;}
+.gov-green{color:#1a7a4a;}
+.gov-blue{color:#1a5a9a;}
+.gov-red{color:#a02020;}
+.gov-controls{padding:16px 32px 0;display:flex;flex-direction:column;gap:10px;}
+.gov-filter-btns{display:flex;flex-wrap:wrap;gap:6px;}
+.gov-table-wrap{padding:16px 32px 0;overflow-x:auto;}
+.gov-table{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:12px;}
+.gov-table thead tr{background:var(--navy);}
+.gov-table thead th{color:#fff;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 14px;text-align:left;white-space:nowrap;}
+.gov-table tbody tr{border-bottom:1px solid #eee;cursor:pointer;transition:background 0.15s;}
+.gov-table tbody tr:hover{background:#f0f5fa;}
+.gov-table tbody tr.on{background:#dce8f2;}
+.gov-table tbody td{padding:10px 14px;vertical-align:middle;color:#222;}
+.gov-table tbody td:first-child{font-weight:700;color:var(--navy);font-family:'Rajdhani',sans-serif;font-size:14px;}
+.gov-status{display:inline-block;padding:2px 10px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.gov-status.inprogress{background:#e8f0fa;color:#1a5a9a;border:1px solid #b8cce0;}
+.gov-status.executed{background:#e8f5ee;color:#1a7a4a;border:1px solid #a8d8bc;}
+.gov-status.rejected{background:#faeaea;color:#a02020;border:1px solid #e0b0b0;}
+.gov-status.expired{background:#f5f0e8;color:#7a5a1a;border:1px solid #d8c8a0;}
+.gov-vote-bar{display:flex;align-items:center;gap:6px;}
+.gov-bar{flex:1;height:6px;background:#eee;border-radius:3px;overflow:hidden;}
+.gov-bar-fill{height:100%;border-radius:3px;}
+.gov-bar-fill.accept{background:#1a7a4a;}
+.gov-bar-fill.reject{background:#a02020;}
+.gov-detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+.gov-detail-stat{background:#f7f9fc;border:1px solid #e0e0e0;border-left:3px solid var(--navy);padding:12px 16px;}
+.gov-detail-stat-val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--navy);}
+.gov-detail-stat-label{font-family:'DM Mono',monospace;font-size:11px;color:#888;margin-top:2px;}
+.gov-detail-meta{font-family:'DM Mono',monospace;font-size:12px;color:#555;line-height:2;}
+.gov-detail-meta span{color:#111;font-weight:500;}
+.gov-loading{font-family:'DM Mono',monospace;font-size:13px;color:#aaa;padding:32px;text-align:center;}
+@media(max-width:900px){
+  .gov-stats{grid-template-columns:repeat(4,1fr);}.gov-table-wrap,.gov-controls,.ceb-count{padding-left:16px;padding-right:16px;}
+  .gov-detail-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:600px){.gov-stats{grid-template-columns:repeat(2,1fr);}.gov-detail-grid{grid-template-columns:1fr;}}
+
 /* RIZE NETWORK MAP STYLES */
 .rn-map-area{margin:20px 0 0;background:#fff;border-top:1px solid #dde4ed;position:relative;overflow:hidden;}
 #rn-svg{display:block;width:100%;}
@@ -268,6 +310,74 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     <div class="ib-text"  id="board-text"></div>
   </div>
   </div><!-- end lc-body -->
+</div>
+
+
+<!-- ── CONTAINER 4: CANTON GOVERNANCE ── -->
+<div class="lc" id="gov-lc">
+  <div class="lc-header" onclick="toggleLc('gov-lc')">
+    <div class="lc-header-text">
+      <h2>Canton Network Governance</h2>
+      <p>Live on-chain governance vote requests — powered by <a href="https://lighthouse.cantonloop.com" target="_blank" style="color:var(--navy);text-decoration:none;border-bottom:1px solid #b8cce0;">5N Lighthouse</a></p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="lc-body" id="gov-lc-body">
+
+    <!-- Stats bar -->
+    <div class="gov-stats" id="gov-stats">
+      <div class="gov-stat"><div class="gov-stat-val" id="gs-total">—</div><div class="gov-stat-label">Total Proposals</div></div>
+      <div class="gov-stat"><div class="gov-stat-val gov-green" id="gs-executed">—</div><div class="gov-stat-label">Executed</div></div>
+      <div class="gov-stat"><div class="gov-stat-val gov-blue" id="gs-progress">—</div><div class="gov-stat-label">In Progress</div></div>
+      <div class="gov-stat"><div class="gov-stat-val gov-red" id="gs-rejected">—</div><div class="gov-stat-label">Rejected</div></div>
+      <div class="gov-stat"><div class="gov-stat-val" id="gs-votes">—</div><div class="gov-stat-label">Total Votes</div></div>
+      <div class="gov-stat"><div class="gov-stat-val gov-green" id="gs-accept">—</div><div class="gov-stat-label">Accept Votes</div></div>
+      <div class="gov-stat"><div class="gov-stat-val gov-red" id="gs-reject">—</div><div class="gov-stat-label">Reject Votes</div></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="gov-controls">
+      <input class="ceb-search" id="gov-search" type="text" placeholder="Search proposals…" oninput="govFilter()"/>
+      <div class="gov-filter-btns">
+        <button class="ceb-tag on" data-status="ALL" onclick="govSetStatus(this)">All</button>
+        <button class="ceb-tag" data-status="InProgress" onclick="govSetStatus(this)">In Progress</button>
+        <button class="ceb-tag" data-status="Executed" onclick="govSetStatus(this)">Executed</button>
+        <button class="ceb-tag" data-status="Rejected" onclick="govSetStatus(this)">Rejected</button>
+        <button class="ceb-tag" data-status="Expired" onclick="govSetStatus(this)">Expired</button>
+      </div>
+    </div>
+
+    <div class="ceb-count" id="gov-count"></div>
+    <div class="ceb-pagination" id="gov-pagination-top"></div>
+
+    <!-- Table -->
+    <div class="gov-table-wrap">
+      <table class="gov-table" id="gov-table">
+        <thead>
+          <tr>
+            <th style="width:60px">#</th>
+            <th>Title</th>
+            <th style="width:110px">Status</th>
+            <th style="width:90px">Accept</th>
+            <th style="width:90px">Reject</th>
+            <th style="width:130px">Date</th>
+          </tr>
+        </thead>
+        <tbody id="gov-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="ceb-pagination" id="gov-pagination"></div>
+
+    <!-- Detail box -->
+    <div class="info-box" id="gov-box" style="display:none">
+      <div class="ib-title" id="gov-detail-title"></div>
+      <div id="gov-detail-body"></div>
+    </div>
+
+    <div class="gov-loading" id="gov-loading">Loading governance data…</div>
+
+  </div>
 </div>
 
 </div><!-- end eco-wrap -->
@@ -685,6 +795,203 @@ document.addEventListener("DOMContentLoaded", function() {
       document.getElementById('ceb-count').textContent = 'Could not load ecosystem data.';
       console.error('CEB load error:', err);
     });
+
+
+  /* ── CANTON GOVERNANCE ── */
+  const GOV_API = 'https://lighthouse.cantonloop.com/api';
+  const GOV_PER_PAGE = 20;
+  let govAll = [];
+  let govFiltered = [];
+  let govPage = 0;
+  let govStatus = 'ALL';
+  let govActive = null;
+
+  function govStatusClass(s) {
+    if (!s) return '';
+    var m = {inprogress:'inprogress', executed:'executed', rejected:'rejected', expired:'expired'};
+    return m[(s||'').toLowerCase().replace(/\s/,'')] || '';
+  }
+
+  function govFormatDate(d) {
+    if (!d) return '—';
+    try { return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+    catch(e) { return d.slice(0,10); }
+  }
+
+  function govVotePct(accept, total) {
+    if (!total) return 0;
+    return Math.round(accept / total * 100);
+  }
+
+  window.govSetStatus = function(btn) {
+    document.querySelectorAll('.gov-filter-btns .ceb-tag').forEach(function(b){b.classList.remove('on');});
+    btn.classList.add('on');
+    govStatus = btn.dataset.status;
+    govPage = 0;
+    govApplyFilter();
+  };
+
+  window.govFilter = function() {
+    govPage = 0;
+    govApplyFilter();
+  };
+
+  function govApplyFilter() {
+    var q = (document.getElementById('gov-search').value||'').toLowerCase().trim();
+    govFiltered = govAll.filter(function(r) {
+      var matchStatus = govStatus === 'ALL' || (r.status||'').toLowerCase() === govStatus.toLowerCase();
+      var matchQ = !q ||
+        (r.title||'').toLowerCase().includes(q) ||
+        (r.description||'').toLowerCase().includes(q) ||
+        String(r.id||'').includes(q);
+      return matchStatus && matchQ;
+    });
+    govRender();
+  }
+
+  function govBuildPag(pages) {
+    if (pages <= 1) return '';
+    var h = '<button class="ceb-pg-btn" onclick="govGoPage('+(govPage-1)+')" '+(govPage===0?'disabled':'')+'>&#8592;</button>';
+    for (var i=0;i<pages;i++) {
+      h += '<button class="ceb-pg-btn'+(i===govPage?' on':'')+'" onclick="govGoPage('+i+')">'+(i+1)+'</button>';
+    }
+    h += '<button class="ceb-pg-btn" onclick="govGoPage('+(govPage+1)+')" '+(govPage>=pages-1?'disabled':'')+'>&#8594;</button>';
+    return h;
+  }
+
+  function govRender() {
+    var total = govFiltered.length;
+    var pages = Math.max(1, Math.ceil(total / GOV_PER_PAGE));
+    if (govPage >= pages) govPage = pages - 1;
+    var start = govPage * GOV_PER_PAGE;
+    var slice = govFiltered.slice(start, start + GOV_PER_PAGE);
+
+    document.getElementById('gov-count').textContent =
+      total + ' proposal' + (total !== 1 ? 's' : '') + (total < govAll.length ? ' (filtered)' : '');
+
+    document.getElementById('gov-pagination-top').innerHTML = govBuildPag(pages);
+    document.getElementById('gov-pagination').innerHTML = govBuildPag(pages);
+
+    var tbody = document.getElementById('gov-tbody');
+    tbody.innerHTML = slice.map(function(r) {
+      var sc = govStatusClass(r.status);
+      var totalVotes = (r.accept_votes||0) + (r.reject_votes||0);
+      var pct = govVotePct(r.accept_votes||0, totalVotes);
+      var barHtml = totalVotes > 0
+        ? '<div class="gov-vote-bar"><div class="gov-bar"><div class="gov-bar-fill accept" style="width:'+pct+'%"></div></div><span style="color:#1a7a4a;font-weight:700">'+pct+'%</span></div>'
+        : '<span style="color:#ccc">—</span>';
+      var rejectBar = totalVotes > 0
+        ? '<div class="gov-vote-bar"><div class="gov-bar"><div class="gov-bar-fill reject" style="width:'+(100-pct)+'%"></div></div><span style="color:#a02020;font-weight:700">'+(100-pct)+'%</span></div>'
+        : '<span style="color:#ccc">—</span>';
+      return '<tr id="gov-row-'+r.id+'" onclick="govPick(\''+r.id+'\')">'+
+        '<td>'+r.id+'</td>'+
+        '<td style="max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(r.title||r.description||'Proposal #'+r.id)+'</td>'+
+        '<td><span class="gov-status '+sc+'">'+(r.status||'—')+'</span></td>'+
+        '<td>'+barHtml+'</td>'+
+        '<td>'+rejectBar+'</td>'+
+        '<td style="color:#888;white-space:nowrap;">'+govFormatDate(r.created_at||r.date||r.effective_at)+'</td>'+
+        '</tr>';
+    }).join('');
+  }
+
+  window.govGoPage = function(p) {
+    govPage = p;
+    govRender();
+  };
+
+  window.govPick = function(id) {
+    // Toggle
+    if (govActive === id) {
+      govActive = null;
+      document.querySelectorAll('#gov-tbody tr').forEach(function(r){r.classList.remove('on');});
+      document.getElementById('gov-box').style.display = 'none';
+      return;
+    }
+    govActive = id;
+    document.querySelectorAll('#gov-tbody tr').forEach(function(r){r.classList.remove('on');});
+    var row = document.getElementById('gov-row-'+id);
+    if (row) row.classList.add('on');
+
+    // Load detail
+    var box = document.getElementById('gov-box');
+    var titleEl = document.getElementById('gov-detail-title');
+    var bodyEl = document.getElementById('gov-detail-body');
+    titleEl.textContent = 'Loading…';
+    bodyEl.innerHTML = '';
+    box.style.display = 'block';
+    box.scrollIntoView({behavior:'smooth', block:'nearest'});
+
+    fetch(GOV_API + '/governance/' + id)
+      .then(function(r){return r.json();})
+      .then(function(d) {
+        var totalVotes = (d.accept_votes||0) + (d.reject_votes||0);
+        var pct = govVotePct(d.accept_votes||0, totalVotes);
+        var sc = govStatusClass(d.status);
+        titleEl.textContent = d.title || d.description || 'Proposal #'+id;
+        bodyEl.innerHTML =
+          '<div style="margin-bottom:12px"><span class="gov-status '+sc+'">'+(d.status||'')+'</span></div>'+
+          '<div class="gov-detail-grid">'+
+            '<div class="gov-detail-stat"><div class="gov-detail-stat-val gov-green">'+(d.accept_votes||0)+'</div><div class="gov-detail-stat-label">Accept Votes</div></div>'+
+            '<div class="gov-detail-stat"><div class="gov-detail-stat-val gov-red">'+(d.reject_votes||0)+'</div><div class="gov-detail-stat-label">Reject Votes</div></div>'+
+            '<div class="gov-detail-stat"><div class="gov-detail-stat-val">'+totalVotes+'</div><div class="gov-detail-stat-label">Total Votes</div></div>'+
+          '</div>'+
+          '<div class="gov-detail-meta">'+
+            (d.description && d.description !== d.title ? '<p style="font-family:\'DM Mono\',monospace;font-size:13px;color:#333;line-height:1.7;margin-bottom:16px;">'+d.description+'</p>' : '')+
+            (d.effective_at ? '<div>Effective: <span>'+govFormatDate(d.effective_at)+'</span></div>' : '')+
+            (d.created_at ? '<div>Created: <span>'+govFormatDate(d.created_at)+'</span></div>' : '')+
+            (d.expires_at ? '<div>Expires: <span>'+govFormatDate(d.expires_at)+'</span></div>' : '')+
+            (d.proposal_type ? '<div>Type: <span>'+d.proposal_type+'</span></div>' : '')+
+          '</div>'+
+          '<div style="margin-top:16px;font-family:\'DM Mono\',monospace;font-size:11px;color:#aaa;">Source: <a href="https://lighthouse.cantonloop.com/governance/'+id+'" target="_blank" style="color:var(--navy);">View on 5N Lighthouse</a></div>';
+      })
+      .catch(function() {
+        // Fallback to list data
+        var r = govAll.find(function(x){return String(x.id)===String(id);});
+        if (r) {
+          titleEl.textContent = r.title || r.description || 'Proposal #'+id;
+          bodyEl.innerHTML = '<p style="font-family:\'DM Mono\',monospace;font-size:13px;color:#666;">Status: '+(r.status||'—')+'</p>';
+        }
+      });
+  };
+
+  // Init governance
+  function govInit() {
+    var loadEl = document.getElementById('gov-loading');
+    Promise.all([
+      fetch(GOV_API + '/governance/stats').then(function(r){return r.json();}),
+      fetch(GOV_API + '/governance').then(function(r){return r.json();})
+    ]).then(function(results) {
+      var stats = results[0];
+      var data = results[1];
+
+      // Stats bar
+      document.getElementById('gs-total').textContent = stats.total_requests || 0;
+      document.getElementById('gs-executed').textContent = stats.executed_count || 0;
+      document.getElementById('gs-progress').textContent = stats.in_progress_count || 0;
+      document.getElementById('gs-rejected').textContent = stats.rejected_count || 0;
+      document.getElementById('gs-votes').textContent = (stats.total_votes||0).toLocaleString();
+      document.getElementById('gs-accept').textContent = (stats.total_accept_votes||0).toLocaleString();
+      document.getElementById('gs-reject').textContent = (stats.total_reject_votes||0).toLocaleString();
+
+      // List - handle both array and {results:[...]} shapes
+      govAll = Array.isArray(data) ? data : (data.results || data.items || data.data || []);
+      // Sort: in_progress first, then by id desc
+      govAll.sort(function(a,b){
+        var ap = (a.status||'').toLowerCase()==='inprogress'?0:1;
+        var bp = (b.status||'').toLowerCase()==='inprogress'?0:1;
+        if (ap !== bp) return ap - bp;
+        return (b.id||0) - (a.id||0);
+      });
+      govFiltered = govAll.slice();
+      if (loadEl) loadEl.style.display = 'none';
+      govRender();
+    }).catch(function(err) {
+      if (loadEl) loadEl.textContent = 'Could not load governance data.';
+      console.error('GOV error:', err);
+    });
+  }
+
+  govInit();
 
 }); // end DOMContentLoaded
 </script>
