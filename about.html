@@ -2,17 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<title id="page-title">Article &mdash; Tokerize</title>
+<title>About &mdash; Tokerize</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta name="description" id="meta-desc" content=""/>
-<meta property="og:title" id="og-title" content=""/>
-<meta property="og:description" id="og-desc" content=""/>
-<meta property="og:type" content="article"/>
-<meta property="og:image" id="og-image" content=""/>
-<script type="application/ld+json" id="schema-article">{}</script>
+<meta name="description" content="Tokerize is the RIZE community hub for tokenization intelligence. Independent, community-driven, focused on real-world asset tokenization."/>
 <style>
 
-@font-face{font-family:'Rajdhani';src:url('/assets/fonts/rajdhani.semibold.ttf') format('truetype');font-weight:600;font-style:normal;}
+@font-face{font-family:'Rajdhani';src:url('data:font/truetype;base64,PLACEHOLDER') format('truetype');font-weight:600;font-style:normal;}
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap');
 :root {
@@ -57,7 +52,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 .section-label::after{content:"";flex:1;height:1px;background:var(--border);}
 .featured{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--border);margin-bottom:48px;}
 .featured-img{background:#111;overflow:hidden;min-height:320px;}
-.featured-img img{width:100%;height:100%;object-fit:cover;display:block;opacity:0.9;transition:opacity 0.3s;}
+.featured-img img{width:100%;height:100%;object-fit:contain;display:block;opacity:0.95;transition:opacity 0.3s;background:#000;}
 .featured:hover .featured-img img{opacity:1;}
 .featured-body{padding:40px 36px;display:flex;flex-direction:column;justify-content:space-between;border-left:1px solid var(--border);}
 .article-tag{display:inline-block;font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#fff;background:var(--navy);padding:4px 10px;margin-bottom:20px;}
@@ -85,75 +80,38 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 @media(max-width:600px){.hero{padding:48px 16px 40px;}.article-grid{grid-template-columns:1fr;}}
 
 
-.reading-progress{position:fixed;top:0;left:0;height:3px;background:var(--navy);z-index:200;transition:width 0.1s linear;}
-.article-header{background:var(--black);padding:56px 40px 48px;border-bottom:1px solid rgba(255,255,255,0.08);}
-.article-header .wrap{max-width:820px;}
-.back-link{display:inline-flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.75);text-decoration:none;margin-bottom:28px;transition:background 0.2s,color 0.2s;border:1px solid rgba(255,255,255,0.25);padding:6px 14px;background:rgba(255,255,255,0.05);}
-.back-link:hover{background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.5);}
-.article-header h1{font-family:'Rajdhani',sans-serif;font-size:clamp(22px,4vw,40px);font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;line-height:1.15;margin-bottom:20px;}
-.article-byline{display:flex;align-items:center;gap:16px;font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.7);}
-.article-cover{width:100%;max-height:480px;object-fit:cover;display:block;}
-.article-body{max-width:820px;margin:0 auto;padding:56px 28px 80px;}
-.article-body p{font-family:'DM Mono',monospace;font-size:15px;line-height:1.85;color:#222;margin-bottom:24px;text-align:justify;}
-.article-body h2{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text);margin:48px 0 16px;padding-bottom:10px;border-bottom:2px solid var(--navy);}
-.article-body h3{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--text);margin:32px 0 12px;}
-.article-body strong{font-family:'DM Mono',monospace;font-weight:500;color:var(--navy);background:rgba(13,45,78,0.06);padding:1px 3px;}
-.article-body img{width:100%;display:block;margin:32px 0;border:1px solid var(--border);}
-.article-body blockquote{border-left:3px solid var(--navy);padding:16px 24px;margin:32px 0;background:var(--bluelt);font-family:'DM Mono',monospace;font-size:14px;color:var(--navy);}
-.article-body a{color:var(--navy);text-decoration:underline;}
-@media(max-width:768px){.article-header{padding:36px 16px 32px;}.article-body{padding:36px 16px 60px;}}
+.page-header{background:var(--black);padding:56px 40px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.page-header .wrap{max-width:800px;}
+.page-header h1{font-family:'Rajdhani',sans-serif;font-size:clamp(28px,5vw,52px);font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#fff;}
+.page-body{max-width:800px;margin:0 auto;padding:60px 28px 80px;}
+.page-body p{font-family:'DM Mono',monospace;font-size:15px;line-height:1.85;color:#333;margin-bottom:24px;text-align:justify;}
+.page-body h2{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text);margin:40px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--navy);}
+@media(max-width:768px){.page-header{padding:36px 16px;}.page-body{padding:36px 16px 60px;}}
 
 </style>
 </head>
 <body>
-<div class="reading-progress" id="rp"></div>
 <header class="site-header">
-    <a href="/" class="site-header-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></a>
+    <a href="/" class="site-header-logo"><img src="data:image/png;base64,PLACEHOLDER" alt="Tokerize"/></a>
     <nav class="site-nav">
       <a href="/" class="nav-home">Home</a>
       <a href="/about">About</a>
       <a href="/hub" class="nav-hub">RIZE Data Hub</a>
     </nav>
   </header>
-<div class="article-header">
-  <div class="wrap">
-    <a href="/" class="back-link">&larr; Back to Tokerize</a>
-    <h1 id="article-title">Loading...</h1>
-    <div class="article-byline">
-      <span id="article-date">&mdash;</span>
-      <span>|</span>
-      <span>Tokerize Editorial</span>
-    </div>
-  </div>
+<div class="page-header"><div class="wrap"><h1>About Tokerize</h1></div></div>
+<div class="page-body">
+<p>Tokerize is an independent community media focused on real-world asset tokenization &mdash; with a particular focus on T-RIZE and the RIZENET ecosystem.</p>
+<p>Our goal is simple: make institutional-grade tokenization intelligence accessible to every member of the RIZE community, regardless of their background in finance or blockchain technology.</p>
+<h2>What We Cover</h2>
+<p>We publish in-depth analyses of tokenized instruments, structured finance mechanisms, on-chain governance models, and the broader tokenization landscape. Every article is written to be understood from first principles.</p>
+<h2>RIZE Data Hub</h2>
+<p>Beyond editorial content, Tokerize operates the RIZE Data Hub &mdash; a live market intelligence dashboard tracking RIZE price, market cap, TVS/TVL ratios, and comparative market positioning in real time.</p>
+<h2>Independence</h2>
+<p>Tokerize is community-driven and independently operated. We are not affiliated with T-RIZE Group. All content reflects our own analysis and research.</p>
 </div>
-<img id="article-cover" class="article-cover" src="" alt="" style="display:none"/>
-<div class="article-body" id="article-body"><p style="color:#999">Loading...</p></div>
-<script>
-window.addEventListener('scroll',()=>{
-  const el=document.getElementById('rp');
-  const d=document.documentElement;
-  el.style.width=(d.scrollTop/(d.scrollHeight-d.clientHeight)*100)+'%';
-});
-const slug=new URLSearchParams(window.location.search).get('slug');
-if(slug){
-  fetch('/articles.json').then(r=>r.json()).then(articles=>{
-    const a=articles.find(x=>x.slug===slug);
-    if(!a){document.getElementById('article-body').innerHTML='<p>Article not found.</p>';return;}
-    document.getElementById('page-title').textContent=a.title+' — Tokerize';
-    document.getElementById('meta-desc').setAttribute('content',a.excerpt);
-    document.getElementById('og-title').setAttribute('content',a.title);
-    document.getElementById('og-desc').setAttribute('content',a.excerpt);
-    if(a.image)document.getElementById('og-image').setAttribute('content',a.image);
-    document.getElementById('schema-article').textContent=JSON.stringify({"@context":"https://schema.org","@type":"Article","headline":a.title,"description":a.excerpt,"datePublished":a.date,"image":a.image||"","publisher":{"@type":"Organization","name":"Tokerize","url":"https://tokerize.top"}});
-    document.getElementById('article-title').textContent=a.title;
-    document.getElementById('article-date').textContent=a.date;
-    if(a.image){const c=document.getElementById('article-cover');c.src=a.image;c.alt=a.title;c.style.display='block';}
-    document.getElementById('article-body').innerHTML=a.content;
-  });
-}
-</script>
 <footer class="site-footer">
-    <div class="footer-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></div>
+    <div class="footer-logo"><img src="data:image/png;base64,PLACEHOLDER" alt="Tokerize"/></div>
     <nav class="footer-nav">
       <a href="/">Home</a><a href="/about">About</a><a href="/hub">RIZE Data Hub</a>
     </nav>
