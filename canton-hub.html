@@ -883,8 +883,8 @@ document.addEventListener("DOMContentLoaded", function() {
       var rejectBar = totalVotes > 0
         ? '<div class="gov-vote-bar"><div class="gov-bar"><div class="gov-bar-fill reject" style="width:'+(100-pct)+'%"></div></div><span style="color:#a02020;font-weight:700">'+(100-pct)+'%</span></div>'
         : '<span style="color:#ccc">—</span>';
-      return '<tr data-id="'+r.id+'" onclick="govPick(\''+r.id+'\')">'
-        '<td>'+r.id+'</td>'+
+      return '<tr data-id="'+r.id+'" onclick="govPick(\''+r.id+'\')">'+
+        '<td>'+r.id.slice(0,8)+'&hellip;</td>'+
         '<td style="max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="color:#888;font-size:11px;margin-right:6px;">'+(r.requester||'')+'</span>'+(r.title||'—')+'</td>'+
         '<td><span class="gov-status '+sc+'">'+(r.status||'—')+'</span></td>'+
         '<td>'+barHtml+'</td>'+
