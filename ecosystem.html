@@ -182,7 +182,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 .rip-bonded-hero-main{display:flex;align-items:center;gap:16px;}
 .rip-bonded-hero-val{font-family:'Rajdhani',sans-serif;font-size:clamp(40px,5.5vw,64px);font-weight:700;color:#fff;letter-spacing:1px;line-height:1;}
 .rip-bonded-hero-logo{width:40px;height:40px;opacity:0.9;flex-shrink:0;margin-top:4px;}
-.rip-bonded-hero-usd{font-family:'Rajdhani',sans-serif;font-size:clamp(22px,3vw,32px);font-weight:700;color:rgba(255,255,255,0.85);letter-spacing:0.5px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.12);margin-top:4px;}
+.rip-bonded-hero-usd{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.75);padding-top:10px;border-top:1px solid rgba(255,255,255,0.12);margin-top:4px;}
 .rip-bonded-hero-sub{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:0.5px;}
 @media(max-width:900px){.gov-stats{grid-template-columns:repeat(3,1fr);}.gov-table-wrap{padding-left:16px;padding-right:16px;}}
 @media(max-width:600px){.gov-stats{grid-template-columns:repeat(2,1fr);}.rip-bonded-hero{margin:14px 16px 0;padding:22px 18px;}.gov-table-wrap{padding-left:16px;padding-right:16px;}}
@@ -204,7 +204,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     <a href="/hub" class="back-to-hub">&larr; Back to RIZE Data Hub</a>
     <span class="eco-eyebrow" style="font-size:14px;letter-spacing:2px">RIZE Community Learn Center</span>
     <h1>RIZE Ecosystem Hub</h1>
-    <p>Explore the full institutional ecosystem behind T-RIZE — partners, Canton Network members, Foundation board, and live RWA deals. Click on any entity to learn more.</p>
+    <p>Your complete guide to the RIZE ecosystem — the technology stack, institutional partners, Foundation board, live RWA deals, on-chain governance, and the full Canton Network. Click on any module below to explore.</p>
   </div>
 </div>
 
@@ -1203,7 +1203,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   function ripGetPrice() {
-    return fetch('https://api.coingecko.com/api/v3/simple/price?ids=rizenet&vs_currencies=usd')
+    return fetch('/api/coingecko?path=/simple/price&ids=rizenet&vs_currencies=usd')
       .then(function(r){ return r.json(); })
       .then(function(d){ return (d.rizenet && d.rizenet.usd) ? d.rizenet.usd : null; })
       .catch(function(){ return null; });
@@ -1231,17 +1231,17 @@ document.addEventListener("DOMContentLoaded", function() {
     var usdEl = document.getElementById('rip-bonded-usd');
     var subEl = document.getElementById('rip-bonding-status');
     if (!tokEl) return;
-    var t = (tokens !== null && tokens > 0) ? tokens : 938507545;
-    var live = (tokens !== null && tokens > 0);
-    tokEl.textContent = t.toLocaleString('en-US') + ' RIZE';
-    if (price) {
-      usdEl.textContent = '$' + (t * price).toLocaleString('en-US', {maximumFractionDigits:0}) + ' USD value';
+    if (tokens !== null && tokens > 0) {
+      tokEl.textContent = tokens.toLocaleString('en-US') + ' RIZE';
+      usdEl.textContent = price
+        ? '$' + (tokens * price).toLocaleString('en-US', {maximumFractionDigits:0}) + ' USD value'
+        : 'USD value unavailable — try again shortly';
+      subEl.textContent = 'Live · Base Mainnet · ' + new Date().toLocaleTimeString('en-GB');
     } else {
-      usdEl.textContent = live ? '' : ',589,791 USD value';
+      tokEl.textContent = '—';
+      usdEl.textContent = '';
+      subEl.textContent = 'Data failed to load — try again shortly';
     }
-    subEl.textContent = live
-      ? 'Live · Base Mainnet · ' + new Date().toLocaleTimeString('en-GB')
-      : 'Cached · Base Mainnet';
   }
 
   function ripLoad() {
