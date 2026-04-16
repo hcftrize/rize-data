@@ -804,7 +804,7 @@ document.addEventListener("DOMContentLoaded", function() {
      CANTON ECOSYSTEM BROWSER
   ═══════════════════════════════════════════════════ */
   const CEB_JSON = 'https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/canton-ecosystem/entities.json';
-  const CEB_LOGO_BASE = 'https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/canton-ecosystem/logos/';
+  const CEB_LOGO_BASE = 'https://cdn.jsdelivr.net/gh/hcftrize/TOKERIZE@dev/canton-ecosystem/logos/';
   const CEB_PER_PAGE = 48;
 
 
@@ -955,25 +955,13 @@ document.addEventListener("DOMContentLoaded", function() {
     var grid = document.getElementById('ceb-grid');
     grid.innerHTML = slice.map(function(e) {
       var isPriority = cebSlugMatch(e.slug, CEB_PRIORITY);
-      // GitHub raw serves SVGs as text/plain — <img> rejects them.
-      // Strategy: use logo_local (GitHub) for rasters, logo_cdn for SVGs if valid, else GitHub raster slug.png
-      var BAD_CDN = 'yellow-arrow-right';
+      // jsDelivr serves all formats (SVG/PNG/JPG) with correct Content-Type
       var logoLocal = e.logo_local ? e.logo_local.split(/[\\\/]/).pop() : null;
-      var cdnOk = e.logo_cdn && e.logo_cdn.indexOf(BAD_CDN) === -1;
-      var logoUrl;
-      if (logoLocal && /\.(png|jpg|jpeg|webp)$/i.test(logoLocal)) {
-        // We have a raster local file → use GitHub
-        logoUrl = CEB_LOGO_BASE + logoLocal;
-      } else if (cdnOk) {
-        // CDN is valid (not the placeholder arrow) → use it (handles SVGs correctly)
-        logoUrl = e.logo_cdn;
-      } else {
-        // Fallback: try GitHub with slug.png
-        logoUrl = CEB_LOGO_BASE + e.slug + '.png';
-      }
+      var logoUrl = logoLocal ? CEB_LOGO_BASE + logoLocal : null;
       var initials = e.name.split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
-      var logoHtml = logoUrl
-        ? '<div class="ceb-logo"><img src="' + logoUrl + '" alt="' + e.name + '" onerror="this.parentElement.className=\'ceb-logo initials\';this.parentElement.textContent=\'' + initials + '\'"/></div>'
+      var imgSrc = logoUrl || e.logo_cdn || '';
+      var logoHtml = imgSrc
+        ? '<div class="ceb-logo"><img src="' + imgSrc + '" alt="' + e.name + '" onerror="this.parentElement.className=\'ceb-logo initials\';this.parentElement.textContent=\'' + initials + '\'"/></div>'
         : '<div class="ceb-logo initials">' + initials + '</div>';
       return '<div class="ceb-bubble' + (isPriority ? ' priority' : '') + '" id="ceb-b-' + e.slug + '" onclick="cebPick(\'' + e.slug + '\')">'
         + logoHtml
