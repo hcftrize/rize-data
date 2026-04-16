@@ -899,7 +899,7 @@ document.addEventListener("DOMContentLoaded", function() {
     var grid = document.getElementById('cip-grid');
     grid.innerHTML = cipFiltered.map(function(c) {
       var sc = cipStatusClass(c.status);
-      return '<div class="cip-bubble'+(cipActiveBubble===c.id?' on':'')+'" id="cip-b-'+c.number+'" onclick="cipPick(''+c.id+'')">'+
+      return '<div class="cip-bubble" data-cipid="'+c.id+'" id="cip-b-'+c.number+'">'+
         '<div class="cip-id">'+c.id+'</div>'+
         '<div class="cip-title">'+c.title+'</div>'+
         '<div class="cip-tags">'+
@@ -908,6 +908,16 @@ document.addEventListener("DOMContentLoaded", function() {
         '</div>'+
         '</div>';
     }).join('');
+    // Attach click handlers via event delegation
+    grid.onclick = function(e) {
+      var bubble = e.target.closest('[data-cipid]');
+      if (bubble) cipPick(bubble.dataset.cipid);
+    };
+    // Restore active state
+    if (cipActiveBubble) {
+      var el = grid.querySelector('[data-cipid="'+cipActiveBubble+'"]');
+      if (el) el.classList.add('on');
+    }
   }
 
   window.cipPick = function(id) {
