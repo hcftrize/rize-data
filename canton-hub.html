@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Canton Ecosystem Hub - Tokerize</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+@font-face{font-family:'Rajdhani';src:url('/assets/fonts/rajdhani.semibold.ttf') format('truetype');font-weight:600;font-style:normal;}
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap');
+:root{--black:#000;--navy:#0d2d4e;--navy2:#1a3a5c;--bluelt:#e8f0f7;--white:#fff;--off:#f7f7f5;--text:#111;--muted:#666;--border:#e0e0e0;--shadow:0 2px 20px rgba(0,0,0,0.08);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text);min-height:100vh;}
+.site-header{width:100%;background:var(--black);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:96px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,0.08);}
+.site-header-logo img{height:72px;display:block;}
+.site-nav{display:flex;align-items:center;gap:0;}
+.site-nav a{color:rgba(255,255,255,1.0);text-decoration:none;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:6px 20px;transition:color 0.2s;border-right:1px solid rgba(255,255,255,0.1);}
+.site-nav a:first-child{border-left:1px solid rgba(255,255,255,0.1);}
+.site-nav a:hover,.site-nav a.active{color:#fff;}
+.site-nav a.nav-hub{color:#fff;background:var(--navy);border:none;padding:8px 20px;margin-left:16px;letter-spacing:1.5px;transition:background 0.2s;}
+.site-nav a.nav-hub:hover{background:var(--navy2);}
+.wrap{max-width:1140px;margin:0 auto;padding:0 28px;}
+.site-footer{background:var(--black);color:rgba(255,255,255,0.5);padding:40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-top:80px;border-top:1px solid rgba(255,255,255,0.08);}
+.footer-logo img{height:60px;opacity:1;}
+.footer-nav{display:flex;gap:24px;}
+.footer-nav a{color:rgba(255,255,255,1.0);text-decoration:none;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:2px;text-transform:uppercase;transition:color 0.2s;}
+.footer-nav a:hover{color:#fff;}
+.footer-copy{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.25);}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:#f0f0f0;}::-webkit-scrollbar-thumb{background:var(--navy);}
+@media(max-width:768px){
+  .site-header{padding:0 16px;height:68px;}.site-header-logo img{height:48px;}
+  .site-nav a{font-size:11px;padding:5px 10px;letter-spacing:1.2px;}
+  .site-nav a.nav-hub{margin-left:8px;padding:6px 12px;}
+  .wrap{padding:0 16px;}
+  .site-footer{flex-direction:column;align-items:flex-start;padding:28px 16px;gap:16px;}
+}
+.eco-wrap{max-width:1200px;margin:0 auto;padding:48px 28px 80px;}
+.eco-hero{background:var(--black);padding:48px 40px 40px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:48px;}
+.back-to-hub{display:inline-flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);text-decoration:none;border:1px solid rgba(255,255,255,0.2);padding:6px 16px;margin-bottom:24px;background:rgba(255,255,255,0.04);transition:background 0.2s,color 0.2s;}
+.back-to-hub:hover{background:rgba(255,255,255,0.12);color:#fff;}
+.eco-eyebrow{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:14px;display:block;}
+.eco-hero h1{font-family:'Rajdhani',sans-serif;font-size:clamp(28px,4vw,52px);font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#fff;margin-bottom:12px;}
+.eco-hero p{font-family:'DM Mono',monospace;font-size:14px;color:rgba(255,255,255,0.75);line-height:1.7;max-width:600px;}
+.lc{margin-bottom:48px;border:1px solid #e0e0e0;border-top:3px solid var(--navy);background:#fff;}
+.lc-header{padding:28px 32px 0;}
+.lc-header h2{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--navy);margin:0 0 4px;}
+.lc-header p{font-family:'DM Mono',monospace;font-size:13px;color:#555;margin:4px 0 0;}
+.slider-wrap{padding:20px 32px 0;}
+.slider-viewport{overflow:hidden;}
+.slider-track{display:flex;transition:transform 0.32s ease;}
+.slider-page{min-width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.slider-controls{display:flex;align-items:center;justify-content:space-between;padding:14px 32px 0;}
+.s-btn{width:36px;height:36px;border:1px solid #ddd;background:#fff;cursor:pointer;font-size:16px;color:var(--navy);display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0;}
+.s-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+.s-btn:disabled{opacity:0.25;cursor:not-allowed;}
+.s-dots{display:flex;gap:5px;}
+.s-dot{width:5px;height:5px;border-radius:50%;background:#ddd;cursor:pointer;transition:background 0.2s;}
+.s-dot.on{background:var(--navy);}
+.bubble{display:flex;flex-direction:column;align-items:center;padding:18px 14px;border:1px solid #e8e8e8;cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s;text-align:center;background:#fafafa;user-select:none;min-height:130px;justify-content:center;}
+.bubble:hover{border-color:var(--navy);box-shadow:0 2px 10px rgba(13,45,78,0.08);}
+.bubble.on{border-color:var(--navy);background:#eef3f8;}
+.b-avatar{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:12px;flex-shrink:0;background:#f0f0f0;border:1px solid #e0e0e0;}
+.canton-bubble .b-avatar{background:#111!important;border-color:#333!important;}
+.b-avatar img{width:100%;height:100%;object-fit:contain;border-radius:50%;padding:6px;}
+.b-avatar.person img{object-fit:cover;padding:0;}
+.b-avatar.initials{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:#fff;}
+.b-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#000;line-height:1.2;}
+.b-tag{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#333;margin-top:5px;text-transform:uppercase;letter-spacing:0.8px;}
+.info-box{margin:20px 32px 32px;border:1px solid #e0e0e0;border-left:3px solid var(--navy);background:#f7f9fc;padding:24px 28px;min-height:100px;}
+.ib-prompt{font-family:'DM Mono',monospace;font-size:13px;color:#777;font-style:italic;}
+.ib-title{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);margin-bottom:14px;display:none;}
+.ib-text{font-family:'DM Mono',monospace;font-size:15px;color:#111;line-height:1.85;text-align:justify;display:none;}
+.team-section{border-top:1px solid #ebebeb;padding:20px 32px 0;margin-top:4px;}
+.team-section h3{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--navy);margin-bottom:14px;}
+.team-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+.t-bubble{display:flex;flex-direction:column;align-items:center;padding:18px 10px;border:1px solid #e8e8e8;cursor:pointer;transition:border-color 0.2s;text-align:center;background:#fafafa;}
+.t-bubble:hover{border-color:var(--navy);}
+.t-bubble.on{border-color:var(--navy);background:#eef3f8;}
+.t-avatar{width:96px;height:96px;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:10px;background:var(--navy);font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:#fff;}
+.t-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.t-name{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#000;line-height:1.2;}
+.t-info-box{display:none;margin:12px 0 4px;padding:12px 16px;border:1px solid #e0e0e0;border-left:3px solid var(--navy);background:#f7f9fc;}
+.t-info-box.show{display:block;}
+.t-info-role{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0.5px;}
+.t-info-name{font-family:'DM Mono',monospace;font-size:12px;color:#666;margin-top:2px;}
+.photo-credit{font-family:'DM Mono',monospace;font-size:10px;color:#ccc;text-align:right;padding:8px 32px 16px;}
+.deals-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:20px 32px 0;}
+.d-bubble{display:flex;flex-direction:column;align-items:center;padding:24px 16px;border:1px solid #e8e8e8;cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s;text-align:center;background:#fafafa;}
+.d-bubble:hover{border-color:var(--navy);box-shadow:0 2px 10px rgba(13,45,78,0.08);}
+.d-bubble.on{border-color:var(--navy);background:#eef3f8;}
+.d-avatar{width:90px;height:90px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:14px;background:#f0f0f0;border:1px solid #e0e0e0;}
+.d-avatar img{width:100%;height:100%;object-fit:contain;padding:8px;border-radius:50%;}
+.d-name{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#111;line-height:1.2;}
+.d-sub{font-family:'DM Mono',monospace;font-size:12px;color:#555;margin-top:5px;}
+@media(max-width:900px){.slider-page{grid-template-columns:repeat(2,1fr);}.team-grid{grid-template-columns:repeat(3,1fr);}.deals-grid{grid-template-columns:1fr;}}
+@media(max-width:600px){.eco-wrap{padding:20px 12px 60px;}.eco-hero{padding:32px 16px;}.lc-header{padding:18px 16px 0;}.slider-wrap{padding:14px 16px 0;}.slider-controls{padding:10px 16px 0;}.info-box{margin:14px 16px 20px;padding:18px 16px;}.team-section{padding:14px 16px 0;}.team-grid{grid-template-columns:repeat(2,1fr);}.deals-grid{padding:14px 16px 0;}.photo-credit{padding:8px 16px 12px;}}
+
+/* CANTON ECOSYSTEM BROWSER */
+.ceb-controls{padding:20px 32px 0;display:flex;flex-direction:column;gap:12px;}
+.ceb-search{font-family:'DM Mono',monospace;font-size:13px;padding:10px 16px;border:1px solid #dde4ed;background:#fff;color:#111;outline:none;width:100%;max-width:420px;transition:border-color 0.2s;}
+.ceb-search:focus{border-color:var(--navy);}
+.ceb-filters{display:flex;flex-wrap:wrap;gap:6px;}
+.ceb-tag{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:4px 12px;border:1px solid #dde4ed;background:#fff;color:#666;cursor:pointer;transition:all 0.15s;}
+.ceb-tag:hover{border-color:var(--navy);color:var(--navy);}
+.ceb-tag.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+.ceb-count{padding:12px 32px 0;font-family:'DM Mono',monospace;font-size:11px;color:#aaa;letter-spacing:0.5px;}
+.ceb-grid{padding:16px 32px 0;display:grid;grid-template-columns:repeat(6,1fr);gap:12px;}
+.ceb-bubble{display:flex;flex-direction:column;align-items:center;padding:14px 8px;border:1px solid #e8e8e8;cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s;text-align:center;background:#fafafa;min-height:110px;justify-content:center;}
+.ceb-bubble:hover{border-color:var(--navy);box-shadow:0 2px 8px rgba(13,45,78,0.08);}
+.ceb-bubble.on{border-color:var(--navy);background:#eef3f8;}
+.ceb-bubble.priority{border-color:#b8cce0;}
+.ceb-logo{width:56px;height:56px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:8px;background:#f0f0f0;border:1px solid #e0e0e0;flex-shrink:0;}
+.ceb-logo img{width:100%;height:100%;object-fit:contain;padding:6px;border-radius:50%;}
+.ceb-logo.dark{background:#111;border-color:#333;}
+.ceb-logo.initials{background:var(--navy);font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#fff;}
+.ceb-name{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:#000;line-height:1.2;}
+.ceb-pagination{display:flex;align-items:center;justify-content:center;gap:4px;padding:20px 32px 8px;}
+.ceb-pg-btn{min-width:32px;height:32px;padding:0 8px;border:1px solid #dde4ed;background:#fff;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--navy);transition:all 0.15s;display:flex;align-items:center;justify-content:center;}
+.ceb-pg-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+.ceb-pg-btn.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+.ceb-pg-btn:disabled{opacity:0.25;cursor:not-allowed;}
+@media(max-width:900px){.ceb-grid{grid-template-columns:repeat(3,1fr);}.ceb-controls,.ceb-count,.ceb-grid,.ceb-pagination{padding-left:16px;padding-right:16px;}}
+@media(max-width:600px){.ceb-grid{grid-template-columns:repeat(2,1fr);}}
+
+
+/* CIP MODULE */
+.cip-grid{padding:16px 32px 0;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.cip-bubble{padding:16px 14px;border:1px solid #e8e8e8;cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s;background:#fafafa;min-height:100px;}
+.cip-bubble:hover{border-color:var(--navy);box-shadow:0 2px 8px rgba(13,45,78,0.08);}
+.cip-bubble.on{border-color:var(--navy);background:#eef3f8;}
+.cip-id{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--navy);letter-spacing:1px;margin-bottom:4px;}
+.cip-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;color:#111;line-height:1.3;margin-bottom:8px;}
+.cip-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.cip-type{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:2px 8px;border:1px solid #dde4ed;color:#666;}
+.cip-status-badge{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:2px 8px;}
+.cip-status-final{background:#e8f5ee;color:#1a7a4a;border:1px solid #a8d8bc;}
+.cip-status-approved{background:#e8f0fa;color:#1a5a9a;border:1px solid #b8cce0;}
+.cip-status-replaced,.cip-status-obsolete,.cip-status-withdrawn{background:#f5f0e8;color:#7a5a1a;border:1px solid #d8c8a0;}
+.cip-status-rejected{background:#faeaea;color:#a02020;border:1px solid #e0b0b0;}
+.cip-status-proposed,.cip-status-draft,.cip-status-active{background:#f0eafa;color:#5a1a9a;border:1px solid #c8b0d8;}
+.cip-status-unknown{background:#f0f0f0;color:#888;border:1px solid #ddd;}
+.cip-controls{padding:16px 32px 0;display:flex;flex-direction:column;gap:10px;}
+.cip-filter-btns{display:flex;flex-wrap:wrap;gap:6px;}
+@media(max-width:900px){.cip-grid{grid-template-columns:repeat(3,1fr);padding-left:16px;padding-right:16px;}.cip-controls{padding-left:16px;padding-right:16px;}}
+@media(max-width:600px){.cip-grid{grid-template-columns:repeat(2,1fr);}}
+
+/* GOVERNANCE MODULE */
+.gov-stats{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#e0e0e0;border:1px solid #e0e0e0;margin:20px 32px 0;}
+.gov-stat{background:#fff;padding:16px 12px;text-align:center;}
+.gov-stat-val{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--navy);}
+.gov-stat-label{font-family:'DM Mono',monospace;font-size:10px;color:#888;letter-spacing:0.5px;margin-top:2px;text-transform:uppercase;}
+.gov-green{color:#1a7a4a;}
+.gov-blue{color:#1a5a9a;}
+.gov-red{color:#a02020;}
+.gov-controls{padding:16px 32px 0;display:flex;flex-direction:column;gap:10px;}
+.gov-filter-btns{display:flex;flex-wrap:wrap;gap:6px;}
+.gov-table-wrap{padding:16px 32px 0;overflow-x:auto;}
+.gov-table{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:12px;}
+.gov-table thead tr{background:var(--navy);}
+.gov-table thead th{color:#fff;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 14px;text-align:left;white-space:nowrap;}
+.gov-table tbody tr{border-bottom:1px solid #eee;cursor:pointer;transition:background 0.15s;}
+.gov-table tbody tr:hover{background:#f0f5fa;}
+.gov-table tbody tr.on{background:#dce8f2;}
+.gov-table tbody td{padding:10px 14px;vertical-align:middle;color:#222;}
+.gov-table tbody td:first-child{font-weight:700;color:var(--navy);font-family:'Rajdhani',sans-serif;font-size:14px;}
+.gov-status{display:inline-block;padding:2px 10px;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.gov-status.inprogress{background:#e8f0fa;color:#1a5a9a;border:1px solid #b8cce0;}
+.gov-status.executed{background:#e8f5ee;color:#1a7a4a;border:1px solid #a8d8bc;}
+.gov-status.rejected{background:#faeaea;color:#a02020;border:1px solid #e0b0b0;}
+.gov-status.expired{background:#f5f0e8;color:#7a5a1a;border:1px solid #d8c8a0;}
+.gov-vote-bar{display:flex;align-items:center;gap:6px;}
+.gov-bar{flex:1;height:6px;background:#eee;border-radius:3px;overflow:hidden;}
+.gov-bar-fill{height:100%;border-radius:3px;}
+.gov-bar-fill.accept{background:#1a7a4a;}
+.gov-bar-fill.reject{background:#a02020;}
+.gov-detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;}
+.gov-detail-stat{background:#f7f9fc;border:1px solid #e0e0e0;border-left:3px solid var(--navy);padding:12px 16px;}
+.gov-detail-stat-val{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--navy);}
+.gov-detail-stat-label{font-family:'DM Mono',monospace;font-size:11px;color:#888;margin-top:2px;}
+.gov-detail-meta{font-family:'DM Mono',monospace;font-size:12px;color:#555;line-height:2;}
+.gov-detail-meta span{color:#111;font-weight:500;}
+.gov-loading{font-family:'DM Mono',monospace;font-size:13px;color:#aaa;padding:32px;text-align:center;}
+@media(max-width:900px){
+  .gov-stats{grid-template-columns:repeat(4,1fr);}.gov-table-wrap,.gov-controls,.ceb-count{padding-left:16px;padding-right:16px;}
+  .gov-detail-grid{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:600px){.gov-stats{grid-template-columns:repeat(2,1fr);}.gov-detail-grid{grid-template-columns:1fr;}}
+
+/* RIZE NETWORK MAP STYLES */
+.rn-map-area{margin:20px 0 0;background:#fff;border-top:1px solid #dde4ed;position:relative;overflow:hidden;}
+#rn-svg{display:block;width:100%;}
+.rn-node{cursor:pointer;}
+.rn-box{fill:#fff;stroke:#b8cce0;stroke-width:1;transition:stroke 0.2s,fill 0.15s;}
+.rn-node:hover .rn-box,.rn-node.rn-on .rn-box{stroke:#0d2d4e;stroke-width:1.5;fill:#eef3f8;}
+.rn-box-c{fill:#eef3f8;stroke:#0d2d4e;stroke-width:1.5;}
+.rn-node:hover .rn-box-c,.rn-node.rn-on .rn-box-c{fill:#dce8f2;stroke:#0a2240;stroke-width:2;}
+.rn-box-gold{fill:#eef3f8;stroke:#c8960a;stroke-width:1.5;}
+.rn-node:hover .rn-box-gold,.rn-node.rn-on .rn-box-gold{fill:#fff3cc;stroke:#a07000;stroke-width:2;}
+.rn-conn{cursor:pointer;}
+.rn-conn-bg{fill:#fff;stroke:#b8cce0;stroke-width:1;}
+.rn-conn:hover .rn-conn-bg{stroke:#0d2d4e;fill:#eef3f8;}
+.rn-conn-txt{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;fill:#0d2d4e;text-anchor:middle;}
+.rn-conn-txt-gold{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;fill:#8a6200;text-anchor:middle;}
+.rn-info-box{margin:0 32px 32px;border:1px solid #e0e0e0;border-left:3px solid var(--navy);background:#f7f9fc;padding:22px 26px;min-height:80px;}
+.rn-prompt{font-family:'DM Mono',monospace;font-size:13px;color:#888;font-style:italic;}
+.rn-title{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);margin-bottom:14px;display:none;}
+.rn-body{font-family:'DM Mono',monospace;font-size:15px;color:#111;line-height:1.85;text-align:justify;display:none;}
+.rn-map-hint{text-align:center;padding:8px 0 4px;font-family:'DM Mono',monospace;font-size:10px;color:#aaa;letter-spacing:0.5px;}
+
+/* COLLAPSE / EXPAND */
+.lc-header{padding:28px 32px 0;display:flex;align-items:flex-start;justify-content:space-between;cursor:pointer;user-select:none;}
+.lc-header-text{flex:1;}
+.lc-toggle{width:32px;height:32px;border:1px solid #dde4ed;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:16px;margin-top:2px;transition:background 0.15s,border-color 0.15s;}
+.lc-toggle svg{transition:transform 0.28s ease;}
+.lc-toggle:hover{background:#eef3f8;border-color:var(--navy);}
+.lc-body{overflow:hidden;transition:max-height 0.35s ease, opacity 0.28s ease;max-height:4000px;opacity:1;}
+.lc-body.collapsed{max-height:0;opacity:0;}
+.lc.collapsed .lc-toggle svg{transform:rotate(-90deg);}
+.lc-header{padding-bottom:20px;}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="/" class="site-header-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></a>
+  <nav class="site-nav">
+    <a href="/" class="nav-home">Home</a>
+    <a href="/about">About</a>
+    <a href="/hub" class="nav-hub">RIZE Data Hub</a>
+  </nav>
+</header>
+
+<div class="eco-hero">
+  <div style="max-width:1200px;margin:0 auto">
+    <a href="/hub" class="back-to-hub">&larr; Back to RIZE Data Hub</a>
+    <span class="eco-eyebrow" style="font-size:14px;letter-spacing:2px">RIZE Community Learn Center</span>
+    <h1>Canton Ecosystem Hub</h1>
+    <p>Explore the full Canton Network ecosystem — 283 ecosystem partners, premier members, Foundation board, and live on-chain governance. Click on any entity to learn more.</p>
+  </div>
+</div>
+
+<div class="eco-wrap">
+
+<div class="lc collapsed" id="ceb-lc">
+  <div class="lc-header" onclick="toggleLc('ceb-lc')">
+    <div class="lc-header-text">
+      <h2>Canton Network Ecosystem</h2>
+      <p>283 partners, validators, applications and institutions building on the Canton Network</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="lc-body collapsed" id="ceb-lc-body">
+
+    <!-- Search + Filters -->
+    <div class="ceb-controls">
+      <input class="ceb-search" id="ceb-search" type="text" placeholder="Search entities…" oninput="cebFilter()"/>
+      <div class="ceb-filters" id="ceb-filters">
+        <button class="ceb-tag on" data-tag="ALL" onclick="cebSetTag(this)">All</button>
+      </div>
+    </div>
+
+    <!-- Count -->
+    <div class="ceb-count" id="ceb-count"></div>
+
+    <!-- Top Pagination -->
+    <div class="ceb-pagination" id="ceb-pagination-top"></div>
+
+    <!-- Grid -->
+    <div class="ceb-grid" id="ceb-grid"></div>
+
+    <!-- Pagination -->
+    <div class="ceb-pagination" id="ceb-pagination"></div>
+
+    <!-- Info box -->
+    <div class="info-box" id="ceb-box">
+      <p class="ib-prompt">Click on any entity to learn about their role in the Canton ecosystem.</p>
+      <div class="ib-title" id="ceb-title"></div>
+      <div class="ib-text" id="ceb-text"></div>
+    </div>
+
+  </div><!-- end lc-body -->
+</div>
+
+<div class="lc collapsed" id="canton-lc">
+  <div class="lc-header" onclick="toggleLc('canton-lc')">
+    <div class="lc-header-text">
+      <h2>Canton Network Premier Members</h2>
+      <p>The institutional founders and premier members of the Canton Network</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="lc-body collapsed" id="canton-lc-body">
+  <div class="slider-wrap">
+    <div class="slider-viewport">
+      <div class="slider-track" id="canton-track"></div>
+    </div>
+  </div>
+  <div class="slider-controls">
+    <button class="s-btn" id="canton-prev" onclick="slide('canton',-1)">&#8592;</button>
+    <div class="s-dots" id="canton-dots"></div>
+    <button class="s-btn" id="canton-next" onclick="slide('canton',1)">&#8594;</button>
+  </div>
+  <div class="info-box" id="canton-box">
+    <p class="ib-prompt">Click on a member to learn about their role and institutional weight.</p>
+    <div class="ib-title" id="canton-title"></div>
+    <div class="ib-text"  id="canton-text"></div>
+  </div>
+  </div><!-- end lc-body -->
+</div>
+
+<div class="lc collapsed" id="board-lc">
+  <div class="lc-header" onclick="toggleLc('board-lc')">
+    <div class="lc-header-text">
+      <h2>Canton Foundation Board Members</h2>
+      <p>The governance leaders steering the Canton Network foundation</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="lc-body collapsed" id="board-lc-body">
+  <div class="slider-wrap">
+    <div class="slider-viewport">
+      <div class="slider-track" id="board-track"></div>
+    </div>
+  </div>
+  <div class="slider-controls">
+    <button class="s-btn" id="board-prev" onclick="slide('board',-1)">&#8592;</button>
+    <div class="s-dots" id="board-dots"></div>
+    <button class="s-btn" id="board-next" onclick="slide('board',1)">&#8594;</button>
+  </div>
+  <div class="info-box" id="board-box">
+    <p class="ib-prompt">Click on a board member to learn about their background and expertise.</p>
+    <div class="ib-title" id="board-title"></div>
+    <div class="ib-text"  id="board-text"></div>
+  </div>
+  </div><!-- end lc-body -->
+</div>
+
+
+
+<!-- ── CONTAINER 4: CANTON CIPs ── -->
+<div class="lc collapsed" id="cip-lc">
+  <div class="lc-header" onclick="toggleLc('cip-lc')">
+    <div class="lc-header-text">
+      <h2>Canton Improvement Proposals (CIPs)</h2>
+      <p>Proposals shaping the Canton Network — governance, tokenomics, standards and process</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="lc-body collapsed" id="cip-lc-body">
+    <div class="cip-controls">
+      <input class="ceb-search" id="cip-search" type="text" placeholder="Search CIPs…" oninput="cipFilter()"/>
+      <div class="cip-filter-btns" id="cip-type-filters">
+        <button class="ceb-tag on" data-filter="ALL" data-group="type" onclick="cipSetFilter(this,'type')">All Types</button>
+        <button class="ceb-tag" data-filter="Governance" data-group="type" onclick="cipSetFilter(this,'type')">Governance</button>
+        <button class="ceb-tag" data-filter="Tokenomics" data-group="type" onclick="cipSetFilter(this,'type')">Tokenomics</button>
+        <button class="ceb-tag" data-filter="Standards Track" data-group="type" onclick="cipSetFilter(this,'type')">Standards</button>
+        <button class="ceb-tag" data-filter="Process" data-group="type" onclick="cipSetFilter(this,'type')">Process</button>
+      </div>
+
+    </div>
+    <div id="cip-count" style="display:none"></div>
+    <div class="ceb-pagination" id="cip-pagination-top"></div>
+    <div class="cip-grid" id="cip-grid"></div>
+    <div class="ceb-pagination" id="cip-pagination-bot"></div>
+    <div class="info-box" id="cip-box" style="display:none">
+      <div class="ib-title" id="cip-detail-title"></div>
+      <div id="cip-detail-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── CONTAINER 5: CANTON GOVERNANCE VOTES ── -->
+<div class="lc collapsed" id="gov-lc">
+  <div class="lc-header" onclick="toggleLc('gov-lc')">
+    <div class="lc-header-text">
+      <h2>Canton Network Governance Votes</h2>
+      <p>Live on-chain Super Validator governance vote requests — powered by <a href="https://lighthouse.cantonloop.com" target="_blank" style="color:var(--navy);text-decoration:none;border-bottom:1px solid #b8cce0;">5N Lighthouse</a></p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="lc-body collapsed" id="gov-lc-body">
+
+    <!-- Stats bar -->
+    <div class="gov-stats" id="gov-stats">
+      <div class="gov-stat"><div class="gov-stat-val" id="gs-total">—</div><div class="gov-stat-label">Total Proposals</div></div>
+      <div class="gov-stat"><div class="gov-stat-val gov-green" id="gs-executed">—</div><div class="gov-stat-label">Executed</div></div>
+      <div class="gov-stat"><div class="gov-stat-val gov-blue" id="gs-progress">—</div><div class="gov-stat-label">In Progress</div></div>
+      <div class="gov-stat"><div class="gov-stat-val gov-red" id="gs-rejected">—</div><div class="gov-stat-label">Rejected</div></div>
+      <div class="gov-stat"><div class="gov-stat-val" id="gs-votes">—</div><div class="gov-stat-label">Total Votes</div></div>
+      <div class="gov-stat"><div class="gov-stat-val gov-green" id="gs-accept">—</div><div class="gov-stat-label">Accept Votes</div></div>
+      <div class="gov-stat"><div class="gov-stat-val gov-red" id="gs-reject">—</div><div class="gov-stat-label">Reject Votes</div></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="gov-controls">
+      <input class="ceb-search" id="gov-search" type="text" placeholder="Search proposals…" oninput="govFilter()"/>
+      <div class="gov-filter-btns">
+        <button class="ceb-tag on" data-status="ALL" onclick="govSetStatus(this)">All</button>
+        <button class="ceb-tag" data-status="InProgress" onclick="govSetStatus(this)">In Progress</button>
+        <button class="ceb-tag" data-status="Executed" onclick="govSetStatus(this)">Executed</button>
+        <button class="ceb-tag" data-status="Rejected" onclick="govSetStatus(this)">Rejected</button>
+        <button class="ceb-tag" data-status="Expired" onclick="govSetStatus(this)">Expired</button>
+      </div>
+    </div>
+
+    <div class="ceb-count" id="gov-count"></div>
+    <div class="ceb-pagination" id="gov-pagination-top"></div>
+
+    <!-- Table -->
+    <div class="gov-table-wrap">
+      <table class="gov-table" id="gov-table">
+        <thead>
+          <tr>
+                        <th>Title</th>
+            <th style="width:110px">Status</th>
+            <th style="width:90px">Accept</th>
+            <th style="width:90px">Reject</th>
+            <th style="width:130px">Date</th>
+          </tr>
+        </thead>
+        <tbody id="gov-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="ceb-pagination" id="gov-pagination"></div>
+
+    <!-- Detail box -->
+    <div class="info-box" id="gov-box" style="display:none">
+      <div class="ib-title" id="gov-detail-title"></div>
+      <div id="gov-detail-body"></div>
+    </div>
+
+    <div class="gov-loading" id="gov-loading">Loading governance data…</div>
+
+  </div>
+</div>
+
+</div><!-- end eco-wrap -->
+
+<footer class="site-footer">
+  <div class="footer-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></div>
+  <nav class="footer-nav">
+    <a href="/">Home</a><a href="/about">About</a><a href="/hub">RIZE Data Hub</a>
+  </nav>
+  <p class="footer-copy">&copy; 2026 Tokerize &mdash; RIZE Community Tokenization Hub</p>
+</footer>
+
+<script>
+const CANTON=[{"id":"trize","name":"T-RIZE Group","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_trize.png","text":"T-RIZE Group (est. 2022) is an institutional market-infrastructure company on the Canton Network with two featured applications and fully deployed workflows for origination, structuring, tokenization, collateralization, and post-trade lifecycle management. T-RIZE has secured over $10B in signed contracts and MOUs, delivering the first tokenized new-construction real-estate transaction on Canton and one of the largest private-credit tokenizations in the market. T-RIZE specializes in institutional structured products including private credit, funds, securitized debt, construction loans, and convertible digital bonds. Its architecture is engineered for interoperability with global custodians, CSDs, broker-dealers, and ATSs."},{"id":"dtcc","name":"DTCC","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_dtcc.png","text":"DTCC (Depository Trust & Clearing Corporation) is the world's largest financial market infrastructure, processing over $2.15 quadrillion in securities transactions annually and providing clearing and settlement services for virtually all US-listed equities, corporate and municipal bonds, government securities, and money market instruments. DTCC serves as the backbone of the US financial system. Their participation on Canton Network signals a fundamental shift in how post-trade infrastructure is being reimagined for the digital asset era."},{"id":"euroclear","name":"Euroclear","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_euroclear-1.png","text":"Euroclear is one of the world's largest financial market infrastructure providers, operating as a central securities depository (CSD) with over €37 trillion in assets under custody and processing €1 quadrillion+ in securities transactions annually. Headquartered in Brussels, Euroclear serves over 2,000 clients in 90+ countries. Their presence on Canton Network is a landmark signal — as a leading European CSD, Euroclear's participation validates Canton as the institutional standard for next-generation securities settlement."},{"id":"bnp","name":"BNP Paribas","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_bnpparibas.png","text":"BNP Paribas is Europe's largest bank by total assets, with €2.5 trillion+ in assets and operations in 65 countries. One of the founding institutions of the Canton Network, BNP Paribas brings global investment banking, prime brokerage, and custodian capabilities to the ecosystem. Their Securities Services division manages €12+ trillion in assets under custody, making their Canton integration a direct pipeline for institutional tokenized asset distribution and settlement at scale."},{"id":"bny","name":"BNY Mellon","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_bny.png","text":"BNY Mellon is the world's largest custodian bank with $49.5 trillion in assets under custody and administration — larger than the GDP of every country except the US and China combined. As the custodian of choice for institutional investors globally, BNY Mellon's participation on Canton Network means tokenized assets on Canton can be custodied, settled, and administered through the world's most trusted custody infrastructure. BNY Mellon launched its Digital Assets unit in 2021 and has been a leading voice in bridging TradFi and blockchain."},{"id":"digitalasset","name":"Digital Asset","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_da.png","text":"Digital Asset is the technology company behind DAML (Digital Asset Modeling Language) — the smart contract language that powers the Canton Network. Co-founded by Yuval Rooz and Blythe Masters, Digital Asset has raised $300M+ from Goldman Sachs, Citigroup, JPMorgan, and Deutsche Börse. DAML is the programming language used by T-RIZE to deploy its tokenization applications on Canton, making Digital Asset the foundational technology layer beneath every T-RIZE structured product."},{"id":"broadridge","name":"Broadridge","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_broadridge-1.png","text":"Broadridge Financial Solutions is an S&P 500 company with a $24B+ market cap and 15,000+ associates globally. Broadridge processes $10 trillion in fixed income transactions daily and manages proxy voting for $10 trillion in equity assets. Their DLT-based repo platform has already processed $1+ trillion in transactions, making them one of the most advanced TradFi firms in applying blockchain to real capital markets workflows."},{"id":"hsbc","name":"HSBC","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_hsbc.png","text":"HSBC is one of the world's largest banking organizations with $3 trillion in total assets and operations in 60+ countries. HSBC Orion — their proprietary digital assets platform — enables financial institutions to issue digital bonds on blockchain. HSBC has already issued tokenized bonds and manages cross-border settlement for tokenized assets. For T-RIZE's KAI18-1 instrument, HSBC UK Bank PLC held the blocked account under the security interests layer, directly integrating their infrastructure into the deal."},{"id":"sbi","name":"SBI Digital Asset Holdings","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_sbi.webp","text":"SBI Digital Asset Holdings is the digital assets arm of SBI Holdings — Japan's largest internet-based financial services company with ¥15+ trillion in assets under management. SBI's Canton presence opens the door to Japanese and Asian institutional capital flows into tokenized RWAs. SBI has been one of the most aggressive TradFi institutions in Asia in embracing blockchain infrastructure, with investments in Ripple, SBI Crypto, and multiple digital asset ventures."},{"id":"cumberland","name":"Cumberland","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_cumberland.png","text":"Cumberland is a global leader in institutional crypto market-making and a subsidiary of DRW — the Chicago-based trading firm managing $10B+ in capital. Cumberland facilitates billions in daily crypto trading volume and serves as a primary liquidity provider for institutional investors. Their Canton presence brings critical liquidity infrastructure to tokenized asset markets, enabling institutions to convert between digital and traditional assets at scale."},{"id":"obsidian","name":"Obsidian Systems","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_obsidian.png","text":"Obsidian Systems is a leading technology consulting and node-hosting company specializing in the Canton ecosystem, co-founded by Ryan Trinkle — a longtime Haskell open-source contributor. Since DAML (Canton's smart contract language) is based on Haskell, Obsidian brings uniquely relevant deep technical expertise. Their work spans DeFi, blockchain infrastructure, and compliance technology. Obsidian's Ryan Trinkle chairs the Audit and Finance Committee of the Canton Foundation board."},{"id":"fivenorth","name":"Five North","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_5north-1.png","text":"Five North is a proprietary trading and venture studio building foundational infrastructure for the Canton Network — the basic building blocks that developers use to create decentralized financial applications and markets. Founded by Yiannis Varelas, Five North designs, trades, and builds across fintech, data, and crypto with a core focus on Canton Network primitives. Their work is analogous to the role early Ethereum developers played in building the DeFi stack — essential and foundational."},{"id":"intellecteu","name":"IntellectEU","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/intellectEU.png","text":"IntellectEU is a leading financial technology company specializing in blockchain, payments, and digital asset infrastructure. Their Catalyst Product Suite is actively deployed by Canton Network participants to modernize payments and digital asset adoption at scale. IntellectEU's solutions enable financial institutions to connect legacy systems with blockchain infrastructure — a critical capability for institutions migrating existing workflows onto Canton."},{"id":"libertycity","name":"Liberty City Ventures","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/lvc_logo-1.png","text":"Liberty City Ventures is a New York-based venture capital firm focused on blockchain, crypto, and fintech investments. LCV previously incubated Paxos (managing $20B+ in tokenized assets) and Lukka (crypto accounting platform). Their institutional investment thesis is directly aligned with the tokenization of real-world assets on compliant infrastructure like Canton."},{"id":"ltp","name":"LTP","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_ltp.png","text":"LTP is a top global prime broker for digital assets, providing institutional-grade infrastructure across execution, settlement, custody, lending, and financing. Founded by Jack Yang in 2021, LTP serves as critical financial plumbing for institutions accessing digital asset markets. As a Canton Network Premier Member, LTP brings regulated prime brokerage capabilities to tokenized RWA markets."},{"id":"tradeweb","name":"Tradeweb","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_tradeweb.png","text":"Tradeweb Markets is a leading global operator of electronic marketplaces with $1.5 trillion+ in average daily trading volume and a $25B+ market cap (NASDAQ: TW). Connecting 2,500+ clients across 65 countries, Tradeweb's electronic trading infrastructure for government bonds, corporate bonds, and derivatives could become the distribution layer for secondary trading of tokenized fixed-income RWAs on Canton."},{"id":"sevenridge","name":"7Ridge","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_7ridge.png","text":"7Ridge is a sector-focused asset manager specializing in transformative technology for capital markets. Led by partners including Veronica Augustsson — former CEO of Cinnober (acquired by Nasdaq for $190M) — 7Ridge brings decades of trading technology and financial infrastructure expertise to the Canton ecosystem's governance and strategic direction."}];
+const BOARD=[{"id":"madani","name":"Madani Boukalba","role":"T-RIZE Group — Founder & CEO","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/Madani-Boukalba-1.jpg","text":"Madani Boukalba is the Founder & CEO of T-RIZE Group (est. 2022), an institutional market-infrastructure company on the Canton Network with fully deployed workflows for origination, structuring, tokenization, collateralization, and post-trade lifecycle management. T-RIZE has secured over $10B in signed contracts and MOUs and is delivering the first tokenized new-construction real-estate transaction on Canton, alongside one of the largest private-credit tokenizations in the market. T-RIZE specializes in institutional structured products including private credit, funds, securitized debt, construction loans, and convertible digital bonds. Madani co-leads the first Industrial Research Chair in Tokenization & Federated Learning, supported by the Government of Canada. He is co-author of a U.S. patent-pending communication and orchestration protocol. Before T-RIZE, he spent 13 years at CDPQ as a Senior Trader specializing in complex derivatives and collateral optimization."},{"id":"yuval","name":"Yuval Rooz","role":"Digital Asset — Co-Founder & CEO","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/yuval-rooz-1.webp","text":"Yuval Rooz is the Co-Founder and CEO of Digital Asset — the New York-based company behind DAML, the smart contract language powering Canton Network. Digital Asset has raised $300M+ from Goldman Sachs, Citigroup, JPMorgan, and Deutsche Börse. Before Digital Asset, Yuval managed an algorithmic trading desk at DRW and worked as a trader and developer at Citadel. He holds a B.S. in Electrical Engineering from Georgia Tech."},{"id":"jorgen","name":"Jørgen Ouaknine","role":"Euroclear — Group Head of Innovation & Digital Assets","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/jorgen-ouaknine-1.webp","text":"Jørgen Ouaknine has over 20 years of experience in banking and financial services, currently leading Innovation and Digital Assets at Euroclear — the world's largest CSD with €37 trillion in assets under custody. Previously served as CEO of two BNP Paribas subsidiaries in Morocco. His work directly shapes how €37 trillion in assets could eventually migrate onto distributed ledger infrastructure."},{"id":"chris","name":"Chris Zuehlke","role":"Cumberland — Global Head","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/Chris-Zuehlke.jpg","text":"Chris Zuehlke is a Partner at DRW and Global Head of Cumberland, one of the world's leading institutional crypto market makers. Under his leadership, Cumberland has grown into a dominant force in institutional digital asset liquidity — facilitating billions in daily volume for the world's largest banks, hedge funds, and asset managers. Cumberland's market-making capabilities are critical infrastructure for any tokenized asset seeking liquidity."},{"id":"german","name":"Germán Soto Sanchez","role":"Broadridge — Chief Product & Strategy Officer","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/German-Soto-Sanchez.jpg","text":"Germán Soto Sanchez is the Chief Product and Strategy Officer of Broadridge Financial Solutions — an S&P 500 company with $24B+ market cap. A direct report to the CEO and member of the Executive Leadership Team, Germán previously led strategic investments at JPMorgan Chase and was President of Cloud9 Technologies. He holds an MBA from Stanford GSB and a B.S. in Mechanical Engineering from MIT."},{"id":"john","name":"John O'Neill","role":"HSBC — Group Head of Digital Assets & Currencies","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/john.jpg","text":"John O'Neill is HSBC's Group Head of Digital Assets and Currencies, leading HSBC Orion — the bank's proprietary digital assets platform enabling financial institutions to issue digital bonds on blockchain. With $3 trillion in total HSBC assets and operations in 60+ countries, John's work directly shapes how one of the world's largest banks integrates tokenized assets into its core banking infrastructure. He has over 20 years of experience in financial services."},{"id":"jack","name":"Jack Yang","role":"LTP — Founder & CEO","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/Jack-Yang.jpg","text":"Jack Yang founded LTP in 2021 after building APAC's largest crypto quant fund database. Starting his career as an aircraft engineer, Jack brought aerospace-grade precision to digital finance, building LTP into a top global prime broker delivering secure, regulated infrastructure across execution, settlement, custody, lending, and financing for digital assets."},{"id":"amy","name":"Amy Kalnoki","role":"Bitwave — Co-Founder & COO","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/amy-kalnoki-1.webp","text":"Amy Kalnoki is Co-Founder and COO of Bitwave — the #1 digital asset finance platform for enterprises, with SOC 1 Type 2 and SOC 2 Type 2 compliance. Before Bitwave, she co-founded Synata, an enterprise search startup acquired by Cisco in 2016. Recognized with a CrossTech Innovation Award in 2024, Amy ensures T-RIZE's institutional clients can accurately account for every tokenized transaction."},{"id":"mark","name":"Mark Wendland","role":"Canton Strategic Holdings — Chairman & CEO","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/mark-wendland.webp","text":"Mark Wendland is Chairman and CEO of Canton Strategic Holdings, overseeing digital asset treasury strategy and Super Validator operations. Previously Partner and COO at DRW ($10B+ AUM) and before that led Global Fixed Income Finance at Citadel. His dual background in traditional finance operations and digital asset treasury management makes him uniquely positioned to steward Canton's long-term capital strategy."},{"id":"ryan","name":"Ryan Trinkle","role":"Obsidian Systems — Partner","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/ryan_trinkle.jpg","text":"Ryan Trinkle is co-founder of Obsidian Systems and a longtime Haskell open-source contributor — best known for Reflex FRP. Since DAML (Canton's smart contract language) is based on Haskell, Ryan brings uniquely relevant deep technical expertise. As a Canton Foundation board member, he chairs the Audit and Finance Committee, providing critical governance oversight to the network."},{"id":"patrick","name":"Patrick Corker","role":"BNY Mellon — Managing Director, Digital Assets","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/patrick-corker.jpg","text":"Patrick Corker leads BNY Mellon's pioneering efforts to bridge traditional finance with blockchain-based assets across custody, tokenization, and data integration. With $49.5 trillion in assets under custody at BNY, Patrick's work determines what tokenized RWAs can achieve institutional scale. Before BNY, he was VP and Treasurer at Circle, and held roles at LedgerX, Goldman Sachs, and Deloitte."},{"id":"veronica","name":"Veronica Augustsson","role":"7RIDGE — Partner","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/veronica.jpg","text":"Veronica Augustsson is a Partner at 7RIDGE. Previously CEO of Cinnober — the leading independent trading and clearing technology provider, acquired by Nasdaq for $190M. Named in Institutional Investor's Trading Tech 40, Financial News' 100 Most Influential Women in Finance, and Sweden's Top 10 Most Powerful CEOs. She brings world-class trading infrastructure expertise to Canton's governance."},{"id":"justin","name":"Justin Peterson","role":"Tradeweb — Chief Technology Officer","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/peterson.jpg","text":"Justin Peterson is CTO of Tradeweb Markets — the $25B+ NASDAQ-listed electronic trading platform processing $1.5 trillion+ in daily volume. With 30+ years in computer science and 20+ in financial services, Justin holds a Ph.D. in Computer Science from Georgia Tech. His role on the Canton Foundation board brings world-class electronic trading architecture expertise to Canton's technical governance."},{"id":"kinga","name":"Kinga Bosse","role":"MPCH — Chief Operating Officer","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/kinga_bosse.jpg","text":"Kinga Bosse is COO at MPCH — a leading security firm for businesses and government. Previously CFO at Lukka (digital asset accounting) and held senior roles at Houlihan Lokey, AIG, and State Street. Her 20+ years across finance, insurtech, and fintech provides valuable operational and financial governance expertise to the Canton Foundation board."},{"id":"james","name":"James Lang","role":"Liberty City Ventures — Managing Director","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/James-Lang.jpg","text":"James Lang leads Liberty City Ventures' investment team, with a career spanning hedge fund management, OTC trading at Paxos, and founding-stage involvement at Lukka. Previously managed the $175M portfolio of the Episcopal Diocese of Long Island's Investment Advisory Committee (top-decile returns). He holds a CFA designation, an MBA from NYU, and a B.A. in Economics from Columbia University."},{"id":"jonathan","name":"Jonathan Mayeur","role":"IntellectEU — Head of Product","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/Jonathan-Mayeur.jpg","text":"Jonathan Mayeur is Head of Product at IntellectEU, leading development of the Catalyst Product Suite — actively deployed by Canton Network participants to modernize payments and digital asset adoption at scale. His six years of work on payments and blockchain projects across capital markets, telco, and supply chain provide practical, production-grade insight into Canton's operational challenges."},{"id":"yiannis","name":"Yiannis Varelas","role":"Five North — Founder","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/yiannis.jpg","text":"Yiannis Varelas leads Five North, a proprietary trading and venture studio building foundational infrastructure for the Canton Network — the basic building blocks used to develop decentralized financial applications and markets. Built from years of engineering, market research, and first-principles risk-taking, Five North sits at the intersection of trading and infrastructure development for institutional blockchain markets."}];
+
+const CIPS = [{"id": "CIP-0000", "number": 0, "title": "Canton Improvement Process for the Global Synchronizer on Canton Network", "status": "Approved", "type": "Process", "created": "2024-01-03", "summary": "Summary of the CIP process: - Draft your CIP Draft - Send the text of the CIP to the CIP Discuss mailing list - Work with a CIP editor for refinement and finalize as a Pull Request - Iterate until the CIP has a sponsor and endorser on cip-discuss - Send contact info for all parties involved in the CIP to operations@sync.global, including at least email addresses and a link to the CIP. - Send the CIP to the cip-vote mailing list Proposed - If Approved, the CIP moves to the Active status immediately if no other steps are required - If onchain steps are required, the CIP becomes Final once a ⅔ majority of Super Validator Node Operators implement the CIP onchain, either through an onchain vote,…"}, {"id": "CIP-0001", "number": 1, "title": "Replace the SV tranche time delays with a weighted reward", "status": "Final", "type": "Tokenomics", "created": "2023-12-15", "summary": "Replaces the Super Validator tranche time delays with a weighted reward distribution mechanism. This early tokenomics CIP established how SV rewards are distributed proportionally to validators based on their weight rather than using fixed time-based tranches."}, {"id": "CIP-0002", "number": 2, "title": "Minor adjustments to the Tokenomics variables to fine tune BME tokenomics", "status": "Replaced", "type": "Tokenomics", "created": "2023-12-15", "summary": "Minor adjustments to the tokenomics variables to fine-tune BME (Base Minting Emissions) tokenomics. Introduced small calibration changes to network reward parameters to optimize the economic balance of the Canton Network at launch."}, {"id": "CIP-0003", "number": 3, "title": "Consensus Layer Validator Participation & Rewards", "status": "Final", "type": "Tokenomics", "created": "2023-12-15", "summary": "Defines the consensus layer framework focusing on validator participation, rewards, and network stability. Establishes the foundational rules for how validators earn rewards and maintain the health of the Global Synchronizer."}, {"id": "CIP-0006", "number": 6, "title": "Define the process of distributing and approving", "status": "Active", "type": "Process", "created": "2024-03-12", "summary": "Canton Improvement Proposal CIP-0006 — Define the process of distributing and approving."}, {"id": "CIP-0007", "number": 7, "title": "SVs can earn extra SV reward weight when bringing Validators or apps to the Canton Network", "status": "Replaced", "type": "Tokenomics", "created": "2024-03-12", "summary": "Canton Improvement Proposal CIP-0007 — SVs can earn extra SV reward weight when bringing Validators or apps to the Canton Network."}, {"id": "CIP-0008", "number": 8, "title": "Update and Refinement to CIP-0002", "status": "Replaced", "type": "Tokenomics", "created": "2024-05-01", "summary": "Canton Improvement Proposal CIP-0008 — Update and Refinement to CIP-0002."}, {"id": "CIP-0009", "number": 9, "title": "Add Broadridge as a T1 (weight 10) Super Validator", "status": "Final", "type": "Governance", "created": "2024-05-11", "summary": "Canton Improvement Proposal CIP-0009 — Add Broadridge as a T1 (weight 10) Super Validator."}, {"id": "CIP-0010", "number": 10, "title": "LCV have met all their requirements to be a T1 Super Validator", "status": "Final", "type": "Governance", "created": "2024-05-11", "summary": "Canton Improvement Proposal CIP-0010 — LCV have met all their requirements to be a T1 Super Validator."}, {"id": "CIP-0011", "number": 11, "title": "IEU have decided to forgo SV minting rights", "status": "Final", "type": "Governance", "created": "2024-05-11", "summary": "Canton Improvement Proposal CIP-0011 — IEU have decided to forgo SV minting rights."}, {"id": "CIP-0012", "number": 12, "title": "Minor adjustments to Canton Coin processing, and Operational configuration, on the Global Synchronizer", "status": "Final", "type": "Standards Track", "created": "2024-05-22", "summary": "Canton Improvement Proposal CIP-0012 — Minor adjustments to Canton Coin processing, and Operational configuration, on the Global Synchronizer."}, {"id": "CIP-0013", "number": 13, "title": "Correct an error in the Daml models controlling the re-onboarding process for Super Validators who have been removed from the quorum. The error allowed Super Validators to mint Canton Coin greater than their agreed share after being removed and returned to the quorum.", "status": "Final", "type": "Standards Track", "created": "2024-05-24", "summary": "Canton Improvement Proposal CIP-0013 — Correct an error in the Daml models controlling the re-onboarding process for Super Validators who have been removed from the quorum. The error allowed Super Validators to mint Canton Coin greater than their agreed share after being removed and returned to the quorum.."}, {"id": "CIP-0014", "number": 14, "title": "Complete additional enhancements to the Scan API to facilitate tax accounting", "status": "Final", "type": "Governance", "created": "2024-05-29", "summary": "Canton Improvement Proposal CIP-0014 — Complete additional enhancements to the Scan API to facilitate tax accounting."}, {"id": "CIP-0015", "number": 15, "title": "Add Copper as a T3 (weight 1) Super Validator", "status": "Final", "type": "Governance", "created": "2024-06-01", "summary": "Canton Improvement Proposal CIP-0015 — Add Copper as a T3 (weight 1) Super Validator."}, {"id": "CIP-0016", "number": 16, "title": "Add Dfns as a T3 (weight 1) Super Validator", "status": "Final", "type": "Governance", "created": "2024-06-01", "summary": "Canton Improvement Proposal CIP-0016 — Add Dfns as a T3 (weight 1) Super Validator."}, {"id": "CIP-0017", "number": 17, "title": "Add MPCH as a T3 (weight 1) Super Validator", "status": "Final", "type": "Governance", "created": "2024-06-01", "summary": "Canton Improvement Proposal CIP-0017 — Add MPCH as a T3 (weight 1) Super Validator."}, {"id": "CIP-0018", "number": 18, "title": "Add Tradeweb as a T1 (weight 10) Super Validator", "status": "Final", "type": "Governance", "created": "2024-06-03", "summary": "Canton Improvement Proposal CIP-0018 — Add Tradeweb as a T1 (weight 10) Super Validator."}, {"id": "CIP-0019", "number": 19, "title": "Add 7RIDGE as a T1 (weight 10) Super Validator.", "status": "Final", "type": "Governance", "created": "2024-06-06", "summary": "Canton Improvement Proposal CIP-0019 — Add 7RIDGE as a T1 (weight 10) Super Validator.."}, {"id": "CIP-0020", "number": 20, "title": "Update and Refinement to CIP-0002", "status": "Final", "type": "Tokenomics", "created": "2024-06-13", "summary": "Canton Improvement Proposal CIP-0020 — Update and Refinement to CIP-0002."}, {"id": "CIP-0021", "number": 21, "title": "Create a subgroup of the Super Validators (“SV”) to vet and vote on making the Featured Application designation for network applications. Call this subgroup the Featured Application and Validator Committee (“FAV-C”).", "status": "Active", "type": "Governance", "created": "2024-06-16", "summary": "Canton Improvement Proposal CIP-0021 — Create a subgroup of the Super Validators (“SV”) to vet and vote on making the Featured Application designation for network applications. Call this subgroup the Featured Application and Validator Committee (“FAV-C”).."}, {"id": "CIP-0022", "number": 22, "title": "Status:", "status": "Unknown", "type": "Governance", "created": "Approved:", "summary": "CIP-0022 is a reserved placeholder in the Canton Improvement Proposal registry. The formal text was submitted as a PDF vote document rather than inline markdown."}, {"id": "CIP-0024", "number": 24, "title": "SVs and Validators can earn SV reward weight when bringing Validators or apps to the Canton Network", "status": "Final", "type": "Tokenomics", "created": "2024-09-27", "summary": "Canton Improvement Proposal CIP-0024 — SVs and Validators can earn SV reward weight when bringing Validators or apps to the Canton Network."}, {"id": "CIP-0025", "number": 25, "title": "CIP-0006 and CIP-0021 called for the formation of Validator and Featured App committees", "status": "Obsolete", "type": "Governance", "created": "2024-09-27", "summary": "Canton Improvement Proposal CIP-0025 — CIP-0006 and CIP-0021 called for the formation of Validator and Featured App committees."}, {"id": "CIP-0032", "number": 32, "title": "Add Lukka as a Tier3 SV (Weight 1)", "status": "Final", "type": "Governance", "created": "2024-12-06", "summary": "Canton Improvement Proposal CIP-0032 — Add Lukka as a Tier3 SV (Weight 1)."}, {"id": "CIP-0033", "number": 33, "title": "Add Strange Pixels as a Tier4 SV (Weight 0.5)", "status": "Rejected", "type": "Governance", "created": "2024-12-06", "summary": "Canton Improvement Proposal CIP-0033 — Add Strange Pixels as a Tier4 SV (Weight 0.5)."}, {"id": "CIP-0034", "number": 34, "title": "Add Proof Group as a Tier3 SV (Weight 1)", "status": "Final", "type": "Governance", "created": "2024-12-06", "summary": "Canton Improvement Proposal CIP-0034 — Add Proof Group as a Tier3 SV (Weight 1)."}, {"id": "CIP-0035", "number": 35, "title": "Add Five North as a Tier2 SV (Weight 3)", "status": "Final", "type": "Governance", "created": "2025-01-07", "summary": "Canton Improvement Proposal CIP-0035 — Add Five North as a Tier2 SV (Weight 3)."}, {"id": "CIP-0036", "number": 36, "title": "Add Kiln as a Tier3 SV (Weight 1)", "status": "Final", "type": "Governance", "created": "2024-12-06", "summary": "Canton Improvement Proposal CIP-0036 — Add Kiln as a Tier3 SV (Weight 1)."}, {"id": "CIP-0037", "number": 37, "title": "Add Obsidian as a Tier3 SV", "status": "Final", "type": "Governance", "created": "2025-02-13", "summary": "Add Obsidian as a Tier3 SV (Weight 1). Obsidian commits to add a Maintainer to the Hyperledger Splice. Obsidian will meaningfully contribute to the repos at least once per month for 2 years, focusing on issues here, but without an obligation to complete all listed tasks. The Daml, Canton, and Splice repos benefit tremendously from expanding the universe of parties who can commit to and maintain them. Taking the time to understand how the code works and making the investment to maintain that code is a significant undertaking. Some organizations are well-structured for this, with a rotating cast of developers who apply Daml, Canton, and Splice to commercial use cases and then contribute to…"}, {"id": "CIP-0038", "number": 38, "title": "Add Hexagate as a Tier3 SV (Weight 1)", "status": "Final", "type": "Governance", "created": "2024-12-06", "summary": "Canton Improvement Proposal CIP-0038 — Add Hexagate as a Tier3 SV (Weight 1)."}, {"id": "CIP-0039", "number": 39, "title": "Add Copper Clearloop as a Tier3 SV (Weight 1)", "status": "Final", "type": "Governance", "created": "2024-12-06", "summary": "Canton Improvement Proposal CIP-0039 — Add Copper Clearloop as a Tier3 SV (Weight 1)."}, {"id": "CIP-0040", "number": 40, "title": "Add Deribit as a Tier3 SV (Weight 1)", "status": "Final", "type": "Governance", "created": "2024-12-06", "summary": "Canton Improvement Proposal CIP-0040 — Add Deribit as a Tier3 SV (Weight 1)."}, {"id": "CIP-0041", "number": 41, "title": "Add Circle as a Weight 10 Super Validator", "status": "Final", "type": "Governance", "created": "2025-02-06", "summary": "Canton Improvement Proposal CIP-0041 — Add Circle as a Weight 10 Super Validator."}, {"id": "CIP-0042", "number": 42, "title": "Stable Price per Canton Coin Transfer via Synchronizer Fees", "status": "Active", "type": "Governance", "created": "2024-12-06", "summary": "Canton Improvement Proposal CIP-0042 — Stable Price per Canton Coin Transfer via Synchronizer Fees."}, {"id": "CIP-0043", "number": 43, "title": "Add TRM as a SV", "status": "Final", "type": "Governance", "created": "2025-02-06", "summary": "Add TRM as a Weight 2.5 SV for providing three services to the Network. Integrating Cantoin Coin with their on-chain AML product. Integrating USDC with their on-chain AML product. Active regulatory engagement and education about Canton and its privacy capabilities. TRM Labs commits to provide on-chain AML monitoring of Canton Coin transactions and USDC by no later than 6 months after the approval of this CIP. TRM Labs commits to join as a General Member of the Global Synchronizer Foundation. On-chain AML monitoring is critical for supporting parties in the Canton Network that wish to send/receive Canton Coin as a regular part of their business. On-chain AML monitoring helps senders de-risk…"}, {"id": "CIP-0044", "number": 44, "title": "Add Elliptic as a Tier4 SV", "status": "Final", "type": "Governance", "created": "2025-02-07", "summary": "Add Elliptic as a Tier4 SV (Weight 0.5) Elliptic commits to provide on-chain AML monitoring of Canton Coin transactions and USDC by no later than 6 months after the approval of this CIP Elliptic commits to join as a General Member of the Global Synchronizer Foundation On-chain AML monitoring is critical for supporting parties in the Canton Network that wish to send/receive Canton Coin as a regular part of their business On-chain AML monitoring helps senders de-risk outbound transactions by having a better understanding about the legitimacy of the destination address Inbound Canton Coin transfers come with information regarding the safety of the incoming Coins from an AML perspective Absent…"}, {"id": "CIP-0045", "number": 45, "title": "SV Operating Requirements", "status": "Active", "type": "Governance", "created": "2025-02-06", "summary": "A few differently weighted Super Validators are currently camping out on the GSF multitenant Super Validator node instead of running their own Super Validator node.. A series of SV CIPs recently passed giving low weighted SVs the right to use the GSF multitenant for 6 months, but many of those parties are not experienced operators, and the network wouldn’t benefit materially from forcing them to contract to run an SV node. This CIP proposes a 2.5 SV weight threshold above which an SV must begin to operate their own SV or their own SV node, or risk forfeiting their SV weight, or their right to be a Super Validator rights owner. The GSF multitenant is creating a bit of a free rider problem…"}, {"id": "CIP-0046", "number": 46, "title": "Add Coin Metrics as a Weight 1 Super Validator", "status": "Final", "type": "Governance", "created": "2025-01-31", "summary": "Add Coin Metrics as a Weight 1 Super Validator. Coin Metrics agrees to integrate Canton MainNet data into their analytics products. Coin Metrics was founded in 2017 as an open-source project to determine the economic significance of public blockchains. Today, Coin Metrics licenses data products to many of the largest, most prominent names in the TradFi & cryptoasset space. Canton Network's current and future participants represent many of the same users and clients of Coin Metrics data products. Coin Metrics supporting Canton would allow insightful, aggregate network and market data metrics for Canton alongside a wide variet"}, {"id": "CIP-0047", "number": 47, "title": "Featured App Activity Markers", "status": "Final", "type": "Tokenomics", "created": "2025-02-12", "summary": "Currently, featured applications can only generate activity records and mint rewards as part of Canton Coin transfers. However, this excludes a significant amount of applications that do not inherently involve Canton Coin. To address this problem and allow rewarding applications that do not involve Canton Coin, we propose introducing the ability for featured applications to create app activity markers without transfering Canton Coin. An app activity marker is equivalent to the existing app activity records created as part of a Canton Coin transfer recording a fixed amount of burned CC. The value of this marker will be determined by a new governance parameter. Currently, as part of a Canton…"}, {"id": "CIP-0048", "number": 48, "title": "Raising the Rewards Cap for Validators and Application Providers", "status": "Final", "type": "Tokenomics", "created": "2025-02-19", "summary": "I propose that we raise the reward minting caps for Validators and application providers by a factor of 200X, to $570 USD/round for Validators, and 20,000 for application providers. This will have the effect of eliminating minting caps until Canton Coin reaches a conversion rate of $1 USD per Canton Coin. The Super Validators can implement this change via an onchain vote. To make the change persist in both the current configuration, as well as the future steps of the issuance curve, the same value will be set in all \"future values\" fields, as detailed below. The Super Validators for the Global Synchronizer use an instance of the Splice decentralized apps to manage on-chain governance and…"}, {"id": "CIP-0049", "number": 49, "title": "Incentivizing Cold Backups for Super Validators to Enhance Network Resilience", "status": "Proposed", "type": "Governance", "created": "2025-02-28", "summary": "This proposal calls for a network-wide adoption of a formal backup and backup verification method of the network. The goal is to incentivise Super Validator nodes to maintain full, cold backups of the network’s historical state—from the network’s inception to the present. By ensuring these offline backups, the Canton Network will bolster its resilience, uphold decentralization, and guarantee data immutability. In return, nodes that comply will receive enhanced rewards (an extra bonus of approximately 20–30%, or a +1 weight adjustment on their existing reward scheme). Additionally, this proposal highlights the need for a future standardized backup procedure and a formal verification…"}, {"id": "CIP-0050", "number": 50, "title": "Controlled Validator Growth Through Trusted Operators", "status": "Withdrawn", "type": "Process", "created": "2025-03-11", "summary": "- Allow existing Validator operators to create up to 10 additional Validators for third-party participants. - Redirect new individual Validator applicants to approved existing operators. - As interest in the network grows, there is increasing demand from individuals wanting to become Validators. However, onboarding independent Validators without oversight could introduce operational and security risks. This proposal establishes a controlled mechanism for growth, leveraging existing trusted operators to facilitate expansion while maintaining an orderly network. - Maintain a controlled, trusted, and orderly network expansion."}, {"id": "CIP-0051", "number": 51, "title": "Streamline onchain governance votes", "status": "Final", "type": "Governance", "created": "2025-03-04", "summary": "This CIP proposes the following changes to on-chain voting: a) votes on config changes will change individual (or a few) config values, and not the whole set of configurations; b) vote proposals will have an expiration date, after which if not enough votes have been submitted, they will be auto-rejected; c) votes on a proposal may be changed until the vote proposal becomes effective; d) votes will be early-rejected upon 2/3 majority of reject votes; e) vote requests can be labeled as \"immediate effectivity\", meaning they will automatically get accepted and take effect immediately as soon as 2/3 of the Super Validator nodes vote in favor. As the Super Validators developed experience with…"}, {"id": "CIP-0052", "number": 52, "title": "Add Monstera as an SV of Weight 5", "status": "Final", "type": "Governance", "created": "2025-03-14", "summary": "Approves Monstera FZE — the digital asset arm of the Witan Group — as a Super Validator with weight 5. Monstera brings institutional asset management expertise from one of the UK's leading investment trusts to the Canton Network validator set."}, {"id": "CIP-0053", "number": 53, "title": "AngelHack as a Weight 2.5 SV", "status": "Final", "type": "Governance", "created": "2025-03-24", "summary": "Approves AngelHack as a Super Validator with weight 2.5. AngelHack is a global innovation platform with 300,000+ developers, contributing developer ecosystem growth and hackathon infrastructure to the Canton Network community."}, {"id": "CIP-0054", "number": 54, "title": "Add Figment as a Weight 1 Super Validator", "status": "Final", "type": "Governance", "created": "2025-03-14", "summary": "Add Figment as a Weight 1 Super Validator Figment commits to support Canton in their Validator as a Service product offering no later than 6 months after the approval of this CIP Accessing the Canton Network currently requires running one (or many) Validators Few entities are skilled enough and/or desire to run their own Validators The uptime of a Validator is critical in Canton as your Validator is part of the validation consensus protocol and is best served by a professional organization with a strong history of uptime The Canton Network is upgrading regularly and node operators benefit from investing in automation and the productization of the node ops - most do not h"}, {"id": "CIP-0055", "number": 55, "title": "Add Bitwave as a Weight 1 SV", "status": "Final", "type": "Governance", "created": "2025-03-17", "summary": "Add Bitwave as a Super Validator with provisional Weight 1. Bitwave commits to operate its own Super Validator (waiving the exemption in CIP 0045), enhancing decentralization and auditability. Associated rewards will remain unminted until defined milestones are met and verified through the Tokenomics Group review process. Audit eligible SV Operator Any network participant which undergoes an annual audit needs an eligible source of data for CC earnings, holdings, and more Auditors will not accept the participant’s node as proof Auditors strongly prefer to access this data from an authorized provider Onchain Payments Canton Network participants would benefit from being able to make Accounts…"}, {"id": "CIP-0056", "number": 56, "title": "Canton Network Token Standard", "status": "Final", "type": "Standards Track", "created": "2025-03-07", "summary": "Define standard APIs for Canton Network tokens so that wallets and apps can use them and build on them in a uniform way. As Hashnote, Brale, SocGen and others have begun to tokenize assets on the Global Synchronizer, and Copper and Dfns have added secure wallet support for Canton Coin, we have reached an ecosystem scale that needs standards that will make all Canton Network tokens compatible and exchangeable. All Canton Network participants benefit if it is easy for any Canton Network app or wallet to display and interact with any asset tokenized on Canton."}, {"id": "CIP-0057", "number": 57, "title": "Add Quantstamp as a Weight 1 Super Validator", "status": "Final", "type": "Governance", "created": "2025-03-07", "summary": "Add Quantstamp as a Tier 3 (Weight 1) Super Validator rights owner Quantstamp commits to complete an audit to determine whether the Daml smart contracts governing the tokenomics of Canton Coin accurately represent the logic and functions articulated in the Canton Coin Whitepaper (Canton Coin: A Canton-Network-native payment application, July 2024/Canton%20Coin%20A%20Canton-Network-native%20payment%20application.pdf?hstc=169870847.27df3a707cb3b89a07f374d4891d8642.1710256798828.1741110253846.1741612640674.91&hssc=169870847.2.1741612640674&hsfp=3850742519&gl=15z4x0kgclauMTQ5NzQwNTI2My4xNzM2ODcwMDU0gaMzg3OTI0NjkxLjE3MTAyNTY3OTg.gaGVK9ZHZSMRMTc0MTYxMjYzOS43Ny4xLjE3NDE2MTI2NDIuNTcuMC4w))…"}, {"id": "CIP-0058", "number": 58, "title": "Add IntellectEU as Weight 1 SV", "status": "Final", "type": "Governance", "created": "2025-04-14", "summary": ": Add IntellectEU as a Tier3 SV (Weight 1) IntellectEU commits to add a Contributor to Splice. IntellectEU will meaningfully contribute to the Splice repos at least once per month for at least 1 year, focusing on resolving issues, but without an obligation to complete all listed tasks/issues As the operator of the GSF multi-tenant SV, IntellectEU will implement the necessary infrastructure in order to operationalize the milestone-based CIP rewards structure as described in the “Mechanics” section within this CIP."}, {"id": "CIP-0059", "number": 59, "title": "Add Woodside AI as an SV of Weight 10", "status": "Final", "type": "Governance", "created": "2025-04-21", "summary": "Approves Woodside AI as a Super Validator with weight 10 — one of the higher weights granted, reflecting Woodside AI's significant institutional investment thesis for Canton and its commitment to advancing AI-driven financial infrastructure on the network."}, {"id": "CIP-0060", "number": 60, "title": "Add Zero Hash as SV of Weight 7.5", "status": "Approved", "type": "Governance", "created": "2025-04-23", "summary": "Approves Zero Hash as a Super Validator with weight 7.5. Zero Hash is a leading infrastructure provider for crypto, stablecoin and tokenized asset settlement — its participation directly strengthens Canton's payment and settlement layer for institutional clients."}, {"id": "CIP-0061", "number": 61, "title": "Add Chainlink as a Super Validator of Weight 7.5", "status": "Final", "type": "Governance", "created": "2025-05-09", "summary": ": Add Chainlink as a Super Validator of Weight 7.5 Chainlink commits to bringing its enterprise-grade oracle infrastructure to the Canton Network by natively integrating with the Canton Network Global Synchronizer and providing key Chainlink services to Canton users, starting with Data Streams, Smart Data including Proof of Reserve (PoR), and the Cross-Chain Interoperability Protocol (CCIP). The use of Data Streams, Proof of Reserve, CCIP, and other Chainlink services by Canton users will unlock new application use cases and value for the overall Canton network ecosystem."}, {"id": "CIP-0062", "number": 62, "title": "Synchronizer Migration with Downtime to Splice 0.4.0 / Canton 3.3", "status": "Final", "type": "Standards Track", "created": "2025-05-14", "summary": "Splice 0.4.0 introduces new features that rely on upgrading from Canton 3.2 to Canton 3.3. This upgrade require a Canton protocol version upgrade, which will require a Major Upgrade with Downtime action by the Super Validators and Validators. The 0.3.x Splice codebase has evolved since the Global Synchronizer nodes (the synchronizer nodes as well as the Super Validator and validator participant nodes) adopted version Canton 3.2. The Canton 3.3 release improves the feature set of Canton 3.2 in multiple aspects. Notable improvements from an ecosystem growth perspective are: : - The Token Standard is based on Daml interfaces. Implementing these interfaces in existing Daml templates like Amulet…"}, {"id": "CIP-0063", "number": 63, "title": "Add Kaiko as a Super Validator of Weight 6.5", "status": "Final", "type": "Governance", "created": "2025-05-27", "summary": "Add Kaiko as a Super Validator of weight 6.5, as milestones and deliverables are reached over an 18-month period of time, as proposed in the detailed deliverables list below. Kaiko commits to building data solutions on the Canton Network, creating a suite of applications in order to: Make Canton activity data available to consumers off-chain through the Kaiko API Make Kaiko’s off-chain and other-chain data available on the Canton Network Enable third parties to publish bespoke data onto Canton, in a privacy enabled manner Enhance network value through real-world data integration and use cases Provide increased visibility to Canton through the inclusion of Canton in Kaiko Research Support…"}, {"id": "CIP-0064", "number": 64, "title": "Delegateless Automation", "status": "Final", "type": "Standards Track", "created": "2025-04-21", "summary": "This CIP proposes to replace the elected SV delegate mechanism, to improve fault tolerance and more fully automate decentralized operations. In the current approach, the Decentralized Synchronizer Operations (DSO) party, which represents the consensus of the Super Validators, delegates actions to a single Super Validator (SV) party known as the delegate. The delegate then submits those actions to the ledger. In the proposed approach, the DSO party authorizes all the SV parties to submit the designated actions. The automation component of the SV application on each Super Validator node then automatically attempts to submit these delegated actions. Each application applies a random delay,…"}, {"id": "CIP-0065", "number": 65, "title": "Add Layer Zero, Wormhole, and Chainlink as SVs at Weight 3 each", "status": "Final", "type": "Governance", "created": "2025-06-02", "summary": "Add Layer Zero, Wormhole, and Chainlink as SVs at Weight 3 each Create a bonus pool of Weight 5 Building cross-chain bridges is difficult to do well. There are large investments in engineering, testing, and security audits to get it right. Accordingly, each bridge operator should be fairly compensated for their investment to connect to Canton. In addition, it is common for one bridge to be considered the ‘preferred’ option of the chain. This can sometimes be expressed by giving that bridge the right to use the common name form of the bridged asset. For example, the ‘preferred’ version of b"}, {"id": "CIP-0066", "number": 66, "title": "Enable escrow mechanisms and governance votes to allow Canton Coin minting from the unminted pool", "status": "Final", "type": "Tokenomics", "created": "2025-06-18", "summary": "This proposal introduces a new governance mechanism allowing Super Validators (SVs) to initiate a vote to authorize the minting of Canton Coin from an unclaimed (unminted) reward pool, helping to operationalize the milestone-based CIP rewards structure and aligning with the first deliverable of CIP-0058: Enable escrow mechanisms to ensure Super Validators deliver value in return for rewards. This change is required to implement the reward distribution mechanism described in CIP-0058. The CIP defines a process whereby, upon successful milestone verification, the Tokenomics Working Group approves a reward amount and the Super Validators assign a portion of unclaimed rewards to be minted. This…"}, {"id": "CIP-0067", "number": 67, "title": "One-Time Allocation of Historical Unclaimed Rewards to GSF", "status": "Final", "type": "Tokenomics", "created": "2025-06-13", "summary": "GSF has played a foundational role in establishing and maintaining the systems that govern the Canton Network, including: Launching the legal entity, onboarding founding members, and establishing governance processes for the Global Synchronizer Defining and maintaining long-term technical roadmaps for protocol coordination Structuring pathways for meaningful community engagement and contribution Leading coordination and execution of Super Validator governance and network-wide decision-making"}, {"id": "CIP-0068", "number": 68, "title": "Bootstrap network from non-zero round", "status": "Final", "type": "Standards Track", "created": "2025-07-09", "summary": "This CIP proposes to modify the network's bootstrapping process allowing SV nodes to start from a pre-configured non-zero round. Currently, on network resets, all SV nodes begin at round zero, which also means they revert to the initial coin issuance curve. Our goal is to enable network resets that maintain historical round progression, rather than resetting to zero. This approach aims to better align TestNet with MainNet's ongoing state. s The main motivation for this change is to reset TestNet with an initial round close to the one running in MainNet for the future resets. MainNet continuously progresses through rounds and forcing TestNet to restart from round zero creates a significant…"}, {"id": "CIP-0069", "number": 69, "title": "Add Ledger as an SV of Weight 5", "status": "Final", "type": "Governance", "created": "2025-07-11", "summary": "Approves Ledger as a Super Validator with weight 5. Ledger is the global leader in hardware wallet security and digital asset infrastructure. Their participation as an SV brings best-in-class key management and custody security standards to the Canton validator set."}, {"id": "CIP-0070", "number": 70, "title": "Adjusting Reward Caps for Validators", "status": "Withdrawn", "type": "Tokenomics", "created": "2025-07-22", "summary": "As the network continues to grow, there is an increasing potential for the free rider problem to emerge with Validators and liveness rewards; Validators can collect liveness rewards significantly in excess of their operating costs without otherwise participating in the network. To mitigate this and encourage participation among validators operating on the network, we suggest to adjust both the cap for Validator liveness rewards and activity rewards. New values in the Canton Coin DSO configuration would be set as follows given the current Super Validator oracle price of 0.05: I propose that we raise the reward minting caps for Validators and application providers by a factor of 200X, to $570…"}, {"id": "CIP-0071", "number": 71, "title": "Add Ubyx as an SV of Weight 5", "status": "Final", "type": "Governance", "created": "2025-06-06", "summary": "Add Ubyx as an SV with Weight 5, as milestones and deliverables are reached over an 18-month period, as proposed in the detailed list of deliverables below. Ubyx commits to building solutions on the Canton Network enabling regulated transfers of value on-chain as well integration into the broader Ubyx stablecoin clearing platform. Make it possible to attach information of regulatory importance to transactions Integrate the broader Ubyx clearing system with the Canton ecosystem Allow Ubyx ecosystem participants to interact with the stablecoin clearing system through their own Canton Node using the Global Synchronizer."}, {"id": "CIP-0072", "number": 72, "title": "Add Fireblocks as an SV of Weight 5", "status": "Approved", "type": "Governance", "created": "2025-07-30", "summary": "Approves Fireblocks as a Super Validator with weight 5. Fireblocks is the institutional-grade digital asset platform trusted by 1,800+ financial institutions globally for custody, transfers and tokenization. Their SV role reinforces Canton's institutional custody infrastructure."}, {"id": "CIP-0073", "number": 73, "title": "Weighted Validator Liveness Rewards for SV-Chosen Parties", "status": "Replaced", "type": "Tokenomics", "created": "2025-07-23", "summary": "This CIP proposes extending the concept of validator liveness rewards to arbitrary parties--not just validator operators--as well as supporting weights defined through governance. This allows hosting multiple parties on a single validator while still providing the same rewards to the parties on the same node as if they were running their own node. It also allows weighting certain some parties higher, e.g., because they have been shown to contribute significantly to the success of the network, or have committed to do so. This CIP also enables external parties to sign a contract authorizing any party to automatically submit a minting transaction on behalf of the external party. MainNet is…"}, {"id": "CIP-0074", "number": 74, "title": "Add BitGo as an SV of Weight 5", "status": "Approved", "type": "Governance", "created": "2025-08-15", "summary": "Approves BitGo as a Super Validator with weight 5. BitGo is the leading institutional digital asset custody and infrastructure provider. As Canton SV, BitGo brings regulated multi-signature custody, staking, and settlement capabilities to the network's validator set."}, {"id": "CIP-0075", "number": 75, "title": "Add Zodia as a SV with max weight 5", "status": "Approved", "type": "Governance", "created": "2025-09-11", "summary": ": Add Zodia Custody as a Super Validator with provisional Weight 5 as milestones and deliverables are reached over a 6 month period of time as proposed below Zodia Custody commits to: Enhance network value through integration of its product suite with Canton, bringing regulated custody, settlement, connectivity and tri-party collateral services to the network Support development of Canton by providing practical feedback and suggestions on documentation, requirements and use cases Associated rewards will remain unminted until defined milestones are met and verified through the Tokenomics Group review process."}, {"id": "CIP-0076", "number": 76, "title": "Hypernative as a Super Validator with a Weight of 1", "status": "Final", "type": "Governance", "created": "2025-08-20", "summary": ": Hypernative as a Super Validator with a Weight of 1"}, {"id": "CIP-0077", "number": 77, "title": "Add Taurus as an SV of Weight 5", "status": "Approved", "type": "Governance", "created": "2025-08-26", "summary": "Add Taurus as a Super Validator of weight 5 as proposed in the detailed deliverables list below. Taurus commits to contribute to the growth of the Canton Network ecosystem and speed up its adoption within the financial sector by integrating Canton Network within its platform, allowing its banking clients to use and build on Canton Network."}, {"id": "CIP-0078", "number": 78, "title": "Canton Coin Fee Removal", "status": "Final", "type": "Tokenomics", "created": "2025-09-08", "summary": "This CIP proposes to remove Canton Coin fees and adjust holding fees so that users do not have to pay fees when transferring Canton Coin and application developers can build applications without special code to deal with these fees. This will make Canton Coin, and the Global Synchronizer, more attractive for both users and application developers. This CIP proposes to remove Canton Coin fees and adjust holding fees so that users do not have to pay fees when transferring Canton Coin and application developers can build applications without special code to deal with these fees. This will make Canton Coin more attractive for both users and application developers. Removing these fees is possible…"}, {"id": "CIP-0079", "number": 79, "title": "SV Readiness — Demonstrate Third-Party Price Feed Integration for CC Listing", "status": "Approved", "type": "Governance", "created": "2025-09-15", "summary": ": This CIP requires all Super Validator (SV) operators to demonstrate operational readiness to ingest, validate, monitor, and expose a reference price feed (e.g., CC/USD) no later than October 15, 2025, in support of the Canton Coin (CC) listing. The Kaiko reference price (see attached Kaiko proposal) is cited as an example of a feed SVs may use to meet this requirement. The Canton Coin (CC) / Dollar (USD) conversion rate is fundamental to the Canton Network's tokenomics, essential for understanding expected featured app reward behaviors and traffic fees. Currently, Super Validators manually upload this rate based on their individual assessments. With a future Canton Coin listing and the…"}, {"id": "CIP-0080", "number": 80, "title": "Add Republic as an SV of Weight 6", "status": "Approved", "type": "Governance", "created": "2025-09-18", "summary": "Approves Republic as a Super Validator with weight 6. Republic is a leading on-chain investment ecosystem specializing in tokenized real-world assets and private markets. Their SV participation aligns with Canton's focus on institutional RWA tokenization and distribution."}, {"id": "CIP-0081", "number": 81, "title": "Add YZi Labs as Weight 10 SV", "status": "Approved", "type": "Governance", "created": "2025-09-23", "summary": "YZi Labs is an investment vehicle managing over $10 billion in assets globally, with a portfolio that spans more than 300 projects across 25 countries on six continents. YZi Labs invests at every stage, with a focus on projects in Web3, artificial intelligence, and biotechnology. The firm’s investment philosophy emphasizes impact first, based on the belief that meaningful returns follow from ventures delivering long-term value. YZi intends to make a serious, flexible commitment to Canton: drivin"}, {"id": "CIP-0082", "number": 82, "title": "Establish a 5% Development Fund (Foundation-Governed)", "status": "Active", "type": "Governance", "created": "2025-09-24", "summary": "This CIP ratifies the creation of a Development Fund equal to 5% of all future CC mint emissions, allocated to a Foundation-governed Fund. The Fund exists to sustain long-term investment in the Canton protocol (core R&D, dev tools, security, audits, reference implementations, DeFi app(s) liquidity seeding, critical infra). The fund is prospective (no retroactive allocation) and is taken pro-rata from all issuance streams so that every pool contributes, reflecting that everyone benefits from protocol investment. A subsequent CIP will propose the implementation mechanics (addresses, start epoch/height, accounting hooks, spend process, guardrails). Many networks finance protocol growth…"}, {"id": "CIP-0083", "number": 83, "title": "DTCC Super Validator Participation", "status": "Approved", "type": "Governance", "created": "2025-10-01", "summary": "DTCC is the largest post-trade financial services company in the world and a critical part of the global capital markets infrastructure. Bringing DTCC into the Canton SV set strengthens: Institutional credibility of the network. Alignment with traditional financial market infrastructure. Adoption and integration pathways for large-scale institutional use cases."}, {"id": "CIP-0084", "number": 84, "title": "Tokenomics Committee to Recommend $/MB Price Tuning", "status": "Approved", "type": "Tokenomics", "created": "2025-10-01", "summary": "The Canton Network is experiencing incredible demand and has rapidly accelerating momentum across institutional and retail adoption. Institutional Onboarding: A significant waiting list exists for new validators. Retail Readiness: Retail motions are beginning to onboard users by the tens of thousands with continued pent-up demand. Asset Growth: Multiple new assets are expected to come online in quick succession. All of this is leading to rapidly accelerating expansion and adoption of the network"}, {"id": "CIP-0085", "number": 85, "title": "Add Talos as Weight 6.5 SV", "status": "Approved", "type": "Governance", "created": "2025-09-08", "summary": "This CIP preserves Coin Metrics’ existing Weight 1.0 Super Validator under CIP-0046 and adds an escrowed, outcome-linked maximum earnable Weight of +6.5 for Talos. The incremental weight mints only upon Accountability Subcommittee verification of adoption milestones across: Canton Coin (CC) trading/custody readiness via Talos pX integration to Canton Measured production usage through defined trading and settlement volumes The proposal ties incremental SV rewards to real usage and service quality — readiness, live flows, and operational performance — consistent with community precedent. The objective is to broaden CC access through Talos integrations, demonstrate private institutional…"}, {"id": "CIP-0086", "number": 86, "title": "ERC-20 Middleware and Distributed Indexer for Canton Network", "status": "Approved", "type": "Tokenomics", "created": "2025-10-14", "summary": "This project aims to provide Canton Network operators, token issuers, and ecosystem participants with a robust and extensible ERC-20-compatible middleware and distributed indexer infrastructure that complies with Canton’s privacy-preserving ledger model while aligning with Ethereum’s dominant token interface standard. This Statement of Work (SOW) outlines the development of an ERC-20 interface middleware and distributed indexer for the Canton Network. The goal is to enable Ethereum-like token interactions (e.g., stablecoins, tokenized assets) to operate natively on Canton’s distributed ledger using a familiar API surface while maintaining strict privacy, security, and performance…"}, {"id": "CIP-0087", "number": 87, "title": "Add Hex Trust as a Super Validator (Weight 3)", "status": "Approved", "type": "Governance", "created": "2025-09-26", "summary": "Add Hex Trust as an SV of Weight 3. Hex Trust commits to: - Bring a comprehensive financial ecosystem to the Canton Network through the integration of regulated custody, on/off-ramp, payments, and yield products for stablecoins. - Support development of Canton by providing practical feedback and suggestions on documentation, requirements, and use cases. ---"}, {"id": "CIP-0089", "number": 89, "title": "Splice 0.5.0 / Canton 3.4 Upgrade", "status": "Approved", "type": "Standards Track", "created": "2025-08-21", "summary": "Splice 0.5.0 introduces new features and scaling improvements that rely on Canton 3.4. We recommend adopting Splice 0.5.0, which requires a Major Upgrade with Downtime, for the Super Validators and Validators, to move the network from Canton 3.3 to Canton 3.4. . The 0.4.x Splice codebase has evolved since the Global Synchronizer nodes (the synchronizer nodes as well as the Super Validator and validator participant nodes) adopted version Canton 3.3. The Canton 3.4 release improves the feature set of Canton 3.3 in multiple aspects. Notable improvements from an ecosystem growth perspective are: - Canton Network is growing rapidly and may approach limits without further scaling improvements.…"}, {"id": "CIP-0090", "number": 90, "title": "** Onboard USDT0 to Canton — Outcome-Linked SV Weight (Max 10)", "status": "Approved", "type": "Governance", "created": "** 2025-10-28", "summary": "This CIP proposes awarding up to Weight 10 for onboarding USDT0 (a USD stablecoin issued by the USDT0 issuer) to Canton MainNet, with rewards tied to (i) an MVP go-live, (ii) earlier readiness of MVP (time-based acceleration), (iii) on-chain adoption of MVP, (iv) Native integration go-live, (v) earlier readiness of Native go-live (time-based acceleration), (vi) on-chain adoption of Native USDT0 +1 for completing a production-ready MVP within 180 days. Up to +2 acceleration if MVP readiness occurs as early as Day 60 (linear down to 0 at Day 180). Up to +2 adoption bonus at +0.5 per $1.5B notional transacted through MVP on Canton (cap +2). +1 for completing a production-ready Native…"}, {"id": "CIP-0091", "number": 91, "title": "Add Zenith as an SV of Weight 10", "status": "Approved", "type": "Governance", "created": "2025-10-17", "summary": ": Add Zenith as a Super Validator (SV) of weight 10, with the majority of the weight reachable through growth and adoption KPIs. Zenith commits to building a solution enabling participants in the Canton Network to run execution environments using arbitrary VMs (EVM, SVM, MoveVM etc.) deployed as Virtual Blockchains (VBs) on Zenith, that can interoperate with Canton subnets, and be verifiably settled on Canton Mainnet. : Based on the Polyglot Canton Whitepaper, key priorities of Canton Network include global composability, privacy, and regulatory compliance. To address these priorities, Zenith proposes Virtual Blockchains (VBs) as a natural extension of Canton’s Polyglot strategy, enabling…"}, {"id": "CIP-0092", "number": 92, "title": "Controlled Transition to Dynamic Market Feeds Post-Listing of Canton Coin (CC)", "status": "Approved", "type": "Governance", "created": "2025-10-31", "summary": ": This proposal recommends that Super Validator (SV) operators adopt a controlled, 10-day transition period following the spot listing of Canton Coin (CC) to move from the current fixed on-chain conversion rate mechanics toward fully dynamic, market-based price feeds. During this transition period, each SV must update its vote for the on-chain median price at least once every 24 hours, using reasonable reference prices that reflect evolving market conditions. Each SV may independently migrate to its live market feed when, in its judgment, market liquidity and volatility conditions allow. : At the time of listing, market price discovery for Canton Coin is expected to be highly volatile as…"}, {"id": "CIP-0093", "number": 93, "title": "Add Bosphorus SV (BSV) as a Super Validator Max Weight 6", "status": "Approved", "type": "Governance", "created": "2025-11-07", "summary": "Bosphorus SV (BSV) will drive user and transaction adoption across Eurasia and the Middle East, focusing on institutional participants transacting in stablecoins, tokenized Treasuries, and other RWAs. BSV’s rewards will be tied to verifiable on-chain burn generated by wallets, apps, and institutions it directly onboards or supports. BSV will focus on: - Regional tokenized U.S. Treasury (UST) distribution to financial institutions and treasuries - Stablecoin settlement and rails for cross border trade and institutional transactions - Stablecoin wallet, debit, and credit card issuance - On-chain lending and borrowing applications built on stablecoins and tokenized collaterals - New tokenized…"}, {"id": "CIP-0094", "number": 94, "title": "Add Blockdaemon as a Super Validator (weight 5.0)", "status": "Approved", "type": "Governance", "created": "2025-12-01", "summary": "Blockdaemon proposes to join the Canton Network as a Super Validator with Weight 5.0 linked to measurable institutional adoption milestones. Blockdaemon will: - Operate geographically distributed, multi-cloud validator clusters with audited 99.9%+ uptime. - Act as delegated operator for major banks, exchanges, custodians, CSDs and asset-managers, lowering the barrier to Canton entry. - Provide institutional-grade MPC wallets (FIPS-140-2 L3 HSM-seeded, policy-based approvals) that secure client keys while enabling seamless custody and tokenization use cases for CC, Stable Coins and RWAs. - Leverage Blockdaemon brand to drive institutional interest into Canton. These contributions deliver…"}, {"id": "CIP-0095", "number": 95, "title": "Onboard Mesh to Canton — Outcome-Linked SV Weight (Max 10)", "status": "Approved", "type": "Governance", "created": "2025-12-09", "summary": "This CIP proposes awarding up to Weight 10 for onboarding Mesh (global payments network for stablecoins and cryptoassets) to Canton MainNet, with rewards tied to (i) successful integration, (ii) earlier readiness (time-based acceleration), and (iii) on-chain adoption. - +2 for completing a production-ready Canton Implementation within 180 days. - Up to +2 acceleration if Production readiness occurs as early as Day 60 (linear down to 0 at Day 180). - Up to +3 adoption bonus at +0.5 per $500M notional transacted on Canton (cap +3). - Up to +3 adoption bonus at +0.5 per $1B notional transacted on Canton (cap +3). Mesh's crypto payment infrastructure connects 400+ million users across 300+…"}, {"id": "CIP-0096", "number": 96, "title": "Removing Liveness Rewards from Validator Rewards Pool", "status": "Approved", "type": "Tokenomics", "created": "2025-12-07", "summary": "As the network continues to grow, there is an increasing potential for the free rider problem to emerge with Validators and liveness rewards; Validators can collect liveness rewards as incentives from the network without otherwise participating in the network and adding utility. To mitigate this and encourage participation among validators operating on the network, we suggest adjusting the Validator liveness rewards cap while leaving other aspects of Validator rewards unchanged. The reduction in liveness rewards would begin no more than 5 business days following CIP approval, along the below schedule: 1. No more than 5 days business from CIP Approval: Liveness rewards set to 67% of current…"}, {"id": "CIP-0097", "number": 97, "title": "Nasdaq Super Validator Participation", "status": "Approved", "type": "Governance", "created": "2025-12-30", "summary": "This CIP proposes granting Nasdaq participation as a Super Validator (SV) with Weight 10. Given the strategic importance of Nasdaq to the Canton ecosystem, their inclusion will bring credibility, alignment with traditional financial infrastructure, and meaningful contributions to network governance and adoption. This CIP establishes an umbrella, milestone-based program through which Nasdaq can receive SV Weight (up to 10) for initiatives that materially advance the Canton ecosystem. Unlike other CIPs, this program contains confidential commitments to the ecosystem. Those commitments and milestones have been agreed with the Tokenomics and Accountability Committees and will be made available…"}, {"id": "CIP-0098", "number": 98, "title": "Cap Per-Transaction Application Rewards at $1.50", "status": "Approved", "type": "Tokenomics", "created": "2025-12-17", "summary": "This CIP introduces a maximum per-transaction Application Reward (“App Reward”) of $1.50. Today, App Rewards are uncapped, which creates outsized and asymmetric incentives during periods of low network activity. This proposal aligns rewards more closely with fee generation by ensuring that each App transaction can produce, at most, a 50% positive expected value relative to the fees it generates when the network is below Validator and Application equilibrium. This change is a ledger configuration update—requiring no code changes—and can be activated immediately upon approval. The current uncapped App Reward model was appropriate during early-stage bootstrapping when network activity was low,…"}, {"id": "CIP-0099", "number": 99, "title": "Zero Hash Modifications to Adoption Incentive", "status": "Approved", "type": "Tokenomics", "created": "2025-01-07", "summary": "Canton Improvement Proposal CIP-0099 — Zero Hash Modifications to Adoption Incentive."}, {"id": "CIP-0100", "number": 100, "title": "Governance of the CIP 0082 Development Fund", "status": "Active", "type": "Tokenomics", "created": "2025-12-22", "summary": "This CIP ratifies how the development fund in CIP-0082 will be managed. Specifically, this document covers the CIP-0082 abstract and specification items S4-S6 where a subsequent CIP is mentioned: A subsequent CIP will propose the implementation mechanics (addresses, start epoch/height, accounting hooks, spend process, guardrails). | S1 | Establish Development Fund | A Foundation-controlled Development Fund is recognized as the canonical sink for the fund; custody and signers per Foundation bylaws. | One primary on-chain address | Activation contingent on subsequent CIP specifying address, custody, and accounting hooks. | | :---- | :---- | :---- | :---- | :---- | | S4 | Governance of Spend |…"}, {"id": "CIP-0102", "number": 102, "title": "Add Tharimmune as a Super Validator (SV)", "status": "Approved", "type": "Governance", "created": "2026-01-17", "summary": "Add Tharimmune, Inc. (“Tharimmune”) as a weight 4 Super Validator (SV) on the Global Synchronizer. Reward weight will be granted via escrow mechanism and released in tranches as milestones are delivered. Tharimmune is a Canton ecosystem–focused digital asset treasury company that has publicly committed capital and participation to the network, including validator operations and ecosystem support. Tharimmune will act as a new, independent operator to strengthen decentralization and provide public-goods contributions to the network. Tharimmune recently announced a $545M private placement to establish a Canton Coin (CC) treasury and actively participate in the network via validator…"}, {"id": "CIP-0103", "number": 103, "title": "dApp Standard", "status": "Approved", "type": "Standards Track", "created": "2025-11-28", "summary": "This proposal introduces a vendor-neutral dApp API that decouples network connectivity and key management from decentralized applications, while providing a standardized set of primitives for interacting with the Canton Network. Using the dApp API, users can access any application with a validator and signing provider of their choice. In this model, dApp clients operate in conjunction with Wallets, which implement the dApp API, are trusted by the user, and enforce authorization to guard against malicious requests from untrusted dApps. The design emphasizes a minimal, interoperable surface with strict, unambiguous semantics for requests, responses, and errors, while remaining flexible enough…"}, {"id": "CIP-0104", "number": 104, "title": "Traffic-Based App Rewards", "status": "Approved", "type": "Tokenomics", "created": "2026-01-29", "summary": "This CIP proposes to improve the quality of the app reward incentives by removing featured app markers and instead basing an app’s rewards on the actual traffic spent on (sub-)transactions that change the state managed by the app. This is achieved by measuring traffic spent directly on the Global Synchronizer using only sequencer and mediator data. This removes the need for app builders to create FeaturedAppActivityMarkers in all the right places, and instead measures the actual burn contributed by all activity of an app provider party by default. To enable validator operators to manage the traffic costs incurred by validating (as opposed to submitting) transactions and to foster…"}, {"id": "CIP-0105", "number": 105, "title": "Super Validator (SV) Locking & Long-Term Commitment Framework", "status": "Approved", "type": "Tokenomics", "created": "2026-02-06", "summary": "Canton Improvement Proposal CIP-0105 — Super Validator (SV) Locking & Long-Term Commitment Framework."}, {"id": "CIP-0106", "number": 106, "title": "Add QCP Group as a Super Validator (weight 5.0)", "status": "Approved", "type": "Governance", "created": "2026-02-01", "summary": "QCP Group proposes to join the Canton Network as a Super Validator (SV) with a maximum potential weight of 5.0, tied to quantifiable institutional adoption, application delivery, and network economic activity milestones. The Canton Network is uniquely positioned for enterprise adoption of privacy-preserving, interoperable digital asset infrastructure. QCP’s mandate as an SV is to shift the network from pilot into institutional flow by delivering production-grade settlement workflows, RWA onboarding at scale, and sustained transaction volume. By tying SV weight to sustained economic gravity rather than one-time spikes, this proposal ensures long-term institutional contribution to the network."}, {"id": "CIP-0107", "number": 107, "title": "24h Submission Delay for End-User CC Transactions", "status": "Approved", "type": "Standards Track", "created": "2026-01-21", "summary": "This CIP supports a 24 hours submission delay between preparing and execution for all CC end-user transactions. Specifically this applies to all token standard operations making CC fully compliant with the token standard as well as the CC specific public actions of creating, renewing, and archiving preapprovals, purchasing traffic, and tapping funds on DevNet. Between preparing and executing a transaction, the key(s) registered in the topology state for the submitting external party must sign the transaction. This often requires explicit human approval sometimes even from multiple people. Doing that within a 10 minute window can be quite disruptive and does not match the expectations from…"}, {"id": "CIP-0108", "number": 108, "title": "Add Merkle Science’s Predictive Analytics as a Weight 1 SV", "status": "Proposed", "type": "Governance", "created": "2020-12-16", "summary": "This CIP proposes Merkle Science to join the Canton Foundation by adding Merkle Science as a Weight [ ] SV: 1) Natively integrate the Canon Network to protect economic activities from illicit and sanctioned activities. 2) Actively accelerate the institutional adoption via 100+ global customers. Ecosystem Protection: Merkle Science will deploy its industry-leading predictive analytics to enable real-time detection of sanctioned and illicit activity. This serves as a foundational layer of network security required to meet increasing regulatory obligations for financial institutions and stablecoin issuers. Such infrastructure is a prerequisite for institutional adoption of Canton.…"}, {"id": "CIP-0109", "number": 109, "title": "Visa Super Validator Participation", "status": "Approved", "type": "Governance", "created": "2026-03-20", "summary": "Canton Improvement Proposal CIP-0109 — Visa Super Validator Participation."}, {"id": "CIP-0110", "number": 110, "title": "Add Apollo as max weight 7 SV", "status": "Approved", "type": "Governance", "created": "2026-03-19", "summary": "Canton Improvement Proposal CIP-0110 — Add Apollo as max weight 7 SV."}, {"id": "CIP-0111", "number": 111, "title": "Process for Reducing Super Validator Weight", "status": "Proposed", "type": "Governance", "created": "2026-03-18", "summary": "The CIP outlines the process by which the network reduces the weight of a Super Validator (“SV”) under certain circumstances. The process includes (i) a review of the circumstances associated with the SV, (ii) an off-chain governance procedure, and (iii) a corresponding on-chain vote and configuration change. A “Ghost SV” refers to an SV in the process of completing milestones associated with an allocation of weight. While operating as a Ghost SV, unminted rewards associated with its total potential weight accrue in escrow. The process introduced in this CIP also addresses how to calculate and \"burn” any unminted rewards associated with Ghost SV weight that have been reduced while…"}, {"id": "CIP-0112", "number": 112, "title": "Canton Network Token Standard V2 - Improvements for Privacy, Performance and Traditional Accounting", "status": "Draft", "type": "Standards Track", "created": "2026-03-31", "summary": "Canton Improvement Proposal CIP-0112 — Canton Network Token Standard V2 - Improvements for Privacy, Performance and Traditional Accounting."}, {"id": "CIP-0113", "number": 113, "title": "Add Further Asset Management as a Super Validator (Weight 8.0)", "status": "Approved", "type": "Governance", "created": "2025-11-26", "summary": "This proposal seeks to add Further Asset Management (“Further”) as a Super Validator (SV) on the Canton Network with a maximum reward weight of 8.0, earned through milestone-based delivery and perpetual economic sustainment. Further will act as a regional aggregation layer for the GCC, onboarding sovereign-aligned capital and regulated settlement workflows via its portfolio companies (BridgePort, Pave Bank, Kaio, and Fuze). Further’s role as a regional aggregator delivers a unique multiplier effect to the Canton Network. By implementing perpetual sustainment and pro-rata attribution, this CIP ensures that Further’s weight remains a transparent, accurate, and long-term reflection of the…"}, {"id": "CIP-0114", "number": 114, "title": "Digital Asset Treasury (DAT) SV Program", "status": "Proposed", "type": "Tokenomics", "created": "2026-03-19", "summary": "This proposal establishes a time-bound Super Validator (SV) program to encourage the formation and growth of Digital Asset Treasury companies (DATs) that provide investor access to Canton Coin (CC) and commit to long-term CC ownership. A DAT is an operating company whose primary purpose is to acquire, accumulate, and hold CC as a treasury asset while offering third parties structured access to CC exposure. DATs that accumulate and hold CC over multi-year periods provide durable ecosystem value and may earn SV rewards based on verifiable, consistent CC holdings. The current tokenomics framework primarily rewards active participation in validation and application activity but does not…"}];
+
+document.addEventListener("DOMContentLoaded", function() {
+
+  /* ── MODULE COLLAPSE / EXPAND ── */
+  window.toggleLc = function(id) {
+    const lc = document.getElementById(id);
+    const body = document.getElementById(id + '-body');
+    if (!lc || !body) return;
+    const collapsed = lc.classList.toggle('collapsed');
+    body.classList.toggle('collapsed', collapsed);
+  };
+
+  /* ── NETWORK MAP ── */
+  function rnShow(key) {
+    const d = RN_INFO[key];
+    if (!d) return;
+    document.getElementById("rn-prompt").style.display = "none";
+    const t = document.getElementById("rn-title");
+    const b = document.getElementById("rn-body");
+    t.style.display = "block";
+    b.style.display  = "block";
+    t.textContent   = d.title;
+    b.innerHTML     = d.body.replace(/\n\n/g,"<br><br>").replace(/\n/g,"<br>");
+    document.getElementById("rn-info").scrollIntoView({behavior:"smooth",block:"nearest"});
+  }
+
+  function rnDeselect() {
+    document.querySelectorAll(".rn-node").forEach(el => el.classList.remove("rn-on"));
+  }
+
+  const nodeMap = {
+    "nd-canton":    "canton",
+    "nd-trize":     "trize",
+    "nd-fireblocks":"fireblocks",
+    "nd-base":      "base",
+    "nd-ats":       "ats",
+    "nd-rizenet":   "rizenet",
+    "nd-chainlink": "chainlink",
+    "nd-proof":     "proof",
+    "nd-fl":        "fl",
+    "nd-util1":     "util_canton",
+    "nd-util2":     "util_gateway",
+    "nd-util3":     "util_dml",
+  };
+
+  Object.entries(nodeMap).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("click", function(e) {
+      e.stopPropagation();
+      rnDeselect();
+      el.classList.add("rn-on");
+      rnShow(key);
+    });
+  });
+
+  const ccipEl = document.getElementById("conn-ccip");
+  if (ccipEl) ccipEl.addEventListener("click", function(e) { e.stopPropagation(); rnDeselect(); rnShow("ccip"); });
+
+  const wrap1El = document.getElementById("conn-wrap1");
+  if (wrap1El) wrap1El.addEventListener("click", function(e) { e.stopPropagation(); rnDeselect(); rnShow("wrap"); });
+
+  const svgEl = document.getElementById("rn-svg");
+  if (svgEl) svgEl.addEventListener("click", function() {
+    rnDeselect();
+    document.getElementById("rn-prompt").style.display = "";
+    document.getElementById("rn-title").style.display  = "none";
+    document.getElementById("rn-body").style.display   = "none";
+  });
+
+  /* Animated Canton members */
+  const members = ["BNY Mellon","Goldman Sachs","DTCC","HSBC","BNP Paribas","Euroclear","J.P. Morgan","Morgan Stanley","Broadridge","Cumberland","Deutsche Börse","SBI Digital"];
+  let cm = 0;
+  setInterval(function() {
+    cm = (cm + 1) % members.length;
+    const el = document.getElementById("canton-member");
+    if (el) el.textContent = members[cm];
+  }, 1900);
+
+  /* Animated proof label */
+  const proofWords = ["Proof of Process","Proof of Origin","Proof of Reserve"];
+  let pi = 0;
+  setInterval(function() {
+    pi = (pi + 1) % proofWords.length;
+    const el = document.getElementById("proof-lbl");
+    if (el) { el.style.opacity="0"; setTimeout(function(){ el.textContent=proofWords[pi]; el.style.opacity="1"; },300); }
+  }, 2500);
+
+  /* Animated FL label */
+  const flWords = ["Insurance Claims","Default Risks"];
+  let fi = 0;
+  setInterval(function() {
+    fi = (fi + 1) % flWords.length;
+    const el = document.getElementById("fl-lbl");
+    if (el) { el.style.opacity="0"; setTimeout(function(){ el.textContent=flWords[fi]; el.style.opacity="1"; },300); }
+  }, 2800);
+
+  /* SLIDER LOGIC */
+  const PER_PAGE=6;
+  const state={eco:0,canton:0,board:0};
+
+  function buildSlider(key,data,isPerson,darkBg){
+    const track=document.getElementById(key+'-track');
+    const dots=document.getElementById(key+'-dots');
+    if(!track||!dots)return;
+    const pages=[];
+    for(let i=0;i<data.length;i+=PER_PAGE)pages.push(data.slice(i,i+PER_PAGE));
+    track.innerHTML=pages.map(function(page){
+      const bubblesHtml=page.map(function(item){
+        const extraClass=darkBg?'canton-bubble ':'';
+        const hasImg=item.img&&item.img!=='';
+        const initials=(item.name||'').split(' ').map(function(w){return w[0];}).join('').slice(0,2);
+        const avatarContent=hasImg?'<img src="'+item.img+'" alt="'+item.name+'" onerror="this.parentElement.innerHTML=\''+initials+'\'" />':initials;
+        const avatarClass='b-avatar'+(isPerson?' person':'')+((!hasImg)?' initials':'');
+        const avatarStyle=!hasImg?'style="background:var(--navy)"':'';
+        const tagHtml=item.tag?'<div class="b-tag">'+item.tag+'</div>':(item.role?'<div class="b-tag">'+item.role.split('—')[0].trim()+'</div>':'');
+        return '<div class="bubble '+extraClass+'" id="b-'+key+'-'+item.id+'" onclick="pick(\''+key+'\',\''+item.id+'\')">'
+          +'<div class="'+avatarClass+'" '+avatarStyle+'>'+avatarContent+'</div>'
+          +'<div class="b-name">'+item.name+'</div>'+tagHtml+'</div>';
+      }).join('');
+      return '<div class="slider-page">'+bubblesHtml+'</div>';
+    }).join('');
+    dots.innerHTML=pages.map(function(_,i){
+      return '<div class="s-dot '+(i===0?'on':'')+'" onclick="goPage(\''+key+'\','+i+')"></div>';
+    }).join('');
+    updateBtns(key,pages.length);
+  }
+
+  window.slide=function(key,dir){const pages=document.getElementById(key+'-track').querySelectorAll('.slider-page').length;state[key]=Math.max(0,Math.min(pages-1,state[key]+dir));applySlide(key,pages);};
+  window.goPage=function(key,idx){const pages=document.getElementById(key+'-track').querySelectorAll('.slider-page').length;state[key]=idx;applySlide(key,pages);};
+  function applySlide(key,pages){document.getElementById(key+'-track').style.transform='translateX(-'+state[key]*100+'%)';document.querySelectorAll('#'+key+'-dots .s-dot').forEach(function(d,i){d.classList.toggle('on',i===state[key]);});updateBtns(key,pages);}
+  function updateBtns(key,pages){const p=document.getElementById(key+'-prev');const n=document.getElementById(key+'-next');if(p)p.disabled=state[key]===0;if(n)n.disabled=state[key]>=pages-1;}
+
+  const active={canton:null,board:null};
+  const dataMap={canton:CANTON,board:BOARD};
+
+  window.pick=function(key,id){
+    const item=dataMap[key].find(function(x){return x.id===id;});
+    if(!item)return;
+    if(active[key]===id){active[key]=null;document.querySelectorAll('[id^="b-'+key+'-"]').forEach(function(b){b.classList.remove('on');});resetBox(key);return;}
+    active[key]=id;
+    document.querySelectorAll('[id^="b-'+key+'-"]').forEach(function(b){b.classList.remove('on');});
+    const bel=document.getElementById('b-'+key+'-'+id);
+    if(bel)bel.classList.add('on');
+    const box=document.getElementById(key+'-box');
+    const prompt=box.querySelector('.ib-prompt');
+    const title=document.getElementById(key+'-title');
+    const text=document.getElementById(key+'-text');
+    if(prompt)prompt.style.display='none';
+    title.style.display='block';text.style.display='block';
+    title.textContent=item.role?item.name+' — '+item.role:item.name;
+    text.textContent=item.text;
+  };
+
+  function resetBox(key){const box=document.getElementById(key+'-box');const prompt=box.querySelector('.ib-prompt');const title=document.getElementById(key+'-title');const text=document.getElementById(key+'-text');if(prompt)prompt.style.display='';if(title){title.style.display='none';title.textContent='';}if(text){text.style.display='none';text.innerHTML='';}}
+
+  let activeTeam=null;
+
+
+  buildSlider('canton',CANTON,false,true);
+  buildSlider('board',BOARD,true);
+
+  /* ═══════════════════════════════════════════════════
+     CANTON ECOSYSTEM BROWSER
+  ═══════════════════════════════════════════════════ */
+  const CEB_JSON = 'https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/canton-ecosystem/entities.json';
+  const CEB_LOGO_BASE = 'https://cdn.jsdelivr.net/gh/hcftrize/TOKERIZE@dev/canton-ecosystem/logos/';
+  // Exact filename map — covers all 282 logos (png/jpg/jpeg/svg)
+  const CEB_FILES={"1pilot":"1pilot.png","21shares":"21shares.png","4mgroup":"4mgroup.png","5n-loop-wallet":"5n-loop-wallet.png","7ridge":"7ridge.jpg","7trust":"7trust.png","acme":"acme.png","akascan":"akascan.png","akua-finance":"akua-finance.png","alchemy":"alchemy.png","alpend":"alpend.png","amberdata":"amberdata.png","ambertrading":"ambertrading.png","angelhack":"angelhack.jpeg","appsfactory":"appsfactory.png","archax":"archax.png","arrington-capital":"arrington-capital.png","artichoke-capital":"artichoke-capital.jpeg","asterizm":"asterizm.jpeg","axa-im":"axa-im.png","b2c2":"b2c2.png","banco-santander":"banco-santander.png","bank-of-america":"bank-of-america.png","bank-of-china":"bank-of-china.png","bcw-group":"bcw-group.jpeg","beyondcentral":"beyondcentral.png","bitalpha-dba-bitwave":"biatlpha-dba-bitwave.png","binance-us":"binance-us.png","bitcoin-suisse":"bitcoin-suisse.jpeg","bitgo":"bitgo.jpeg","bitsafe":"bitsafe.png","bitwave":"bitwave.jpeg","black-manta-capital-partners":"black-manta-capital-partners.png","blockdaemon":"blockdaemon.png","bnp-paribas":"bnp-paribas.png","bny":"bny.png","bp":"bp.png","brale":"brale.jpeg","bridgeport":"bridgeport.jpg","brikly":"brikly.jpg","broadridge":"broadridge.png","bron-wallet":"bron-wallet.png","bybit":"bybit.png","c8-wallet":"c8-wallet.png","calastone":"calastone.png","cantara":"cantara.jpg","cantex":"cantex.jpg","canton-strategic-holdings":"canton-strategic-holdings.png","castle-island":"castle-island.jpeg","castleton-commodities-international":"castleton-commodities-international.jpeg","cbtc":"cbtc.png","cc-view":"cc-view.png","chain-experts":"chain-experts.png","chainbridge-tax-planner":"chainbridge-tax-planner.jpg","chainlink":"chainlink.png","chainsafe":"chainsafe.png","chata---sync-insights":"chata---sync-insights.png","checker-finance":"checker-finance.png","circle":"circle.png","citi":"citi.png","clifford-chance":"clifford-chance.png","coin-metrics-canton-data-app":"coin-metrics-canton-data-app.jpg","coin-metrics":"coin-metrics.png","coinshares":"coinshares.png","cointelegraph-decentralization-guardians":"cointelegraph-decentralization-guardians.png","commerzbank-ag":"commerzbank-ag.png","console-wallet":"console-wallet.jpg","copper":"copper.png","credit-agricole":"credit-agricole.png","credshields":"credshields.jpg","crypto-finance-ag":"crypto-finance-ag.png","cryptocom":"cryptocom.png","ctrl-alt":"ctrl-alt.png","cumberland-sv":"cumberland-sv.jpeg","cypherock":"cypherock.png","d2x":"d2x.png","da-registry-app":"da-registry-app.png","dedge-security":"dedge-security.jpg","deloitte":"deloitte.png","denex-gas-station":"denex-gas-station.png","depinx":"depinx.jpg","desyn":"desyn.png","dfns":"dfns.png","digital-asset":"digital-asset.png","drw":"drw.jpeg","dsrv":"dsrv.png","dstash":"dstash.jpg","dtcc":"dtcc.jpg","dv-chain":"dv-chain.png","ea-finance":"ea-finance.png","edgevana":"edgevana.jpg","efficient-frontier":"efficient-frontier.png","eib":"eib.png","eleox":"eleox.png","elk-capital-markets":"elk-capital-markets.png","elliptic":"elliptic.png","elwood-technologies":"elwood-technologies.jpg","equilend":"equilend.jpeg","equitize":"equitize.jpeg","euroclear":"euroclear.png","euronext":"euronext.jpg","everstake":"everstake.png","ey":"ey.png","fairmint":"fairmint.jpeg","falconx":"falconx.jpeg","fasanara":"fasanara.png","fcx":"fcx.png","fidelity":"fidelity.jpeg","figment":"figment.png","finoa-consensus-services":"finoa-consensus-services.png","fireblocks":"fireblocks.jpg","five-north":"five-north.png","flipside-crypto":"flipside-crypto.jpeg","flow-desk":"flow-desk.png","flowryd-os":"flowryd-os.png","flowtraders":"flowtraders.png","founders-fund":"founders-fund.png","foundinals":"foundinals.png","franklin-templeton":"franklin-templeton.png","frax":"frax.png","g-20-group":"g-20-group.jpg","galaxy":"galaxy.jpeg","gambyl":"gambyl.png","gate":"gate.jpeg","gatewayfm":"gatewayfm.png","gemini":"gemini.png","gk8-galaxy":"gk8-galaxy.jpg","global-blockchain-business-council":"global-blockchain-business-council.png","global-synchronizer":"global-synchronizer.png","globalstake":"globalstake.png","goldman-sachs":"goldman-sachs.png","gravity-team":"gravity-team.jpeg","gs-dap":"gs-dap.png","gsr":"gsr.png","hashkeycloud":"hashkeycloud.png","hashnote-now-circle":"hashnote-now-circle.jpg","hashrupt":"hashrupt.png","haven-digital-partners":"haven-digital-partners.png","hextrust":"hextrust.jpg","hifi":"hifi.png","hkex":"hkex.png","hkma":"hkma.png","hoodrun":"hoodrun.jpg","houdini-swap":"houdini-swap.jpeg","hsbc":"hsbc.png","hydra-x":"hydra-x.png","hypernative":"hypernative.png","ibenji":"ibenji.jpg","icapital":"icapital.png","intellecteu":"intellecteu.png","ipblock-llc":"ipblock-llc.jpg","jp-morgan":"jp-morgan.png","k2f-labs":"k2f-labs.jpg","kaiko-data-services":"kaiko-data-services.png","kaiko":"kaiko.png","kairo":"kairo.png","kaleido":"kaleido.png","keyrock":"keyrock.png","kiln":"kiln.png","klarsign":"klarsign.jpg","koch-energy-services":"koch-energy-services.png","komonode":"komonode.png","kpmg":"kpmg.png","kraken":"kraken.jpeg","kucoin":"kucoin.png","lab6174":"lab6174.png","launchnodes":"launchnodes.png","layerzero":"layerzero.png","ledger":"ledger.png","ledgible":"ledgible.jpeg","lendos":"lendos.jpeg","liberty-city-ventures":"liberty-city-ventures.png","liquidity-tech-ltp":"liquidity-tech-ltp.jpg","lloyds-banking-group":"lloyds-banking-group.png","london-stock-exchange":"london-stock-exchange.jpg","luganodes":"luganodes.png","lukka-inc":"lukka-inc.jpg","luxembourg-stock-exchange":"luxembourg-stock-exchange.jpg","maestro":"maestro.png","marex":"marex.jpg","memora":"memora.png","mercuria-energy-america":"mercuria-energy-america.png","meria":"meria.png","merkle-science":"merkle-science.jpg","mesh":"mesh.jpg","mexc":"mexc.png","microsoft":"microsoft.jpg","midao":"midao.jpeg","mintify":"mintify.png","moatcapital":"moatcapital.png","monerium":"monerium.jpeg","moodys":"moodys.jpg","moonshot":"moonshot.jpeg","mpch":"mpch.png","mufg":"mufg.png","nansen":"nansen.png","nasdaq":"nasdaq.png","nightly-wallet":"nightly-wallet.jpg","node-fortress":"node-fortress.png","node-monster":"node-monster.png","noders":"noders.jpg","novaprime":"novaprime.png","noves":"noves.png","obligate":"obligate.png","obsidian-systems":"obsidian-systems.png","oliver-wyman":"oliver-wyman.png","ownera":"ownera.png","p2p":"p2p.png","particula":"particula.png","paxos":"paxos.jpg","paysafe":"paysafe.png","pixelplex":"pixelplex.jpg","polychain":"polychain.png","posthuman":"posthuman.png","primrose-capital-management":"primrose-capital-management.jpeg","prometheus":"prometheus.png","proof-group":"proof-group.png","puroearth":"puroearth.png","pyth":"pyth.png","qcp-trading":"qcp-trading.jpeg","quantstamp":"quantstamp.jpeg","realworld-solutions":"realworld-solutions.jpg","receipts-depositary-corporation-rdc":"receipts-depositary-corporation-rdc.jpg","redstone":"redstone.png","republic":"republic.png","robinhood":"robinhood.png","rwaxyz":"rwaxyz.png","sbc":"sbc.png","sbi-digital-asset-holdings":"sbi-digital-asset-holdings.png","société-générale":"société-générale.png","sekoya-labs":"sekoya-labs.jpeg","send":"send.png","sg-forge":"sg-forge.jpg","shell-energy-north-america":"shell-energy-north-america.png","solv-protocol":"solv-protocol.jpg","splice-an-lfdt-lab":"splice-an-lfdt-lab.png","stakecraft":"stakecraft.jpg","t-rize":"t-rize.png","talos":"talos.png","taurus":"taurus.png","temple-digital-group":"temple-digital-group.png","temple-trading":"temple-trading.jpg","texture-capital":"texture-capital.png","the-tie":"the-tie.png","thetanuts":"thetanuts.png","tradecraft":"tradecraft.jpg","tradefast":"tradefast.jpg","tradeweb-24x7-repo-app-for-canton":"tradeweb-24x7-repo-app-for-canton.png","tradeweb":"tradeweb.png","trakx":"trakx.png","treasuryspring":"treasuryspring.jpg","trm-labs":"trm-labs.jpeg","ubs":"ubs.jpg","ubyx":"ubyx.jpeg","unhedged":"unhedged.jpg","union-investment":"union-investment.png","usd1":"usd1.jpg","usdc":"usdc.jpg","usdm1":"usdm1.png","utila":"utila.png","vigil-markets":"vigil-markets.jpeg","visa":"visa.jpg","walletconnect":"walletconnect.png","wells-fargo":"wells-fargo.jpg","witan-group":"witan-group.png","worldpay":"worldpay.jpg","wormhole":"wormhole.png","xbto":"xbto.jpeg","xlabs":"xlabs.png","xventures":"xventures.jpg","zeconomy":"zeconomy.png","zenith":"zenith.jpg","zerohash":"zerohash.jpg","zinnia":"zinnia.png","zodia-custody":"zodia-custody.png","zoro-wallet":"zoro-wallet.png"};
+  const CEB_PER_PAGE = 48;
+
+
+  // Priority order — T-RIZE first, then institutionals, then alpha. tradeweb-24x7 and sbc excluded.
+  // Priority: T-RIZE first, then institutionals. sbc + tradeweb-24x7 excluded.
+  const CEB_PRIORITY = [
+    't-rize','axa-im','banco-santander','bank-of-america','bank-of-china',
+    'bnp-paribas','bny','bp','broadridge','citi','credit-agricole',
+    'crypto-finance-ag','cumberland-sv','deloitte','digital-asset','dtcc',
+    'euroclear','euronext','fidelity','franklin-templeton','goldman-sachs',
+    'hkma','hsbc','kpmg','lloyds-banking-group','london-stock-exchange',
+    'luxembourg-stock-exchange','microsoft','moodys','nasdaq',
+    'sbi-digital-asset-holdings','shell-energy-north-america','société-générale','sg-forge',
+    'tradeweb','ubs','visa','wells-fargo'
+  ];
+
+  let cebAll = [];       // all entities sorted (priority first, then alpha)
+  let cebFiltered = [];  // after search+tag filter
+  let cebPage = 0;
+  let cebActiveTag = 'ALL';
+  let cebActiveBubble = null;
+
+  function cebSlugMatch(slug, priorities) {
+    // Exact match only — prevents 'sbc' matching 'hsbc', 'tradeweb' matching 'tradeweb-24x7', etc.
+    return priorities.indexOf(slug) !== -1;
+  }
+
+  function cebCleanText(raw) {
+    if (!raw) return '';
+    // Detect 404 pages — return empty so info box shows nothing
+    if (raw.indexOf("Page Not Found") !== -1 || raw.indexOf("doesn't exist or has been moved") !== -1) return '';
+    // Strip nav boilerplate up to the entity name paragraph
+    var t = raw.replace(/Canton Network[\s\S]*?Speak to an expert\n/,'');
+    // Strip roles/utilities at the end
+    t = t.replace(/\n(Network Utilities|Roles)[\s\S]*/,'');
+    // Strip URL lines
+    t = t.replace(/https?:\/\/\S+/g,'');
+    // Collapse multiple newlines
+    t = t.replace(/\n{3,}/g,'\n\n').trim();
+    return t;
+  }
+
+  function cebCleanTags(tags) {
+    var bad = /network util|roles\n|apps \(all\)|apps \(featured\)|no items found/i;
+    var seen = {};
+    return tags.filter(function(t) {
+      var clean = t.trim();
+      if (!clean || bad.test(clean) || clean.length > 40) return false;
+      // Deduplicate
+      var key = clean.toUpperCase();
+      if (seen[key]) return false;
+      seen[key] = true;
+      return true;
+    });
+  }
+
+  function cebSort(entities) {
+    var priority = [];
+    var rest = [];
+    entities.forEach(function(e) {
+      if (cebSlugMatch(e.slug, CEB_PRIORITY)) priority.push(e);
+      else rest.push(e);
+    });
+    // Sort priority by CEB_PRIORITY order — exact match only
+    priority.sort(function(a,b) {
+      var ai = CEB_PRIORITY.indexOf(a.slug);
+      var bi = CEB_PRIORITY.indexOf(b.slug);
+      return ai - bi;
+    });
+    // Sort rest alphabetically
+    rest.sort(function(a,b){ return a.name.localeCompare(b.name); });
+    return priority.concat(rest);
+  }
+
+  function cebBuildFilters(entities) {
+    var tagSet = {};
+    entities.forEach(function(e) {
+      cebCleanTags(e.tags||[]).forEach(function(t) {
+        tagSet[t.toUpperCase()] = true;
+      });
+    });
+    var tags = Object.keys(tagSet).sort();
+    var container = document.getElementById('ceb-filters');
+    // Keep the ALL button, add the rest
+    tags.forEach(function(tag) {
+      var btn = document.createElement('button');
+      btn.className = 'ceb-tag';
+      btn.dataset.tag = tag;
+      btn.textContent = tag;
+      btn.onclick = function(){ cebSetTag(btn); };
+      container.appendChild(btn);
+    });
+  }
+
+  window.cebSetTag = function(btn) {
+    document.querySelectorAll('.ceb-tag').forEach(function(b){ b.classList.remove('on'); });
+    btn.classList.add('on');
+    cebActiveTag = btn.dataset.tag;
+    cebPage = 0;
+    cebApplyFilter();
+  };
+
+  window.cebFilter = function() {
+    cebPage = 0;
+    cebApplyFilter();
+  };
+
+  function cebApplyFilter() {
+    var q = (document.getElementById('ceb-search').value||'').toLowerCase().trim();
+    cebFiltered = cebAll.filter(function(e) {
+      var matchTag = cebActiveTag === 'ALL' ||
+        cebCleanTags(e.tags||[]).some(function(t){ return t.toUpperCase() === cebActiveTag; });
+      var matchQ = !q ||
+        e.name.toLowerCase().includes(q) ||
+        (e.short_desc||'').toLowerCase().includes(q) ||
+        (e.detail_text||'').toLowerCase().includes(q);
+      return matchTag && matchQ;
+    });
+    cebRender();
+  }
+
+  function cebRender() {
+    var total = cebFiltered.length;
+    var pages = Math.ceil(total / CEB_PER_PAGE);
+    if (cebPage >= pages) cebPage = Math.max(0, pages - 1);
+    var start = cebPage * CEB_PER_PAGE;
+    var slice = cebFiltered.slice(start, start + CEB_PER_PAGE);
+
+    // Count
+    document.getElementById('ceb-count').textContent =
+      total + ' ' + (total === 1 ? 'entity' : 'entities') +
+      (total < cebAll.length ? ' (filtered)' : '');
+
+    // Build pagination HTML (shared between top and bottom)
+    function buildPagHtml() {
+      if (pages <= 1) return '';
+      var h = '<button class="ceb-pg-btn" onclick="cebGoPage('+(cebPage-1)+')" '+(cebPage===0?'disabled':'')+'>&#8592;</button>';
+      for (var i=0; i<pages; i++) {
+        h += '<button class="ceb-pg-btn'+(i===cebPage?' on':'')+'" onclick="cebGoPage('+i+')">'+(i+1)+'</button>';
+      }
+      h += '<button class="ceb-pg-btn" onclick="cebGoPage('+(cebPage+1)+')" '+(cebPage>=pages-1?'disabled':'')+'>&#8594;</button>';
+      return h;
+    }
+
+    // Top pagination
+    var pgTop = document.getElementById('ceb-pagination-top');
+    if (pgTop) pgTop.innerHTML = buildPagHtml();
+
+    // Grid
+    var grid = document.getElementById('ceb-grid');
+    grid.innerHTML = slice.map(function(e) {
+      var isPriority = cebSlugMatch(e.slug, CEB_PRIORITY);
+      // Fixed map for 283 known entities. New entities show initials until manually added.
+      var logoFile = CEB_FILES[e.slug];
+      var logoUrl = logoFile ? CEB_LOGO_BASE + logoFile : null;
+      var initials = e.name.split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
+      var logoHtml = logoUrl
+        ? '<div class="ceb-logo"><img src="' + logoUrl + '" alt="' + e.name + '" onerror="this.parentElement.className=\'ceb-logo initials\';this.parentElement.textContent=\'' + initials + '\'"/></div>'
+        : '<div class="ceb-logo initials">' + initials + '</div>';
+      return '<div class="ceb-bubble' + (isPriority ? ' priority' : '') + '" id="ceb-b-' + e.slug + '" onclick="cebPick(\'' + e.slug + '\')">'
+        + logoHtml
+        + '<div class="ceb-name">' + e.name + '</div>'
+        + '</div>';
+    }).join('');
+
+    // Bottom pagination
+    var pgEl = document.getElementById('ceb-pagination');
+    if (pgEl) pgEl.innerHTML = buildPagHtml();
+  }
+
+  window.cebGoPage = function(p) {
+    cebPage = p;
+    cebRender();
+  };
+
+  window.cebPick = function(slug) {
+    var e = cebAll.find(function(x){ return x.slug === slug; });
+    if (!e) return;
+
+    // Toggle
+    if (cebActiveBubble === slug) {
+      cebActiveBubble = null;
+      document.querySelectorAll('.ceb-bubble').forEach(function(b){ b.classList.remove('on'); });
+      var box = document.getElementById('ceb-box');
+      box.querySelector('.ib-prompt').style.display = '';
+      document.getElementById('ceb-title').style.display = 'none';
+      document.getElementById('ceb-text').style.display = 'none';
+      return;
+    }
+
+    cebActiveBubble = slug;
+    document.querySelectorAll('.ceb-bubble').forEach(function(b){ b.classList.remove('on'); });
+    var el = document.getElementById('ceb-b-' + slug);
+    if (el) el.classList.add('on');
+
+    var box = document.getElementById('ceb-box');
+    box.querySelector('.ib-prompt').style.display = 'none';
+    var titleEl = document.getElementById('ceb-title');
+    var textEl = document.getElementById('ceb-text');
+    titleEl.style.display = 'block';
+    textEl.style.display = 'block';
+
+    // Clean tags for display
+    var cleanTags = cebCleanTags(e.tags||[]);
+    var tagLine = cleanTags.length ? '<span style="font-family:\'DM Mono\',monospace;font-size:11px;color:#888;display:block;margin-bottom:10px;">' + cleanTags.join(' · ') + '</span>' : '';
+
+    titleEl.textContent = e.name;
+    var bodyText = cebCleanText(e.detail_text || '') || (e.short_desc || '');
+    // Remove entity name if it appears at start of text (duplicate with title)
+    if (bodyText.toLowerCase().startsWith(e.name.toLowerCase())) {
+      bodyText = bodyText.slice(e.name.length).replace(/^[\s\n\r]+/, '');
+    }
+    textEl.innerHTML = tagLine + bodyText.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+
+    box.scrollIntoView({behavior:'smooth', block:'nearest'});
+  };
+
+  // Load JSON and init
+  fetch(CEB_JSON)
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      data.forEach(function(e) {
+        e.tags = cebCleanTags(e.tags||[]);
+      });
+      cebAll = cebSort(data);
+      cebFiltered = cebAll.slice();
+      cebBuildFilters(cebAll);
+      cebRender();
+    })
+    .catch(function(err) {
+      document.getElementById('ceb-count').textContent = 'Could not load ecosystem data.';
+      console.error('CEB load error:', err);
+    });
+
+
+
+  /* ── CANTON CIPs ── */
+  var cipFiltered = CIPS.slice().reverse();
+  var cipActiveType = 'ALL';
+  var cipActiveStatus = 'ALL';
+  var cipActiveBubble = null;
+
+  function cipStatusClass(s) {
+    if (!s) return 'unknown';
+    return (s||'').toLowerCase().replace(/[^a-z]/g,'');
+  }
+
+  window.cipSetFilter = function(btn, group) {
+    document.querySelectorAll('[data-group="'+group+'"].ceb-tag').forEach(function(b){b.classList.remove('on');});
+    btn.classList.add('on');
+    if (group === 'type') cipActiveType = btn.dataset.filter;
+    else cipActiveStatus = btn.dataset.filter;
+    cipApplyFilter();
+  };
+
+  window.cipFilter = function() { cipApplyFilter(); };
+
+  function cipApplyFilter() {
+    cipPage = 0;
+    var q = (document.getElementById('cip-search').value||'').toLowerCase().trim();
+    cipFiltered = CIPS.slice().reverse().filter(function(c) {
+      var matchType = cipActiveType === 'ALL' || c.type === cipActiveType;
+      var matchStatus = cipActiveStatus === 'ALL' || c.status === cipActiveStatus;
+      var matchQ = !q ||
+        c.id.toLowerCase().includes(q) ||
+        c.title.toLowerCase().includes(q) ||
+        c.summary.toLowerCase().includes(q);
+      return matchType && matchStatus && matchQ;
+    });
+    cipRender();
+  }
+
+  var cipPage = 0;
+  var CIP_PER_PAGE = 12;
+
+  function cipBuildPag(pages) {
+    if (pages <= 1) return '';
+    var h = '<button class="ceb-pg-btn" onclick="cipGoPage('+(cipPage-1)+')" '+(cipPage===0?'disabled':'')+'>&#8592;</button>';
+    for (var i=0;i<pages;i++) {
+      h += '<button class="ceb-pg-btn'+(i===cipPage?' on':'')+'" onclick="cipGoPage('+i+')">'+(i+1)+'</button>';
+    }
+    h += '<button class="ceb-pg-btn" onclick="cipGoPage('+(cipPage+1)+')" '+(cipPage>=pages-1?'disabled':'')+'>&#8594;</button>';
+    return h;
+  }
+
+  window.cipGoPage = function(p) { cipPage = p; cipRender(); };
+
+  function cipRender() {
+    var count = cipFiltered.length;
+    document.getElementById('cip-count').textContent = '';
+    var pages = Math.max(1, Math.ceil(count / CIP_PER_PAGE));
+    if (cipPage >= pages) cipPage = pages - 1;
+    var start = cipPage * CIP_PER_PAGE;
+    var slice = cipFiltered.slice(start, start + CIP_PER_PAGE);
+
+    var pagHtml = cipBuildPag(pages);
+    var topEl = document.getElementById('cip-pagination-top');
+    var botEl = document.getElementById('cip-pagination-bot');
+    if (topEl) topEl.innerHTML = pagHtml;
+    if (botEl) botEl.innerHTML = pagHtml;
+
+    var grid = document.getElementById('cip-grid');
+    grid.innerHTML = slice.map(function(c) {
+      var sc = cipStatusClass(c.status);
+      return '<div class="cip-bubble" data-cipid="'+c.id+'" id="cip-b-'+c.number+'">'+
+        '<div class="cip-id">'+c.id+'</div>'+
+        '<div class="cip-title">'+c.title+'</div>'+
+        '<div class="cip-tags">'+
+          '<span class="cip-status-badge cip-status-'+sc+'">'+c.status+'</span>'+
+          (c.type ? '<span class="cip-type">'+c.type+'</span>' : '')+
+        '</div>'+
+        '</div>';
+    }).join('');
+    // Attach click handlers via event delegation
+    grid.onclick = function(e) {
+      var bubble = e.target.closest('[data-cipid]');
+      if (bubble) cipPick(bubble.dataset.cipid);
+    };
+    // Restore active state
+    if (cipActiveBubble) {
+      var el = grid.querySelector('[data-cipid="'+cipActiveBubble+'"]');
+      if (el) el.classList.add('on');
+    }
+  }
+
+  window.cipPick = function(id) {
+    var c = CIPS.find(function(x){return x.id===id;});
+    if (!c) return;
+
+    if (cipActiveBubble === id) {
+      cipActiveBubble = null;
+      document.querySelectorAll('.cip-bubble').forEach(function(b){b.classList.remove('on');});
+      document.getElementById('cip-box').style.display = 'none';
+      return;
+    }
+    cipActiveBubble = id;
+    document.querySelectorAll('.cip-bubble').forEach(function(b){b.classList.remove('on');});
+    var el = document.getElementById('cip-b-'+c.number);
+    if (el) el.classList.add('on');
+
+    var sc = cipStatusClass(c.status);
+    var box = document.getElementById('cip-box');
+    var titleEl = document.getElementById('cip-detail-title');
+    var bodyEl = document.getElementById('cip-detail-body');
+
+    titleEl.textContent = c.id + ' — ' + c.title;
+
+    var summaryText = document.createElement('p');
+    summaryText.className = 'ib-text';
+    summaryText.style.display = 'block';
+    summaryText.style.marginBottom = '16px';
+    summaryText.textContent = c.summary;
+
+    var metaDiv = document.createElement('div');
+    metaDiv.style.fontFamily = 'DM Mono, monospace';
+    metaDiv.style.fontSize = '12px';
+    metaDiv.style.color = '#888';
+    metaDiv.style.lineHeight = '2';
+
+    var sc2 = cipStatusClass(c.status);
+    var badge = '<span class="cip-status-badge cip-status-'+sc2+'">'+c.status+'</span>';
+    var typeTag = c.type ? ' <span class="cip-type">'+c.type+'</span>' : '';
+    var created = c.created ? '<div>Created: <span style="color:#333">'+c.created+'</span></div>' : '';
+    var ref = '<div>Source: <span style="color:#333"><a href="https://github.com/canton-foundation/cips/tree/main/'+c.id.toLowerCase()+'" target="_blank" style="color:var(--navy)">github.com/canton-foundation/cips</a></span></div>';
+    metaDiv.innerHTML = created + ref;
+
+    bodyEl.innerHTML = '<div style="margin-bottom:14px">'+badge+typeTag+'</div>';
+    bodyEl.appendChild(summaryText);
+    bodyEl.appendChild(metaDiv);
+
+    box.style.display = 'block';
+    box.scrollIntoView({behavior:'smooth', block:'nearest'});
+  };
+
+    cipRender();
+
+  /* ── CANTON GOVERNANCE ── */
+  const GOV_API = 'https://lighthouse.cantonloop.com/api';
+  const GOV_PER_PAGE = 20;
+  let govAll = [];
+  let govFiltered = [];
+  let govPage = 0;
+  let govStatus = 'ALL';
+  let govActive = null;
+
+  function govStatusClass(s) {
+    if (!s) return '';
+    var m = {inprogress:'inprogress', executed:'executed', rejected:'rejected', expired:'expired'};
+    return m[(s||'').toLowerCase().replace(/\s/,'')] || '';
+  }
+
+  function govFormatDate(d) {
+    if (!d) return '—';
+    try { return new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+    catch(e) { return d.slice(0,10); }
+  }
+
+  function govVotePct(accept, total) {
+    if (!total) return 0;
+    return Math.round(accept / total * 100);
+  }
+
+  window.govSetStatus = function(btn) {
+    document.querySelectorAll('.gov-filter-btns .ceb-tag').forEach(function(b){b.classList.remove('on');});
+    btn.classList.add('on');
+    govStatus = btn.dataset.status;
+    govPage = 0;
+    govApplyFilter();
+  };
+
+  window.govFilter = function() {
+    govPage = 0;
+    govApplyFilter();
+  };
+
+  function govApplyFilter() {
+    var q = (document.getElementById('gov-search').value||'').toLowerCase().trim();
+    govFiltered = govAll.filter(function(r) {
+      var matchStatus = govStatus === 'ALL' || (r.status||'') === govStatus;
+      var matchQ = !q ||
+        (r.title||'').toLowerCase().includes(q) ||
+        (r.description||'').toLowerCase().includes(q) ||
+        String(r.id||'').includes(q);
+      return matchStatus && matchQ;
+    });
+    govRender();
+  }
+
+  function govBuildPag(pages) {
+    if (pages <= 1) return '';
+    var h = '<button class="ceb-pg-btn" onclick="govGoPage('+(govPage-1)+')" '+(govPage===0?'disabled':'')+'>&#8592;</button>';
+    for (var i=0;i<pages;i++) {
+      h += '<button class="ceb-pg-btn'+(i===govPage?' on':'')+'" onclick="govGoPage('+i+')">'+(i+1)+'</button>';
+    }
+    h += '<button class="ceb-pg-btn" onclick="govGoPage('+(govPage+1)+')" '+(govPage>=pages-1?'disabled':'')+'>&#8594;</button>';
+    return h;
+  }
+
+  function govRender() {
+    var total = govFiltered.length;
+    var pages = Math.max(1, Math.ceil(total / GOV_PER_PAGE));
+    if (govPage >= pages) govPage = pages - 1;
+    var start = govPage * GOV_PER_PAGE;
+    var slice = govFiltered.slice(start, start + GOV_PER_PAGE);
+
+    document.getElementById('gov-count').textContent =
+      total + ' proposal' + (total !== 1 ? 's' : '') + (total < govAll.length ? ' (filtered)' : '');
+
+    document.getElementById('gov-pagination-top').innerHTML = govBuildPag(pages);
+    document.getElementById('gov-pagination').innerHTML = govBuildPag(pages);
+
+    var tbody = document.getElementById('gov-tbody');
+    tbody.innerHTML = slice.map(function(r) {
+      var sc = govStatusClass(r.status);
+      var totalVotes = (r.accept_votes||0) + (r.reject_votes||0);
+      var pct = govVotePct(r.accept_votes||0, totalVotes);
+      var barHtml = totalVotes > 0
+        ? '<div class="gov-vote-bar"><div class="gov-bar"><div class="gov-bar-fill accept" style="width:'+pct+'%"></div></div><span style="color:#1a7a4a;font-weight:700">'+pct+'%</span></div>'
+        : '<span style="color:#ccc">—</span>';
+      var rejectBar = totalVotes > 0
+        ? '<div class="gov-vote-bar"><div class="gov-bar"><div class="gov-bar-fill reject" style="width:'+(100-pct)+'%"></div></div><span style="color:#a02020;font-weight:700">'+(100-pct)+'%</span></div>'
+        : '<span style="color:#ccc">—</span>';
+      return '<tr data-id="'+r.id+'" onclick="govPick(\''+r.id+'\')">'+
+        '<td style="max-width:480px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(r.title||'—')+'</td>'+
+        '<td><span class="gov-status '+sc+'">'+(r.status||'—')+'</span></td>'+
+        '<td>'+barHtml+'</td>'+
+        '<td>'+rejectBar+'</td>'+
+        '<td style="color:#888;white-space:nowrap;">'+govFormatDate(r.created_at||r.date||r.effective_at)+'</td>'+
+        '</tr>';
+    }).join('');
+  }
+
+  window.govGoPage = function(p) {
+    govPage = p;
+    govRender();
+  };
+
+  window.govPick = function(id) {
+    // Toggle
+    if (govActive === id) {
+      govActive = null;
+      document.querySelectorAll('#gov-tbody tr').forEach(function(r){r.classList.remove('on');});
+      document.getElementById('gov-box').style.display = 'none';
+      return;
+    }
+    govActive = id;
+    document.querySelectorAll('#gov-tbody tr').forEach(function(r){r.classList.remove('on');});
+    var row = document.querySelector('#gov-tbody tr[data-id="'+id+'"]');
+    if (row) row.classList.add('on');
+
+    var r = govAll.find(function(x){return x.id === id;});
+    if (!r) return;
+
+    var box = document.getElementById('gov-box');
+    var titleEl = document.getElementById('gov-detail-title');
+    var bodyEl = document.getElementById('gov-detail-body');
+    var sc = govStatusClass(r.status);
+    var totalVotes = (r.accept_votes||0) + (r.reject_votes||0);
+    var pct = govVotePct(r.accept_votes||0, totalVotes);
+
+    titleEl.textContent = r.requester || 'Vote Request';
+    bodyEl.innerHTML =
+      '<div style="margin-bottom:14px;display:flex;align-items:center;gap:12px;">'+
+        '<span class="gov-status '+sc+'">'+(r.status||'')+'</span>'+
+        (r.requester ? '<span style="font-family:\'DM Mono\',monospace;font-size:12px;color:#888;">Requested by '+r.requester+'</span>' : '')+
+      '</div>'+
+      '<div class="gov-detail-grid">'+
+        '<div class="gov-detail-stat"><div class="gov-detail-stat-val gov-green">'+(r.accept_votes||0)+'</div><div class="gov-detail-stat-label">Accept Votes</div></div>'+
+        '<div class="gov-detail-stat"><div class="gov-detail-stat-val gov-red">'+(r.reject_votes||0)+'</div><div class="gov-detail-stat-label">Reject Votes</div></div>'+
+        '<div class="gov-detail-stat"><div class="gov-detail-stat-val">'+totalVotes+'</div><div class="gov-detail-stat-label">Total Votes</div></div>'+
+      '</div>'+
+      (r.description ? '<p style="font-family:\'DM Mono\',monospace;font-size:13px;color:#222;line-height:1.8;margin-bottom:16px;text-align:justify;">'+r.description.replace(/\n/g,'<br>')+'</p>' : '')+
+      '<div class="gov-detail-meta">'+
+        (r.created_at ? '<div>Created: <span>'+govFormatDate(r.created_at)+'</span></div>' : '')+
+        (r.vote_before ? '<div>Vote before: <span>'+govFormatDate(r.vote_before)+'</span></div>' : '')+
+        (r.target_effective_at ? '<div>Effective: <span>'+govFormatDate(r.target_effective_at)+'</span></div>' : '')+
+        (r.reason_url ? '<div>Reference: <span><a href="'+r.reason_url+'" target="_blank" style="color:var(--navy);">'+r.reason_url.replace(/https?:\/\//,'').slice(0,60)+'…</a></span></div>' : '')+
+      '</div>';
+
+    box.style.display = 'block';
+    box.scrollIntoView({behavior:'smooth', block:'nearest'});
+  };
+
+  // Init governance
+  function govInit() {
+    var loadEl = document.getElementById('gov-loading');
+    Promise.all([
+      fetch(GOV_API + '/governance/stats').then(function(r){return r.json();}),
+      fetch(GOV_API + '/governance').then(function(r){return r.json();})
+    ]).then(function(results) {
+      var stats = results[0];
+      var data = results[1];
+
+      // Stats bar
+      document.getElementById('gs-total').textContent = stats.total_requests || 0;
+      document.getElementById('gs-executed').textContent = stats.executed_count || 0;
+      document.getElementById('gs-progress').textContent = stats.in_progress_count || 0;
+      document.getElementById('gs-rejected').textContent = stats.rejected_count || 0;
+      document.getElementById('gs-votes').textContent = (stats.total_votes||0).toLocaleString();
+      document.getElementById('gs-accept').textContent = (stats.total_accept_votes||0).toLocaleString();
+      document.getElementById('gs-reject').textContent = (stats.total_reject_votes||0).toLocaleString();
+
+      // List - handle both array and {vote_requests:[...]} shapes
+      govAll = Array.isArray(data) ? data : (data.vote_requests || data.results || data.items || data.data || []);
+      // Map fields - reason_body is the title, id is the hash
+      govAll = govAll.map(function(r) {
+        return {
+          id: r.id,
+          title: (r.reason_body||'').slice(0,120) + ((r.reason_body||'').length>120?'…':''),
+          description: r.reason_body || '',
+          status: r.status ? (r.status==='in_progress'?'InProgress': r.status.charAt(0).toUpperCase()+r.status.slice(1)) : '',
+          accept_votes: r.accept_votes||0,
+          reject_votes: r.reject_votes||0,
+          total_votes: r.total_votes||0,
+          created_at: r.created_at||'',
+          requester: r.requester||'',
+          reason_url: r.reason_url||'',
+          vote_before: r.vote_before||'',
+          target_effective_at: r.target_effective_at||''
+        };
+      });
+      // Sort: in_progress first, then by id desc
+      govAll.sort(function(a,b){
+        var ap = (a.status||'').toLowerCase()==='inprogress'?0:1;
+        var bp = (b.status||'').toLowerCase()==='inprogress'?0:1;
+        if (ap !== bp) return ap - bp;
+        return (b.created_at||'').localeCompare(a.created_at||'');
+      });
+      govFiltered = govAll.slice();
+      if (loadEl) loadEl.style.display = 'none';
+      govRender();
+    }).catch(function(err) {
+      if (loadEl) loadEl.textContent = 'Could not load governance data.';
+      console.error('GOV error:', err);
+    });
+  }
+
+  govInit();
+
+}); // end DOMContentLoaded
+</script>
+</body>
+</html>

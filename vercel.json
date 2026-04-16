@@ -7,6 +7,7 @@
     { "src": "/cc-data-hub", "dest": "/cc-data-hub.html" },
     { "src": "/hub", "dest": "/hub.html" },
     { "src": "/ecosystem", "dest": "/ecosystem.html" },
+    { "src": "/canton-hub", "dest": "/canton-hub.html" },
     { "src": "/admin", "dest": "/admin.html" }
   ]
 }
