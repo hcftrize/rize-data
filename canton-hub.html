@@ -865,19 +865,15 @@ document.addEventListener("DOMContentLoaded", function() {
     return (s||'').toLowerCase().replace(/[^a-z]/g,'');
   }
 
-  var CIP_PER_PAGE = 12;
-  var cipPage = 0;
-
   window.cipSetFilter = function(btn, group) {
     document.querySelectorAll('[data-group="'+group+'"].ceb-tag').forEach(function(b){b.classList.remove('on');});
     btn.classList.add('on');
     if (group === 'type') cipActiveType = btn.dataset.filter;
     else cipActiveStatus = btn.dataset.filter;
-    cipPage = 0;
     cipApplyFilter();
   };
 
-  window.cipFilter = function() { cipPage = 0; cipApplyFilter(); };
+  window.cipFilter = function() { cipApplyFilter(); };
 
   function cipApplyFilter() {
     var q = (document.getElementById('cip-search').value||'').toLowerCase().trim();
@@ -892,6 +888,9 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     cipRender();
   }
+
+  var CIP_PER_PAGE = 12;
+  var cipPage = 0;
 
   function cipBuildPag(pages) {
     if (pages <= 1) return '';
