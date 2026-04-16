@@ -865,6 +865,9 @@ document.addEventListener("DOMContentLoaded", function() {
     return (s||'').toLowerCase().replace(/[^a-z]/g,'');
   }
 
+  var CIP_PER_PAGE = 12;
+  var cipPage = 0;
+
   window.cipSetFilter = function(btn, group) {
     document.querySelectorAll('[data-group="'+group+'"].ceb-tag').forEach(function(b){b.classList.remove('on');});
     btn.classList.add('on');
@@ -889,9 +892,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     cipRender();
   }
-
-  var CIP_PER_PAGE = 12;
-  var cipPage = 0;
 
   function cipBuildPag(pages) {
     if (pages <= 1) return '';
