@@ -212,7 +212,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     <a href="/hub" class="back-to-hub">&larr; Back to RIZE Data Hub</a>
     <span class="eco-eyebrow" style="font-size:14px;letter-spacing:2px">RIZE Community Learn Center</span>
     <h1>Canton Ecosystem Hub</h1>
-    <p>Explore the full institutional ecosystem behind T-RIZE — partners, Canton Network members, Foundation board, and live RWA deals. Click on any entity to learn more.</p>
+    <p>Explore the full Canton Network ecosystem — 283 ecosystem partners, premier members, Foundation board, and live on-chain governance. Click on any entity to learn more.</p>
   </div>
 </div>
 
@@ -355,8 +355,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
       <table class="gov-table" id="gov-table">
         <thead>
           <tr>
-            <th style="width:60px">#</th>
-            <th>Title</th>
+                        <th>Title</th>
             <th style="width:110px">Status</th>
             <th style="width:90px">Accept</th>
             <th style="width:90px">Reject</th>
@@ -884,8 +883,7 @@ document.addEventListener("DOMContentLoaded", function() {
         ? '<div class="gov-vote-bar"><div class="gov-bar"><div class="gov-bar-fill reject" style="width:'+(100-pct)+'%"></div></div><span style="color:#a02020;font-weight:700">'+(100-pct)+'%</span></div>'
         : '<span style="color:#ccc">—</span>';
       return '<tr data-id="'+r.id+'" onclick="govPick(\''+r.id+'\')">'+
-        '<td>'+r.id.slice(0,8)+'&hellip;</td>'+
-        '<td style="max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span style="color:#888;font-size:11px;margin-right:6px;">'+(r.requester||'')+'</span>'+(r.title||'—')+'</td>'+
+        '<td style="max-width:480px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(r.title||'—')+'</td>'+
         '<td><span class="gov-status '+sc+'">'+(r.status||'—')+'</span></td>'+
         '<td>'+barHtml+'</td>'+
         '<td>'+rejectBar+'</td>'+
@@ -912,46 +910,37 @@ document.addEventListener("DOMContentLoaded", function() {
     var row = document.querySelector('#gov-tbody tr[data-id="'+id+'"]');
     if (row) row.classList.add('on');
 
-    // Load detail
+    var r = govAll.find(function(x){return x.id === id;});
+    if (!r) return;
+
     var box = document.getElementById('gov-box');
     var titleEl = document.getElementById('gov-detail-title');
     var bodyEl = document.getElementById('gov-detail-body');
-    titleEl.textContent = 'Loading…';
-    bodyEl.innerHTML = '';
+    var sc = govStatusClass(r.status);
+    var totalVotes = (r.accept_votes||0) + (r.reject_votes||0);
+    var pct = govVotePct(r.accept_votes||0, totalVotes);
+
+    titleEl.textContent = r.requester || 'Vote Request';
+    bodyEl.innerHTML =
+      '<div style="margin-bottom:14px;display:flex;align-items:center;gap:12px;">'+
+        '<span class="gov-status '+sc+'">'+(r.status||'')+'</span>'+
+        (r.requester ? '<span style="font-family:\'DM Mono\',monospace;font-size:12px;color:#888;">Requested by '+r.requester+'</span>' : '')+
+      '</div>'+
+      '<div class="gov-detail-grid">'+
+        '<div class="gov-detail-stat"><div class="gov-detail-stat-val gov-green">'+(r.accept_votes||0)+'</div><div class="gov-detail-stat-label">Accept Votes</div></div>'+
+        '<div class="gov-detail-stat"><div class="gov-detail-stat-val gov-red">'+(r.reject_votes||0)+'</div><div class="gov-detail-stat-label">Reject Votes</div></div>'+
+        '<div class="gov-detail-stat"><div class="gov-detail-stat-val">'+totalVotes+'</div><div class="gov-detail-stat-label">Total Votes</div></div>'+
+      '</div>'+
+      (r.description ? '<p style="font-family:\'DM Mono\',monospace;font-size:13px;color:#222;line-height:1.8;margin-bottom:16px;text-align:justify;">'+r.description.replace(/\n/g,'<br>')+'</p>' : '')+
+      '<div class="gov-detail-meta">'+
+        (r.created_at ? '<div>Created: <span>'+govFormatDate(r.created_at)+'</span></div>' : '')+
+        (r.vote_before ? '<div>Vote before: <span>'+govFormatDate(r.vote_before)+'</span></div>' : '')+
+        (r.target_effective_at ? '<div>Effective: <span>'+govFormatDate(r.target_effective_at)+'</span></div>' : '')+
+        (r.reason_url ? '<div>Reference: <span><a href="'+r.reason_url+'" target="_blank" style="color:var(--navy);">'+r.reason_url.replace(/https?:\/\//,'').slice(0,60)+'…</a></span></div>' : '')+
+      '</div>';
+
     box.style.display = 'block';
     box.scrollIntoView({behavior:'smooth', block:'nearest'});
-
-    fetch(GOV_API + '/governance/' + id)
-      .then(function(r){return r.json();})
-      .then(function(d) {
-        var totalVotes = (d.accept_votes||0) + (d.reject_votes||0);
-        var pct = govVotePct(d.accept_votes||0, totalVotes);
-        var sc = govStatusClass(d.status);
-        titleEl.textContent = d.title || d.description || 'Proposal #'+id;
-        bodyEl.innerHTML =
-          '<div style="margin-bottom:12px"><span class="gov-status '+sc+'">'+(d.status||'')+'</span></div>'+
-          '<div class="gov-detail-grid">'+
-            '<div class="gov-detail-stat"><div class="gov-detail-stat-val gov-green">'+(d.accept_votes||0)+'</div><div class="gov-detail-stat-label">Accept Votes</div></div>'+
-            '<div class="gov-detail-stat"><div class="gov-detail-stat-val gov-red">'+(d.reject_votes||0)+'</div><div class="gov-detail-stat-label">Reject Votes</div></div>'+
-            '<div class="gov-detail-stat"><div class="gov-detail-stat-val">'+totalVotes+'</div><div class="gov-detail-stat-label">Total Votes</div></div>'+
-          '</div>'+
-          '<div class="gov-detail-meta">'+
-            (d.description && d.description !== d.title ? '<p style="font-family:\'DM Mono\',monospace;font-size:13px;color:#333;line-height:1.7;margin-bottom:16px;">'+d.description+'</p>' : '')+
-            (d.effective_at ? '<div>Effective: <span>'+govFormatDate(d.effective_at)+'</span></div>' : '')+
-            (d.created_at ? '<div>Created: <span>'+govFormatDate(d.created_at)+'</span></div>' : '')+
-            (d.expires_at ? '<div>Expires: <span>'+govFormatDate(d.expires_at)+'</span></div>' : '')+
-            (d.proposal_type ? '<div>Type: <span>'+d.proposal_type+'</span></div>' : '')+
-          '</div>'+
-          '<div style="margin-top:16px;font-family:\'DM Mono\',monospace;font-size:11px;color:#aaa;">Source: <a href="https://lighthouse.cantonloop.com/governance/'+id+'" target="_blank" style="color:var(--navy);">View on 5N Lighthouse</a></div>';
-      })
-      .catch(function() {
-        // Fallback to list data
-        var r = govAll.find(function(x){return String(x.id)===String(id);});
-        if (r) {
-          titleEl.textContent = r.title || r.description || 'Proposal #'+id;
-          bodyEl.innerHTML = '<p style="font-family:\'DM Mono\',monospace;font-size:13px;color:#666;">Status: '+(r.status||'—')+'</p>';
-        }
-      });
   };
 
   // Init governance
