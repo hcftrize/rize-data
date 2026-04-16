@@ -94,6 +94,33 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 @media(max-width:900px){.slider-page{grid-template-columns:repeat(2,1fr);}.team-grid{grid-template-columns:repeat(3,1fr);}.deals-grid{grid-template-columns:1fr;}}
 @media(max-width:600px){.eco-wrap{padding:20px 12px 60px;}.eco-hero{padding:32px 16px;}.lc-header{padding:18px 16px 0;}.slider-wrap{padding:14px 16px 0;}.slider-controls{padding:10px 16px 0;}.info-box{margin:14px 16px 20px;padding:18px 16px;}.team-section{padding:14px 16px 0;}.team-grid{grid-template-columns:repeat(2,1fr);}.deals-grid{padding:14px 16px 0;}.photo-credit{padding:8px 16px 12px;}}
 
+/* ═══════ CANTON ECOSYSTEM BROWSER ═══════ */
+.ceb-controls{padding:20px 32px 0;display:flex;flex-direction:column;gap:12px;}
+.ceb-search{font-family:'DM Mono',monospace;font-size:13px;padding:10px 16px;border:1px solid #dde4ed;background:#fff;color:#111;outline:none;width:100%;max-width:420px;transition:border-color 0.2s;}
+.ceb-search:focus{border-color:var(--navy);}
+.ceb-filters{display:flex;flex-wrap:wrap;gap:6px;}
+.ceb-tag{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:4px 12px;border:1px solid #dde4ed;background:#fff;color:#666;cursor:pointer;transition:all 0.15s;}
+.ceb-tag:hover{border-color:var(--navy);color:var(--navy);}
+.ceb-tag.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+.ceb-count{padding:12px 32px 0;font-family:'DM Mono',monospace;font-size:11px;color:#aaa;letter-spacing:0.5px;}
+.ceb-grid{padding:16px 32px 0;display:grid;grid-template-columns:repeat(6,1fr);gap:12px;}
+.ceb-bubble{display:flex;flex-direction:column;align-items:center;padding:14px 8px;border:1px solid #e8e8e8;cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s;text-align:center;background:#fafafa;min-height:110px;justify-content:center;}
+.ceb-bubble:hover{border-color:var(--navy);box-shadow:0 2px 8px rgba(13,45,78,0.08);}
+.ceb-bubble.on{border-color:var(--navy);background:#eef3f8;}
+.ceb-bubble.priority{border-color:#b8cce0;}
+.ceb-logo{width:56px;height:56px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;margin-bottom:8px;background:#f0f0f0;border:1px solid #e0e0e0;flex-shrink:0;}
+.ceb-logo img{width:100%;height:100%;object-fit:contain;padding:6px;border-radius:50%;}
+.ceb-logo.dark{background:#111;border-color:#333;}
+.ceb-logo.initials{background:var(--navy);font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#fff;}
+.ceb-name{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:#000;line-height:1.2;}
+.ceb-pagination{display:flex;align-items:center;justify-content:center;gap:4px;padding:20px 32px 8px;}
+.ceb-pg-btn{min-width:32px;height:32px;padding:0 8px;border:1px solid #dde4ed;background:#fff;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--navy);transition:all 0.15s;display:flex;align-items:center;justify-content:center;}
+.ceb-pg-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+.ceb-pg-btn.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+.ceb-pg-btn:disabled{opacity:0.25;cursor:not-allowed;}
+@media(max-width:900px){.ceb-grid{grid-template-columns:repeat(3,1fr);}.ceb-controls,.ceb-count,.ceb-grid,.ceb-pagination{padding-left:16px;padding-right:16px;}}
+@media(max-width:600px){.ceb-grid{grid-template-columns:repeat(2,1fr);}}
+
 /* ═══════ RIZE NETWORK MAP STYLES ═══════ */
 .rn-map-area{margin:20px 0 0;background:#fff;border-top:1px solid #dde4ed;position:relative;overflow:hidden;}
 #rn-svg{display:block;width:100%;}
@@ -460,7 +487,45 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
   </div><!-- end lc-body -->
 </div>
 
-</div><!-- end eco-wrap -->
+<!-- ── CONTAINER 5: CANTON ECOSYSTEM BROWSER ── -->
+<div class="lc" id="ceb-lc">
+  <div class="lc-header" onclick="toggleLc('ceb-lc')">
+    <div class="lc-header-text">
+      <h2>Canton Network Ecosystem</h2>
+      <p>283 partners, validators, applications and institutions building on the Canton Network</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="lc-body" id="ceb-lc-body">
+
+    <!-- Search + Filters -->
+    <div class="ceb-controls">
+      <input class="ceb-search" id="ceb-search" type="text" placeholder="Search entities…" oninput="cebFilter()"/>
+      <div class="ceb-filters" id="ceb-filters">
+        <button class="ceb-tag on" data-tag="ALL" onclick="cebSetTag(this)">All</button>
+      </div>
+    </div>
+
+    <!-- Count -->
+    <div class="ceb-count" id="ceb-count"></div>
+
+    <!-- Grid -->
+    <div class="ceb-grid" id="ceb-grid"></div>
+
+    <!-- Pagination -->
+    <div class="ceb-pagination" id="ceb-pagination"></div>
+
+    <!-- Info box -->
+    <div class="info-box" id="ceb-box">
+      <p class="ib-prompt">Click on any entity to learn about their role in the Canton ecosystem.</p>
+      <div class="ib-title" id="ceb-title"></div>
+      <div class="ib-text" id="ceb-text"></div>
+    </div>
+
+  </div><!-- end lc-body -->
+</div>
+
+
 
 <footer class="site-footer">
   <div class="footer-logo"><img src="data:image/png;base64,PLACEHOLDER" alt="Tokerize"/></div>
@@ -731,6 +796,231 @@ document.addEventListener("DOMContentLoaded", function() {
   buildSlider('board',BOARD,true);
   buildTeam();
   buildDeals();
+
+  /* ═══════════════════════════════════════════════════
+     CANTON ECOSYSTEM BROWSER
+  ═══════════════════════════════════════════════════ */
+  const CEB_JSON = 'https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/canton-ecosystem/entities.json';
+  const CEB_LOGO_BASE = 'https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/canton-ecosystem/';
+  const CEB_PER_PAGE = 48;
+
+  // Priority order — these appear first, in this exact order
+  const CEB_PRIORITY = [
+    't-rize','axa-im','banco-santander','bank-of-america','bank-of-china',
+    'bnp-paribas','bny','bp','broadridge','citi','credit-agricole',
+    'crypto-finance-ag','cumberland-sv','deloitte','digital-asset','dtcc',
+    'euroclear','euronext','fidelity','franklin-templeton','goldman-sachs',
+    'hkma','hsbc','kpmg','lloyds-banking-group','london-stock-exchange',
+    'luxembourg-stock-exchange','microsoft','moodys','nasdaq',
+    'sbi-digital-asset-holdings','shell','societe-generale','sg-forge',
+    'tradeweb','ubs','visa','wells-fargo'
+  ];
+
+  let cebAll = [];       // all entities sorted (priority first, then alpha)
+  let cebFiltered = [];  // after search+tag filter
+  let cebPage = 0;
+  let cebActiveTag = 'ALL';
+  let cebActiveBubble = null;
+
+  function cebSlugMatch(slug, priorities) {
+    // fuzzy match: slug contains priority key or vice versa
+    return priorities.some(function(p) {
+      return slug.includes(p) || p.includes(slug);
+    });
+  }
+
+  function cebCleanText(raw) {
+    if (!raw) return '';
+    // Strip nav boilerplate up to the entity name paragraph
+    var t = raw.replace(/Canton Network[\s\S]*?Speak to an expert\n/,'');
+    // Strip roles/utilities at the end
+    t = t.replace(/\n(Network Utilities|Roles)[\s\S]*/,'');
+    // Strip URL lines
+    t = t.replace(/https?:\/\/\S+/g,'');
+    // Collapse multiple newlines
+    t = t.replace(/\n{3,}/g,'\n\n').trim();
+    return t;
+  }
+
+  function cebCleanTags(tags) {
+    var bad = /network util|roles\n|apps \(all\)|apps \(featured\)|no items found/i;
+    var seen = {};
+    return tags.filter(function(t) {
+      var clean = t.trim();
+      if (!clean || bad.test(clean) || clean.length > 40) return false;
+      // Deduplicate
+      var key = clean.toUpperCase();
+      if (seen[key]) return false;
+      seen[key] = true;
+      return true;
+    });
+  }
+
+  function cebSort(entities) {
+    var priority = [];
+    var rest = [];
+    entities.forEach(function(e) {
+      if (cebSlugMatch(e.slug, CEB_PRIORITY)) priority.push(e);
+      else rest.push(e);
+    });
+    // Sort priority by CEB_PRIORITY order
+    priority.sort(function(a,b) {
+      var ai = CEB_PRIORITY.findIndex(function(p){ return a.slug.includes(p)||p.includes(a.slug); });
+      var bi = CEB_PRIORITY.findIndex(function(p){ return b.slug.includes(p)||p.includes(b.slug); });
+      return ai - bi;
+    });
+    // Sort rest alphabetically
+    rest.sort(function(a,b){ return a.name.localeCompare(b.name); });
+    return priority.concat(rest);
+  }
+
+  function cebBuildFilters(entities) {
+    var tagSet = {};
+    entities.forEach(function(e) {
+      cebCleanTags(e.tags||[]).forEach(function(t) {
+        tagSet[t.toUpperCase()] = true;
+      });
+    });
+    var tags = Object.keys(tagSet).sort();
+    var container = document.getElementById('ceb-filters');
+    // Keep the ALL button, add the rest
+    tags.forEach(function(tag) {
+      var btn = document.createElement('button');
+      btn.className = 'ceb-tag';
+      btn.dataset.tag = tag;
+      btn.textContent = tag;
+      btn.onclick = function(){ cebSetTag(btn); };
+      container.appendChild(btn);
+    });
+  }
+
+  window.cebSetTag = function(btn) {
+    document.querySelectorAll('.ceb-tag').forEach(function(b){ b.classList.remove('on'); });
+    btn.classList.add('on');
+    cebActiveTag = btn.dataset.tag;
+    cebPage = 0;
+    cebApplyFilter();
+  };
+
+  window.cebFilter = function() {
+    cebPage = 0;
+    cebApplyFilter();
+  };
+
+  function cebApplyFilter() {
+    var q = (document.getElementById('ceb-search').value||'').toLowerCase().trim();
+    cebFiltered = cebAll.filter(function(e) {
+      var matchTag = cebActiveTag === 'ALL' ||
+        cebCleanTags(e.tags||[]).some(function(t){ return t.toUpperCase() === cebActiveTag; });
+      var matchQ = !q ||
+        e.name.toLowerCase().includes(q) ||
+        (e.short_desc||'').toLowerCase().includes(q) ||
+        (e.detail_text||'').toLowerCase().includes(q);
+      return matchTag && matchQ;
+    });
+    cebRender();
+  }
+
+  function cebRender() {
+    var total = cebFiltered.length;
+    var pages = Math.ceil(total / CEB_PER_PAGE);
+    if (cebPage >= pages) cebPage = Math.max(0, pages - 1);
+    var start = cebPage * CEB_PER_PAGE;
+    var slice = cebFiltered.slice(start, start + CEB_PER_PAGE);
+
+    // Count
+    document.getElementById('ceb-count').textContent =
+      total + ' ' + (total === 1 ? 'entity' : 'entities') +
+      (total < cebAll.length ? ' (filtered)' : '');
+
+    // Grid
+    var grid = document.getElementById('ceb-grid');
+    grid.innerHTML = slice.map(function(e) {
+      var isPriority = cebSlugMatch(e.slug, CEB_PRIORITY);
+      var logoUrl = e.logo_cdn
+        ? e.logo_cdn
+        : (e.logo_local ? CEB_LOGO_BASE + e.logo_local.replace(/\\/g,'/') : '');
+      var initials = e.name.split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
+      var logoHtml = logoUrl
+        ? '<div class="ceb-logo"><img src="' + logoUrl + '" alt="' + e.name + '" onerror="this.parentElement.className=\'ceb-logo initials\';this.parentElement.textContent=\'' + initials + '\'"/></div>'
+        : '<div class="ceb-logo initials">' + initials + '</div>';
+      return '<div class="ceb-bubble' + (isPriority ? ' priority' : '') + '" id="ceb-b-' + e.slug + '" onclick="cebPick(\'' + e.slug + '\')">'
+        + logoHtml
+        + '<div class="ceb-name">' + e.name + '</div>'
+        + '</div>';
+    }).join('');
+
+    // Pagination
+    var pgEl = document.getElementById('ceb-pagination');
+    if (pages <= 1) { pgEl.innerHTML = ''; return; }
+    var html = '<button class="ceb-pg-btn" onclick="cebGoPage(' + (cebPage-1) + ')" '+(cebPage===0?'disabled':'')+'>&#8592;</button>';
+    for (var i=0; i<pages; i++) {
+      html += '<button class="ceb-pg-btn'+(i===cebPage?' on':'')+'" onclick="cebGoPage('+i+')">'+(i+1)+'</button>';
+    }
+    html += '<button class="ceb-pg-btn" onclick="cebGoPage('+(cebPage+1)+')" '+(cebPage>=pages-1?'disabled':'')+'>&#8594;</button>';
+    pgEl.innerHTML = html;
+  }
+
+  window.cebGoPage = function(p) {
+    cebPage = p;
+    cebRender();
+    document.getElementById('ceb-grid').scrollIntoView({behavior:'smooth',block:'start'});
+  };
+
+  window.cebPick = function(slug) {
+    var e = cebAll.find(function(x){ return x.slug === slug; });
+    if (!e) return;
+
+    // Toggle
+    if (cebActiveBubble === slug) {
+      cebActiveBubble = null;
+      document.querySelectorAll('.ceb-bubble').forEach(function(b){ b.classList.remove('on'); });
+      var box = document.getElementById('ceb-box');
+      box.querySelector('.ib-prompt').style.display = '';
+      document.getElementById('ceb-title').style.display = 'none';
+      document.getElementById('ceb-text').style.display = 'none';
+      return;
+    }
+
+    cebActiveBubble = slug;
+    document.querySelectorAll('.ceb-bubble').forEach(function(b){ b.classList.remove('on'); });
+    var el = document.getElementById('ceb-b-' + slug);
+    if (el) el.classList.add('on');
+
+    var box = document.getElementById('ceb-box');
+    box.querySelector('.ib-prompt').style.display = 'none';
+    var titleEl = document.getElementById('ceb-title');
+    var textEl = document.getElementById('ceb-text');
+    titleEl.style.display = 'block';
+    textEl.style.display = 'block';
+
+    // Clean tags for display
+    var cleanTags = cebCleanTags(e.tags||[]);
+    var tagLine = cleanTags.length ? '<span style="font-family:\'DM Mono\',monospace;font-size:11px;color:#888;display:block;margin-bottom:10px;">' + cleanTags.join(' · ') + '</span>' : '';
+
+    titleEl.textContent = e.name;
+    var bodyText = cebCleanText(e.detail_text || e.short_desc || '');
+    textEl.innerHTML = tagLine + bodyText.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+
+    box.scrollIntoView({behavior:'smooth', block:'nearest'});
+  };
+
+  // Load JSON and init
+  fetch(CEB_JSON)
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      data.forEach(function(e) {
+        e.tags = cebCleanTags(e.tags||[]);
+      });
+      cebAll = cebSort(data);
+      cebFiltered = cebAll.slice();
+      cebBuildFilters(cebAll);
+      cebRender();
+    })
+    .catch(function(err) {
+      document.getElementById('ceb-count').textContent = 'Could not load ecosystem data.';
+      console.error('CEB load error:', err);
+    });
 
 }); // end DOMContentLoaded
 </script>
