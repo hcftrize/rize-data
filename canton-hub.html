@@ -440,43 +440,10 @@ document.addEventListener("DOMContentLoaded", function() {
   function resetBox(key){const box=document.getElementById(key+'-box');const prompt=box.querySelector('.ib-prompt');const title=document.getElementById(key+'-title');const text=document.getElementById(key+'-text');if(prompt)prompt.style.display='';if(title){title.style.display='none';title.textContent='';}if(text){text.style.display='none';text.innerHTML='';}}
 
   let activeTeam=null;
-  function buildTeam(){
-    const grid=document.getElementById('team-grid');
-    if(!grid)return;
-    grid.innerHTML=TEAM.map(function(m){
-      return '<div class="t-bubble" id="tm-'+m.id+'" onclick="pickTeam(\''+m.id+'\')">'
-        +'<div class="t-avatar">'+(m.img?'<img src="'+m.img+'" alt="'+m.name+'" onerror="this.parentElement.innerHTML=\''+m.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2)+'\'"/>':m.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2))+'</div>'
-        +'<div class="t-name">'+m.name+'</div></div>';
-    }).join('');
-  }
 
-  window.pickTeam=function(id){
-    const m=TEAM.find(function(x){return x.id===id;});
-    const box=document.getElementById('team-box');
-    if(activeTeam===id){activeTeam=null;document.querySelectorAll('[id^="tm-"]').forEach(function(b){b.classList.remove('on');});box.classList.remove('show');return;}
-    activeTeam=id;
-    document.querySelectorAll('[id^="tm-"]').forEach(function(b){b.classList.remove('on');});
-    document.getElementById('tm-'+id).classList.add('on');
-    document.getElementById('team-role').textContent=m.role;
-    document.getElementById('team-name-el').textContent=m.name;
-    box.classList.add('show');
-  };
 
-  function buildDeals(){
-    const grid=document.getElementById('deals-grid');
-    if(!grid)return;
-    grid.innerHTML=DEALS.map(function(d){
-      return '<div class="d-bubble" id="b-deals-'+d.id+'" onclick="pick(\'deals\',\''+d.id+'\')">'
-        +'<div class="d-avatar">'+(d.img?'<img src="'+d.img+'" alt="'+d.name+'" onerror="this.parentElement.innerHTML=\''+d.name.slice(0,2)+'\'"/>':d.name.slice(0,2))+'</div>'
-        +'<div class="d-name">'+d.name+'</div><div class="d-sub">'+d.subtitle+'</div></div>';
-    }).join('');
-  }
-
-  buildSlider('eco',ECO,false);
   buildSlider('canton',CANTON,false,true);
   buildSlider('board',BOARD,true);
-  buildTeam();
-  buildDeals();
 
   /* ═══════════════════════════════════════════════════
      CANTON ECOSYSTEM BROWSER
