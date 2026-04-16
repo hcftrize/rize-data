@@ -262,14 +262,8 @@ document.addEventListener("DOMContentLoaded", function() {
   };
 
   /* SLIDER ENGINE */
-    fi = (fi + 1) % flWords.length;
-    const el = document.getElementById("fl-lbl");
-    if (el) { el.style.opacity="0"; setTimeout(function(){ el.textContent=flWords[fi]; el.style.opacity="1"; },300); }
-  }, 2800);
-
-  /* EXISTING ECO HUB LOGIC */
   const PER_PAGE=6;
-  const state={eco:0,canton:0,board:0};
+  const state={canton:0,board:0};
 
   function buildSlider(key,data,isPerson,darkBg){
     const track=document.getElementById(key+'-track');
@@ -302,8 +296,8 @@ document.addEventListener("DOMContentLoaded", function() {
   function applySlide(key,pages){document.getElementById(key+'-track').style.transform='translateX(-'+state[key]*100+'%)';document.querySelectorAll('#'+key+'-dots .s-dot').forEach(function(d,i){d.classList.toggle('on',i===state[key]);});updateBtns(key,pages);}
   function updateBtns(key,pages){const p=document.getElementById(key+'-prev');const n=document.getElementById(key+'-next');if(p)p.disabled=state[key]===0;if(n)n.disabled=state[key]>=pages-1;}
 
-  const active={eco:null,canton:null,board:null,deals:null};
-  const dataMap={eco:ECO,canton:CANTON,board:BOARD,deals:DEALS};
+  const active={canton:null,board:null};
+  const dataMap={canton:CANTON,board:BOARD};
 
   window.pick=function(key,id){
     const item=dataMap[key].find(function(x){return x.id===id;});
@@ -321,14 +315,12 @@ document.addEventListener("DOMContentLoaded", function() {
     title.style.display='block';text.style.display='block';
     title.textContent=item.role?item.name+' - '+item.role:item.name;
     text.textContent=item.text;
-    text.textContent=item.text;
   };
 
   buildSlider('canton', CANTON, false, true);
   buildSlider('board', BOARD, true);
 
-     CANTON ECOSYSTEM BROWSER
-  ═══════════════════════════════════════════════════ */
+  /* CANTON ECOSYSTEM BROWSER */
   const CEB_JSON = 'https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/canton-ecosystem/entities.json';
   const CEB_LOGO_BASE = 'https://cdn.jsdelivr.net/gh/hcftrize/TOKERIZE@dev/canton-ecosystem/logos/';
   // Exact filename map - covers all 282 logos (png/jpg/jpeg/svg)
