@@ -958,13 +958,14 @@ document.addEventListener("DOMContentLoaded", function() {
     grid.innerHTML = slice.map(function(e) {
       var isPriority = cebSlugMatch(e.slug, CEB_PRIORITY);
       // Logo cascade:
-      // 1. logo_local from JSON (new entities after scrape — png/jpg/jpeg, SVGs converted by CI)
-      // 2. CEB_FILES map (exact filenames for current 283 entities)
+      // 1. CEB_FILES map — exact filenames for all 283 known entities (png/jpg/jpeg/svg via jsDelivr)
+      // 2. logo_local from JSON — new entities added after scrape (CI converts SVGs to PNG first)
       // 3. Initials fallback
-      var logoLocal = e.logo_local ? e.logo_local.split(/[\\\/]/).pop() : null;
-      var logoFile = (logoLocal && /\.(png|jpg|jpeg)$/i.test(logoLocal))
-        ? logoLocal
-        : (CEB_FILES[e.slug] || null);
+      var logoFile = CEB_FILES[e.slug];
+      if (!logoFile && e.logo_local) {
+        var localName = e.logo_local.split(/[\\\/]/).pop();
+        if (/\.(png|jpg|jpeg)$/i.test(localName)) logoFile = localName;
+      }
       var logoUrl = logoFile ? CEB_LOGO_BASE + logoFile : null;
       var initials = e.name.split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
       var logoHtml = logoUrl
