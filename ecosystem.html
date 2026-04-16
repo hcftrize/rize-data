@@ -955,23 +955,22 @@ document.addEventListener("DOMContentLoaded", function() {
     var grid = document.getElementById('ceb-grid');
     grid.innerHTML = slice.map(function(e) {
       var isPriority = cebSlugMatch(e.slug, CEB_PRIORITY);
-      // Extension map for slugs whose logo_local is null (scraper missed them)
-      var EXT = {"broadridge":"svg","deloitte":"svg","dtcc":"svg","goldman-sachs":"svg",
-        "lloyds-banking-group":"svg","luxembourg-stock-exchange":"svg","robinhood":"svg",
-        "gs-dap":"svg","hkex":"svg","jp-morgan":"svg","mufg":"svg","oliver-wyman":"svg",
-        "société-générale":"svg","societe-generale":"svg","sbc":"svg","splice-an-lfdt-lab":"svg",
-        "liquidity-tech-ltp":"svg","agentic-ledger":"svg","bigoo":"svg","brikly":"svg",
-        "bron-wallet":"svg","c8-wallet":"svg","cantex":"svg","cc-explorer":"svg","cc-view":"svg",
-        "chata---sync-insights":"svg","crypto-treasury-connector":"svg","da-registry-app":"png",
-        "dedge-security":"svg","desyn":"svg","dfns":"png","ea-finance":"svg","edgevana":"svg",
-        "g-20-group":"svg","hashnote-now-circle":"svg","hashrupt":"svg","haven-digital-partners":"svg",
-        "k2f-labs":"svg","kairo":"svg","lab6174":"svg","layerzero":"svg","memora":"svg",
-        "mesh":"svg","p2p":"svg","pixelplex":"svg","polychain":"svg","posthuman":"svg",
-        "registerlabs":"svg","rocklik":"svg","stakecraft":"svg","wormhole":"svg","zenith":"svg",
-        "7ridge":"svg","bitalpha-dba-bitwave":"svg"};
+      // GitHub raw serves SVGs as text/plain — <img> rejects them.
+      // Strategy: use logo_local (GitHub) for rasters, logo_cdn for SVGs if valid, else GitHub raster slug.png
+      var BAD_CDN = 'yellow-arrow-right';
       var logoLocal = e.logo_local ? e.logo_local.split(/[\\\/]/).pop() : null;
-      var logoFile = logoLocal || (e.slug + '.' + (EXT[e.slug] || 'png'));
-      var logoUrl = CEB_LOGO_BASE + logoFile;
+      var cdnOk = e.logo_cdn && e.logo_cdn.indexOf(BAD_CDN) === -1;
+      var logoUrl;
+      if (logoLocal && /\.(png|jpg|jpeg|webp)$/i.test(logoLocal)) {
+        // We have a raster local file → use GitHub
+        logoUrl = CEB_LOGO_BASE + logoLocal;
+      } else if (cdnOk) {
+        // CDN is valid (not the placeholder arrow) → use it (handles SVGs correctly)
+        logoUrl = e.logo_cdn;
+      } else {
+        // Fallback: try GitHub with slug.png
+        logoUrl = CEB_LOGO_BASE + e.slug + '.png';
+      }
       var initials = e.name.split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
       var logoHtml = logoUrl
         ? '<div class="ceb-logo"><img src="' + logoUrl + '" alt="' + e.name + '" onerror="this.parentElement.className=\'ceb-logo initials\';this.parentElement.textContent=\'' + initials + '\'"/></div>'
