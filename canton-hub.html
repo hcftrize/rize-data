@@ -41,14 +41,9 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 .eco-hero h1{font-family:'Rajdhani',sans-serif;font-size:clamp(28px,4vw,52px);font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#fff;margin-bottom:12px;}
 .eco-hero p{font-family:'DM Mono',monospace;font-size:14px;color:rgba(255,255,255,0.75);line-height:1.7;max-width:600px;}
 .lc{margin-bottom:48px;border:1px solid #e0e0e0;border-top:3px solid var(--navy);background:#fff;}
-.lc-header{padding:28px 32px 0;display:flex;align-items:flex-start;justify-content:space-between;cursor:pointer;}
+.lc-header{padding:28px 32px 0;}
 .lc-header h2{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--navy);margin:0 0 4px;}
 .lc-header p{font-family:'DM Mono',monospace;font-size:13px;color:#555;margin:4px 0 0;}
-.lc-header-text{flex:1;}
-.lc-toggle{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid #dde4ed;flex-shrink:0;margin-left:16px;margin-top:4px;transition:transform 0.2s;}
-.lc.collapsed .lc-toggle{transform:rotate(-90deg);}
-.lc-body{padding-bottom:4px;}
-.lc-body.collapsed{display:none;}
 .slider-wrap{padding:20px 32px 0;}
 .slider-viewport{overflow:hidden;}
 .slider-track{display:flex;transition:transform 0.32s ease;}
@@ -138,6 +133,26 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 .rn-node:hover .rn-box-gold,.rn-node.rn-on .rn-box-gold{fill:#fff3cc;stroke:#a07000;stroke-width:2;}
 .rn-conn{cursor:pointer;}
 .rn-conn-bg{fill:#fff;stroke:#b8cce0;stroke-width:1;}
+.rn-conn:hover .rn-conn-bg{stroke:#0d2d4e;fill:#eef3f8;}
+.rn-conn-txt{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;fill:#0d2d4e;text-anchor:middle;}
+.rn-conn-txt-gold{font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;fill:#8a6200;text-anchor:middle;}
+.rn-info-box{margin:0 32px 32px;border:1px solid #e0e0e0;border-left:3px solid var(--navy);background:#f7f9fc;padding:22px 26px;min-height:80px;}
+.rn-prompt{font-family:'DM Mono',monospace;font-size:13px;color:#888;font-style:italic;}
+.rn-title{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);margin-bottom:14px;display:none;}
+.rn-body{font-family:'DM Mono',monospace;font-size:15px;color:#111;line-height:1.85;text-align:justify;display:none;}
+.rn-map-hint{text-align:center;padding:8px 0 4px;font-family:'DM Mono',monospace;font-size:10px;color:#aaa;letter-spacing:0.5px;}
+
+/* COLLAPSE / EXPAND */
+.lc-header{padding:28px 32px 0;display:flex;align-items:flex-start;justify-content:space-between;cursor:pointer;user-select:none;}
+.lc-header-text{flex:1;}
+.lc-toggle{width:32px;height:32px;border:1px solid #dde4ed;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:16px;margin-top:2px;transition:background 0.15s,border-color 0.15s;}
+.lc-toggle svg{transition:transform 0.28s ease;}
+.lc-toggle:hover{background:#eef3f8;border-color:var(--navy);}
+.lc-body{overflow:hidden;transition:max-height 0.35s ease, opacity 0.28s ease;max-height:4000px;opacity:1;}
+.lc-body.collapsed{max-height:0;opacity:0;}
+.lc.collapsed .lc-toggle svg{transform:rotate(-90deg);}
+.lc-header{padding-bottom:20px;}
+</style>
 </head>
 <body>
 
@@ -153,15 +168,14 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 <div class="eco-hero">
   <div style="max-width:1200px;margin:0 auto">
     <a href="/hub" class="back-to-hub">&larr; Back to RIZE Data Hub</a>
-    <span class="eco-eyebrow" style="font-size:14px;letter-spacing:2px">Canton Network</span>
-    <h1>Canton Ecosystem Hub</h1>
-    <p>Explore the full Canton Network ecosystem - 283 partners, validators, applications and institutions building on the world's largest institutional blockchain.</p>
+    <span class="eco-eyebrow" style="font-size:14px;letter-spacing:2px">RIZE Community Learn Center</span>
+    <h1>RIZE Ecosystem Hub</h1>
+    <p>Explore the full institutional ecosystem behind T-RIZE — partners, Canton Network members, Foundation board, and live RWA deals. Click on any entity to learn more.</p>
   </div>
 </div>
 
 <div class="eco-wrap">
 
-<!-- ── CONTAINER 1: CANTON ECOSYSTEM BROWSER ── -->
 <div class="lc collapsed" id="ceb-lc">
   <div class="lc-header" onclick="toggleLc('ceb-lc')">
     <div class="lc-header-text">
@@ -171,25 +185,37 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
   <div class="lc-body collapsed" id="ceb-lc-body">
+
+    <!-- Search + Filters -->
     <div class="ceb-controls">
       <input class="ceb-search" id="ceb-search" type="text" placeholder="Search entities…" oninput="cebFilter()"/>
       <div class="ceb-filters" id="ceb-filters">
         <button class="ceb-tag on" data-tag="ALL" onclick="cebSetTag(this)">All</button>
       </div>
     </div>
+
+    <!-- Count -->
     <div class="ceb-count" id="ceb-count"></div>
+
+    <!-- Top Pagination -->
     <div class="ceb-pagination" id="ceb-pagination-top"></div>
+
+    <!-- Grid -->
     <div class="ceb-grid" id="ceb-grid"></div>
+
+    <!-- Pagination -->
     <div class="ceb-pagination" id="ceb-pagination"></div>
+
+    <!-- Info box -->
     <div class="info-box" id="ceb-box">
       <p class="ib-prompt">Click on any entity to learn about their role in the Canton ecosystem.</p>
       <div class="ib-title" id="ceb-title"></div>
       <div class="ib-text" id="ceb-text"></div>
     </div>
-  </div>
+
+  </div><!-- end lc-body -->
 </div>
 
-<!-- ── CONTAINER 2: CANTON PREMIER MEMBERS ── -->
 <div class="lc collapsed" id="canton-lc">
   <div class="lc-header" onclick="toggleLc('canton-lc')">
     <div class="lc-header-text">
@@ -199,23 +225,24 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
   <div class="lc-body collapsed" id="canton-lc-body">
-    <div class="slider-wrap">
-      <div class="slider-viewport"><div class="slider-track" id="canton-track"></div></div>
-    </div>
-    <div class="slider-controls">
-      <button class="s-btn" id="canton-prev" onclick="slide('canton',-1)">&#8592;</button>
-      <div class="s-dots" id="canton-dots"></div>
-      <button class="s-btn" id="canton-next" onclick="slide('canton',1)">&#8594;</button>
-    </div>
-    <div class="info-box" id="canton-box">
-      <p class="ib-prompt">Click on a member to learn about their role and institutional weight.</p>
-      <div class="ib-title" id="canton-title"></div>
-      <div class="ib-text" id="canton-text"></div>
+  <div class="slider-wrap">
+    <div class="slider-viewport">
+      <div class="slider-track" id="canton-track"></div>
     </div>
   </div>
+  <div class="slider-controls">
+    <button class="s-btn" id="canton-prev" onclick="slide('canton',-1)">&#8592;</button>
+    <div class="s-dots" id="canton-dots"></div>
+    <button class="s-btn" id="canton-next" onclick="slide('canton',1)">&#8594;</button>
+  </div>
+  <div class="info-box" id="canton-box">
+    <p class="ib-prompt">Click on a member to learn about their role and institutional weight.</p>
+    <div class="ib-title" id="canton-title"></div>
+    <div class="ib-text"  id="canton-text"></div>
+  </div>
+  </div><!-- end lc-body -->
 </div>
 
-<!-- ── CONTAINER 3: BOARD MEMBERS ── -->
 <div class="lc collapsed" id="board-lc">
   <div class="lc-header" onclick="toggleLc('board-lc')">
     <div class="lc-header-text">
@@ -225,20 +252,22 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
   <div class="lc-body collapsed" id="board-lc-body">
-    <div class="slider-wrap">
-      <div class="slider-viewport"><div class="slider-track" id="board-track"></div></div>
-    </div>
-    <div class="slider-controls">
-      <button class="s-btn" id="board-prev" onclick="slide('board',-1)">&#8592;</button>
-      <div class="s-dots" id="board-dots"></div>
-      <button class="s-btn" id="board-next" onclick="slide('board',1)">&#8594;</button>
-    </div>
-    <div class="info-box" id="board-box">
-      <p class="ib-prompt">Click on a board member to learn about their background and expertise.</p>
-      <div class="ib-title" id="board-title"></div>
-      <div class="ib-text" id="board-text"></div>
+  <div class="slider-wrap">
+    <div class="slider-viewport">
+      <div class="slider-track" id="board-track"></div>
     </div>
   </div>
+  <div class="slider-controls">
+    <button class="s-btn" id="board-prev" onclick="slide('board',-1)">&#8592;</button>
+    <div class="s-dots" id="board-dots"></div>
+    <button class="s-btn" id="board-next" onclick="slide('board',1)">&#8594;</button>
+  </div>
+  <div class="info-box" id="board-box">
+    <p class="ib-prompt">Click on a board member to learn about their background and expertise.</p>
+    <div class="ib-title" id="board-title"></div>
+    <div class="ib-text"  id="board-text"></div>
+  </div>
+  </div><!-- end lc-body -->
 </div>
 
 </div><!-- end eco-wrap -->
@@ -248,27 +277,112 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
   <nav class="footer-nav">
     <a href="/">Home</a><a href="/about">About</a><a href="/hub">RIZE Data Hub</a>
   </nav>
-  <p class="footer-copy">&copy; 2026 Tokerize - RIZE Community Tokenization Hub</p>
+  <p class="footer-copy">&copy; 2026 Tokerize &mdash; RIZE Community Tokenization Hub</p>
 </footer>
 
 <script>
-const CANTON=[{"id":"trize","name":"T-RIZE Group","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_trize.png","text":"T-RIZE Group (est. 2022) is an institutional market-infrastructure company on the Canton Network with two featured applications and fully deployed workflows for origination, structuring, tokenization, collateralization, and post-trade lifecycle management. T-RIZE has secured over $10B in signed contracts and MOUs, delivering the first tokenized new-construction real-estate transaction on Canton and one of the largest private-credit tokenizations in the market. T-RIZE specializes in institutional structured products including private credit, funds, securitized debt, construction loans, and convertible digital bonds. Its architecture is engineered for interoperability with global custodians, CSDs, broker-dealers, and ATSs."},{"id":"dtcc","name":"DTCC","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_dtcc.png","text":"DTCC (Depository Trust & Clearing Corporation) is the world's largest financial market infrastructure, processing over $2.15 quadrillion in securities transactions annually and providing clearing and settlement services for virtually all US-listed equities, corporate and municipal bonds, government securities, and money market instruments. DTCC serves as the backbone of the US financial system. Their participation on Canton Network signals a fundamental shift in how post-trade infrastructure is being reimagined for the digital asset era."},{"id":"euroclear","name":"Euroclear","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_euroclear-1.png","text":"Euroclear is one of the world's largest financial market infrastructure providers, operating as a central securities depository (CSD) with over €37 trillion in assets under custody and processing €1 quadrillion+ in securities transactions annually. Headquartered in Brussels, Euroclear serves over 2,000 clients in 90+ countries. Their presence on Canton Network is a landmark signal - as a leading European CSD, Euroclear's participation validates Canton as the institutional standard for next-generation securities settlement."},{"id":"bnp","name":"BNP Paribas","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_bnpparibas.png","text":"BNP Paribas is Europe's largest bank by total assets, with €2.5 trillion+ in assets and operations in 65 countries. One of the founding institutions of the Canton Network, BNP Paribas brings global investment banking, prime brokerage, and custodian capabilities to the ecosystem. Their Securities Services division manages €12+ trillion in assets under custody, making their Canton integration a direct pipeline for institutional tokenized asset distribution and settlement at scale."},{"id":"bny","name":"BNY Mellon","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_bny.png","text":"BNY Mellon is the world's largest custodian bank with $49.5 trillion in assets under custody and administration - larger than the GDP of every country except the US and China combined. As the custodian of choice for institutional investors globally, BNY Mellon's participation on Canton Network means tokenized assets on Canton can be custodied, settled, and administered through the world's most trusted custody infrastructure. BNY Mellon launched its Digital Assets unit in 2021 and has been a leading voice in bridging TradFi and blockchain."},{"id":"digitalasset","name":"Digital Asset","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_da.png","text":"Digital Asset is the technology company behind DAML (Digital Asset Modeling Language) - the smart contract language that powers the Canton Network. Co-founded by Yuval Rooz and Blythe Masters, Digital Asset has raised $300M+ from Goldman Sachs, Citigroup, JPMorgan, and Deutsche Börse. DAML is the programming language used by T-RIZE to deploy its tokenization applications on Canton, making Digital Asset the foundational technology layer beneath every T-RIZE structured product."},{"id":"broadridge","name":"Broadridge","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_broadridge-1.png","text":"Broadridge Financial Solutions is an S&P 500 company with a $24B+ market cap and 15,000+ associates globally. Broadridge processes $10 trillion in fixed income transactions daily and manages proxy voting for $10 trillion in equity assets. Their DLT-based repo platform has already processed $1+ trillion in transactions, making them one of the most advanced TradFi firms in applying blockchain to real capital markets workflows."},{"id":"hsbc","name":"HSBC","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_hsbc.png","text":"HSBC is one of the world's largest banking organizations with $3 trillion in total assets and operations in 60+ countries. HSBC Orion - their proprietary digital assets platform - enables financial institutions to issue digital bonds on blockchain. HSBC has already issued tokenized bonds and manages cross-border settlement for tokenized assets. For T-RIZE's KAI18-1 instrument, HSBC UK Bank PLC held the blocked account under the security interests layer, directly integrating their infrastructure into the deal."},{"id":"sbi","name":"SBI Digital Asset Holdings","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_sbi.webp","text":"SBI Digital Asset Holdings is the digital assets arm of SBI Holdings - Japan's largest internet-based financial services company with ¥15+ trillion in assets under management. SBI's Canton presence opens the door to Japanese and Asian institutional capital flows into tokenized RWAs. SBI has been one of the most aggressive TradFi institutions in Asia in embracing blockchain infrastructure, with investments in Ripple, SBI Crypto, and multiple digital asset ventures."},{"id":"cumberland","name":"Cumberland","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_cumberland.png","text":"Cumberland is a global leader in institutional crypto market-making and a subsidiary of DRW - the Chicago-based trading firm managing $10B+ in capital. Cumberland facilitates billions in daily crypto trading volume and serves as a primary liquidity provider for institutional investors. Their Canton presence brings critical liquidity infrastructure to tokenized asset markets, enabling institutions to convert between digital and traditional assets at scale."},{"id":"obsidian","name":"Obsidian Systems","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_obsidian.png","text":"Obsidian Systems is a leading technology consulting and node-hosting company specializing in the Canton ecosystem, co-founded by Ryan Trinkle - a longtime Haskell open-source contributor. Since DAML (Canton's smart contract language) is based on Haskell, Obsidian brings uniquely relevant deep technical expertise. Their work spans DeFi, blockchain infrastructure, and compliance technology. Obsidian's Ryan Trinkle chairs the Audit and Finance Committee of the Canton Foundation board."},{"id":"fivenorth","name":"Five North","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_5north-1.png","text":"Five North is a proprietary trading and venture studio building foundational infrastructure for the Canton Network - the basic building blocks that developers use to create decentralized financial applications and markets. Founded by Yiannis Varelas, Five North designs, trades, and builds across fintech, data, and crypto with a core focus on Canton Network primitives. Their work is analogous to the role early Ethereum developers played in building the DeFi stack - essential and foundational."},{"id":"intellecteu","name":"IntellectEU","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/intellectEU.png","text":"IntellectEU is a leading financial technology company specializing in blockchain, payments, and digital asset infrastructure. Their Catalyst Product Suite is actively deployed by Canton Network participants to modernize payments and digital asset adoption at scale. IntellectEU's solutions enable financial institutions to connect legacy systems with blockchain infrastructure - a critical capability for institutions migrating existing workflows onto Canton."},{"id":"libertycity","name":"Liberty City Ventures","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/lvc_logo-1.png","text":"Liberty City Ventures is a New York-based venture capital firm focused on blockchain, crypto, and fintech investments. LCV previously incubated Paxos (managing $20B+ in tokenized assets) and Lukka (crypto accounting platform). Their institutional investment thesis is directly aligned with the tokenization of real-world assets on compliant infrastructure like Canton."},{"id":"ltp","name":"LTP","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_ltp.png","text":"LTP is a top global prime broker for digital assets, providing institutional-grade infrastructure across execution, settlement, custody, lending, and financing. Founded by Jack Yang in 2021, LTP serves as critical financial plumbing for institutions accessing digital asset markets. As a Canton Network Premier Member, LTP brings regulated prime brokerage capabilities to tokenized RWA markets."},{"id":"tradeweb","name":"Tradeweb","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_tradeweb.png","text":"Tradeweb Markets is a leading global operator of electronic marketplaces with $1.5 trillion+ in average daily trading volume and a $25B+ market cap (NASDAQ: TW). Connecting 2,500+ clients across 65 countries, Tradeweb's electronic trading infrastructure for government bonds, corporate bonds, and derivatives could become the distribution layer for secondary trading of tokenized fixed-income RWAs on Canton."},{"id":"sevenridge","name":"7Ridge","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_7ridge.png","text":"7Ridge is a sector-focused asset manager specializing in transformative technology for capital markets. Led by partners including Veronica Augustsson - former CEO of Cinnober (acquired by Nasdaq for $190M) - 7Ridge brings decades of trading technology and financial infrastructure expertise to the Canton ecosystem's governance and strategic direction."}];
-const BOARD=[{"id":"madani","name":"Madani Boukalba","role":"T-RIZE Group - Founder & CEO","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/Madani-Boukalba-1.jpg","text":"Madani Boukalba is the Founder & CEO of T-RIZE Group (est. 2022), an institutional market-infrastructure company on the Canton Network with fully deployed workflows for origination, structuring, tokenization, collateralization, and post-trade lifecycle management. T-RIZE has secured over $10B in signed contracts and MOUs and is delivering the first tokenized new-construction real-estate transaction on Canton, alongside one of the largest private-credit tokenizations in the market. T-RIZE specializes in institutional structured products including private credit, funds, securitized debt, construction loans, and convertible digital bonds. Madani co-leads the first Industrial Research Chair in Tokenization & Federated Learning, supported by the Government of Canada. He is co-author of a U.S. patent-pending communication and orchestration protocol. Before T-RIZE, he spent 13 years at CDPQ as a Senior Trader specializing in complex derivatives and collateral optimization."},{"id":"yuval","name":"Yuval Rooz","role":"Digital Asset - Co-Founder & CEO","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/yuval-rooz-1.webp","text":"Yuval Rooz is the Co-Founder and CEO of Digital Asset - the New York-based company behind DAML, the smart contract language powering Canton Network. Digital Asset has raised $300M+ from Goldman Sachs, Citigroup, JPMorgan, and Deutsche Börse. Before Digital Asset, Yuval managed an algorithmic trading desk at DRW and worked as a trader and developer at Citadel. He holds a B.S. in Electrical Engineering from Georgia Tech."},{"id":"jorgen","name":"Jørgen Ouaknine","role":"Euroclear - Group Head of Innovation & Digital Assets","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/jorgen-ouaknine-1.webp","text":"Jørgen Ouaknine has over 20 years of experience in banking and financial services, currently leading Innovation and Digital Assets at Euroclear - the world's largest CSD with €37 trillion in assets under custody. Previously served as CEO of two BNP Paribas subsidiaries in Morocco. His work directly shapes how €37 trillion in assets could eventually migrate onto distributed ledger infrastructure."},{"id":"chris","name":"Chris Zuehlke","role":"Cumberland - Global Head","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/Chris-Zuehlke.jpg","text":"Chris Zuehlke is a Partner at DRW and Global Head of Cumberland, one of the world's leading institutional crypto market makers. Under his leadership, Cumberland has grown into a dominant force in institutional digital asset liquidity - facilitating billions in daily volume for the world's largest banks, hedge funds, and asset managers. Cumberland's market-making capabilities are critical infrastructure for any tokenized asset seeking liquidity."},{"id":"german","name":"Germán Soto Sanchez","role":"Broadridge - Chief Product & Strategy Officer","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/German-Soto-Sanchez.jpg","text":"Germán Soto Sanchez is the Chief Product and Strategy Officer of Broadridge Financial Solutions - an S&P 500 company with $24B+ market cap. A direct report to the CEO and member of the Executive Leadership Team, Germán previously led strategic investments at JPMorgan Chase and was President of Cloud9 Technologies. He holds an MBA from Stanford GSB and a B.S. in Mechanical Engineering from MIT."},{"id":"john","name":"John O'Neill","role":"HSBC - Group Head of Digital Assets & Currencies","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/john.jpg","text":"John O'Neill is HSBC's Group Head of Digital Assets and Currencies, leading HSBC Orion - the bank's proprietary digital assets platform enabling financial institutions to issue digital bonds on blockchain. With $3 trillion in total HSBC assets and operations in 60+ countries, John's work directly shapes how one of the world's largest banks integrates tokenized assets into its core banking infrastructure. He has over 20 years of experience in financial services."},{"id":"jack","name":"Jack Yang","role":"LTP - Founder & CEO","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/Jack-Yang.jpg","text":"Jack Yang founded LTP in 2021 after building APAC's largest crypto quant fund database. Starting his career as an aircraft engineer, Jack brought aerospace-grade precision to digital finance, building LTP into a top global prime broker delivering secure, regulated infrastructure across execution, settlement, custody, lending, and financing for digital assets."},{"id":"amy","name":"Amy Kalnoki","role":"Bitwave - Co-Founder & COO","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/amy-kalnoki-1.webp","text":"Amy Kalnoki is Co-Founder and COO of Bitwave - the #1 digital asset finance platform for enterprises, with SOC 1 Type 2 and SOC 2 Type 2 compliance. Before Bitwave, she co-founded Synata, an enterprise search startup acquired by Cisco in 2016. Recognized with a CrossTech Innovation Award in 2024, Amy ensures T-RIZE's institutional clients can accurately account for every tokenized transaction."},{"id":"mark","name":"Mark Wendland","role":"Canton Strategic Holdings - Chairman & CEO","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/mark-wendland.webp","text":"Mark Wendland is Chairman and CEO of Canton Strategic Holdings, overseeing digital asset treasury strategy and Super Validator operations. Previously Partner and COO at DRW ($10B+ AUM) and before that led Global Fixed Income Finance at Citadel. His dual background in traditional finance operations and digital asset treasury management makes him uniquely positioned to steward Canton's long-term capital strategy."},{"id":"ryan","name":"Ryan Trinkle","role":"Obsidian Systems - Partner","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/ryan_trinkle.jpg","text":"Ryan Trinkle is co-founder of Obsidian Systems and a longtime Haskell open-source contributor - best known for Reflex FRP. Since DAML (Canton's smart contract language) is based on Haskell, Ryan brings uniquely relevant deep technical expertise. As a Canton Foundation board member, he chairs the Audit and Finance Committee, providing critical governance oversight to the network."},{"id":"patrick","name":"Patrick Corker","role":"BNY Mellon - Managing Director, Digital Assets","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/patrick-corker.jpg","text":"Patrick Corker leads BNY Mellon's pioneering efforts to bridge traditional finance with blockchain-based assets across custody, tokenization, and data integration. With $49.5 trillion in assets under custody at BNY, Patrick's work determines what tokenized RWAs can achieve institutional scale. Before BNY, he was VP and Treasurer at Circle, and held roles at LedgerX, Goldman Sachs, and Deloitte."},{"id":"veronica","name":"Veronica Augustsson","role":"7RIDGE - Partner","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/veronica.jpg","text":"Veronica Augustsson is a Partner at 7RIDGE. Previously CEO of Cinnober - the leading independent trading and clearing technology provider, acquired by Nasdaq for $190M. Named in Institutional Investor's Trading Tech 40, Financial News' 100 Most Influential Women in Finance, and Sweden's Top 10 Most Powerful CEOs. She brings world-class trading infrastructure expertise to Canton's governance."},{"id":"justin","name":"Justin Peterson","role":"Tradeweb - Chief Technology Officer","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/peterson.jpg","text":"Justin Peterson is CTO of Tradeweb Markets - the $25B+ NASDAQ-listed electronic trading platform processing $1.5 trillion+ in daily volume. With 30+ years in computer science and 20+ in financial services, Justin holds a Ph.D. in Computer Science from Georgia Tech. His role on the Canton Foundation board brings world-class electronic trading architecture expertise to Canton's technical governance."},{"id":"kinga","name":"Kinga Bosse","role":"MPCH - Chief Operating Officer","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/kinga_bosse.jpg","text":"Kinga Bosse is COO at MPCH - a leading security firm for businesses and government. Previously CFO at Lukka (digital asset accounting) and held senior roles at Houlihan Lokey, AIG, and State Street. Her 20+ years across finance, insurtech, and fintech provides valuable operational and financial governance expertise to the Canton Foundation board."},{"id":"james","name":"James Lang","role":"Liberty City Ventures - Managing Director","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/James-Lang.jpg","text":"James Lang leads Liberty City Ventures' investment team, with a career spanning hedge fund management, OTC trading at Paxos, and founding-stage involvement at Lukka. Previously managed the $175M portfolio of the Episcopal Diocese of Long Island's Investment Advisory Committee (top-decile returns). He holds a CFA designation, an MBA from NYU, and a B.A. in Economics from Columbia University."},{"id":"jonathan","name":"Jonathan Mayeur","role":"IntellectEU - Head of Product","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/Jonathan-Mayeur.jpg","text":"Jonathan Mayeur is Head of Product at IntellectEU, leading development of the Catalyst Product Suite - actively deployed by Canton Network participants to modernize payments and digital asset adoption at scale. His six years of work on payments and blockchain projects across capital markets, telco, and supply chain provide practical, production-grade insight into Canton's operational challenges."},{"id":"yiannis","name":"Yiannis Varelas","role":"Five North - Founder","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/yiannis.jpg","text":"Yiannis Varelas leads Five North, a proprietary trading and venture studio building foundational infrastructure for the Canton Network - the basic building blocks used to develop decentralized financial applications and markets. Built from years of engineering, market research, and first-principles risk-taking, Five North sits at the intersection of trading and infrastructure development for institutional blockchain markets."}];
+const CANTON=[{"id":"trize","name":"T-RIZE Group","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_trize.png","text":"T-RIZE Group (est. 2022) is an institutional market-infrastructure company on the Canton Network with two featured applications and fully deployed workflows for origination, structuring, tokenization, collateralization, and post-trade lifecycle management. T-RIZE has secured over $10B in signed contracts and MOUs, delivering the first tokenized new-construction real-estate transaction on Canton and one of the largest private-credit tokenizations in the market. T-RIZE specializes in institutional structured products including private credit, funds, securitized debt, construction loans, and convertible digital bonds. Its architecture is engineered for interoperability with global custodians, CSDs, broker-dealers, and ATSs."},{"id":"dtcc","name":"DTCC","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_dtcc.png","text":"DTCC (Depository Trust & Clearing Corporation) is the world's largest financial market infrastructure, processing over $2.15 quadrillion in securities transactions annually and providing clearing and settlement services for virtually all US-listed equities, corporate and municipal bonds, government securities, and money market instruments. DTCC serves as the backbone of the US financial system. Their participation on Canton Network signals a fundamental shift in how post-trade infrastructure is being reimagined for the digital asset era."},{"id":"euroclear","name":"Euroclear","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_euroclear-1.png","text":"Euroclear is one of the world's largest financial market infrastructure providers, operating as a central securities depository (CSD) with over €37 trillion in assets under custody and processing €1 quadrillion+ in securities transactions annually. Headquartered in Brussels, Euroclear serves over 2,000 clients in 90+ countries. Their presence on Canton Network is a landmark signal — as a leading European CSD, Euroclear's participation validates Canton as the institutional standard for next-generation securities settlement."},{"id":"bnp","name":"BNP Paribas","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_bnpparibas.png","text":"BNP Paribas is Europe's largest bank by total assets, with €2.5 trillion+ in assets and operations in 65 countries. One of the founding institutions of the Canton Network, BNP Paribas brings global investment banking, prime brokerage, and custodian capabilities to the ecosystem. Their Securities Services division manages €12+ trillion in assets under custody, making their Canton integration a direct pipeline for institutional tokenized asset distribution and settlement at scale."},{"id":"bny","name":"BNY Mellon","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_bny.png","text":"BNY Mellon is the world's largest custodian bank with $49.5 trillion in assets under custody and administration — larger than the GDP of every country except the US and China combined. As the custodian of choice for institutional investors globally, BNY Mellon's participation on Canton Network means tokenized assets on Canton can be custodied, settled, and administered through the world's most trusted custody infrastructure. BNY Mellon launched its Digital Assets unit in 2021 and has been a leading voice in bridging TradFi and blockchain."},{"id":"digitalasset","name":"Digital Asset","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_da.png","text":"Digital Asset is the technology company behind DAML (Digital Asset Modeling Language) — the smart contract language that powers the Canton Network. Co-founded by Yuval Rooz and Blythe Masters, Digital Asset has raised $300M+ from Goldman Sachs, Citigroup, JPMorgan, and Deutsche Börse. DAML is the programming language used by T-RIZE to deploy its tokenization applications on Canton, making Digital Asset the foundational technology layer beneath every T-RIZE structured product."},{"id":"broadridge","name":"Broadridge","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_broadridge-1.png","text":"Broadridge Financial Solutions is an S&P 500 company with a $24B+ market cap and 15,000+ associates globally. Broadridge processes $10 trillion in fixed income transactions daily and manages proxy voting for $10 trillion in equity assets. Their DLT-based repo platform has already processed $1+ trillion in transactions, making them one of the most advanced TradFi firms in applying blockchain to real capital markets workflows."},{"id":"hsbc","name":"HSBC","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_hsbc.png","text":"HSBC is one of the world's largest banking organizations with $3 trillion in total assets and operations in 60+ countries. HSBC Orion — their proprietary digital assets platform — enables financial institutions to issue digital bonds on blockchain. HSBC has already issued tokenized bonds and manages cross-border settlement for tokenized assets. For T-RIZE's KAI18-1 instrument, HSBC UK Bank PLC held the blocked account under the security interests layer, directly integrating their infrastructure into the deal."},{"id":"sbi","name":"SBI Digital Asset Holdings","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_sbi.webp","text":"SBI Digital Asset Holdings is the digital assets arm of SBI Holdings — Japan's largest internet-based financial services company with ¥15+ trillion in assets under management. SBI's Canton presence opens the door to Japanese and Asian institutional capital flows into tokenized RWAs. SBI has been one of the most aggressive TradFi institutions in Asia in embracing blockchain infrastructure, with investments in Ripple, SBI Crypto, and multiple digital asset ventures."},{"id":"cumberland","name":"Cumberland","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_cumberland.png","text":"Cumberland is a global leader in institutional crypto market-making and a subsidiary of DRW — the Chicago-based trading firm managing $10B+ in capital. Cumberland facilitates billions in daily crypto trading volume and serves as a primary liquidity provider for institutional investors. Their Canton presence brings critical liquidity infrastructure to tokenized asset markets, enabling institutions to convert between digital and traditional assets at scale."},{"id":"obsidian","name":"Obsidian Systems","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_obsidian.png","text":"Obsidian Systems is a leading technology consulting and node-hosting company specializing in the Canton ecosystem, co-founded by Ryan Trinkle — a longtime Haskell open-source contributor. Since DAML (Canton's smart contract language) is based on Haskell, Obsidian brings uniquely relevant deep technical expertise. Their work spans DeFi, blockchain infrastructure, and compliance technology. Obsidian's Ryan Trinkle chairs the Audit and Finance Committee of the Canton Foundation board."},{"id":"fivenorth","name":"Five North","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_5north-1.png","text":"Five North is a proprietary trading and venture studio building foundational infrastructure for the Canton Network — the basic building blocks that developers use to create decentralized financial applications and markets. Founded by Yiannis Varelas, Five North designs, trades, and builds across fintech, data, and crypto with a core focus on Canton Network primitives. Their work is analogous to the role early Ethereum developers played in building the DeFi stack — essential and foundational."},{"id":"intellecteu","name":"IntellectEU","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/intellectEU.png","text":"IntellectEU is a leading financial technology company specializing in blockchain, payments, and digital asset infrastructure. Their Catalyst Product Suite is actively deployed by Canton Network participants to modernize payments and digital asset adoption at scale. IntellectEU's solutions enable financial institutions to connect legacy systems with blockchain infrastructure — a critical capability for institutions migrating existing workflows onto Canton."},{"id":"libertycity","name":"Liberty City Ventures","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/lvc_logo-1.png","text":"Liberty City Ventures is a New York-based venture capital firm focused on blockchain, crypto, and fintech investments. LCV previously incubated Paxos (managing $20B+ in tokenized assets) and Lukka (crypto accounting platform). Their institutional investment thesis is directly aligned with the tokenization of real-world assets on compliant infrastructure like Canton."},{"id":"ltp","name":"LTP","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_ltp.png","text":"LTP is a top global prime broker for digital assets, providing institutional-grade infrastructure across execution, settlement, custody, lending, and financing. Founded by Jack Yang in 2021, LTP serves as critical financial plumbing for institutions accessing digital asset markets. As a Canton Network Premier Member, LTP brings regulated prime brokerage capabilities to tokenized RWA markets."},{"id":"tradeweb","name":"Tradeweb","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_tradeweb.png","text":"Tradeweb Markets is a leading global operator of electronic marketplaces with $1.5 trillion+ in average daily trading volume and a $25B+ market cap (NASDAQ: TW). Connecting 2,500+ clients across 65 countries, Tradeweb's electronic trading infrastructure for government bonds, corporate bonds, and derivatives could become the distribution layer for secondary trading of tokenized fixed-income RWAs on Canton."},{"id":"sevenridge","name":"7Ridge","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/logo_7ridge.png","text":"7Ridge is a sector-focused asset manager specializing in transformative technology for capital markets. Led by partners including Veronica Augustsson — former CEO of Cinnober (acquired by Nasdaq for $190M) — 7Ridge brings decades of trading technology and financial infrastructure expertise to the Canton ecosystem's governance and strategic direction."}];
+const BOARD=[{"id":"madani","name":"Madani Boukalba","role":"T-RIZE Group — Founder & CEO","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/Madani-Boukalba-1.jpg","text":"Madani Boukalba is the Founder & CEO of T-RIZE Group (est. 2022), an institutional market-infrastructure company on the Canton Network with fully deployed workflows for origination, structuring, tokenization, collateralization, and post-trade lifecycle management. T-RIZE has secured over $10B in signed contracts and MOUs and is delivering the first tokenized new-construction real-estate transaction on Canton, alongside one of the largest private-credit tokenizations in the market. T-RIZE specializes in institutional structured products including private credit, funds, securitized debt, construction loans, and convertible digital bonds. Madani co-leads the first Industrial Research Chair in Tokenization & Federated Learning, supported by the Government of Canada. He is co-author of a U.S. patent-pending communication and orchestration protocol. Before T-RIZE, he spent 13 years at CDPQ as a Senior Trader specializing in complex derivatives and collateral optimization."},{"id":"yuval","name":"Yuval Rooz","role":"Digital Asset — Co-Founder & CEO","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/yuval-rooz-1.webp","text":"Yuval Rooz is the Co-Founder and CEO of Digital Asset — the New York-based company behind DAML, the smart contract language powering Canton Network. Digital Asset has raised $300M+ from Goldman Sachs, Citigroup, JPMorgan, and Deutsche Börse. Before Digital Asset, Yuval managed an algorithmic trading desk at DRW and worked as a trader and developer at Citadel. He holds a B.S. in Electrical Engineering from Georgia Tech."},{"id":"jorgen","name":"Jørgen Ouaknine","role":"Euroclear — Group Head of Innovation & Digital Assets","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/jorgen-ouaknine-1.webp","text":"Jørgen Ouaknine has over 20 years of experience in banking and financial services, currently leading Innovation and Digital Assets at Euroclear — the world's largest CSD with €37 trillion in assets under custody. Previously served as CEO of two BNP Paribas subsidiaries in Morocco. His work directly shapes how €37 trillion in assets could eventually migrate onto distributed ledger infrastructure."},{"id":"chris","name":"Chris Zuehlke","role":"Cumberland — Global Head","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/Chris-Zuehlke.jpg","text":"Chris Zuehlke is a Partner at DRW and Global Head of Cumberland, one of the world's leading institutional crypto market makers. Under his leadership, Cumberland has grown into a dominant force in institutional digital asset liquidity — facilitating billions in daily volume for the world's largest banks, hedge funds, and asset managers. Cumberland's market-making capabilities are critical infrastructure for any tokenized asset seeking liquidity."},{"id":"german","name":"Germán Soto Sanchez","role":"Broadridge — Chief Product & Strategy Officer","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/German-Soto-Sanchez.jpg","text":"Germán Soto Sanchez is the Chief Product and Strategy Officer of Broadridge Financial Solutions — an S&P 500 company with $24B+ market cap. A direct report to the CEO and member of the Executive Leadership Team, Germán previously led strategic investments at JPMorgan Chase and was President of Cloud9 Technologies. He holds an MBA from Stanford GSB and a B.S. in Mechanical Engineering from MIT."},{"id":"john","name":"John O'Neill","role":"HSBC — Group Head of Digital Assets & Currencies","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/john.jpg","text":"John O'Neill is HSBC's Group Head of Digital Assets and Currencies, leading HSBC Orion — the bank's proprietary digital assets platform enabling financial institutions to issue digital bonds on blockchain. With $3 trillion in total HSBC assets and operations in 60+ countries, John's work directly shapes how one of the world's largest banks integrates tokenized assets into its core banking infrastructure. He has over 20 years of experience in financial services."},{"id":"jack","name":"Jack Yang","role":"LTP — Founder & CEO","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/Jack-Yang.jpg","text":"Jack Yang founded LTP in 2021 after building APAC's largest crypto quant fund database. Starting his career as an aircraft engineer, Jack brought aerospace-grade precision to digital finance, building LTP into a top global prime broker delivering secure, regulated infrastructure across execution, settlement, custody, lending, and financing for digital assets."},{"id":"amy","name":"Amy Kalnoki","role":"Bitwave — Co-Founder & COO","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/amy-kalnoki-1.webp","text":"Amy Kalnoki is Co-Founder and COO of Bitwave — the #1 digital asset finance platform for enterprises, with SOC 1 Type 2 and SOC 2 Type 2 compliance. Before Bitwave, she co-founded Synata, an enterprise search startup acquired by Cisco in 2016. Recognized with a CrossTech Innovation Award in 2024, Amy ensures T-RIZE's institutional clients can accurately account for every tokenized transaction."},{"id":"mark","name":"Mark Wendland","role":"Canton Strategic Holdings — Chairman & CEO","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/mark-wendland.webp","text":"Mark Wendland is Chairman and CEO of Canton Strategic Holdings, overseeing digital asset treasury strategy and Super Validator operations. Previously Partner and COO at DRW ($10B+ AUM) and before that led Global Fixed Income Finance at Citadel. His dual background in traditional finance operations and digital asset treasury management makes him uniquely positioned to steward Canton's long-term capital strategy."},{"id":"ryan","name":"Ryan Trinkle","role":"Obsidian Systems — Partner","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/ryan_trinkle.jpg","text":"Ryan Trinkle is co-founder of Obsidian Systems and a longtime Haskell open-source contributor — best known for Reflex FRP. Since DAML (Canton's smart contract language) is based on Haskell, Ryan brings uniquely relevant deep technical expertise. As a Canton Foundation board member, he chairs the Audit and Finance Committee, providing critical governance oversight to the network."},{"id":"patrick","name":"Patrick Corker","role":"BNY Mellon — Managing Director, Digital Assets","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/patrick-corker.jpg","text":"Patrick Corker leads BNY Mellon's pioneering efforts to bridge traditional finance with blockchain-based assets across custody, tokenization, and data integration. With $49.5 trillion in assets under custody at BNY, Patrick's work determines what tokenized RWAs can achieve institutional scale. Before BNY, he was VP and Treasurer at Circle, and held roles at LedgerX, Goldman Sachs, and Deloitte."},{"id":"veronica","name":"Veronica Augustsson","role":"7RIDGE — Partner","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/veronica.jpg","text":"Veronica Augustsson is a Partner at 7RIDGE. Previously CEO of Cinnober — the leading independent trading and clearing technology provider, acquired by Nasdaq for $190M. Named in Institutional Investor's Trading Tech 40, Financial News' 100 Most Influential Women in Finance, and Sweden's Top 10 Most Powerful CEOs. She brings world-class trading infrastructure expertise to Canton's governance."},{"id":"justin","name":"Justin Peterson","role":"Tradeweb — Chief Technology Officer","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/peterson.jpg","text":"Justin Peterson is CTO of Tradeweb Markets — the $25B+ NASDAQ-listed electronic trading platform processing $1.5 trillion+ in daily volume. With 30+ years in computer science and 20+ in financial services, Justin holds a Ph.D. in Computer Science from Georgia Tech. His role on the Canton Foundation board brings world-class electronic trading architecture expertise to Canton's technical governance."},{"id":"kinga","name":"Kinga Bosse","role":"MPCH — Chief Operating Officer","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/kinga_bosse.jpg","text":"Kinga Bosse is COO at MPCH — a leading security firm for businesses and government. Previously CFO at Lukka (digital asset accounting) and held senior roles at Houlihan Lokey, AIG, and State Street. Her 20+ years across finance, insurtech, and fintech provides valuable operational and financial governance expertise to the Canton Foundation board."},{"id":"james","name":"James Lang","role":"Liberty City Ventures — Managing Director","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/James-Lang.jpg","text":"James Lang leads Liberty City Ventures' investment team, with a career spanning hedge fund management, OTC trading at Paxos, and founding-stage involvement at Lukka. Previously managed the $175M portfolio of the Episcopal Diocese of Long Island's Investment Advisory Committee (top-decile returns). He holds a CFA designation, an MBA from NYU, and a B.A. in Economics from Columbia University."},{"id":"jonathan","name":"Jonathan Mayeur","role":"IntellectEU — Head of Product","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/Jonathan-Mayeur.jpg","text":"Jonathan Mayeur is Head of Product at IntellectEU, leading development of the Catalyst Product Suite — actively deployed by Canton Network participants to modernize payments and digital asset adoption at scale. His six years of work on payments and blockchain projects across capital markets, telco, and supply chain provide practical, production-grade insight into Canton's operational challenges."},{"id":"yiannis","name":"Yiannis Varelas","role":"Five North — Founder","img":"https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/yiannis.jpg","text":"Yiannis Varelas leads Five North, a proprietary trading and venture studio building foundational infrastructure for the Canton Network — the basic building blocks used to develop decentralized financial applications and markets. Built from years of engineering, market research, and first-principles risk-taking, Five North sits at the intersection of trading and infrastructure development for institutional blockchain markets."}];
 
 document.addEventListener("DOMContentLoaded", function() {
 
-  /* MODULE COLLAPSE / EXPAND */
+  /* ── MODULE COLLAPSE / EXPAND ── */
   window.toggleLc = function(id) {
-    var lc = document.getElementById(id);
-    var body = document.getElementById(id + '-body');
+    const lc = document.getElementById(id);
+    const body = document.getElementById(id + '-body');
     if (!lc || !body) return;
-    var collapsed = lc.classList.toggle('collapsed');
+    const collapsed = lc.classList.toggle('collapsed');
     body.classList.toggle('collapsed', collapsed);
   };
 
-  /* SLIDER ENGINE */
+  /* ── NETWORK MAP ── */
+  function rnShow(key) {
+    const d = RN_INFO[key];
+    if (!d) return;
+    document.getElementById("rn-prompt").style.display = "none";
+    const t = document.getElementById("rn-title");
+    const b = document.getElementById("rn-body");
+    t.style.display = "block";
+    b.style.display  = "block";
+    t.textContent   = d.title;
+    b.innerHTML     = d.body.replace(/\n\n/g,"<br><br>").replace(/\n/g,"<br>");
+    document.getElementById("rn-info").scrollIntoView({behavior:"smooth",block:"nearest"});
+  }
+
+  function rnDeselect() {
+    document.querySelectorAll(".rn-node").forEach(el => el.classList.remove("rn-on"));
+  }
+
+  const nodeMap = {
+    "nd-canton":    "canton",
+    "nd-trize":     "trize",
+    "nd-fireblocks":"fireblocks",
+    "nd-base":      "base",
+    "nd-ats":       "ats",
+    "nd-rizenet":   "rizenet",
+    "nd-chainlink": "chainlink",
+    "nd-proof":     "proof",
+    "nd-fl":        "fl",
+    "nd-util1":     "util_canton",
+    "nd-util2":     "util_gateway",
+    "nd-util3":     "util_dml",
+  };
+
+  Object.entries(nodeMap).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("click", function(e) {
+      e.stopPropagation();
+      rnDeselect();
+      el.classList.add("rn-on");
+      rnShow(key);
+    });
+  });
+
+  const ccipEl = document.getElementById("conn-ccip");
+  if (ccipEl) ccipEl.addEventListener("click", function(e) { e.stopPropagation(); rnDeselect(); rnShow("ccip"); });
+
+  const wrap1El = document.getElementById("conn-wrap1");
+  if (wrap1El) wrap1El.addEventListener("click", function(e) { e.stopPropagation(); rnDeselect(); rnShow("wrap"); });
+
+  const svgEl = document.getElementById("rn-svg");
+  if (svgEl) svgEl.addEventListener("click", function() {
+    rnDeselect();
+    document.getElementById("rn-prompt").style.display = "";
+    document.getElementById("rn-title").style.display  = "none";
+    document.getElementById("rn-body").style.display   = "none";
+  });
+
+  /* Animated Canton members */
+  const members = ["BNY Mellon","Goldman Sachs","DTCC","HSBC","BNP Paribas","Euroclear","J.P. Morgan","Morgan Stanley","Broadridge","Cumberland","Deutsche Börse","SBI Digital"];
+  let cm = 0;
+  setInterval(function() {
+    cm = (cm + 1) % members.length;
+    const el = document.getElementById("canton-member");
+    if (el) el.textContent = members[cm];
+  }, 1900);
+
+  /* Animated proof label */
+  const proofWords = ["Proof of Process","Proof of Origin","Proof of Reserve"];
+  let pi = 0;
+  setInterval(function() {
+    pi = (pi + 1) % proofWords.length;
+    const el = document.getElementById("proof-lbl");
+    if (el) { el.style.opacity="0"; setTimeout(function(){ el.textContent=proofWords[pi]; el.style.opacity="1"; },300); }
+  }, 2500);
+
+  /* Animated FL label */
+  const flWords = ["Insurance Claims","Default Risks"];
+  let fi = 0;
+  setInterval(function() {
+    fi = (fi + 1) % flWords.length;
+    const el = document.getElementById("fl-lbl");
+    if (el) { el.style.opacity="0"; setTimeout(function(){ el.textContent=flWords[fi]; el.style.opacity="1"; },300); }
+  }, 2800);
+
+  /* ── EXISTING ECO HUB LOGIC ── */
   const PER_PAGE=6;
-  const state={canton:0,board:0};
+  const state={eco:0,canton:0,board:0};
 
   function buildSlider(key,data,isPerson,darkBg){
     const track=document.getElementById(key+'-track');
@@ -284,7 +398,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const avatarContent=hasImg?'<img src="'+item.img+'" alt="'+item.name+'" onerror="this.parentElement.innerHTML=\''+initials+'\'" />':initials;
         const avatarClass='b-avatar'+(isPerson?' person':'')+((!hasImg)?' initials':'');
         const avatarStyle=!hasImg?'style="background:var(--navy)"':'';
-        const tagHtml=item.tag?'<div class="b-tag">'+item.tag+'</div>':(item.role?'<div class="b-tag">'+item.role.split('-')[0].trim()+'</div>':'');
+        const tagHtml=item.tag?'<div class="b-tag">'+item.tag+'</div>':(item.role?'<div class="b-tag">'+item.role.split('—')[0].trim()+'</div>':'');
         return '<div class="bubble '+extraClass+'" id="b-'+key+'-'+item.id+'" onclick="pick(\''+key+'\',\''+item.id+'\')">'
           +'<div class="'+avatarClass+'" '+avatarStyle+'>'+avatarContent+'</div>'
           +'<div class="b-name">'+item.name+'</div>'+tagHtml+'</div>';
@@ -298,11 +412,12 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   window.slide=function(key,dir){const pages=document.getElementById(key+'-track').querySelectorAll('.slider-page').length;state[key]=Math.max(0,Math.min(pages-1,state[key]+dir));applySlide(key,pages);};
+  window.goPage=function(key,idx){const pages=document.getElementById(key+'-track').querySelectorAll('.slider-page').length;state[key]=idx;applySlide(key,pages);};
   function applySlide(key,pages){document.getElementById(key+'-track').style.transform='translateX(-'+state[key]*100+'%)';document.querySelectorAll('#'+key+'-dots .s-dot').forEach(function(d,i){d.classList.toggle('on',i===state[key]);});updateBtns(key,pages);}
   function updateBtns(key,pages){const p=document.getElementById(key+'-prev');const n=document.getElementById(key+'-next');if(p)p.disabled=state[key]===0;if(n)n.disabled=state[key]>=pages-1;}
 
-  const active={canton:null,board:null};
-  const dataMap={canton:CANTON,board:BOARD};
+  const active={eco:null,canton:null,board:null,deals:null};
+  const dataMap={eco:ECO,canton:CANTON,board:BOARD,deals:DEALS};
 
   window.pick=function(key,id){
     const item=dataMap[key].find(function(x){return x.id===id;});
@@ -318,22 +433,62 @@ document.addEventListener("DOMContentLoaded", function() {
     const text=document.getElementById(key+'-text');
     if(prompt)prompt.style.display='none';
     title.style.display='block';text.style.display='block';
-    title.textContent=item.role?item.name+' - '+item.role:item.name;
+    title.textContent=item.role?item.name+' — '+item.role:item.name;
     text.textContent=item.text;
   };
 
-  buildSlider('canton', CANTON, false, true);
-  buildSlider('board', BOARD, true);
+  function resetBox(key){const box=document.getElementById(key+'-box');const prompt=box.querySelector('.ib-prompt');const title=document.getElementById(key+'-title');const text=document.getElementById(key+'-text');if(prompt)prompt.style.display='';if(title){title.style.display='none';title.textContent='';}if(text){text.style.display='none';text.innerHTML='';}}
 
-  /* CANTON ECOSYSTEM BROWSER */
+  let activeTeam=null;
+  function buildTeam(){
+    const grid=document.getElementById('team-grid');
+    if(!grid)return;
+    grid.innerHTML=TEAM.map(function(m){
+      return '<div class="t-bubble" id="tm-'+m.id+'" onclick="pickTeam(\''+m.id+'\')">'
+        +'<div class="t-avatar">'+(m.img?'<img src="'+m.img+'" alt="'+m.name+'" onerror="this.parentElement.innerHTML=\''+m.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2)+'\'"/>':m.name.split(' ').map(function(w){return w[0];}).join('').slice(0,2))+'</div>'
+        +'<div class="t-name">'+m.name+'</div></div>';
+    }).join('');
+  }
+
+  window.pickTeam=function(id){
+    const m=TEAM.find(function(x){return x.id===id;});
+    const box=document.getElementById('team-box');
+    if(activeTeam===id){activeTeam=null;document.querySelectorAll('[id^="tm-"]').forEach(function(b){b.classList.remove('on');});box.classList.remove('show');return;}
+    activeTeam=id;
+    document.querySelectorAll('[id^="tm-"]').forEach(function(b){b.classList.remove('on');});
+    document.getElementById('tm-'+id).classList.add('on');
+    document.getElementById('team-role').textContent=m.role;
+    document.getElementById('team-name-el').textContent=m.name;
+    box.classList.add('show');
+  };
+
+  function buildDeals(){
+    const grid=document.getElementById('deals-grid');
+    if(!grid)return;
+    grid.innerHTML=DEALS.map(function(d){
+      return '<div class="d-bubble" id="b-deals-'+d.id+'" onclick="pick(\'deals\',\''+d.id+'\')">'
+        +'<div class="d-avatar">'+(d.img?'<img src="'+d.img+'" alt="'+d.name+'" onerror="this.parentElement.innerHTML=\''+d.name.slice(0,2)+'\'"/>':d.name.slice(0,2))+'</div>'
+        +'<div class="d-name">'+d.name+'</div><div class="d-sub">'+d.subtitle+'</div></div>';
+    }).join('');
+  }
+
+  buildSlider('eco',ECO,false);
+  buildSlider('canton',CANTON,false,true);
+  buildSlider('board',BOARD,true);
+  buildTeam();
+  buildDeals();
+
+  /* ═══════════════════════════════════════════════════
+     CANTON ECOSYSTEM BROWSER
+  ═══════════════════════════════════════════════════ */
   const CEB_JSON = 'https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/canton-ecosystem/entities.json';
   const CEB_LOGO_BASE = 'https://cdn.jsdelivr.net/gh/hcftrize/TOKERIZE@dev/canton-ecosystem/logos/';
-  // Exact filename map - covers all 282 logos (png/jpg/jpeg/svg)
-  const CEB_FILES={"1pilot":"1pilot.png","21shares":"21shares.png","4mgroup":"4mgroup.png","5n-loop-wallet":"5n-loop-wallet.png","7ridge":"7ridge.jpg","7trust":"7trust.png","acme":"acme.png","akascan":"akascan.png","akua-finance":"akua-finance.png","alchemy":"alchemy.png","alpend":"alpend.png","amberdata":"amberdata.png","ambertrading":"ambertrading.png","angelhack":"angelhack.jpeg","appsfactory":"appsfactory.png","archax":"archax.png","arrington-capital":"arrington-capital.png","artichoke-capital":"artichoke-capital.jpeg","asterizm":"asterizm.jpeg","axa-im":"axa-im.png","b2c2":"b2c2.png","banco-santander":"banco-santander.png","bank-of-america":"bank-of-america.png","bank-of-china":"bank-of-china.png","bcw-group":"bcw-group.jpeg","beyondcentral":"beyondcentral.png","bitalpha-dba-bitwave":"biatlpha-dba-bitwave.png","binance-us":"binance-us.png","bitcoin-suisse":"bitcoin-suisse.jpeg","bitgo":"bitgo.jpeg","bitsafe":"bitsafe.png","bitwave":"bitwave.jpeg","black-manta-capital-partners":"black-manta-capital-partners.png","blockdaemon":"blockdaemon.png","bnp-paribas":"bnp-paribas.png","bny":"bny.png","bp":"bp.png","brale":"brale.jpeg","bridgeport":"bridgeport.jpg","brikly":"brikly.jpg","broadridge":"broadridge.png","bron-wallet":"bron-wallet.png","bybit":"bybit.png","c8-wallet":"c8-wallet.png","calastone":"calastone.png","cantara":"cantara.jpg","cantex":"cantex.jpg","canton-strategic-holdings":"canton-strategic-holdings.png","castle-island":"castle-island.jpeg","castleton-commodities-international":"castleton-commodities-international.jpeg","cbtc":"cbtc.png","cc-view":"cc-view.png","chain-experts":"chain-experts.png","chainbridge-tax-planner":"chainbridge-tax-planner.jpg","chainlink":"chainlink.png","chainsafe":"chainsafe.png","chata---sync-insights":"chata---sync-insights.png","checker-finance":"checker-finance.png","circle":"circle.png","citi":"citi.png","clifford-chance":"clifford-chance.png","coin-metrics-canton-data-app":"coin-metrics-canton-data-app.jpg","coin-metrics":"coin-metrics.png","coinshares":"coinshares.png","cointelegraph-decentralization-guardians":"cointelegraph-decentralization-guardians.png","commerzbank-ag":"commerzbank-ag.png","console-wallet":"console-wallet.jpg","copper":"copper.png","credit-agricole":"credit-agricole.png","credshields":"credshields.jpg","crypto-finance-ag":"crypto-finance-ag.png","cryptocom":"cryptocom.png","ctrl-alt":"ctrl-alt.png","cumberland-sv":"cumberland-sv.jpeg","cypherock":"cypherock.png","d2x":"d2x.png","da-registry-app":"da-registry-app.png","dedge-security":"dedge-security.jpg","deloitte":"deloitte.png","denex-gas-station":"denex-gas-station.png","depinx":"depinx.jpg","desyn":"desyn.png","dfns":"dfns.png","digital-asset":"digital-asset.png","drw":"drw.jpeg","dsrv":"dsrv.png","dstash":"dstash.jpg","dtcc":"dtcc.jpg","dv-chain":"dv-chain.png","ea-finance":"ea-finance.png","edgevana":"edgevana.jpg","efficient-frontier":"efficient-frontier.png","eib":"eib.png","eleox":"eleox.png","elk-capital-markets":"elk-capital-markets.png","elliptic":"elliptic.png","elwood-technologies":"elwood-technologies.jpg","equilend":"equilend.jpeg","equitize":"equitize.jpeg","euroclear":"euroclear.png","euronext":"euronext.jpg","everstake":"everstake.png","ey":"ey.png","fairmint":"fairmint.jpeg","falconx":"falconx.jpeg","fasanara":"fasanara.png","fcx":"fcx.png","fidelity":"fidelity.jpeg","figment":"figment.png","finoa-consensus-services":"finoa-consensus-services.png","fireblocks":"fireblocks.jpg","five-north":"five-north.png","flipside-crypto":"flipside-crypto.jpeg","flow-desk":"flow-desk.png","flowryd-os":"flowryd-os.png","flowtraders":"flowtraders.png","founders-fund":"founders-fund.png","foundinals":"foundinals.png","franklin-templeton":"franklin-templeton.png","frax":"frax.png","g-20-group":"g-20-group.jpg","galaxy":"galaxy.jpeg","gambyl":"gambyl.png","gate":"gate.jpeg","gatewayfm":"gatewayfm.png","gemini":"gemini.png","gk8-galaxy":"gk8-galaxy.jpg","global-blockchain-business-council":"global-blockchain-business-council.png","global-synchronizer":"global-synchronizer.png","globalstake":"globalstake.png","goldman-sachs":"goldman-sachs.png","gravity-team":"gravity-team.jpeg","gs-dap":"gs-dap.png","gsr":"gsr.png","hashkeycloud":"hashkeycloud.png","hashnote-now-circle":"hashnote-now-circle.jpg","hashrupt":"hashrupt.png","haven-digital-partners":"haven-digital-partners.png","hextrust":"hextrust.jpg","hifi":"hifi.png","hkex":"hkex.png","hkma":"hkma.png","hoodrun":"hoodrun.jpg","houdini-swap":"houdini-swap.jpeg","hsbc":"hsbc.png","hydra-x":"hydra-x.png","hypernative":"hypernative.png","ibenji":"ibenji.jpg","icapital":"icapital.png","intellecteu":"intellecteu.png","ipblock-llc":"ipblock-llc.jpg","jp-morgan":"jp-morgan.png","k2f-labs":"k2f-labs.jpg","kaiko-data-services":"kaiko-data-services.png","kaiko":"kaiko.png","kairo":"kairo.png","kaleido":"kaleido.png","keyrock":"keyrock.png","kiln":"kiln.png","klarsign":"klarsign.jpg","koch-energy-services":"koch-energy-services.png","komonode":"komonode.png","kpmg":"kpmg.png","kraken":"kraken.jpeg","kucoin":"kucoin.png","lab6174":"lab6174.png","launchnodes":"launchnodes.png","layerzero":"layerzero.png","ledger":"ledger.png","ledgible":"ledgible.jpeg","lendos":"lendos.jpeg","liberty-city-ventures":"liberty-city-ventures.png","liquidity-tech-ltp":"liquidity-tech-ltp.jpg","lloyds-banking-group":"lloyds-banking-group.png","london-stock-exchange":"london-stock-exchange.jpg","luganodes":"luganodes.png","lukka-inc":"lukka-inc.jpg","luxembourg-stock-exchange":"luxembourg-stock-exchange.jpg","maestro":"maestro.png","marex":"marex.jpg","memora":"memora.png","mercuria-energy-america":"mercuria-energy-america.png","meria":"meria.png","merkle-science":"merkle-science.jpg","mesh":"mesh.jpg","mexc":"mexc.png","microsoft":"microsoft.jpg","midao":"midao.jpeg","mintify":"mintify.png","moatcapital":"moatcapital.png","monerium":"monerium.jpeg","moodys":"moodys.jpg","moonshot":"moonshot.jpeg","mpch":"mpch.png","mufg":"mufg.png","nansen":"nansen.png","nasdaq":"nasdaq.png","nightly-wallet":"nightly-wallet.jpg","node-fortress":"node-fortress.png","node-monster":"node-monster.png","noders":"noders.jpg","novaprime":"novaprime.png","noves":"noves.png","obligate":"obligate.png","obsidian-systems":"obsidian-systems.png","oliver-wyman":"oliver-wyman.png","ownera":"ownera.png","p2p":"p2p.png","particula":"particula.png","paxos":"paxos.jpg","paysafe":"paysafe.png","pixelplex":"pixelplex.jpg","polychain":"polychain.png","posthuman":"posthuman.png","primrose-capital-management":"primrose-capital-management.jpeg","prometheus":"prometheus.png","proof-group":"proof-group.png","puroearth":"puroearth.png","pyth":"pyth.png","qcp-trading":"qcp-trading.jpeg","quantstamp":"quantstamp.jpeg","realworld-solutions":"realworld-solutions.jpg","receipts-depositary-corporation-rdc":"receipts-depositary-corporation-rdc.jpg","redstone":"redstone.png","republic":"republic.png","robinhood":"robinhood.png","rwaxyz":"rwaxyz.png","sbc":"sbc.png","sbi-digital-asset-holdings":"sbi-digital-asset-holdings.png","soci\u00e9t\u00e9-g\u00e9n\u00e9rale":"société-générale.png","sekoya-labs":"sekoya-labs.jpeg","send":"send.png","sg-forge":"sg-forge.jpg","shell-energy-north-america":"shell-energy-north-america.png","solv-protocol":"solv-protocol.jpg","splice-an-lfdt-lab":"splice-an-lfdt-lab.png","stakecraft":"stakecraft.jpg","t-rize":"t-rize.png","talos":"talos.png","taurus":"taurus.png","temple-digital-group":"temple-digital-group.png","temple-trading":"temple-trading.jpg","texture-capital":"texture-capital.png","the-tie":"the-tie.png","thetanuts":"thetanuts.png","tradecraft":"tradecraft.jpg","tradefast":"tradefast.jpg","tradeweb-24x7-repo-app-for-canton":"tradeweb-24x7-repo-app-for-canton.png","tradeweb":"tradeweb.png","trakx":"trakx.png","treasuryspring":"treasuryspring.jpg","trm-labs":"trm-labs.jpeg","ubs":"ubs.jpg","ubyx":"ubyx.jpeg","unhedged":"unhedged.jpg","union-investment":"union-investment.png","usd1":"usd1.jpg","usdc":"usdc.jpg","usdm1":"usdm1.png","utila":"utila.png","vigil-markets":"vigil-markets.jpeg","visa":"visa.jpg","walletconnect":"walletconnect.png","wells-fargo":"wells-fargo.jpg","witan-group":"witan-group.png","worldpay":"worldpay.jpg","wormhole":"wormhole.png","xbto":"xbto.jpeg","xlabs":"xlabs.png","xventures":"xventures.jpg","zeconomy":"zeconomy.png","zenith":"zenith.jpg","zerohash":"zerohash.jpg","zinnia":"zinnia.png","zodia-custody":"zodia-custody.png","zoro-wallet":"zoro-wallet.png"};
+  // Exact filename map — covers all 282 logos (png/jpg/jpeg/svg)
+  const CEB_FILES={"1pilot":"1pilot.png","21shares":"21shares.png","4mgroup":"4mgroup.png","5n-loop-wallet":"5n-loop-wallet.png","7ridge":"7ridge.jpg","7trust":"7trust.png","acme":"acme.png","akascan":"akascan.png","akua-finance":"akua-finance.png","alchemy":"alchemy.png","alpend":"alpend.png","amberdata":"amberdata.png","ambertrading":"ambertrading.png","angelhack":"angelhack.jpeg","appsfactory":"appsfactory.png","archax":"archax.png","arrington-capital":"arrington-capital.png","artichoke-capital":"artichoke-capital.jpeg","asterizm":"asterizm.jpeg","axa-im":"axa-im.png","b2c2":"b2c2.png","banco-santander":"banco-santander.png","bank-of-america":"bank-of-america.png","bank-of-china":"bank-of-china.png","bcw-group":"bcw-group.jpeg","beyondcentral":"beyondcentral.png","bitalpha-dba-bitwave":"biatlpha-dba-bitwave.png","binance-us":"binance-us.png","bitcoin-suisse":"bitcoin-suisse.jpeg","bitgo":"bitgo.jpeg","bitsafe":"bitsafe.png","bitwave":"bitwave.jpeg","black-manta-capital-partners":"black-manta-capital-partners.png","blockdaemon":"blockdaemon.png","bnp-paribas":"bnp-paribas.png","bny":"bny.png","bp":"bp.png","brale":"brale.jpeg","bridgeport":"bridgeport.jpg","brikly":"brikly.jpg","broadridge":"broadridge.png","bron-wallet":"bron-wallet.png","bybit":"bybit.png","c8-wallet":"c8-wallet.png","calastone":"calastone.png","cantara":"cantara.jpg","cantex":"cantex.jpg","canton-strategic-holdings":"canton-strategic-holdings.png","castle-island":"castle-island.jpeg","castleton-commodities-international":"castleton-commodities-international.jpeg","cbtc":"cbtc.png","cc-view":"cc-view.png","chain-experts":"chain-experts.png","chainbridge-tax-planner":"chainbridge-tax-planner.jpg","chainlink":"chainlink.png","chainsafe":"chainsafe.png","chata---sync-insights":"chata---sync-insights.png","checker-finance":"checker-finance.png","circle":"circle.png","citi":"citi.png","clifford-chance":"clifford-chance.png","coin-metrics-canton-data-app":"coin-metrics-canton-data-app.jpg","coin-metrics":"coin-metrics.png","coinshares":"coinshares.png","cointelegraph-decentralization-guardians":"cointelegraph-decentralization-guardians.png","commerzbank-ag":"commerzbank-ag.png","console-wallet":"console-wallet.jpg","copper":"copper.png","credit-agricole":"credit-agricole.png","credshields":"credshields.jpg","crypto-finance-ag":"crypto-finance-ag.png","cryptocom":"cryptocom.png","ctrl-alt":"ctrl-alt.png","cumberland-sv":"cumberland-sv.jpeg","cypherock":"cypherock.png","d2x":"d2x.png","da-registry-app":"da-registry-app.png","dedge-security":"dedge-security.jpg","deloitte":"deloitte.png","denex-gas-station":"denex-gas-station.png","depinx":"depinx.jpg","desyn":"desyn.png","dfns":"dfns.png","digital-asset":"digital-asset.png","drw":"drw.jpeg","dsrv":"dsrv.png","dstash":"dstash.jpg","dtcc":"dtcc.jpg","dv-chain":"dv-chain.png","ea-finance":"ea-finance.png","edgevana":"edgevana.jpg","efficient-frontier":"efficient-frontier.png","eib":"eib.png","eleox":"eleox.png","elk-capital-markets":"elk-capital-markets.png","elliptic":"elliptic.png","elwood-technologies":"elwood-technologies.jpg","equilend":"equilend.jpeg","equitize":"equitize.jpeg","euroclear":"euroclear.png","euronext":"euronext.jpg","everstake":"everstake.png","ey":"ey.png","fairmint":"fairmint.jpeg","falconx":"falconx.jpeg","fasanara":"fasanara.png","fcx":"fcx.png","fidelity":"fidelity.jpeg","figment":"figment.png","finoa-consensus-services":"finoa-consensus-services.png","fireblocks":"fireblocks.jpg","five-north":"five-north.png","flipside-crypto":"flipside-crypto.jpeg","flow-desk":"flow-desk.png","flowryd-os":"flowryd-os.png","flowtraders":"flowtraders.png","founders-fund":"founders-fund.png","foundinals":"foundinals.png","franklin-templeton":"franklin-templeton.png","frax":"frax.png","g-20-group":"g-20-group.jpg","galaxy":"galaxy.jpeg","gambyl":"gambyl.png","gate":"gate.jpeg","gatewayfm":"gatewayfm.png","gemini":"gemini.png","gk8-galaxy":"gk8-galaxy.jpg","global-blockchain-business-council":"global-blockchain-business-council.png","global-synchronizer":"global-synchronizer.png","globalstake":"globalstake.png","goldman-sachs":"goldman-sachs.png","gravity-team":"gravity-team.jpeg","gs-dap":"gs-dap.png","gsr":"gsr.png","hashkeycloud":"hashkeycloud.png","hashnote-now-circle":"hashnote-now-circle.jpg","hashrupt":"hashrupt.png","haven-digital-partners":"haven-digital-partners.png","hextrust":"hextrust.jpg","hifi":"hifi.png","hkex":"hkex.png","hkma":"hkma.png","hoodrun":"hoodrun.jpg","houdini-swap":"houdini-swap.jpeg","hsbc":"hsbc.png","hydra-x":"hydra-x.png","hypernative":"hypernative.png","ibenji":"ibenji.jpg","icapital":"icapital.png","intellecteu":"intellecteu.png","ipblock-llc":"ipblock-llc.jpg","jp-morgan":"jp-morgan.png","k2f-labs":"k2f-labs.jpg","kaiko-data-services":"kaiko-data-services.png","kaiko":"kaiko.png","kairo":"kairo.png","kaleido":"kaleido.png","keyrock":"keyrock.png","kiln":"kiln.png","klarsign":"klarsign.jpg","koch-energy-services":"koch-energy-services.png","komonode":"komonode.png","kpmg":"kpmg.png","kraken":"kraken.jpeg","kucoin":"kucoin.png","lab6174":"lab6174.png","launchnodes":"launchnodes.png","layerzero":"layerzero.png","ledger":"ledger.png","ledgible":"ledgible.jpeg","lendos":"lendos.jpeg","liberty-city-ventures":"liberty-city-ventures.png","liquidity-tech-ltp":"liquidity-tech-ltp.jpg","lloyds-banking-group":"lloyds-banking-group.png","london-stock-exchange":"london-stock-exchange.jpg","luganodes":"luganodes.png","lukka-inc":"lukka-inc.jpg","luxembourg-stock-exchange":"luxembourg-stock-exchange.jpg","maestro":"maestro.png","marex":"marex.jpg","memora":"memora.png","mercuria-energy-america":"mercuria-energy-america.png","meria":"meria.png","merkle-science":"merkle-science.jpg","mesh":"mesh.jpg","mexc":"mexc.png","microsoft":"microsoft.jpg","midao":"midao.jpeg","mintify":"mintify.png","moatcapital":"moatcapital.png","monerium":"monerium.jpeg","moodys":"moodys.jpg","moonshot":"moonshot.jpeg","mpch":"mpch.png","mufg":"mufg.png","nansen":"nansen.png","nasdaq":"nasdaq.png","nightly-wallet":"nightly-wallet.jpg","node-fortress":"node-fortress.png","node-monster":"node-monster.png","noders":"noders.jpg","novaprime":"novaprime.png","noves":"noves.png","obligate":"obligate.png","obsidian-systems":"obsidian-systems.png","oliver-wyman":"oliver-wyman.png","ownera":"ownera.png","p2p":"p2p.png","particula":"particula.png","paxos":"paxos.jpg","paysafe":"paysafe.png","pixelplex":"pixelplex.jpg","polychain":"polychain.png","posthuman":"posthuman.png","primrose-capital-management":"primrose-capital-management.jpeg","prometheus":"prometheus.png","proof-group":"proof-group.png","puroearth":"puroearth.png","pyth":"pyth.png","qcp-trading":"qcp-trading.jpeg","quantstamp":"quantstamp.jpeg","realworld-solutions":"realworld-solutions.jpg","receipts-depositary-corporation-rdc":"receipts-depositary-corporation-rdc.jpg","redstone":"redstone.png","republic":"republic.png","robinhood":"robinhood.png","rwaxyz":"rwaxyz.png","sbc":"sbc.png","sbi-digital-asset-holdings":"sbi-digital-asset-holdings.png","société-générale":"société-générale.png","sekoya-labs":"sekoya-labs.jpeg","send":"send.png","sg-forge":"sg-forge.jpg","shell-energy-north-america":"shell-energy-north-america.png","solv-protocol":"solv-protocol.jpg","splice-an-lfdt-lab":"splice-an-lfdt-lab.png","stakecraft":"stakecraft.jpg","t-rize":"t-rize.png","talos":"talos.png","taurus":"taurus.png","temple-digital-group":"temple-digital-group.png","temple-trading":"temple-trading.jpg","texture-capital":"texture-capital.png","the-tie":"the-tie.png","thetanuts":"thetanuts.png","tradecraft":"tradecraft.jpg","tradefast":"tradefast.jpg","tradeweb-24x7-repo-app-for-canton":"tradeweb-24x7-repo-app-for-canton.png","tradeweb":"tradeweb.png","trakx":"trakx.png","treasuryspring":"treasuryspring.jpg","trm-labs":"trm-labs.jpeg","ubs":"ubs.jpg","ubyx":"ubyx.jpeg","unhedged":"unhedged.jpg","union-investment":"union-investment.png","usd1":"usd1.jpg","usdc":"usdc.jpg","usdm1":"usdm1.png","utila":"utila.png","vigil-markets":"vigil-markets.jpeg","visa":"visa.jpg","walletconnect":"walletconnect.png","wells-fargo":"wells-fargo.jpg","witan-group":"witan-group.png","worldpay":"worldpay.jpg","wormhole":"wormhole.png","xbto":"xbto.jpeg","xlabs":"xlabs.png","xventures":"xventures.jpg","zeconomy":"zeconomy.png","zenith":"zenith.jpg","zerohash":"zerohash.jpg","zinnia":"zinnia.png","zodia-custody":"zodia-custody.png","zoro-wallet":"zoro-wallet.png"};
   const CEB_PER_PAGE = 48;
 
 
-  // Priority order - T-RIZE first, then institutionals, then alpha. tradeweb-24x7 and sbc excluded.
+  // Priority order — T-RIZE first, then institutionals, then alpha. tradeweb-24x7 and sbc excluded.
   // Priority: T-RIZE first, then institutionals. sbc + tradeweb-24x7 excluded.
   const CEB_PRIORITY = [
     't-rize','axa-im','banco-santander','bank-of-america','bank-of-china',
@@ -342,7 +497,7 @@ document.addEventListener("DOMContentLoaded", function() {
     'euroclear','euronext','fidelity','franklin-templeton','goldman-sachs',
     'hkma','hsbc','kpmg','lloyds-banking-group','london-stock-exchange',
     'luxembourg-stock-exchange','microsoft','moodys','nasdaq',
-    'sbi-digital-asset-holdings','shell-energy-north-america','soci\u00e9t\u00e9-g\u00e9n\u00e9rale','sg-forge',
+    'sbi-digital-asset-holdings','shell-energy-north-america','société-générale','sg-forge',
     'tradeweb','ubs','visa','wells-fargo'
   ];
 
@@ -353,13 +508,13 @@ document.addEventListener("DOMContentLoaded", function() {
   let cebActiveBubble = null;
 
   function cebSlugMatch(slug, priorities) {
-    // Exact match only - prevents 'sbc' matching 'hsbc', 'tradeweb' matching 'tradeweb-24x7', etc.
+    // Exact match only — prevents 'sbc' matching 'hsbc', 'tradeweb' matching 'tradeweb-24x7', etc.
     return priorities.indexOf(slug) !== -1;
   }
 
   function cebCleanText(raw) {
     if (!raw) return '';
-    // Detect 404 pages - return empty so info box shows nothing
+    // Detect 404 pages — return empty so info box shows nothing
     if (raw.indexOf("Page Not Found") !== -1 || raw.indexOf("doesn't exist or has been moved") !== -1) return '';
     // Strip nav boilerplate up to the entity name paragraph
     var t = raw.replace(/Canton Network[\s\S]*?Speak to an expert\n/,'');
@@ -393,7 +548,7 @@ document.addEventListener("DOMContentLoaded", function() {
       if (cebSlugMatch(e.slug, CEB_PRIORITY)) priority.push(e);
       else rest.push(e);
     });
-    // Sort priority by CEB_PRIORITY order - exact match only
+    // Sort priority by CEB_PRIORITY order — exact match only
     priority.sort(function(a,b) {
       var ai = CEB_PRIORITY.indexOf(a.slug);
       var bi = CEB_PRIORITY.indexOf(b.slug);
@@ -563,7 +718,6 @@ document.addEventListener("DOMContentLoaded", function() {
       document.getElementById('ceb-count').textContent = 'Could not load ecosystem data.';
       console.error('CEB load error:', err);
     });
-
 
 }); // end DOMContentLoaded
 </script>
