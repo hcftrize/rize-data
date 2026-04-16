@@ -1202,10 +1202,21 @@ document.addEventListener("DOMContentLoaded", function() {
     } catch(e) { return null; }
   }
 
+  // Prix RIZE via DexScreener — API publique gratuite, même source que rizenet.io
+  // Prend le prix du pool Aerodrome (liquidity la plus haute, pairs[0])
+  var RIP_POOL = '0xEa5cb64754Ad7aA24F7A6BBe3b724F29B4f822B8';
+  var RIP_USDC = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
+
   function ripGetPrice() {
-    return fetch('/api/coingecko?path=/simple/price&ids=rize&vs_currencies=usd')
+    return fetch('https://api.dexscreener.com/latest/dex/tokens/' + RIP_TOKEN)
       .then(function(r){ return r.json(); })
-      .then(function(d){ return (d.rize && d.rize.usd) ? d.rize.usd : null; })
+      .then(function(d){
+        // Trouver le pool Aerodrome (le plus liquide)
+        var pairs = d.pairs || [];
+        var aerodrome = pairs.find(function(p){ return p.dexId === 'aerodrome'; });
+        var best = aerodrome || pairs[0];
+        return best && best.priceUsd ? parseFloat(best.priceUsd) : null;
+      })
       .catch(function(){ return null; });
   }
 
