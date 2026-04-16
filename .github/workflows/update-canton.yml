@@ -2,9 +2,7 @@ name: Update Canton Ecosystem
 
 on:
   schedule:
-    # Every Monday at 08:00 UTC
     - cron: '0 8 * * 1'
-  # Allow manual trigger from GitHub UI
   workflow_dispatch:
 
 jobs:
@@ -24,15 +22,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install playwright cairosvg
+          pip install playwright
           playwright install chromium
           playwright install-deps chromium
 
       - name: Run scraper (diff mode — new entities only)
         run: python scrape_canton.py --diff
-
-      - name: Convert any new SVG logos to PNG
-        run: python convert_svgs.py
 
       - name: Check for changes
         id: changes
