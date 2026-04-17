@@ -33,7 +33,7 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 .footer-nav a{color:rgba(255,255,255,1.0);text-decoration:none;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;letter-spacing:2px;text-transform:uppercase;transition:color 0.2s;}
 .footer-nav a:hover{color:#fff;}
 .footer-copy{font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.85);}
-.footer-disclaimer{font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,0.75);margin-top:6px;letter-spacing:0.3px;}
+.footer-disclaimer{font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.3px;}
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:#f0f0f0;}::-webkit-scrollbar-thumb{background:var(--navy);}
 @media(max-width:768px){
   .site-header{padding:0 16px;height:68px;}.site-header-logo img{height:48px;}
@@ -88,20 +88,18 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
     <nav class="site-nav">
       <a href="/" class="nav-home">Home</a>
       <a href="/about">About</a>
-      <a href="/hub" class="nav-hub">RIZE Data Hub</a>
+      <a href="/hub" class="nav-hub">Tokerize Data Hub</a>
     </nav>
   </header>
 <div class="hero">
   <div class="wrap">
     <p class="hero-eyebrow">RIZE Community Tokenization Hub</p>
     <h1>Tokerize <span>Everything</span></h1>
-    <p class="hero-sub">In-depth analysis on real-world asset tokenization, live market data for RIZE and Canton Coin, and an institutional-grade hub covering T-RIZE, the Canton Network, and the full RIZENET ecosystem.</p>
+    <p class="hero-sub">Tokerize is a RIZE community website (we aren't affiliated with T-RIZE or Canton Network). We publish comprehensive articles about tokenization, and provide a suite of free web apps in our data hub: monitor the market data for both RIZE and Canton Coin, or learn more about T-RIZE, the full RIZENET ecosystem, and Canton Network — all in the same hub!</p>
   </div>
 </div>
 <div class="wrap">
-  <div style="padding:40px 0 8px;text-align:center;">
-    <a href="/hub" style="display:inline-flex;align-items:center;gap:12px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#fff;background:var(--navy);padding:16px 36px;text-decoration:none;border:2px solid var(--navy);transition:background 0.2s,border-color 0.2s;">Access the RIZE Data Hub &rarr;</a>
-  </div>
+  <div style="padding:40px 0 8px;text-align:center;"><a href="/hub" style="display:inline-flex;align-items:center;gap:12px;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#fff;background:var(--navy);padding:16px 36px;text-decoration:none;border:2px solid var(--navy);transition:background 0.2s;">Access Tokerize Data Hub &rarr;</a></div>
   <div class="section-label"><span>Latest</span></div>
   <div id="featured-container"></div>
   <div class="section-label"><span>More Articles</span></div>
@@ -146,11 +144,12 @@ fetch('/articles.json').then(r=>r.json()).then(articles=>{
   <footer class="site-footer">
     <div class="footer-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></div>
     <nav class="footer-nav">
-      <a href="/">Home</a><a href="/about">About</a><a href="/hub">RIZE Data Hub</a>
+      <a href="/">Home</a><a href="/about">About</a><a href="/hub">Tokerize Data Hub</a>
     </nav>
     <div>
       <p class="footer-copy">Tokerize &mdash; RIZE Community Tokenization Hub</p>
-      <p class="footer-disclaimer">Tokerize is a community built website and is not affiliated with T-RIZE.</p>
+      <p class="footer-disclaimer">Tokerize is a community built website.</p>
+      <p class="footer-disclaimer">We are not affiliated with T-RIZE or Canton Network.</p>
     </div>
   </footer>
 </body></html>
