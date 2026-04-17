@@ -572,7 +572,13 @@ html, body { overflow-x: hidden; max-width: 100%; }
     <span>RIZE Network Map</span>
     <button onclick="closeRnFullscreen()">✕ Close</button>
   </div>
-  <div id="rn-svg-clone-wrap" style="overflow-x:auto;overflow-y:auto;padding:16px;"></div>
+  <div id="rn-svg-clone-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:16px;border-bottom:1px solid #e0e0e0;"></div>
+  <!-- Mirrored learn box inside overlay -->
+  <div class="rn-info-box" id="rn-info-fs" style="margin:16px;border:1px solid #e0e0e0;border-left:3px solid var(--navy);background:#f7f9fc;padding:22px 26px;min-height:80px;">
+    <p class="rn-prompt" id="rn-prompt-fs">Tap any node or connector in the map above to read a detailed explanation.</p>
+    <div class="rn-title" id="rn-title-fs" style="display:none"></div>
+    <div class="rn-body"  id="rn-body-fs"  style="display:none"></div>
+  </div>
 </div>
 <script>
 function openRnFullscreen(){
@@ -584,10 +590,38 @@ function openRnFullscreen(){
     clone.id='rn-svg-clone';
     clone.style.minWidth='900px';
     clone.style.width='900px';
+    // Re-bind click events on cloned nodes so rn-on highlights work in clone
+    clone.querySelectorAll('.rn-node').forEach(function(node){
+      var orig_onclick = node.getAttribute('onclick');
+      if(orig_onclick){
+        node.addEventListener('click', function(){
+          // Deselect all in clone
+          clone.querySelectorAll('.rn-node').forEach(function(n){ n.classList.remove('rn-on'); });
+          node.classList.add('rn-on');
+        });
+      }
+    });
+    // Same for connectors
+    clone.querySelectorAll('.rn-conn').forEach(function(conn){
+      var orig_onclick = conn.getAttribute('onclick');
+      if(orig_onclick){
+        conn.addEventListener('click', function(){
+          clone.querySelectorAll('.rn-conn').forEach(function(c){ c.classList.remove('rn-on'); });
+          conn.classList.add('rn-on');
+        });
+      }
+    });
     wrap.appendChild(clone);
   }
   ov.classList.add('open');
   document.body.style.overflow='hidden';
+  // Reset learn box to default state
+  var fsPrompt = document.getElementById('rn-prompt-fs');
+  var fsT = document.getElementById('rn-title-fs');
+  var fsB = document.getElementById('rn-body-fs');
+  if(fsPrompt) fsPrompt.style.display = '';
+  if(fsT){ fsT.style.display='none'; fsT.textContent=''; }
+  if(fsB){ fsB.style.display='none'; fsB.innerHTML=''; }
   // Force landscape hint
   if(screen.orientation && screen.orientation.lock){
     screen.orientation.lock('landscape').catch(function(){});
@@ -916,18 +950,37 @@ document.addEventListener("DOMContentLoaded", function() {
   function rnShow(key) {
     const d = RN_INFO[key];
     if (!d) return;
+    const bodyHtml = d.body.replace(/\n\n/g,"<br><br>").replace(/\n/g,"<br>");
+    // Main learn box
     document.getElementById("rn-prompt").style.display = "none";
     const t = document.getElementById("rn-title");
     const b = document.getElementById("rn-body");
-    t.style.display = "block";
-    b.style.display  = "block";
-    t.textContent   = d.title;
-    b.innerHTML     = d.body.replace(/\n\n/g,"<br><br>").replace(/\n/g,"<br>");
+    t.style.display = "block"; b.style.display = "block";
+    t.textContent = d.title; b.innerHTML = bodyHtml;
     document.getElementById("rn-info").scrollIntoView({behavior:"smooth",block:"nearest"});
+    // Fullscreen mirrored learn box
+    const fsPrompt = document.getElementById("rn-prompt-fs");
+    const fsT = document.getElementById("rn-title-fs");
+    const fsB = document.getElementById("rn-body-fs");
+    if (fsPrompt) fsPrompt.style.display = "none";
+    if (fsT) { fsT.style.display = "block"; fsT.textContent = d.title; }
+    if (fsB) { fsB.style.display = "block"; fsB.innerHTML = bodyHtml; }
+    // Scroll fullscreen info box into view if overlay is open
+    const ov = document.getElementById("rn-fullscreen-overlay");
+    if (ov && ov.classList.contains("open") && fsT) {
+      fsT.scrollIntoView({behavior:"smooth", block:"nearest"});
+    }
   }
 
   function rnDeselect() {
     document.querySelectorAll(".rn-node").forEach(el => el.classList.remove("rn-on"));
+    // Also reset mirrored fullscreen learn box
+    const fsPrompt = document.getElementById("rn-prompt-fs");
+    const fsT = document.getElementById("rn-title-fs");
+    const fsB = document.getElementById("rn-body-fs");
+    if (fsPrompt) fsPrompt.style.display = "";
+    if (fsT) { fsT.style.display = "none"; fsT.textContent = ""; }
+    if (fsB) { fsB.style.display = "none"; fsB.innerHTML = ""; }
   }
 
   const nodeMap = {
