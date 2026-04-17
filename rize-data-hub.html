@@ -824,7 +824,7 @@
 
       <!-- Table rendered by JS -->
       <div id="bag-simulations"><div class="loading-text">Loading data&hellip;</div></div>
-      <div class="footer-note">Formula: your position size &times; hypothetical price at same market cap.</div>
+      <p class="section-sub" style="margin-top:18px;margin-bottom:0">Formula: your position size × hypothetical price at same market cap.</p>
 
       <!-- Mobile duplicate search bar -->
       <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
@@ -909,9 +909,7 @@
 
       <!-- Table rendered by JS -->
       <div id="ratio-table-wrap"><div class="loading-text">Loading data&hellip;</div></div>
-      <div class="footer-note" style="margin-top:10px">
-        Ratios calculated from USD prices — synthetic pairs. Gain/loss expressed in units of the compared asset.
-      </div>
+      <p class="section-sub" style="margin-top:18px;margin-bottom:0">Ratios calculated from USD prices — synthetic pairs. Gain/loss expressed in units of the compared asset.</p>
     </section>
 
 
@@ -1493,17 +1491,22 @@
       return sortRatio.dir === "desc" ? v(b) - v(a) : v(a) - v(b);
     });
 
-    // Cell formatter — shows % + delta in asset B units
-    function fmtRatioCell(ratioPct, priceB, coinLabel) {
+    // Cell formatter — shows ratio % + exact historical bag gain in units of asset B
+    // pctA = tokenA's own % change over the period (not the ratio %)
+    function fmtRatioCell(ratioPct, priceB, coinLabel, pctA) {
       if (ratioPct == null) return `<span style="color:var(--muted);font-size:12px">loading…</span>`;
       const col  = ratioPct >= 0 ? "#98ffb6" : "var(--pink)";
       const arr  = ratioPct >= 0 ? "↑" : "↓";
       const sign = ratioPct >= 0 ? "+" : "";
-      if (priceB == null) return `<span style="color:${col};font-weight:700">${sign}${ratioPct.toFixed(2)}%</span>`;
-      // Delta in units of B
-      const deltaUSD = bagAmt * priceA * (ratioPct / 100);
-      const deltaB   = deltaUSD / priceB;
-      const abs      = Math.abs(deltaB);
+      if (priceB == null || pctA == null) return `<span style="color:${col};font-weight:700">${sign}${ratioPct.toFixed(2)}%</span>`;
+      // Exact historical gain:
+      //   priceA_old = what tokenA cost N days ago
+      //   deltaUSD   = bag × (priceA_today − priceA_old)  ← real USD gain on the bag
+      //   deltaB     = deltaUSD / priceB_today             ← expressed in units of asset B
+      const priceA_old = priceA / (1 + pctA / 100);
+      const deltaUSD   = bagAmt * (priceA - priceA_old);
+      const deltaB     = deltaUSD / priceB;
+      const abs        = Math.abs(deltaB);
       const formatted =
         abs >= 10000 ? abs.toLocaleString(undefined, { maximumFractionDigits: 0 }) :
         abs >= 100   ? abs.toLocaleString(undefined, { maximumFractionDigits: 1 }) :
@@ -1518,12 +1521,13 @@
       const removable = `<button class="remove-btn" onclick="removeRatioCoin('${coin.id}')" title="Remove">✕</button>`;
       const tagClass  = assetTagClass(coin.id, !!coin.removable);
       const ratioStr  = ratioNow != null ? fmtPrice(ratioNow) : "N/A";
+      const perfA     = currentPerfData[currentCoinId] || {};
       return `<tr>
         <td style="white-space:nowrap">${removable}<span class="${tagClass}">${currentSym}/${coin.label}</span></td>
         <td style="color:var(--cyan);font-weight:700">${ratioStr}</td>
-        <td>${fmtRatioCell(r7d,  priceB, coin.label)}</td>
-        <td>${fmtRatioCell(r30d, priceB, coin.label)}</td>
-        <td>${fmtRatioCell(r90d, priceB, coin.label)}</td>
+        <td>${fmtRatioCell(r7d,  priceB, coin.label, perfA.p7d)}</td>
+        <td>${fmtRatioCell(r30d, priceB, coin.label, perfA.p30d)}</td>
+        <td>${fmtRatioCell(r90d, priceB, coin.label, perfA.p90d)}</td>
       </tr>`;
     }).join("") || `<tr><td colspan="5" style="color:var(--muted)">No data.</td></tr>`;
 
