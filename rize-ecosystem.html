@@ -582,55 +582,129 @@ html, body { overflow-x: hidden; max-width: 100%; }
 </div>
 <script>
 function openRnFullscreen(){
-  var ov=document.getElementById('rn-fullscreen-overlay');
-  var wrap=document.getElementById('rn-svg-clone-wrap');
-  var orig=document.getElementById('rn-svg');
-  if(orig && !wrap.hasChildNodes()){
-    var clone=orig.cloneNode(true);
-    clone.id='rn-svg-clone';
-    clone.style.minWidth='900px';
-    clone.style.width='900px';
-    // Re-bind click events on cloned nodes so rn-on highlights work in clone
-    clone.querySelectorAll('.rn-node').forEach(function(node){
-      var orig_onclick = node.getAttribute('onclick');
-      if(orig_onclick){
-        node.addEventListener('click', function(){
-          // Deselect all in clone
-          clone.querySelectorAll('.rn-node').forEach(function(n){ n.classList.remove('rn-on'); });
-          node.classList.add('rn-on');
-        });
+  var ov   = document.getElementById('rn-fullscreen-overlay');
+  var wrap = document.getElementById('rn-svg-clone-wrap');
+  var orig = document.getElementById('rn-svg');
+  if(!ov || !orig) return;
+
+  if(!wrap.hasChildNodes()){
+    var clone = orig.cloneNode(true);
+    clone.removeAttribute('id');
+    clone.style.minWidth = '900px';
+    clone.style.width    = '900px';
+    clone.style.display  = 'block';
+
+    // ── Tag each clone node/conn with data-rnkey matching nodeMap
+    var nodeMapFs = {
+      "nd-canton":"canton","nd-trize":"trize","nd-fireblocks":"fireblocks",
+      "nd-base":"base","nd-ats":"ats","nd-rizenet":"rizenet",
+      "nd-chainlink":"chainlink","nd-proof":"proof","nd-fl":"fl",
+      "nd-util1":"util_canton","nd-util2":"util_gateway","nd-util3":"util_dml"
+    };
+    Object.entries(nodeMapFs).forEach(function(entry){
+      var origId = entry[0], key = entry[1];
+      var el = clone.getElementById ? clone.getElementById(origId) : clone.querySelector('#'+origId);
+      // querySelector works on clones
+      var cloneEl = clone.querySelector('[id="'+origId+'"]');
+      if(cloneEl){
+        cloneEl.setAttribute('data-rnkey', key);
+        cloneEl.removeAttribute('id');
       }
     });
-    // Same for connectors
-    clone.querySelectorAll('.rn-conn').forEach(function(conn){
-      var orig_onclick = conn.getAttribute('onclick');
-      if(orig_onclick){
-        conn.addEventListener('click', function(){
-          clone.querySelectorAll('.rn-conn').forEach(function(c){ c.classList.remove('rn-on'); });
-          conn.classList.add('rn-on');
-        });
-      }
+
+    // ── Bind animated text elements — give them data attributes instead of IDs
+    ['canton-member','proof-lbl','fl-lbl'].forEach(function(origId){
+      var el = clone.querySelector('[id="'+origId+'"]');
+      if(el){ el.setAttribute('data-rnanim', origId); el.removeAttribute('id'); }
     });
+
+    // ── Remove conn IDs too and tag with data-rnkey
+    var connMapFs = {"conn-ccip":"ccip","conn-wrap1":"wrap"};
+    Object.entries(connMapFs).forEach(function(entry){
+      var origId = entry[0], key = entry[1];
+      var el = clone.querySelector('[id="'+origId+'"]');
+      if(el){ el.setAttribute('data-rnkey', key); el.removeAttribute('id'); }
+    });
+
+    // Remove rn-svg click handler ID ref — svg bg click
+    // (just removeAttribute id from clone root already done above)
+
     wrap.appendChild(clone);
+
+    // ── Bind clicks on tagged clone nodes
+    clone.querySelectorAll('[data-rnkey]').forEach(function(el){
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', function(e){
+        e.stopPropagation();
+        // Deselect all in clone
+        clone.querySelectorAll('.rn-node,.rn-conn').forEach(function(n){ n.classList.remove('rn-on'); });
+        el.classList.add('rn-on');
+        rnShowFs(el.getAttribute('data-rnkey'));
+      });
+    });
+
+    // ── Click on SVG background = deselect
+    clone.addEventListener('click', function(){
+      clone.querySelectorAll('.rn-node,.rn-conn').forEach(function(n){ n.classList.remove('rn-on'); });
+      rnResetFs();
+    });
+
+    // ── Extend animations to clone elements
+    window._rnFsAnimInterval && clearInterval(window._rnFsAnimInterval);
+    window._rnFsAnimInterval = setInterval(function(){
+      // canton-member
+      var cmEl = clone.querySelector('[data-rnanim="canton-member"]');
+      if(cmEl) cmEl.textContent = members[cm]; // cm is already incremented by main interval
+      // proof-lbl
+      var pfEl = clone.querySelector('[data-rnanim="proof-lbl"]');
+      if(pfEl) pfEl.textContent = proofWords[pi];
+      // fl-lbl
+      var flEl = clone.querySelector('[data-rnanim="fl-lbl"]');
+      if(flEl) flEl.textContent = flWords[fi];
+    }, 400); // poll frequently to stay in sync with main intervals
   }
+
   ov.classList.add('open');
-  document.body.style.overflow='hidden';
-  // Reset learn box to default state
-  var fsPrompt = document.getElementById('rn-prompt-fs');
-  var fsT = document.getElementById('rn-title-fs');
-  var fsB = document.getElementById('rn-body-fs');
-  if(fsPrompt) fsPrompt.style.display = '';
-  if(fsT){ fsT.style.display='none'; fsT.textContent=''; }
-  if(fsB){ fsB.style.display='none'; fsB.innerHTML=''; }
-  // Force landscape hint
+  document.body.style.overflow = 'hidden';
+
+  // Reset fullscreen learn box
+  rnResetFs();
+
   if(screen.orientation && screen.orientation.lock){
     screen.orientation.lock('landscape').catch(function(){});
   }
+}
+
+// Show content in fullscreen learn box
+function rnShowFs(key){
+  var d = RN_INFO[key];
+  if(!d) return;
+  var fsPrompt = document.getElementById('rn-prompt-fs');
+  var fsT      = document.getElementById('rn-title-fs');
+  var fsB      = document.getElementById('rn-body-fs');
+  if(fsPrompt) fsPrompt.style.display = 'none';
+  if(fsT){ fsT.style.display='block'; fsT.textContent=d.title; }
+  if(fsB){ fsB.style.display='block'; fsB.innerHTML=d.body.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>'); }
+  // Scroll learn box into view
+  var infoFs = document.getElementById('rn-info-fs');
+  if(infoFs) setTimeout(function(){ infoFs.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 80);
+}
+
+// Reset fullscreen learn box to default state
+function rnResetFs(){
+  var fsPrompt = document.getElementById('rn-prompt-fs');
+  var fsT      = document.getElementById('rn-title-fs');
+  var fsB      = document.getElementById('rn-body-fs');
+  if(fsPrompt) fsPrompt.style.display = '';
+  if(fsT){ fsT.style.display='none'; fsT.textContent=''; }
+  if(fsB){ fsB.style.display='none'; fsB.innerHTML=''; }
 }
 function closeRnFullscreen(){
   document.getElementById('rn-fullscreen-overlay').classList.remove('open');
   document.body.style.overflow='';
   if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+  // Stop clone animation sync
+  if(window._rnFsAnimInterval){ clearInterval(window._rnFsAnimInterval); window._rnFsAnimInterval=null; }
 }
 </script>
 
@@ -951,36 +1025,19 @@ document.addEventListener("DOMContentLoaded", function() {
     const d = RN_INFO[key];
     if (!d) return;
     const bodyHtml = d.body.replace(/\n\n/g,"<br><br>").replace(/\n/g,"<br>");
-    // Main learn box
+    // Main learn box (outside fullscreen)
     document.getElementById("rn-prompt").style.display = "none";
     const t = document.getElementById("rn-title");
     const b = document.getElementById("rn-body");
     t.style.display = "block"; b.style.display = "block";
     t.textContent = d.title; b.innerHTML = bodyHtml;
     document.getElementById("rn-info").scrollIntoView({behavior:"smooth",block:"nearest"});
-    // Fullscreen mirrored learn box
-    const fsPrompt = document.getElementById("rn-prompt-fs");
-    const fsT = document.getElementById("rn-title-fs");
-    const fsB = document.getElementById("rn-body-fs");
-    if (fsPrompt) fsPrompt.style.display = "none";
-    if (fsT) { fsT.style.display = "block"; fsT.textContent = d.title; }
-    if (fsB) { fsB.style.display = "block"; fsB.innerHTML = bodyHtml; }
-    // Scroll fullscreen info box into view if overlay is open
-    const ov = document.getElementById("rn-fullscreen-overlay");
-    if (ov && ov.classList.contains("open") && fsT) {
-      fsT.scrollIntoView({behavior:"smooth", block:"nearest"});
-    }
   }
 
   function rnDeselect() {
-    document.querySelectorAll(".rn-node").forEach(el => el.classList.remove("rn-on"));
-    // Also reset mirrored fullscreen learn box
-    const fsPrompt = document.getElementById("rn-prompt-fs");
-    const fsT = document.getElementById("rn-title-fs");
-    const fsB = document.getElementById("rn-body-fs");
-    if (fsPrompt) fsPrompt.style.display = "";
-    if (fsT) { fsT.style.display = "none"; fsT.textContent = ""; }
-    if (fsB) { fsB.style.display = "none"; fsB.innerHTML = ""; }
+    // Only deselect in the main (non-fullscreen) SVG
+    document.getElementById("rn-svg").querySelectorAll(".rn-node,.rn-conn")
+      .forEach(function(el){ el.classList.remove("rn-on"); });
   }
 
   const nodeMap = {
