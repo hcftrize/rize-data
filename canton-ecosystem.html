@@ -36,7 +36,8 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 }
 .eco-wrap{max-width:1200px;margin:0 auto;padding:48px 28px 80px;}
 .eco-hero{background:var(--black);padding:48px 40px 40px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:48px;}
-.back-to-hub{display:inline-flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);text-decoration:none;border:1px solid rgba(255,255,255,0.2);padding:6px 16px;margin-bottom:24px;background:rgba(255,255,255,0.04);transition:background 0.2s,color 0.2s;}
+.back-to-hub{display:inline-flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,0.35);padding:6px 16px;margin-bottom:24px;background:rgba(255,255,255,0.07);transition:background 0.2s,color 0.2s;}
+.back-to-hub:hover{background:rgba(255,255,255,0.14);border-color:rgba(255,255,255,0.6);}
 .back-to-hub:hover{background:rgba(255,255,255,0.12);color:#fff;}
 .eco-eyebrow{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:14px;display:block;}
 .eco-hero h1{font-family:'Rajdhani',sans-serif;font-size:clamp(28px,4vw,52px);font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#fff;margin-bottom:12px;}
@@ -217,12 +218,103 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 .lc-body.collapsed{max-height:0;opacity:0;}
 .lc.collapsed .lc-toggle svg{transform:rotate(-90deg);}
 .lc-header{padding-bottom:20px;}
+
+/* ═══════════════════════════════════════════════
+   TOKERIZE — SHARED MOBILE FIXES
+   All mobile-only rules. Desktop unchanged.
+   ═══════════════════════════════════════════════ */
+
+/* 1. Prevent horizontal overflow on all pages */
+html, body { overflow-x: hidden; max-width: 100%; }
+
+/* 2. Hamburger menu — CSS-only toggle */
+.nav-toggle { display: none; }
+.nav-toggle-label {
+  display: none;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px;
+  margin-left: auto;
+}
+.nav-toggle-label span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #fff;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.nav-toggle:checked ~ .site-nav { display: flex; }
+.nav-toggle:checked + .nav-toggle-label span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle:checked + .nav-toggle-label span:nth-child(2) { opacity: 0; }
+.nav-toggle:checked + .nav-toggle-label span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@media (max-width: 768px) {
+  /* Hamburger visible on mobile */
+  .nav-toggle-label { display: flex; }
+
+  /* Nav hidden by default, shown when toggle checked */
+  .site-nav {
+    display: none;
+    position: absolute;
+    top: 68px;
+    left: 0;
+    right: 0;
+    background: #000;
+    flex-direction: column;
+    gap: 0;
+    z-index: 99;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 0;
+  }
+  .site-nav a {
+    font-size: 14px !important;
+    padding: 12px 20px !important;
+    border-right: none !important;
+    border-left: none !important;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    letter-spacing: 1.5px !important;
+    width: 100%;
+  }
+  .site-nav a:first-child { border-left: none !important; }
+  .site-nav a.nav-hub {
+    margin-left: 0 !important;
+    background: var(--navy);
+    text-align: center;
+  }
+
+  /* Header layout with hamburger */
+  .site-header { position: relative; flex-wrap: wrap; }
+
+  /* 3. text-align: justify → left on mobile (fix word spacing) */
+  p, .article-body p, .page-body p, .featured-excerpt,
+  .article-card-excerpt, .hub-btn p, .hero-sub {
+    text-align: left !important;
+  }
+
+  /* 4. CTA button full width on index */
+  .wrap a[style*="inline-flex"] {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 5. Data hub tables — scrollable */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* 6. Hub page cards full width */
+  .hub-buttons { grid-template-columns: 1fr !important; }
+  .hub-body { padding: 24px 16px 48px !important; }
+  .hub-hero { padding: 28px 16px !important; }
+}
 </style>
 </head>
 <body>
 
 <header class="site-header">
   <a href="/" class="site-header-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></a>
+  <input type="checkbox" id="nav-toggle" class="nav-toggle"><label for="nav-toggle" class="nav-toggle-label"><span></span><span></span><span></span></label>
   <nav class="site-nav">
     <a href="/" class="nav-home">Home</a>
     <a href="/about">About</a>

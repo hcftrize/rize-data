@@ -37,7 +37,8 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 }
 .eco-wrap{max-width:1200px;margin:0 auto;padding:48px 28px 80px;}
 .eco-hero{background:var(--black);padding:48px 40px 40px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:48px;}
-.back-to-hub{display:inline-flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);text-decoration:none;border:1px solid rgba(255,255,255,0.2);padding:6px 16px;margin-bottom:24px;background:rgba(255,255,255,0.04);transition:background 0.2s,color 0.2s;}
+.back-to-hub{display:inline-flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,0.35);padding:6px 16px;margin-bottom:24px;background:rgba(255,255,255,0.07);transition:background 0.2s,color 0.2s;}
+.back-to-hub:hover{background:rgba(255,255,255,0.14);border-color:rgba(255,255,255,0.6);}
 .back-to-hub:hover{background:rgba(255,255,255,0.12);color:#fff;}
 .eco-eyebrow{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:14px;display:block;}
 .eco-hero h1{font-family:'Rajdhani',sans-serif;font-size:clamp(28px,4vw,52px);font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#fff;margin-bottom:12px;}
@@ -187,13 +188,180 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 .rip-bonded-hero-sub{font-family:'DM Mono',monospace;font-size:13px;color:rgba(255,255,255,0.65);letter-spacing:0.5px;}
 @media(max-width:900px){.gov-stats{grid-template-columns:repeat(3,1fr);}.gov-table-wrap{padding-left:16px;padding-right:16px;}}
 @media(max-width:600px){.gov-stats{grid-template-columns:repeat(2,1fr);}.rip-bonded-hero{margin:14px 16px 0;padding:22px 18px;}.gov-table-wrap{padding-left:16px;padding-right:16px;}}
+
+/* ═══════════════════════════════════════════════
+   TOKERIZE — SHARED MOBILE FIXES
+   All mobile-only rules. Desktop unchanged.
+   ═══════════════════════════════════════════════ */
+
+/* 1. Prevent horizontal overflow on all pages */
+html, body { overflow-x: hidden; max-width: 100%; }
+
+/* 2. Hamburger menu — CSS-only toggle */
+.nav-toggle { display: none; }
+.nav-toggle-label {
+  display: none;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px;
+  margin-left: auto;
+}
+.nav-toggle-label span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #fff;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.nav-toggle:checked ~ .site-nav { display: flex; }
+.nav-toggle:checked + .nav-toggle-label span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle:checked + .nav-toggle-label span:nth-child(2) { opacity: 0; }
+.nav-toggle:checked + .nav-toggle-label span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@media (max-width: 768px) {
+  /* Hamburger visible on mobile */
+  .nav-toggle-label { display: flex; }
+
+  /* Nav hidden by default, shown when toggle checked */
+  .site-nav {
+    display: none;
+    position: absolute;
+    top: 68px;
+    left: 0;
+    right: 0;
+    background: #000;
+    flex-direction: column;
+    gap: 0;
+    z-index: 99;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 0;
+  }
+  .site-nav a {
+    font-size: 14px !important;
+    padding: 12px 20px !important;
+    border-right: none !important;
+    border-left: none !important;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    letter-spacing: 1.5px !important;
+    width: 100%;
+  }
+  .site-nav a:first-child { border-left: none !important; }
+  .site-nav a.nav-hub {
+    margin-left: 0 !important;
+    background: var(--navy);
+    text-align: center;
+  }
+
+  /* Header layout with hamburger */
+  .site-header { position: relative; flex-wrap: wrap; }
+
+  /* 3. text-align: justify → left on mobile (fix word spacing) */
+  p, .article-body p, .page-body p, .featured-excerpt,
+  .article-card-excerpt, .hub-btn p, .hero-sub {
+    text-align: left !important;
+  }
+
+  /* 4. CTA button full width on index */
+  .wrap a[style*="inline-flex"] {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 5. Data hub tables — scrollable */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* 6. Hub page cards full width */
+  .hub-buttons { grid-template-columns: 1fr !important; }
+  .hub-body { padding: 24px 16px 48px !important; }
+  .hub-hero { padding: 28px 16px !important; }
+}
+
+/* Network Map — mobile scroll + fullscreen */
+@media (max-width: 768px) {
+  .rn-map-area {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    cursor: grab;
+  }
+  #rn-svg {
+    min-width: 700px;
+    width: 700px;
+  }
+  .rn-map-fullscreen-btn {
+    display: inline-flex !important;
+  }
+}
+.rn-map-fullscreen-btn {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--navy);
+  background: #fff;
+  border: 1px solid var(--navy);
+  padding: 8px 16px;
+  cursor: pointer;
+  margin: 14px 16px 20px;
+}
+/* Fullscreen overlay */
+.rn-fullscreen-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  z-index: 9999;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.rn-fullscreen-overlay.open { display: block; }
+.rn-fullscreen-overlay #rn-svg-clone {
+  min-width: 900px;
+  width: 900px;
+  display: block;
+}
+.rn-fullscreen-close {
+  position: sticky;
+  top: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--navy);
+  color: #fff;
+  padding: 10px 16px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.rn-fullscreen-close button {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.4);
+  color: #fff;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 4px 12px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
 </style>
 </head>
 <body>
 
 <header class="site-header">
     <a href="/" class="site-header-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></a>
-    <nav class="site-nav">
+    <input type="checkbox" id="nav-toggle" class="nav-toggle"><label for="nav-toggle" class="nav-toggle-label"><span></span><span></span><span></span></label>
+  <nav class="site-nav">
       <a href="/" class="nav-home">Home</a>
       <a href="/about">About</a>
       <a href="/hub" class="nav-hub">Tokerize Data Hub</a>
@@ -397,6 +565,136 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 
     </svg>
   </div>
+
+<button class="rn-map-fullscreen-btn" onclick="openRnFullscreen()">⛶ View Fullscreen</button>
+<div class="rn-fullscreen-overlay" id="rn-fullscreen-overlay">
+  <div class="rn-fullscreen-close">
+    <span>RIZE Network Map</span>
+    <button onclick="closeRnFullscreen()">✕ Close</button>
+  </div>
+  <div id="rn-svg-clone-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:16px;border-bottom:1px solid #e0e0e0;"></div>
+  <!-- Mirrored learn box inside overlay -->
+  <div class="rn-info-box" id="rn-info-fs" style="margin:20px 16px 24px;border:1px solid #e0e0e0;border-left:3px solid var(--navy);background:#f7f9fc;padding:22px 26px;min-height:80px;">
+    <p class="rn-prompt" id="rn-prompt-fs">Tap any node or connector in the map above to read a detailed explanation.</p>
+    <div class="rn-title" id="rn-title-fs" style="display:none"></div>
+    <div class="rn-body"  id="rn-body-fs"  style="display:none"></div>
+  </div>
+</div>
+<script>
+function openRnFullscreen(){
+  var ov   = document.getElementById('rn-fullscreen-overlay');
+  var wrap = document.getElementById('rn-svg-clone-wrap');
+  var orig = document.getElementById('rn-svg');
+  if(!ov || !orig) return;
+
+  if(!wrap.hasChildNodes()){
+    var clone = orig.cloneNode(true);
+    clone.removeAttribute('id');
+    clone.style.minWidth = '900px';
+    clone.style.width    = '900px';
+    clone.style.display  = 'block';
+
+    // ── Tag each clone node/conn with data-rnkey matching nodeMap
+    var nodeMapFs = {
+      "nd-canton":"canton","nd-trize":"trize","nd-fireblocks":"fireblocks",
+      "nd-base":"base","nd-ats":"ats","nd-rizenet":"rizenet",
+      "nd-chainlink":"chainlink","nd-proof":"proof","nd-fl":"fl",
+      "nd-util1":"util_canton","nd-util2":"util_gateway","nd-util3":"util_dml"
+    };
+    Object.entries(nodeMapFs).forEach(function(entry){
+      var origId = entry[0], key = entry[1];
+      var el = clone.getElementById ? clone.getElementById(origId) : clone.querySelector('#'+origId);
+      // querySelector works on clones
+      var cloneEl = clone.querySelector('[id="'+origId+'"]');
+      if(cloneEl){
+        cloneEl.setAttribute('data-rnkey', key);
+        cloneEl.removeAttribute('id');
+      }
+    });
+
+    // ── Bind animated text elements — give them data attributes instead of IDs
+    ['canton-member','proof-lbl','fl-lbl'].forEach(function(origId){
+      var el = clone.querySelector('[id="'+origId+'"]');
+      if(el){ el.setAttribute('data-rnanim', origId); el.removeAttribute('id'); }
+    });
+
+    // ── Remove conn IDs too and tag with data-rnkey
+    var connMapFs = {"conn-ccip":"ccip","conn-wrap1":"wrap"};
+    Object.entries(connMapFs).forEach(function(entry){
+      var origId = entry[0], key = entry[1];
+      var el = clone.querySelector('[id="'+origId+'"]');
+      if(el){ el.setAttribute('data-rnkey', key); el.removeAttribute('id'); }
+    });
+
+    // Remove rn-svg click handler ID ref — svg bg click
+    // (just removeAttribute id from clone root already done above)
+
+    wrap.appendChild(clone);
+
+    // ── Bind clicks on tagged clone nodes
+    clone.querySelectorAll('[data-rnkey]').forEach(function(el){
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', function(e){
+        e.stopPropagation();
+        // Deselect all in clone
+        clone.querySelectorAll('.rn-node,.rn-conn').forEach(function(n){ n.classList.remove('rn-on'); });
+        el.classList.add('rn-on');
+        rnShowFs(el.getAttribute('data-rnkey'));
+      });
+    });
+
+    // ── Click on SVG background = deselect
+    clone.addEventListener('click', function(){
+      clone.querySelectorAll('.rn-node,.rn-conn').forEach(function(n){ n.classList.remove('rn-on'); });
+      rnResetFs();
+    });
+
+    // Animations synced directly in each setInterval
+  }
+
+  ov.classList.add('open');
+  document.body.style.overflow = 'hidden';
+
+  // Reset fullscreen learn box
+  rnResetFs();
+
+  if(screen.orientation && screen.orientation.lock){
+    screen.orientation.lock('landscape').catch(function(){});
+  }
+}
+
+// Show content in fullscreen learn box
+function rnShowFs(key){
+  var d = RN_INFO[key];
+  if(!d) return;
+  var fsPrompt = document.getElementById('rn-prompt-fs');
+  var fsT      = document.getElementById('rn-title-fs');
+  var fsB      = document.getElementById('rn-body-fs');
+  if(fsPrompt) fsPrompt.style.display = 'none';
+  if(fsT){ fsT.style.display='block'; fsT.textContent=d.title; }
+  if(fsB){ fsB.style.display='block'; fsB.innerHTML=d.body.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>'); }
+  // Scroll learn box into view
+  var infoFs = document.getElementById('rn-info-fs');
+  if(infoFs) setTimeout(function(){ infoFs.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 80);
+}
+
+// Reset fullscreen learn box to default state
+function rnResetFs(){
+  var fsPrompt = document.getElementById('rn-prompt-fs');
+  var fsT      = document.getElementById('rn-title-fs');
+  var fsB      = document.getElementById('rn-body-fs');
+  if(fsPrompt) fsPrompt.style.display = '';
+  if(fsT){ fsT.style.display='none'; fsT.textContent=''; }
+  if(fsB){ fsB.style.display='none'; fsB.innerHTML=''; }
+}
+function closeRnFullscreen(){
+  document.getElementById('rn-fullscreen-overlay').classList.remove('open');
+  document.body.style.overflow='';
+  if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+
+}
+</script>
+
   
 
   <!-- SHARED INFO BOX -->
@@ -713,18 +1011,20 @@ document.addEventListener("DOMContentLoaded", function() {
   function rnShow(key) {
     const d = RN_INFO[key];
     if (!d) return;
+    const bodyHtml = d.body.replace(/\n\n/g,"<br><br>").replace(/\n/g,"<br>");
+    // Main learn box (outside fullscreen)
     document.getElementById("rn-prompt").style.display = "none";
     const t = document.getElementById("rn-title");
     const b = document.getElementById("rn-body");
-    t.style.display = "block";
-    b.style.display  = "block";
-    t.textContent   = d.title;
-    b.innerHTML     = d.body.replace(/\n\n/g,"<br><br>").replace(/\n/g,"<br>");
+    t.style.display = "block"; b.style.display = "block";
+    t.textContent = d.title; b.innerHTML = bodyHtml;
     document.getElementById("rn-info").scrollIntoView({behavior:"smooth",block:"nearest"});
   }
 
   function rnDeselect() {
-    document.querySelectorAll(".rn-node").forEach(el => el.classList.remove("rn-on"));
+    // Only deselect in the main (non-fullscreen) SVG
+    document.getElementById("rn-svg").querySelectorAll(".rn-node,.rn-conn")
+      .forEach(function(el){ el.classList.remove("rn-on"); });
   }
 
   const nodeMap = {
@@ -767,13 +1067,23 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("rn-body").style.display   = "none";
   });
 
-  /* Animated Canton members */
+  // Helper: get animated element in fullscreen clone
+  function rnCloneEl(animId) {
+    var wrap = document.getElementById('rn-svg-clone-wrap');
+    if (!wrap) return null;
+    return wrap.querySelector('[data-rnanim="'+animId+'"]');
+  }
+
+    /* Animated Canton members */
   const members = ["BNY Mellon","Goldman Sachs","DTCC","HSBC","BNP Paribas","Euroclear","J.P. Morgan","Morgan Stanley","Broadridge","Cumberland","Deutsche Börse","SBI Digital"];
   let cm = 0;
   setInterval(function() {
     cm = (cm + 1) % members.length;
     const el = document.getElementById("canton-member");
     if (el) el.textContent = members[cm];
+    // Sync clone
+    const elFs = rnCloneEl("canton-member");
+    if (elFs) elFs.textContent = members[cm];
   }, 1900);
 
   /* Animated proof label */
@@ -783,6 +1093,9 @@ document.addEventListener("DOMContentLoaded", function() {
     pi = (pi + 1) % proofWords.length;
     const el = document.getElementById("proof-lbl");
     if (el) { el.style.opacity="0"; setTimeout(function(){ el.textContent=proofWords[pi]; el.style.opacity="1"; },300); }
+    // Sync clone
+    const elFs = rnCloneEl("proof-lbl");
+    if (elFs) { elFs.style.opacity="0"; setTimeout(function(){ elFs.textContent=proofWords[pi]; elFs.style.opacity="1"; },300); }
   }, 2500);
 
   /* Animated FL label */
@@ -792,6 +1105,9 @@ document.addEventListener("DOMContentLoaded", function() {
     fi = (fi + 1) % flWords.length;
     const el = document.getElementById("fl-lbl");
     if (el) { el.style.opacity="0"; setTimeout(function(){ el.textContent=flWords[fi]; el.style.opacity="1"; },300); }
+    // Sync clone
+    const elFs = rnCloneEl("fl-lbl");
+    if (elFs) { elFs.style.opacity="0"; setTimeout(function(){ elFs.textContent=flWords[fi]; elFs.style.opacity="1"; },300); }
   }, 2800);
 
   /* ── EXISTING ECO HUB LOGIC ── */
