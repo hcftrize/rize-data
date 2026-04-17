@@ -308,7 +308,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
   border: 1px solid var(--navy);
   padding: 8px 16px;
   cursor: pointer;
-  margin: 10px 16px 0;
+  margin: 14px 16px 20px;
 }
 /* Fullscreen overlay */
 .rn-fullscreen-overlay {
@@ -574,7 +574,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
   </div>
   <div id="rn-svg-clone-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding:16px;border-bottom:1px solid #e0e0e0;"></div>
   <!-- Mirrored learn box inside overlay -->
-  <div class="rn-info-box" id="rn-info-fs" style="margin:16px;border:1px solid #e0e0e0;border-left:3px solid var(--navy);background:#f7f9fc;padding:22px 26px;min-height:80px;">
+  <div class="rn-info-box" id="rn-info-fs" style="margin:20px 16px 24px;border:1px solid #e0e0e0;border-left:3px solid var(--navy);background:#f7f9fc;padding:22px 26px;min-height:80px;">
     <p class="rn-prompt" id="rn-prompt-fs">Tap any node or connector in the map above to read a detailed explanation.</p>
     <div class="rn-title" id="rn-title-fs" style="display:none"></div>
     <div class="rn-body"  id="rn-body-fs"  style="display:none"></div>
@@ -649,19 +649,7 @@ function openRnFullscreen(){
       rnResetFs();
     });
 
-    // ── Extend animations to clone elements
-    window._rnFsAnimInterval && clearInterval(window._rnFsAnimInterval);
-    window._rnFsAnimInterval = setInterval(function(){
-      // canton-member
-      var cmEl = clone.querySelector('[data-rnanim="canton-member"]');
-      if(cmEl) cmEl.textContent = members[cm]; // cm is already incremented by main interval
-      // proof-lbl
-      var pfEl = clone.querySelector('[data-rnanim="proof-lbl"]');
-      if(pfEl) pfEl.textContent = proofWords[pi];
-      // fl-lbl
-      var flEl = clone.querySelector('[data-rnanim="fl-lbl"]');
-      if(flEl) flEl.textContent = flWords[fi];
-    }, 400); // poll frequently to stay in sync with main intervals
+    // Animations synced directly in each setInterval
   }
 
   ov.classList.add('open');
@@ -703,8 +691,7 @@ function closeRnFullscreen(){
   document.getElementById('rn-fullscreen-overlay').classList.remove('open');
   document.body.style.overflow='';
   if(screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
-  // Stop clone animation sync
-  if(window._rnFsAnimInterval){ clearInterval(window._rnFsAnimInterval); window._rnFsAnimInterval=null; }
+
 }
 </script>
 
@@ -1080,13 +1067,23 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("rn-body").style.display   = "none";
   });
 
-  /* Animated Canton members */
+  // Helper: get animated element in fullscreen clone
+  function rnCloneEl(animId) {
+    var wrap = document.getElementById('rn-svg-clone-wrap');
+    if (!wrap) return null;
+    return wrap.querySelector('[data-rnanim="'+animId+'"]');
+  }
+
+    /* Animated Canton members */
   const members = ["BNY Mellon","Goldman Sachs","DTCC","HSBC","BNP Paribas","Euroclear","J.P. Morgan","Morgan Stanley","Broadridge","Cumberland","Deutsche Börse","SBI Digital"];
   let cm = 0;
   setInterval(function() {
     cm = (cm + 1) % members.length;
     const el = document.getElementById("canton-member");
     if (el) el.textContent = members[cm];
+    // Sync clone
+    const elFs = rnCloneEl("canton-member");
+    if (elFs) elFs.textContent = members[cm];
   }, 1900);
 
   /* Animated proof label */
@@ -1096,6 +1093,9 @@ document.addEventListener("DOMContentLoaded", function() {
     pi = (pi + 1) % proofWords.length;
     const el = document.getElementById("proof-lbl");
     if (el) { el.style.opacity="0"; setTimeout(function(){ el.textContent=proofWords[pi]; el.style.opacity="1"; },300); }
+    // Sync clone
+    const elFs = rnCloneEl("proof-lbl");
+    if (elFs) { elFs.style.opacity="0"; setTimeout(function(){ elFs.textContent=proofWords[pi]; elFs.style.opacity="1"; },300); }
   }, 2500);
 
   /* Animated FL label */
@@ -1105,6 +1105,9 @@ document.addEventListener("DOMContentLoaded", function() {
     fi = (fi + 1) % flWords.length;
     const el = document.getElementById("fl-lbl");
     if (el) { el.style.opacity="0"; setTimeout(function(){ el.textContent=flWords[fi]; el.style.opacity="1"; },300); }
+    // Sync clone
+    const elFs = rnCloneEl("fl-lbl");
+    if (elFs) { elFs.style.opacity="0"; setTimeout(function(){ elFs.textContent=flWords[fi]; elFs.style.opacity="1"; },300); }
   }, 2800);
 
   /* ── EXISTING ECO HUB LOGIC ── */
