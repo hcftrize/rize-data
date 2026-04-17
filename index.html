@@ -80,12 +80,103 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 .article-card-meta{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--border);}
 @media(max-width:900px){.featured{grid-template-columns:1fr;}.featured-body{border-left:none;border-top:1px solid var(--border);padding:24px;}.article-grid{grid-template-columns:1fr 1fr;}}
 @media(max-width:600px){.hero{padding:48px 16px 40px;}.article-grid{grid-template-columns:1fr;}}
+
+/* ═══════════════════════════════════════════════
+   TOKERIZE — SHARED MOBILE FIXES
+   All mobile-only rules. Desktop unchanged.
+   ═══════════════════════════════════════════════ */
+
+/* 1. Prevent horizontal overflow on all pages */
+html, body { overflow-x: hidden; max-width: 100%; }
+
+/* 2. Hamburger menu — CSS-only toggle */
+.nav-toggle { display: none; }
+.nav-toggle-label {
+  display: none;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 5px;
+  padding: 8px;
+  margin-left: auto;
+}
+.nav-toggle-label span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #fff;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.nav-toggle:checked ~ .site-nav { display: flex; }
+.nav-toggle:checked + .nav-toggle-label span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle:checked + .nav-toggle-label span:nth-child(2) { opacity: 0; }
+.nav-toggle:checked + .nav-toggle-label span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@media (max-width: 768px) {
+  /* Hamburger visible on mobile */
+  .nav-toggle-label { display: flex; }
+
+  /* Nav hidden by default, shown when toggle checked */
+  .site-nav {
+    display: none;
+    position: absolute;
+    top: 68px;
+    left: 0;
+    right: 0;
+    background: #000;
+    flex-direction: column;
+    gap: 0;
+    z-index: 99;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 0;
+  }
+  .site-nav a {
+    font-size: 14px !important;
+    padding: 12px 20px !important;
+    border-right: none !important;
+    border-left: none !important;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    letter-spacing: 1.5px !important;
+    width: 100%;
+  }
+  .site-nav a:first-child { border-left: none !important; }
+  .site-nav a.nav-hub {
+    margin-left: 0 !important;
+    background: var(--navy);
+    text-align: center;
+  }
+
+  /* Header layout with hamburger */
+  .site-header { position: relative; flex-wrap: wrap; }
+
+  /* 3. text-align: justify → left on mobile (fix word spacing) */
+  p, .article-body p, .page-body p, .featured-excerpt,
+  .article-card-excerpt, .hub-btn p, .hero-sub {
+    text-align: left !important;
+  }
+
+  /* 4. CTA button full width on index */
+  .wrap a[style*="inline-flex"] {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 5. Data hub tables — scrollable */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* 6. Hub page cards full width */
+  .hub-buttons { grid-template-columns: 1fr !important; }
+  .hub-body { padding: 24px 16px 48px !important; }
+  .hub-hero { padding: 28px 16px !important; }
+}
 </style>
 </head>
 <body>
   <header class="site-header">
     <a href="/" class="site-header-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></a>
-    <nav class="site-nav">
+    <input type="checkbox" id="nav-toggle" class="nav-toggle"><label for="nav-toggle" class="nav-toggle-label"><span></span><span></span><span></span></label>
+  <nav class="site-nav">
       <a href="/" class="nav-home">Home</a>
       <a href="/about">About</a>
       <a href="/hub" class="nav-hub">Tokerize Data Hub</a>
