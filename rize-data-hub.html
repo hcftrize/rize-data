@@ -89,13 +89,26 @@
       color: rgba(255,255,255,1.0);
       text-decoration: none;
       font-family: 'Rajdhani', sans-serif;
-      font-size: 15px;
+      font-size: 17px;
       font-weight: 600;
       letter-spacing: 2px;
       text-transform: uppercase;
       padding: 6px 20px;
       transition: color 0.2s;
       border-right: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .site-nav a.nav-hub {
+      color: #fff;
+      background: var(--navy);
+      border: none;
+      padding: 8px 20px;
+      margin-left: 16px;
+      letter-spacing: 1.5px;
+      transition: background 0.2s;
+    }
+    .site-nav a.nav-hub:hover {
+      background: var(--navy2);
     }
 
     .site-nav a:first-child { border-left: 1px solid rgba(255,255,255,0.1); }
@@ -137,7 +150,7 @@
       color: rgba(255,255,255,1.0);
       text-decoration: none;
       font-family: 'Rajdhani', sans-serif;
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 600;
       letter-spacing: 2px;
       text-transform: uppercase;
@@ -145,13 +158,7 @@
     }
     .footer-nav a:hover { color: #fff; }
 
-    .footer-copy {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.25);
-    }
+    .footer-copy{font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.85);}
 
 
     /* ═══════════════════════════════════════════════════════════
@@ -426,13 +433,7 @@
     .td-pct-up     { color: #3DBE47 !important; font-weight: 700; }
     .td-pct-down   { color: #e05555 !important; font-weight: 700; }
 
-    .footer-note {
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-      font-family: "Trebuchet MS", "Verdana", sans-serif;
-    }
+    .footer-disclaimer{font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.3px;}
 
 
     /* ═══════════════════════════════════════════════════════════
@@ -688,7 +689,7 @@
     <nav class="site-nav">
       <a href="/" class="nav-home">Home</a>
       <a href="/about">About</a>
-      <a href="/hub" class="nav-hub active-hub">RIZE Data Hub</a>
+      <a href="/hub" class="nav-hub active-hub">Tokerize Data Hub</a>
     </nav>
   </header>
 
@@ -698,7 +699,7 @@
   ═══════════════════════════════════════════════════════════ -->
   <div class="hub-hero">
     <div style="max-width:1380px;margin:0 auto">
-      <a href="/hub" class="back-to-hub">&larr; Back to RIZE Data Hub</a>
+      <a href="/hub" class="back-to-hub">&larr; Back to Tokerize Data Hub</a>
       <span class="eco-eyebrow">RIZE Community — Live Market Data</span>
       <div class="hub-grid">
         <div>
@@ -2044,8 +2045,12 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 <footer class="site-footer">
     <div class="footer-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></div>
     <nav class="footer-nav">
-      <a href="/">Home</a><a href="/about">About</a><a href="/hub">RIZE Data Hub</a>
+      <a href="/">Home</a><a href="/about">About</a><a href="/hub">Tokerize Data Hub</a>
     </nav>
-    <p class="footer-copy">&copy; 2026 Tokerize &mdash; RIZE Community Tokenization Hub</p>
+    <div>
+      <p class="footer-copy">Tokerize &mdash; RIZE Community Tokenization Hub</p>
+      <p class="footer-disclaimer">Tokerize is a community built website.</p>
+      <p class="footer-disclaimer">We are not affiliated with T-RIZE or Canton Network.</p>
+    </div>
   </footer>
 </body></html>
