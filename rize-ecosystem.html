@@ -1165,6 +1165,7 @@ document.addEventListener("DOMContentLoaded", function() {
     title.style.display='block';text.style.display='block';
     title.textContent=item.role?item.name+' — '+item.role:item.name;
     text.textContent=item.text;
+    setTimeout(function(){ box.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 60);
   };
 
   function resetBox(key){const box=document.getElementById(key+'-box');const prompt=box.querySelector('.ib-prompt');const title=document.getElementById(key+'-title');const text=document.getElementById(key+'-text');if(prompt)prompt.style.display='';if(title){title.style.display='none';title.textContent='';}if(text){text.style.display='none';text.innerHTML='';}}
@@ -1190,6 +1191,7 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById('team-role').textContent=m.role;
     document.getElementById('team-name-el').textContent=m.name;
     box.classList.add('show');
+    setTimeout(function(){ box.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 60);
   };
 
   function buildDeals(){
@@ -1498,6 +1500,8 @@ document.addEventListener("DOMContentLoaded", function() {
       + '</div>';
 
     box.scrollIntoView({behavior:'smooth', block:'nearest'});
+    const ripBox = document.getElementById('rip-box');
+    if(ripBox) setTimeout(function(){ ripBox.scrollIntoView({behavior:'smooth',block:'nearest'}); }, 60);
   };
 
 
