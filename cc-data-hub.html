@@ -1893,6 +1893,15 @@ const compareCoins = [
     el.style.width    = "max-content";
     el.style.overflow = "visible";
 
+    // Neutralise sticky positioning on th — prevents header row from floating
+    // at its on-screen position while table body expands for the capture.
+    const stickyThs = el.querySelectorAll("th");
+    const savedThPos = [];
+    stickyThs.forEach(function(th) {
+      savedThPos.push(th.style.position);
+      th.style.position = "relative";
+    });
+
     await new Promise(r => setTimeout(r, 60));
 
     try {
@@ -1906,6 +1915,10 @@ const compareCoins = [
       });
       finishDownload(canvas, filename);
     } finally {
+      // Restore th sticky positioning
+      stickyThs.forEach(function(th, i) {
+        th.style.position = savedThPos[i];
+      });
       // Restore all styles
       tableWraps.forEach(function(tw, i) {
         tw.style.overflowX = savedStyles[i].overflowX;
