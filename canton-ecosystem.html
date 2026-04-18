@@ -851,8 +851,12 @@ document.addEventListener("DOMContentLoaded", function() {
     // Build pagination HTML (shared between top and bottom)
     function buildPagHtml() {
       if (pages <= 1) return '';
+      var MAX_VIS = 6;
+      var half = Math.floor(MAX_VIS / 2);
+      var winStart = Math.max(0, Math.min(cebPage - half, pages - MAX_VIS));
+      var winEnd   = Math.min(pages, winStart + MAX_VIS);
       var h = '<button class="ceb-pg-btn" onclick="cebGoPage('+(cebPage-1)+')" '+(cebPage===0?'disabled':'')+'>&#8592;</button>';
-      for (var i=0; i<pages; i++) {
+      for (var i=winStart; i<winEnd; i++) {
         h += '<button class="ceb-pg-btn'+(i===cebPage?' on':'')+'" onclick="cebGoPage('+i+')">'+(i+1)+'</button>';
       }
       h += '<button class="ceb-pg-btn" onclick="cebGoPage('+(cebPage+1)+')" '+(cebPage>=pages-1?'disabled':'')+'>&#8594;</button>';
@@ -992,8 +996,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function cipBuildPag(pages) {
     if (pages <= 1) return '';
+    var MAX_VIS = 6;
+    var half = Math.floor(MAX_VIS / 2);
+    var start = Math.max(0, Math.min(cipPage - half, pages - MAX_VIS));
+    var end   = Math.min(pages, start + MAX_VIS);
     var h = '<button class="ceb-pg-btn" onclick="cipGoPage('+(cipPage-1)+')" '+(cipPage===0?'disabled':'')+'>&#8592;</button>';
-    for (var i=0;i<pages;i++) {
+    for (var i=start;i<end;i++) {
       h += '<button class="ceb-pg-btn'+(i===cipPage?' on':'')+'" onclick="cipGoPage('+i+')">'+(i+1)+'</button>';
     }
     h += '<button class="ceb-pg-btn" onclick="cipGoPage('+(cipPage+1)+')" '+(cipPage>=pages-1?'disabled':'')+'>&#8594;</button>';
@@ -1145,8 +1153,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function govBuildPag(pages) {
     if (pages <= 1) return '';
+    var MAX_VIS = 6;
+    var half = Math.floor(MAX_VIS / 2);
+    var start = Math.max(0, Math.min(govPage - half, pages - MAX_VIS));
+    var end   = Math.min(pages, start + MAX_VIS);
     var h = '<button class="ceb-pg-btn" onclick="govGoPage('+(govPage-1)+')" '+(govPage===0?'disabled':'')+'>&#8592;</button>';
-    for (var i=0;i<pages;i++) {
+    for (var i=start;i<end;i++) {
       h += '<button class="ceb-pg-btn'+(i===govPage?' on':'')+'" onclick="govGoPage('+i+')">'+(i+1)+'</button>';
     }
     h += '<button class="ceb-pg-btn" onclick="govGoPage('+(govPage+1)+')" '+(govPage>=pages-1?'disabled':'')+'>&#8594;</button>';
