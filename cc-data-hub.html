@@ -1886,16 +1886,47 @@ const compareCoins = [
 
   async function doScreenshot(el, filename) {
     el.classList.add("screenshot-mode");
-    await new Promise(r => setTimeout(r, 50));
+
+    // Temporarily remove overflow constraints so html2canvas
+    // captures the full table width, not just the visible scroll area
+    const tableWraps = el.querySelectorAll(".table-wrap");
+    const savedStyles = [];
+    tableWraps.forEach(function(tw) {
+      savedStyles.push({
+        el: tw,
+        overflowX: tw.style.overflowX,
+        width:     tw.style.width,
+      });
+      tw.style.overflowX = "visible";
+      tw.style.width     = "max-content";
+    });
+
+    // Also expand the section itself to fit full content width
+    const savedSectionWidth    = el.style.width;
+    const savedSectionOverflow = el.style.overflow;
+    el.style.width    = "max-content";
+    el.style.overflow = "visible";
+
+    await new Promise(r => setTimeout(r, 60));
+
     try {
       const canvas = await html2canvas(el, {
         backgroundColor: "#060818",
         scale: 2,
         useCORS: true,
         logging: false,
+        windowWidth: el.scrollWidth,
+        width: el.scrollWidth,
       });
       finishDownload(canvas, filename);
     } finally {
+      // Restore all styles
+      tableWraps.forEach(function(tw, i) {
+        tw.style.overflowX = savedStyles[i].overflowX;
+        tw.style.width     = savedStyles[i].width;
+      });
+      el.style.width    = savedSectionWidth;
+      el.style.overflow = savedSectionOverflow;
       el.classList.remove("screenshot-mode");
     }
   }
