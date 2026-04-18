@@ -777,7 +777,17 @@ html, body { overflow-x: hidden; max-width: 100%; }
       .screenshot-btn .screenshot-label { display: none; }
       .screenshot-btn { padding: 8px 10px; gap: 0; }
     }
-</style>
+
+    @media(max-width:700px){
+      .wrap { padding:24px 14px; }
+      .hero,.section,.search-section { padding: 18px; }
+      h1 { font-size: clamp(28px, 8vw, 48px); }
+      .section-title { font-size: 26px; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .metric-value { font-size: 26px; }
+      td { font-size: 15px; }
+    }
+    </style>
 </head>
 <body>
 
