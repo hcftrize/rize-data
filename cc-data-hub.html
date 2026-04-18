@@ -676,7 +676,7 @@
     }
 
     @media(max-width:600px) {
-      .metrics  { grid-template-columns: 1fr; }
+      .metrics  { grid-template-columns: repeat(2, 1fr); }
       .hub-hero { padding: 32px 16px; }
     }
 
@@ -771,29 +771,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
   .hub-hero { padding: 28px 16px !important; }
 }
 
-    /* ═══ ROTATE HINT — mobile only ═══ */
-    .rotate-hint {
-      display: none;
-    }
-    @media (max-width: 768px) and (orientation: portrait) {
-      .rotate-hint {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 16px;
-        background: rgba(126,224,255,0.05);
-        border-bottom: 1px solid rgba(126,224,255,0.1);
-        font-family: 'DM Mono', monospace;
-        font-size: 12px;
-        color: rgba(126,224,255,0.55);
-        letter-spacing: 0.3px;
-      }
-      .rotate-hint-icon {
-        font-size: 18px;
-        line-height: 1;
-        flex-shrink: 0;
-      }
-    }
+    
     /* Screenshot btn — icon only on mobile */
     @media (max-width: 768px) {
       .screenshot-btn .screenshot-label { display: none; }
@@ -850,9 +828,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
 
     <!-- ── SECTION 1 : RIZE / USD CHART ── -->
-    
-  <div class="rotate-hint"><span class="rotate-hint-icon">↺</span><span>Rotate your phone for best experience</span></div>
-<section class="section" id="chart-section" style="display:none">
+    <section class="section" id="chart-section" style="display:none">
       <div class="section-titlebar">
         <span class="section-title" id="chart-title">CC / USD Chart</span>
       </div>
@@ -1037,7 +1013,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
       <!-- Table rendered by JS -->
       <div id="ratio-table-wrap"><div class="loading-text">Loading data&hellip;</div></div>
-      <p class="section-sub" style="margin-top:18px;margin-bottom:0">Hypothetical reading example: +1.5 ETH gains over 90d means that you gain +1.5 ETH compared to 90d ago if you swap CC for ETH today — a direct arbitrage gain. -1.5 ETH over 90d means the opposite: you materialize a -1.5 ETH loss if you swap CC for ETH today compared to swapping it 90 days ago.</p>
+      <p class="section-sub" style="margin-top:18px;margin-bottom:0">Hypothetical reading example: +1.5 ETH gains over 90d means you gain +1.5 ETH compared to 90d ago if you swap CC for ETH today. The opposite situation (-1.5 ETH), means you lose -1.5 ETH compared to 90d ago if you swap CC for ETH today.</p>
     </section>
 
 
@@ -1933,19 +1909,35 @@ const compareCoins = [
 
   async function finishDownload(finalCanvas, filename) {
     try {
-      finalCanvas.toBlob(async blob => {
-        try {
-          await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-          showToast("📋 Screenshot copied to clipboard!");
-        } catch(e) {
+      finalCanvas.toBlob(async (blob) => {
+        const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (isMobile) {
+          // Mobile: direct download (clipboard paste not supported on X/social apps)
           const link = document.createElement("a");
-          link.download = `tokerize-${filename}-${Date.now()}.png`;
+          link.download = `${filename}-${Date.now()}.png`;
           link.href = URL.createObjectURL(blob);
           link.click();
           showToast("💾 Screenshot downloaded!");
+        } else {
+          // Desktop: copy to clipboard
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({"image/png": blob})
+            ]);
+            showToast("📋 Screenshot copied to clipboard!");
+          } catch(e) {
+            // Fallback: download
+            const link = document.createElement("a");
+            link.download = `${filename}-${Date.now()}.png`;
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            showToast("💾 Screenshot downloaded!");
+          }
         }
       }, "image/png");
-    } catch(e) { showToast("⚠ Screenshot failed."); }
+    } catch(e) {
+      showToast("⚠ Screenshot failed.");
+    }
   }
 
   function showToast(msg) {
