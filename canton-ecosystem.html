@@ -115,14 +115,11 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 .ceb-logo.dark{background:#111;border-color:#333;}
 .ceb-logo.initials{background:var(--navy);font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#fff;}
 .ceb-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:#000;line-height:1.2;}
-.ceb-pagination{display:flex;align-items:center;justify-content:center;gap:6px;padding:20px 32px 8px;flex-wrap:wrap;}
+.ceb-pagination{display:flex;align-items:center;justify-content:center;gap:4px;padding:20px 32px 8px;}
 .ceb-pg-btn{min-width:32px;height:32px;padding:0 8px;border:1px solid #dde4ed;background:#fff;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--navy);transition:all 0.15s;display:flex;align-items:center;justify-content:center;}
 .ceb-pg-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
 .ceb-pg-btn.on{background:var(--navy);color:#fff;border-color:var(--navy);}
 .ceb-pg-btn:disabled{opacity:0.25;cursor:not-allowed;}
-/* Arrow buttons (← →) match s-btn style */
-.ceb-pagination .ceb-pg-btn:first-child,
-.ceb-pagination .ceb-pg-btn:last-child{width:36px;height:36px;font-size:16px;border-color:#ddd;flex-shrink:0;}
 @media(max-width:900px){.ceb-grid{grid-template-columns:repeat(3,1fr);}.ceb-controls,.ceb-count,.ceb-grid,.ceb-pagination{padding-left:16px;padding-right:16px;}}
 @media(max-width:600px){.ceb-grid{grid-template-columns:repeat(2,1fr);}}
 
@@ -1003,11 +1000,7 @@ document.addEventListener("DOMContentLoaded", function() {
     return h;
   }
 
-  window.cipGoPage = function(p) { cipPage = p; cipRender(); 
-    // Scroll to section top on mobile
-    var el = document.getElementById('cip-lc-body');
-    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
-  };
+  window.cipGoPage = function(p) { cipPage = p; cipRender(); };
 
   function cipRender() {
     var count = cipFiltered.length;
@@ -1197,9 +1190,6 @@ document.addEventListener("DOMContentLoaded", function() {
   window.govGoPage = function(p) {
     govPage = p;
     govRender();
-    // Scroll to section top on mobile
-    var el = document.getElementById('gov-lc-body');
-    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
   };
 
   window.govPick = function(id) {
