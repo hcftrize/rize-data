@@ -770,6 +770,35 @@ html, body { overflow-x: hidden; max-width: 100%; }
   .hub-body { padding: 24px 16px 48px !important; }
   .hub-hero { padding: 28px 16px !important; }
 }
+
+    /* ═══ ROTATE HINT — mobile only ═══ */
+    .rotate-hint {
+      display: none;
+    }
+    @media (max-width: 768px) and (orientation: portrait) {
+      .rotate-hint {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 16px;
+        background: rgba(126,224,255,0.05);
+        border-bottom: 1px solid rgba(126,224,255,0.1);
+        font-family: 'DM Mono', monospace;
+        font-size: 12px;
+        color: rgba(126,224,255,0.55);
+        letter-spacing: 0.3px;
+      }
+      .rotate-hint-icon {
+        font-size: 18px;
+        line-height: 1;
+        flex-shrink: 0;
+      }
+    }
+    /* Screenshot btn — icon only on mobile */
+    @media (max-width: 768px) {
+      .screenshot-btn .screenshot-label { display: none; }
+      .screenshot-btn { padding: 8px 10px; gap: 0; }
+    }
 </style>
 </head>
 <body>
@@ -821,7 +850,9 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
 
     <!-- ── SECTION 1 : RIZE / USD CHART ── -->
-    <section class="section" id="chart-section" style="display:none">
+    
+  <div class="rotate-hint"><span class="rotate-hint-icon">↺</span><span>Rotate your phone for best experience</span></div>
+<section class="section" id="chart-section" style="display:none">
       <div class="section-titlebar">
         <span class="section-title" id="chart-title">CC / USD Chart</span>
       </div>
@@ -839,7 +870,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div class="wm-badge">
           <span class="wm-text-tokerize">TOKERIZE.TOP</span>
         </div>
-        <button class="screenshot-btn" onclick="takeScreenshot('metrics-section','core-metrics')">&#128247; Screenshot</button>
+        <button class="screenshot-btn" onclick="takeScreenshot('metrics-section','core-metrics')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
       </div>
       <p class="section-sub">Live snapshot of CC valuation metrics from CoinGecko.</p>
       <div id="main-data"><div class="loading-text">Loading data&hellip;</div></div>
@@ -855,7 +886,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div class="wm-badge">
           <span class="wm-text-tokerize">TOKERIZE.TOP</span>
         </div>
-        <button class="screenshot-btn" onclick="takeScreenshot('mktctx-section','market-context')">&#128247; Screenshot</button>
+        <button class="screenshot-btn" onclick="takeScreenshot('mktctx-section','market-context')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
       </div>
       <p class="section-sub">Broader market positioning, relative performance, and valuation signal.</p>
       <div id="market-context"><div class="loading-text">Loading data&hellip;</div></div>
@@ -871,7 +902,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div class="wm-badge">
           <span class="wm-text-tokerize">TOKERIZE.TOP</span>
         </div>
-        <button class="screenshot-btn" onclick="takeScreenshot('comp-section','comparison')">&#128247; Screenshot</button>
+        <button class="screenshot-btn" onclick="takeScreenshot('comp-section','comparison')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
       </div>
       <p class="section-sub">What would CC be worth if it had each asset's market cap?</p>
 
@@ -908,7 +939,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div class="wm-badge">
           <span class="wm-text-tokerize">TOKERIZE.TOP</span>
         </div>
-        <button class="screenshot-btn" onclick="takeScreenshot('bag-section','bag-simulation')">&#128247; Screenshot</button>
+        <button class="screenshot-btn" onclick="takeScreenshot('bag-section','bag-simulation')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
       </div>
       <p class="section-sub">Estimated value of your CC holdings at each simulated target price.</p>
 
@@ -949,7 +980,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div class="wm-badge">
           <span class="wm-text-tokerize">TOKERIZE.TOP</span>
         </div>
-        <button class="screenshot-btn" onclick="takeScreenshot('perf-section','perf')">&#128247; Screenshot</button>
+        <button class="screenshot-btn" onclick="takeScreenshot('perf-section','perf')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
       </div>
       <p class="section-sub" id="perf-sub">7D, 30D and 90D price performance of selected tokens against USD.</p>
 
@@ -982,9 +1013,9 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div class="wm-badge">
           <span class="wm-text-tokerize">TOKERIZE.TOP</span>
         </div>
-        <button class="screenshot-btn" onclick="takeScreenshot('ratio-section','ratio-analysis')">&#128247; Screenshot</button>
+        <button class="screenshot-btn" onclick="takeScreenshot('ratio-section','ratio-analysis')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
       </div>
-      <p class="section-sub">Compare the performance of CC against others and calculate your gains &amp; losses, expressed in compared asset units.</p>
+      <p class="section-sub">How does your bag perform against other assets? Enter your position size and compare gains and losses expressed directly in compared asset units. This allows you to monitor arbitrage opportunities between assets, in clicks.</p>
 
       <!-- Controls row: search + position size -->
       <div style="display:flex;gap:10px;align-items:stretch;margin-bottom:18px;flex-wrap:wrap">
@@ -1006,7 +1037,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
       <!-- Table rendered by JS -->
       <div id="ratio-table-wrap"><div class="loading-text">Loading data&hellip;</div></div>
-      <p class="section-sub" style="margin-top:18px;margin-bottom:0">Ratios calculated from USD prices — synthetic pairs. Gain/loss expressed in units of the compared asset.</p>
+      <p class="section-sub" style="margin-top:18px;margin-bottom:0">Reading example: +1.5 BTC over 90D means that by holding CC instead of BTC these past 90 days, your bag is worth 1.5 BTC more if you swap today — a direct arbitrage gain. -1.5 BTC over 90D means the opposite: by holding CC, you materialize a 1.5 BTC loss if you swap today compared to swapping 90 days ago.</p>
     </section>
 
 
