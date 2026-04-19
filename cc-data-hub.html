@@ -811,6 +811,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
       gap: 0;
       margin-bottom: 24px;
       border-bottom: 1px solid rgba(255,255,255,0.10);
+      flex-wrap: wrap;
     }
     .ctx-tab {
       font-family: 'Rajdhani', sans-serif;
@@ -1183,7 +1184,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         </div>
         <button class="screenshot-btn" onclick="takeScreenshot('ratio-section','ratio-analysis')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
       </div>
-      <p class="section-sub">How does your bag perform against other assets? Enter your position size and compare gains and losses expressed directly in compared asset units. This allows you to monitor arbitrage opportunities between assets, in clicks.</p>
+      <p class="section-sub">Compare gains and losses expressed directly in compared asset units. Monitor arbitrage opportunities between assets, in clicks.</p>
 
       <!-- Controls row: search + position size -->
       <div style="display:flex;gap:10px;align-items:stretch;margin-bottom:18px;flex-wrap:wrap">
@@ -2725,7 +2726,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           cantoBaseOpts.scales.y.ticks.callback = v => v + "%";
           cantoBaseOpts.scales.y.max = 100;
           cantoBaseOpts.plugins.datalabels = {
-            display: true,
+            display: function() { return window.innerWidth >= 700; },
             color: "#000",
             font: { family: "Rajdhani, sans-serif", size: 13, weight: "700" },
             formatter: v => v + "%",
