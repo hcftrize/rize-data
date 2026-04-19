@@ -319,7 +319,6 @@
       flex-wrap: nowrap;
       gap: 8px;
       margin-bottom: 6px;
-      min-width: 0;
     }
 
     .section-sub {
@@ -501,6 +500,8 @@
       pointer-events: none;
     }
     .screenshot-mode .wm-badge { opacity: 0.52; }
+    /* Total Burned: pink in normal view, white on screenshot */
+    .screenshot-mode .rz-burned-val { color: #fff !important; }
 
     .wm-text-tokerize {
       font-family: 'Rajdhani', monospace;
@@ -796,34 +797,9 @@ html, body { overflow-x: hidden; max-width: 100%; }
       max-height: 9999px; opacity: 1;
     }
     .section-body.collapsed { max-height: 0; opacity: 0; }
-
-    /* Screenshot btn: hidden when section is collapsed */
+    /* Screenshot hidden when section is collapsed */
     .section.hub-collapsed .screenshot-btn { display: none !important; }
     .section.hub-collapsed .wm-badge { display: none !important; }
-
-    /* Collapsed sub-description: shown below via flex order, never breaks the title row */
-    .section-collapsed-sub {
-      display: none;
-      font-size: 15px;
-      color: var(--muted);
-      font-family: "Trebuchet MS", "Verdana", sans-serif;
-      line-height: 1.5;
-      width: 100%;
-      order: 99;
-      padding-top: 8px;
-    }
-    .section.hub-collapsed .section-collapsed-sub { display: block; }
-
-    /* When collapsed: allow wrap so sub flows below, keep items top-aligned */
-    .section.hub-collapsed .section-titlebar-row {
-      flex-wrap: wrap;
-      align-items: flex-start;
-    }
-    /* Toggle always top-aligned so its position matches open state */
-    .section-collapse-toggle {
-      align-self: flex-start;
-      flex-shrink: 0;
-    }
 
     /* Mobile — scrollable wide tables & charts */
     @media(max-width:768px) {
@@ -835,7 +811,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
       #comp-section .section-body, #perf-section .section-body {
         overflow-x: auto;
       }
-      /* All tables scrollable */
+      /* KPI row wrap nicely */
       .ctx-kpi-row { gap: 8px; }
       .ctx-kpi { min-width: 120px; padding: 12px 14px; }
       /* Burns table scrollable */
@@ -852,10 +828,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
       border-bottom: 1px solid rgba(255,255,255,0.10);
       flex-wrap: wrap;
     }
-    /* Main RIZE CONTEXT tabs — wrap on mobile (no horizontal scroll) */
-    #rize-ctx-section .ctx-tabs {
-      flex-wrap: wrap;
-    }
     .ctx-tab {
       font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700;
       letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted);
@@ -867,7 +839,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
     .ctx-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
     .ctx-panel { display: none; }
     .ctx-panel.active { display: block; }
-    .ctx-chart-wrap { width: 100%; height: 280px; position: relative; }
+    .ctx-chart-wrap { width: 100%; height: 260px; position: relative; }
     .ctx-chart-wrap canvas { width: 100% !important; height: 100% !important; }
     .ctx-kpi-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
     .ctx-kpi {
@@ -876,15 +848,15 @@ html, body { overflow-x: hidden; max-width: 100%; }
       background: linear-gradient(180deg, rgba(126,224,255,0.03), transparent 60%), rgba(255,255,255,0.015);
     }
     .ctx-kpi-label {
-      display: block; font-family: "Trebuchet MS", sans-serif; font-size: 13px;
-      text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 10px;
+      display: block; font-family: "Trebuchet MS", sans-serif; font-size: 12px;
+      text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 8px;
     }
     .ctx-kpi-value {
-      display: block; font-family: 'Rajdhani', sans-serif; font-size: 30px;
-      font-weight: 700; line-height: 1.08; color: #fff; letter-spacing: 0.5px;
+      display: block; font-family: 'Rajdhani', sans-serif; font-size: 28px;
+      font-weight: 700; line-height: 1.05; color: #fff; letter-spacing: 0.5px;
     }
     .ctx-loading {
-      display: flex; align-items: center; justify-content: center; height: 280px;
+      display: flex; align-items: center; justify-content: center; height: 260px;
       font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted); letter-spacing: 1px;
     }
     .ctx-error { padding: 20px; font-family: 'DM Mono', monospace; font-size: 13px; color: var(--pink); }
@@ -900,10 +872,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
     .tok-table .tok-cat { color: var(--text); }
 
     @media(max-width:700px){
-      .ctx-tab { font-size: 12px; padding: 8px 10px; letter-spacing: 1px; }
+      .ctx-tab { font-size: 12px; padding: 8px 12px; letter-spacing: 1px; }
       .ctx-chart-wrap { height: 200px; }
-      .ctx-kpi { min-width: 90px; }
-      .ctx-kpi-value { font-size: 18px; }
+      .ctx-kpi { min-width: 100px; }
+      .ctx-kpi-value { font-size: 22px; }
       .wrap { padding:24px 14px; }
       .hero,.section,.search-section { padding: 18px; }
       h1 { font-size: clamp(28px, 8vw, 48px); }
@@ -911,28 +883,17 @@ html, body { overflow-x: hidden; max-width: 100%; }
       .section-sub { font-size: 13px; line-height: 1.5; word-break: break-word; }
       .metrics { grid-template-columns: 1fr 1fr; }
       .metric-value { font-size: 26px; }
-      td { font-size: 14px; }
+      td { font-size: 15px; }
       th { font-size: 12px; padding: 8px 8px; }
       td { padding: 8px 8px; }
       .rz-tok-grid { grid-template-columns: 1fr !important; }
-      /* Mobile tokenomics: center pie, full-width table no scroll */
-      .rz-tok-grid > div:first-child {
-        display: flex !important;
-        justify-content: center !important;
-      }
-      .rz-tok-grid > div:first-child > div {
-        width: 240px !important;
-        height: 240px !important;
-        max-width: 240px !important;
-      }
-      .rz-tok-grid .tok-table { min-width: unset !important; font-size: 13px; }
-      .rz-tok-grid .tok-table th,
-      .rz-tok-grid .tok-table td { padding: 7px 8px !important; font-size: 13px !important; }
-      /* Rev grid charts on mobile */
-      .rz-rev-grid .ctx-chart-wrap { height: 220px !important; }
+      .rz-tok-grid > div:first-child { display: flex !important; justify-content: center !important; }
+      .rz-tok-grid > div:first-child > div { width: 240px !important; height: 240px !important; max-width: 240px !important; }
+      .rz-tok-grid .tok-table { min-width: unset !important; }
+      .rz-tok-grid .tok-table th, .rz-tok-grid .tok-table td { padding: 7px 8px !important; font-size: 13px !important; }
       /* Unlock tabs — wrap on mobile */
       #rz-unlock-tabs { flex-wrap: wrap; }
-      #rz-unlock-tabs .ctx-tab { font-size: 13px; padding: 9px 12px; }
+      #rz-unlock-tabs .ctx-tab { font-size: 12px; padding: 8px 12px; }
       /* Burns chart height on mobile */
       #rz-panel-burns .ctx-chart-wrap { height: 200px !important; }
       /* Section titlebar on mobile */
@@ -1043,23 +1004,21 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
       <!-- Panel 1 — T-RIZE CC Rewards -->
       <div class="ctx-panel active" id="rz-panel-rewards">
-      <!-- Single chart area with toggle button -->
-      <div style="margin-bottom:24px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
-          <div id="rz-chart-main-label" style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted)">T-RIZE Cumulative CC Revenue by Source</div>
-          <button id="rz-toggle-burn-adj" onclick="rzToggleBurnAdjChart()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.15);padding:6px 14px;cursor:pointer;transition:background 0.15s,color 0.15s;white-space:nowrap">Display Burn Adjusted ↗</button>
+        <!-- Single chart with toggle -->
+        <div style="margin-bottom:24px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+            <div id="rz-chart-main-label" style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted)">T-RIZE Cumulative CC Revenue by Source</div>
+            <button id="rz-toggle-burn-adj" onclick="rzToggleBurnAdjChart()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.15);padding:6px 14px;cursor:pointer;transition:background 0.15s,color 0.15s;white-space:nowrap">Display Burn Adjusted ↗</button>
+          </div>
+          <div class="ctx-chart-wrap" id="rz-chart-sources-wrap" style="height:260px">
+            <div class="ctx-loading" id="rz-loading-sources">Loading on-chain data&hellip;</div>
+            <canvas id="rz-chart-sources" style="display:none"></canvas>
+          </div>
+          <div class="ctx-chart-wrap" id="rz-chart-cumul-wrap" style="height:260px;display:none">
+            <div class="ctx-loading" id="rz-loading-cumul">Loading on-chain data&hellip;</div>
+            <canvas id="rz-chart-cumul" style="display:none"></canvas>
+          </div>
         </div>
-        <!-- Chart: Revenue by source (default visible) -->
-        <div class="ctx-chart-wrap" id="rz-chart-sources-wrap" style="height:280px">
-          <div class="ctx-loading" id="rz-loading-sources">Loading on-chain data&hellip;</div>
-          <canvas id="rz-chart-sources" style="display:none"></canvas>
-        </div>
-        <!-- Chart: Cumulative net (hidden by default) -->
-        <div class="ctx-chart-wrap" id="rz-chart-cumul-wrap" style="height:280px;display:none">
-          <div class="ctx-loading" id="rz-loading-cumul">Loading on-chain data&hellip;</div>
-          <canvas id="rz-chart-cumul" style="display:none"></canvas>
-        </div>
-      </div>
         <!-- Thin separator -->
         <div style="height:1px;background:rgba(255,255,255,0.07);margin:20px 0"></div>
         <!-- KPI boxes -->
@@ -1086,9 +1045,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
         </div>
       </div>
 
+      <!-- Panel 3 — RIZE Tokenomics -->
       <div class="ctx-panel" id="rz-panel-tokenomics">
         <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:32px;align-items:center" class="rz-tok-grid">
-          <!-- Doughnut — centered, no title, no legend -->
+          <!-- Doughnut — no title, no legend -->
           <div style="display:flex;align-items:center;justify-content:center;">
             <div style="width:100%;max-width:320px;height:320px">
               <canvas id="rz-chart-alloc"></canvas>
@@ -1228,12 +1188,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div class="section-titlebar-row">
         <div class="section-titlebar" style="margin:0">
           <span class="section-title">Portfolio Simulation</span>
-          <!-- Privacy info toggle -->
-          <button onclick="const t=document.getElementById('privacy-tip');t.style.display=t.style.display==='none'?'inline':'none'"
-            style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-left:8px;padding:0;">ⓘ</button>
-          <span id="privacy-tip" style="display:none;font-size:12px;color:var(--muted);margin-left:8px;">
-            Your input is processed locally in your browser only — nothing is stored or transmitted.
-          </span>
         </div>
         <div class="wm-badge">
           <span class="wm-text-tokerize">TOKERIZE.TOP</span>
@@ -2163,10 +2117,13 @@ html, body { overflow-x: hidden; max-width: 100%; }
       tw.style.width     = "max-content";
     });
 
-    // Also expand the section itself to fit full content width
+    // For chart sections (contain canvas), fix to rendered width to avoid extreme stretching.
+    // For table sections, expand to max-content so full table is captured.
+    const hasCharts = el.querySelectorAll("canvas").length > 0;
     const savedSectionWidth    = el.style.width;
     const savedSectionOverflow = el.style.overflow;
-    el.style.width    = "max-content";
+    const captureWidth = hasCharts ? el.offsetWidth : el.scrollWidth;
+    el.style.width    = hasCharts ? captureWidth + "px" : "max-content";
     el.style.overflow = "visible";
 
     // Neutralise sticky positioning on th — prevents header row from floating
@@ -2186,8 +2143,8 @@ html, body { overflow-x: hidden; max-width: 100%; }
         scale: 2,
         useCORS: true,
         logging: false,
-        windowWidth: el.scrollWidth,
-        width: el.scrollWidth,
+        windowWidth: captureWidth,
+        width: captureWidth,
       });
       finishDownload(canvas, filename);
     } finally {
@@ -2509,49 +2466,26 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       if (!section.id) return;
       const titleRow = section.querySelector(".section-titlebar-row");
       if (!titleRow) return;
-
-      // Grab the section-sub text to show when collapsed
-      const subEl = section.querySelector(".section-sub");
-      const subText = subEl ? subEl.textContent.trim() : "";
-
-      // Create collapsed-sub element (shown only when collapsed)
-      const collapsedSub = document.createElement("div");
-      collapsedSub.className = "section-collapsed-sub";
-      collapsedSub.textContent = subText;
-      titleRow.appendChild(collapsedSub);
-
-      // Add toggle button to titlebar row
+      // Add toggle button
       const btn = document.createElement("div");
       btn.className = "section-collapse-toggle";
       btn.innerHTML = toggleSVG;
       titleRow.appendChild(btn);
-
       titleRow.addEventListener("click", function(e) {
-        // Don't intercept screenshot btn clicks
         if (e.target.closest(".screenshot-btn")) return;
         toggleSection(section.id);
       });
-      // Wrap all content after titlebar in a section-body div
+      // Wrap body content
       const body = document.createElement("div");
       body.className = "section-body";
       const children = Array.from(section.childNodes).filter(n => n !== titleRow);
       children.forEach(n => body.appendChild(n));
       section.appendChild(body);
-
       // Start collapsed by default
       section.classList.add("hub-collapsed");
       body.classList.add("collapsed");
     });
   });
-
-  function toggleSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    if (!section) return;
-    const body = section.querySelector(".section-body");
-    if (!body) return;
-    const isCollapsed = section.classList.toggle("hub-collapsed");
-    body.classList.toggle("collapsed", isCollapsed);
-  }
 
   /* ═══════════════════════════════════════════════════════════
      INIT — load data on page ready
@@ -2590,7 +2524,6 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     }
   }
 
-  // Toggle between "by source" chart and "burn adjusted" chart
   let rzBurnAdjVisible = false;
   function rzToggleBurnAdjChart() {
     rzBurnAdjVisible = !rzBurnAdjVisible;
@@ -2901,7 +2834,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const totalScore = cumScoreArr[cumScoreArr.length - 1] || 0;
       const totalBurn  = cumBurn;
 
-      // KPI boxes — reordered: Validator, App, Score, Burned (negative), Net CC | then periods
+      // KPI boxes — Validator, App, Score, Burned (negative), Net CC | then periods
       document.getElementById("rz-kpi-rewards").innerHTML = `
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">Validator Revenue</span>
@@ -2917,7 +2850,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         </div>
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">Total Burned</span>
-          <span class="ctx-kpi-value" style="color:var(--pink)">-${rzFmt(totalBurn)} CC</span>
+          <span class="ctx-kpi-value rz-burned-val" style="color:var(--pink)">-${rzFmt(totalBurn)} CC</span>
         </div>
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">Net CC Revenue</span>
