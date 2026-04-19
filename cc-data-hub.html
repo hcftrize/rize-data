@@ -997,6 +997,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div class="ctx-loading" id="ctx-loading-burn">Loading on-chain data&hellip;</div>
           <canvas id="ctx-chart-burn" style="display:none"></canvas>
         </div>
+        <div class="ctx-kpi-row" id="ctx-kpi-burn"></div>
       </div>
 
       <!-- Panel 3 — Mint Activity -->
@@ -1005,10 +1006,20 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div class="ctx-loading" id="ctx-loading-mint">Loading on-chain data&hellip;</div>
           <canvas id="ctx-chart-mint" style="display:none"></canvas>
         </div>
+        <div class="ctx-kpi-row" id="ctx-kpi-mint"></div>
+        <!-- Cantonomics current state -->
+        <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#fff;margin-bottom:6px">Cantonomics Current State</div>
+          <p style="font-family:'Trebuchet MS',sans-serif;font-size:14px;color:var(--muted);margin-bottom:16px;max-width:700px">Since January 2026, 62% of the total rewards pool go to featured applications, representing around 516 million CC shared among app providers every month.</p>
+          <div class="ctx-chart-wrap" id="ctx-chart-cantonomics-wrap" style="height:320px">
+            <canvas id="ctx-chart-cantonomics"></canvas>
+          </div>
+        </div>
       </div>
 
       <!-- Panel 4 — Mint Allocation -->
       <div class="ctx-panel" id="ctx-panel-alloc">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:16px;text-align:center">Mint Allocation per Role — Since Genesis</div>
         <div class="ctx-chart-wrap" id="ctx-chart-alloc-wrap" style="height:300px;display:flex;align-items:center;justify-content:center;">
           <div class="ctx-loading" id="ctx-loading-alloc">Loading on-chain data&hellip;</div>
           <canvas id="ctx-chart-alloc" style="display:none;max-width:300px;max-height:300px"></canvas>
@@ -1788,7 +1799,7 @@ const compareCoins = [
         abs >= 0.01  ? abs.toFixed(3) :
         abs.toFixed(4);
       const dsign = deltaB >= 0 ? "+" : "-";
-      return `<span style="color:${col};font-weight:700">${sign}${ratioPct.toFixed(2)}% <span style="font-size:16px;vertical-align:middle">${arr}</span></span> <span style="color:#ffffff;font-weight:700">(${dsign}${formatted} ${coinLabel})</span>`;
+      return `<span style="color:${col};font-weight:700;font-size:20px">${sign}${ratioPct.toFixed(2)}% <span style="font-size:16px;vertical-align:middle">${arr}</span></span> <span style="color:#ffffff;font-weight:700;font-size:20px">(${dsign}${formatted} ${coinLabel})</span>`;
     }
 
     const tbody = rows.map(({ coin, priceB, ratioNow, r7d, r30d, r90d }) => {
@@ -2364,7 +2375,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   const CTX_API = "https://fossil-outlook-levitate-gloomy.cantonscan.com/api/mining-rounds/timeseries?interval=week";
 
   // Chart.js instances — kept so we can destroy before re-render
-  const ctxCharts = { ratio: null, mint: null, burn: null, alloc: null };
+  const ctxCharts = { ratio: null, mint: null, burn: null, alloc: null, cantonomics: null };
 
   // Shared data once fetched
   let ctxData = null;
@@ -2508,7 +2519,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
       document.getElementById("ctx-kpi-ratio").innerHTML = `
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">Latest Weekly Ratio</span>
+          <span class="ctx-kpi-label">This Week</span>
           <span class="ctx-kpi-value ${deflClass(latest)}">${latest.toFixed(4)}</span>
         </div>
         <div class="ctx-kpi">
@@ -2587,14 +2598,47 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     }
 
     if (tab === "mint") {
-      // ── 4) Three separate line charts, full history since genesis ──
+      // Three line charts, full history since genesis
       const appR = src.map(r => r.appRewards || 0);
       const valR = src.map(r => r.validatorRewards || 0);
       const svR  = src.map(r => r.superValidatorRewards || 0);
 
+      // KPIs — overall total mint per period
+      const totalMintSeries = src.map(r => (r.appRewards||0) + (r.validatorRewards||0) + (r.superValidatorRewards||0));
+      function mintAvg(n) {
+        const sl = totalMintSeries.slice(-n);
+        return sl.reduce((a,b) => a+b, 0) / sl.length;
+      }
+      const mintThis = totalMintSeries[totalMintSeries.length - 1];
+      const mint1m   = mintAvg(4);
+      const mint3m   = mintAvg(13);
+      const mint6m   = mintAvg(26);
+
+      document.getElementById("ctx-kpi-mint").innerHTML = `
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">This Week</span>
+          <span class="ctx-kpi-value" style="color:#7ee0ff">${ctxFmt(mintThis)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">1M Average</span>
+          <span class="ctx-kpi-value" style="color:#7ee0ff">${ctxFmt(mint1m)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">3M Average</span>
+          <span class="ctx-kpi-value" style="color:#98ffb6">${ctxFmt(mint3m)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">6M Average</span>
+          <span class="ctx-kpi-value" style="color:#ffd36b">${ctxFmt(mint6m)} CC</span>
+        </div>`;
+
       if (ctxCharts.mint) { ctxCharts.mint.destroy(); ctxCharts.mint = null; }
       const cv  = document.getElementById("ctx-chart-mint");
       const ctx = cv.getContext("2d");
+
+      // Merge base opts and add Y axis title "CC"
+      const mintOpts = ctxBaseOpts();
+      mintOpts.scales.y.title = { display: true, text: "CC", color: "#b6c1d8", font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 } };
 
       ctxCharts.mint = new Chart(ctx, {
         type: "line",
@@ -2636,17 +2680,98 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
             },
           ],
         },
-        options: ctxBaseOpts(),
+        options: mintOpts,
       });
+
+      // ── Cantonomics Current State — stacked bar chart ──
+      if (!ctxCharts.cantonomics) {
+        const cvC = document.getElementById("ctx-chart-cantonomics");
+        if (cvC) {
+          const ctxC = cvC.getContext("2d");
+          // Historical schedule from Canton tokenomics (H2 2024 → H1 2029)
+          const canto_labels = ["H2 2024","H1 2025","H2 2025","H1 2026","H2 2026","H1 2027","H2 2027","H1 2028","H2 2028","H1 2029"];
+          const canto_sv  =   [80, 48, 48, 20, 20, 20, 20, 20, 20, 20];
+          const canto_val =   [ 5, 12, 12, 18, 18, 18, 18, 18, 18, 18];
+          const canto_app =   [15, 40, 40, 62, 62, 62, 62, 62, 62, 62];
+
+          const cantoBaseOpts = ctxBaseOpts();
+          cantoBaseOpts.scales.x.stacked = true;
+          cantoBaseOpts.scales.y.stacked = true;
+          cantoBaseOpts.scales.y.ticks.callback = v => v + "%";
+          cantoBaseOpts.scales.y.max = 100;
+
+          ctxCharts.cantonomics = new Chart(ctxC, {
+            type: "bar",
+            data: {
+              labels: canto_labels,
+              datasets: [
+                {
+                  label: "Super Validator reward %",
+                  data: canto_sv,
+                  backgroundColor: "rgba(126,224,255,0.75)",
+                  borderColor: "#7ee0ff",
+                  borderWidth: 1,
+                },
+                {
+                  label: "Validator reward %",
+                  data: canto_val,
+                  backgroundColor: "rgba(152,255,182,0.5)",
+                  borderColor: "#98ffb6",
+                  borderWidth: 1,
+                },
+                {
+                  label: "App provider reward %",
+                  data: canto_app,
+                  backgroundColor: "rgba(255,211,107,0.75)",
+                  borderColor: "#ffd36b",
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: cantoBaseOpts,
+          });
+        }
+      }
     }
 
     if (tab === "burn") {
-      // ── 5) Line chart with points, full history ──
+      // Line chart with points, full history
       const burnData = src.map(r => r.burnAmount || 0);
+
+      // KPIs
+      function burnAvg(n) {
+        const sl = burnData.slice(-n);
+        return sl.reduce((a,b) => a+b, 0) / sl.length;
+      }
+      const burnThis = burnData[burnData.length - 1];
+      const burn1m   = burnAvg(4);
+      const burn3m   = burnAvg(13);
+      const burn6m   = burnAvg(26);
+
+      document.getElementById("ctx-kpi-burn").innerHTML = `
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">This Week</span>
+          <span class="ctx-kpi-value" style="color:#ff8ad8">${ctxFmt(burnThis)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">1M Average</span>
+          <span class="ctx-kpi-value" style="color:#ff8ad8">${ctxFmt(burn1m)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">3M Average</span>
+          <span class="ctx-kpi-value" style="color:#ff8ad8">${ctxFmt(burn3m)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">6M Average</span>
+          <span class="ctx-kpi-value" style="color:#ff8ad8">${ctxFmt(burn6m)} CC</span>
+        </div>`;
 
       if (ctxCharts.burn) { ctxCharts.burn.destroy(); ctxCharts.burn = null; }
       const cv  = document.getElementById("ctx-chart-burn");
       const ctx = cv.getContext("2d");
+
+      const burnOpts = ctxBaseOpts();
+      burnOpts.scales.y.title = { display: true, text: "CC", color: "#b6c1d8", font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 } };
 
       ctxCharts.burn = new Chart(ctx, {
         type: "line",
@@ -2667,7 +2792,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
             },
           ],
         },
-        options: ctxBaseOpts(),
+        options: burnOpts,
       });
     }
 
