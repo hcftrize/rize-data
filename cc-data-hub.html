@@ -1196,6 +1196,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
        CHART.JS (for Canton Context)
   ═══════════════════════════════════════════════════════════ -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
   <!-- ═══════════════════════════════════════════════════════════
        TRADINGVIEW SCRIPT
@@ -2615,13 +2616,14 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const mint6m   = mintAvg(26);
 
       document.getElementById("ctx-kpi-mint").innerHTML = `
+        <div style="width:100%;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:4px">Overall Minted</div>
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">This Week</span>
-          <span class="ctx-kpi-value" style="color:#7ee0ff">${ctxFmt(mintThis)} CC</span>
+          <span class="ctx-kpi-value" style="color:#ffffff">${ctxFmt(mintThis)} CC</span>
         </div>
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">1M Average</span>
-          <span class="ctx-kpi-value" style="color:#7ee0ff">${ctxFmt(mint1m)} CC</span>
+          <span class="ctx-kpi-value" style="color:#ff8ad8">${ctxFmt(mint1m)} CC</span>
         </div>
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">3M Average</span>
@@ -2699,9 +2701,18 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           cantoBaseOpts.scales.y.stacked = true;
           cantoBaseOpts.scales.y.ticks.callback = v => v + "%";
           cantoBaseOpts.scales.y.max = 100;
+          cantoBaseOpts.plugins.datalabels = {
+            display: true,
+            color: "#000",
+            font: { family: "Rajdhani, sans-serif", size: 13, weight: "700" },
+            formatter: v => v + "%",
+            anchor: "center",
+            align: "center",
+          };
 
           ctxCharts.cantonomics = new Chart(ctxC, {
             type: "bar",
+            plugins: [ChartDataLabels],
             data: {
               labels: canto_labels,
               datasets: [
@@ -2751,19 +2762,19 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       document.getElementById("ctx-kpi-burn").innerHTML = `
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">This Week</span>
-          <span class="ctx-kpi-value" style="color:#ff8ad8">${ctxFmt(burnThis)} CC</span>
+          <span class="ctx-kpi-value" style="color:#ffffff">${ctxFmt(burnThis)} CC</span>
         </div>
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">1M Average</span>
-          <span class="ctx-kpi-value" style="color:#ff8ad8">${ctxFmt(burn1m)} CC</span>
+          <span class="ctx-kpi-value" style="color:#7ee0ff">${ctxFmt(burn1m)} CC</span>
         </div>
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">3M Average</span>
-          <span class="ctx-kpi-value" style="color:#ff8ad8">${ctxFmt(burn3m)} CC</span>
+          <span class="ctx-kpi-value" style="color:#98ffb6">${ctxFmt(burn3m)} CC</span>
         </div>
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">6M Average</span>
-          <span class="ctx-kpi-value" style="color:#ff8ad8">${ctxFmt(burn6m)} CC</span>
+          <span class="ctx-kpi-value" style="color:#ffd36b">${ctxFmt(burn6m)} CC</span>
         </div>`;
 
       if (ctxCharts.burn) { ctxCharts.burn.destroy(); ctxCharts.burn = null; }
