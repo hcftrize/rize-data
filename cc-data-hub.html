@@ -961,6 +961,64 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </section>
 
 
+    <!-- ── CANTON CONTEXT ── -->
+    <section class="section" id="canton-ctx-section">
+      <div class="section-titlebar-row">
+        <div class="section-titlebar" style="margin:0">
+          <span class="section-title">Canton Context</span>
+        </div>
+        <div class="wm-badge">
+          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
+        </div>
+        <button class="screenshot-btn" onclick="takeScreenshot('canton-ctx-section','canton-context')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+      </div>
+      <p class="section-sub">On-chain tokenomics from the Canton Network — Data source : CantonScan by ProofGroup</p>
+
+      <!-- Tab switcher -->
+      <div class="ctx-tabs">
+        <button class="ctx-tab active" onclick="ctxSwitch('ratio',this)">Burn / Mint Ratio</button>
+        <button class="ctx-tab" onclick="ctxSwitch('burn',this)">Burn Activity</button>
+        <button class="ctx-tab" onclick="ctxSwitch('mint',this)">Mint Activity</button>
+        <button class="ctx-tab" onclick="ctxSwitch('alloc',this)">Mint Allocation</button>
+      </div>
+
+      <!-- Panel 1 — Burn/Mint Ratio -->
+      <div class="ctx-panel active" id="ctx-panel-ratio">
+        <div class="ctx-chart-wrap" id="ctx-chart-ratio-wrap">
+          <div class="ctx-loading" id="ctx-loading-ratio">Loading on-chain data&hellip;</div>
+          <canvas id="ctx-chart-ratio" style="display:none"></canvas>
+        </div>
+        <div class="ctx-kpi-row" id="ctx-kpi-ratio"></div>
+      </div>
+
+      <!-- Panel 2 — Burn Activity -->
+      <div class="ctx-panel" id="ctx-panel-burn">
+        <div class="ctx-chart-wrap" id="ctx-chart-burn-wrap">
+          <div class="ctx-loading" id="ctx-loading-burn">Loading on-chain data&hellip;</div>
+          <canvas id="ctx-chart-burn" style="display:none"></canvas>
+        </div>
+      </div>
+
+      <!-- Panel 3 — Mint Activity -->
+      <div class="ctx-panel" id="ctx-panel-mint">
+        <div class="ctx-chart-wrap" id="ctx-chart-mint-wrap">
+          <div class="ctx-loading" id="ctx-loading-mint">Loading on-chain data&hellip;</div>
+          <canvas id="ctx-chart-mint" style="display:none"></canvas>
+        </div>
+      </div>
+
+      <!-- Panel 4 — Mint Allocation -->
+      <div class="ctx-panel" id="ctx-panel-alloc">
+        <div class="ctx-chart-wrap" id="ctx-chart-alloc-wrap" style="height:300px;display:flex;align-items:center;justify-content:center;">
+          <div class="ctx-loading" id="ctx-loading-alloc">Loading on-chain data&hellip;</div>
+          <canvas id="ctx-chart-alloc" style="display:none;max-width:300px;max-height:300px"></canvas>
+        </div>
+        <div class="ctx-kpi-row" id="ctx-kpi-alloc"></div>
+      </div>
+
+    </section>
+
+
     <!-- ── SECTION 3 : MARKET CONTEXT ── -->
     <section class="section" id="mktctx-section">
       <div class="section-titlebar-row">
@@ -977,7 +1035,38 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </section>
 
 
-    <!-- ── SECTION 4 : RIZE PRICE SIMULATION ── -->
+    <!-- ── SECTION 4 : PERFORMANCE COMPARISON ── -->
+    <section class="section" id="perf-section">
+      <div class="section-titlebar-row">
+        <div class="section-titlebar" style="margin:0">
+          <span class="section-title">Performance Comparison</span>
+        </div>
+        <div class="wm-badge">
+          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
+        </div>
+        <button class="screenshot-btn" onclick="takeScreenshot('perf-section','perf')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+      </div>
+      <p class="section-sub" id="perf-sub">7D, 30D and 90D price performance of selected tokens against USD.</p>
+
+      <!-- Search bar -->
+      <div class="add-row" style="margin-bottom:18px">
+        <div class="search-wrap">
+          <input type="text" id="add-compare-input-footer"
+            placeholder="Add any crypto to compare&hellip;"
+            autocomplete="off" spellcheck="false"
+            style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
+          <div class="autocomplete-dropdown" id="add-compare-autocomplete-footer"></div>
+        </div>
+        <button id="add-compare-btn-footer" class="add-btn" disabled>+ Add</button>
+      </div>
+      <div id="add-compare-error-footer" style="margin-bottom:10px;font-size:13px;color:var(--pink);display:none"></div>
+
+      <!-- Table rendered by JS -->
+      <div id="perf-table-wrap"><div class="loading-text">Loading data&hellip;</div></div>
+    </section>
+
+
+    <!-- ── SECTION 5 : CC PRICE SIMULATION ── -->
     <section class="section" id="comp-section">
       <div class="section-titlebar-row">
         <div class="section-titlebar" style="margin:0">
@@ -1008,12 +1097,11 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </section>
 
 
-    <!-- ── SECTION 5 : PORTFOLIO SIMULATION ── -->
+    <!-- ── SECTION 6 : PORTFOLIO SIMULATION ── -->
     <section class="section" id="bag-section">
       <div class="section-titlebar-row">
         <div class="section-titlebar" style="margin:0">
           <span class="section-title">Portfolio Simulation</span>
-          <!-- Privacy info toggle -->
           <button onclick="const t=document.getElementById('privacy-tip');t.style.display=t.style.display==='none'?'inline':'none'"
             style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-left:8px;padding:0;">ⓘ</button>
           <span id="privacy-tip" style="display:none;font-size:12px;color:var(--muted);margin-left:8px;">
@@ -1027,6 +1115,19 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
       <p class="section-sub">Estimated value of your CC holdings at each simulated target price.</p>
 
+      <!-- Search bar -->
+      <div class="add-row" style="margin-bottom:18px">
+        <div class="search-wrap">
+          <input type="text" id="add-compare-input-bag"
+            placeholder="Add any crypto to compare&hellip;"
+            autocomplete="off" spellcheck="false"
+            style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
+          <div class="autocomplete-dropdown" id="add-compare-autocomplete-bag"></div>
+        </div>
+        <button id="add-compare-btn-bag" class="add-btn" disabled>+ Add</button>
+      </div>
+      <div id="add-compare-error-bag" style="margin-bottom:10px;font-size:13px;color:var(--pink);display:none"></div>
+
       <!-- Bag size input -->
       <div class="bag-input-row">
         <label class="bag-label">Your position size</label>
@@ -1037,54 +1138,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <!-- Table rendered by JS -->
       <div id="bag-simulations"><div class="loading-text">Loading data&hellip;</div></div>
       <p class="section-sub" style="margin-top:18px;margin-bottom:0">Formula: your position size × hypothetical price at same market cap.</p>
-
-      <!-- Mobile duplicate search bar -->
-      <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
-        <div class="add-row">
-          <div class="search-wrap">
-            <input type="text" id="add-compare-input-bag"
-              placeholder="Add any crypto to compare&hellip;"
-              autocomplete="off" spellcheck="false"
-              style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
-            <div class="autocomplete-dropdown" id="add-compare-autocomplete-bag"></div>
-          </div>
-          <button id="add-compare-btn-bag" class="add-btn" disabled>+ Add</button>
-        </div>
-        <div id="add-compare-error-bag" style="margin-top:6px;font-size:13px;color:var(--pink);display:none"></div>
-      </div>
-    </section>
-
-
-    <!-- ── SECTION 6 : PERFORMANCE COMPARISON ── -->
-    <section class="section" id="perf-section">
-      <div class="section-titlebar-row">
-        <div class="section-titlebar" style="margin:0">
-          <span class="section-title">Performance Comparison</span>
-        </div>
-        <div class="wm-badge">
-          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
-        </div>
-        <button class="screenshot-btn" onclick="takeScreenshot('perf-section','perf')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
-      </div>
-      <p class="section-sub" id="perf-sub">7D, 30D and 90D price performance of selected tokens against USD.</p>
-
-      <!-- Table rendered by JS -->
-      <div id="perf-table-wrap"><div class="loading-text">Loading data&hellip;</div></div>
-
-      <!-- Mobile duplicate search bar -->
-      <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
-        <div class="add-row">
-          <div class="search-wrap">
-            <input type="text" id="add-compare-input-footer"
-              placeholder="Add any crypto to compare&hellip;"
-              autocomplete="off" spellcheck="false"
-              style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
-            <div class="autocomplete-dropdown" id="add-compare-autocomplete-footer"></div>
-          </div>
-          <button id="add-compare-btn-footer" class="add-btn" disabled>+ Add</button>
-        </div>
-        <div id="add-compare-error-footer" style="margin-top:6px;font-size:13px;color:var(--pink);display:none"></div>
-      </div>
     </section>
 
 
@@ -1122,54 +1175,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <!-- Table rendered by JS -->
       <div id="ratio-table-wrap"><div class="loading-text">Loading data&hellip;</div></div>
       <p class="section-sub" style="margin-top:18px;margin-bottom:0">Hypothetical reading example: +1.5 ETH gains over 90d means you gain +1.5 ETH compared to 90d ago if you swap CC for ETH today. The opposite situation (-1.5 ETH), means you lose -1.5 ETH compared to 90d ago if you swap CC for ETH today.</p>
-    </section>
-
-
-    <!-- ── CANTON CONTEXT ── -->
-    <section class="section" id="canton-ctx-section">
-      <div class="section-titlebar-row">
-        <div class="section-titlebar" style="margin:0">
-          <span class="section-title">Canton Context</span>
-        </div>
-        <div class="wm-badge">
-          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
-        </div>
-        <button class="screenshot-btn" onclick="takeScreenshot('canton-ctx-section','canton-context')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
-      </div>
-      <p class="section-sub">On-chain tokenomics from the Canton Network Global Synchronizer — weekly burn &amp; mint activity sourced directly from CantonScan.</p>
-
-      <!-- Tab switcher -->
-      <div class="ctx-tabs">
-        <button class="ctx-tab active" onclick="ctxSwitch('ratio',this)">Burn / Mint Ratio</button>
-        <button class="ctx-tab" onclick="ctxSwitch('mint',this)">Mint Activity</button>
-        <button class="ctx-tab" onclick="ctxSwitch('burn',this)">Burn Activity</button>
-      </div>
-
-      <!-- Panel 1 — Burn/Mint Ratio -->
-      <div class="ctx-panel active" id="ctx-panel-ratio">
-        <div class="ctx-chart-wrap" id="ctx-chart-ratio-wrap">
-          <div class="ctx-loading" id="ctx-loading-ratio">Loading on-chain data&hellip;</div>
-          <canvas id="ctx-chart-ratio" style="display:none"></canvas>
-        </div>
-        <div class="ctx-kpi-row" id="ctx-kpi-ratio"></div>
-      </div>
-
-      <!-- Panel 2 — Mint Activity -->
-      <div class="ctx-panel" id="ctx-panel-mint">
-        <div class="ctx-chart-wrap" id="ctx-chart-mint-wrap">
-          <div class="ctx-loading" id="ctx-loading-mint">Loading on-chain data&hellip;</div>
-          <canvas id="ctx-chart-mint" style="display:none"></canvas>
-        </div>
-      </div>
-
-      <!-- Panel 3 — Burn Activity -->
-      <div class="ctx-panel" id="ctx-panel-burn">
-        <div class="ctx-chart-wrap" id="ctx-chart-burn-wrap">
-          <div class="ctx-loading" id="ctx-loading-burn">Loading on-chain data&hellip;</div>
-          <canvas id="ctx-chart-burn" style="display:none"></canvas>
-        </div>
-      </div>
-
     </section>
 
 
@@ -2359,7 +2364,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   const CTX_API = "https://fossil-outlook-levitate-gloomy.cantonscan.com/api/mining-rounds/timeseries?interval=week";
 
   // Chart.js instances — kept so we can destroy before re-render
-  const ctxCharts = { ratio: null, mint: null, burn: null };
+  const ctxCharts = { ratio: null, mint: null, burn: null, alloc: null };
 
   // Shared data once fetched
   let ctxData = null;
@@ -2389,7 +2394,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       // Keep last 26 weeks for ratio; all history for mint & burn
       ctxData = rows;
       // Hide all loaders
-      ["ratio","mint","burn"].forEach(t => {
+      ["ratio","mint","burn","alloc"].forEach(t => {
         const el = document.getElementById("ctx-loading-" + t);
         if (el) el.style.display = "none";
         const cv = document.getElementById("ctx-chart-" + t);
@@ -2398,8 +2403,9 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       ctxRender("ratio");
       ctxRender("mint");
       ctxRender("burn");
+      ctxRender("alloc");
     } catch(e) {
-      ["ratio","mint","burn"].forEach(t => {
+      ["ratio","mint","burn","alloc"].forEach(t => {
         const el = document.getElementById("ctx-loading-" + t);
         if (el) el.innerHTML = '<span style="color:var(--pink)">⚠ Could not load on-chain data: ' + e.message + '</span>';
       });
@@ -2473,8 +2479,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   function ctxRender(tab) {
     if (!ctxData) return;
 
-    // Ratio: last 26 weeks only; mint & burn: full history
-    const src    = (tab === "ratio") ? ctxData.slice(-26) : ctxData;
+    // Ratio: full history
+    const src    = ctxData;
     const labels = src.map(r => ctxWeekLabel(r.date));
 
     if (tab === "ratio") {
@@ -2486,23 +2492,44 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       });
 
       const latest = ratios[ratios.length - 1];
-      const avg    = ratios.reduce((a, b) => a + b, 0) / ratios.length;
 
-      const deflClass = latest >= 1 ? "deflationary" : latest >= 0.5 ? "neutral" : "inflationary";
-      const deflText  = latest >= 1 ? "DEFLATIONARY 🟢" : latest >= 0.5 ? "NEUTRAL 🟡" : "INFLATIONARY 🔴";
+      // Averages: 1M=4w, 3M=13w, 6M=26w
+      function avgLast(n) {
+        const slice = ratios.slice(-n);
+        return slice.reduce((a, b) => a + b, 0) / slice.length;
+      }
+      const avg1m = avgLast(4);
+      const avg3m = avgLast(13);
+      const avg6m = avgLast(26);
+
+      // Neutral: strictly 0.95–1.05
+      function deflClass(v) { return v > 1.05 ? "deflationary" : v >= 0.95 ? "neutral" : "inflationary"; }
+      function deflText(v)  { return v > 1.05 ? "DEFLATIONARY 🟢" : v >= 0.95 ? "NEUTRAL 🟡" : "INFLATIONARY 🔴"; }
+
       document.getElementById("ctx-kpi-ratio").innerHTML = `
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">Latest Weekly Ratio</span>
-          <span class="ctx-kpi-value ${deflClass}">${latest.toFixed(4)}</span>
+          <span class="ctx-kpi-value ${deflClass(latest)}">${latest.toFixed(4)}</span>
         </div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">26-Week Average</span>
-          <span class="ctx-kpi-value" style="color:var(--muted)">${avg.toFixed(4)}</span>
+          <span class="ctx-kpi-label">1M Average</span>
+          <span class="ctx-kpi-value ${deflClass(avg1m)}">${avg1m.toFixed(4)}</span>
         </div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">Network Status</span>
-          <span class="ctx-kpi-value ${deflClass}" style="font-size:20px">${deflText}</span>
+          <span class="ctx-kpi-label">3M Average</span>
+          <span class="ctx-kpi-value ${deflClass(avg3m)}">${avg3m.toFixed(4)}</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">6M Average</span>
+          <span class="ctx-kpi-value ${deflClass(avg6m)}">${avg6m.toFixed(4)}</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">Tokenomics Status</span>
+          <span class="ctx-kpi-value ${deflClass(latest)}" style="font-size:20px">${deflText(latest)}</span>
         </div>`;
+
+      // Tooltip label also uses updated thresholds
+      const tooltipFn = v => v > 1.05 ? " — Deflationary" : v >= 0.95 ? " — Neutral" : " — Inflationary";
 
       if (ctxCharts.ratio) { ctxCharts.ratio.destroy(); ctxCharts.ratio = null; }
       const cv  = document.getElementById("ctx-chart-ratio");
@@ -2549,7 +2576,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
                 label: c => {
                   if (c.datasetIndex === 1) return null;
                   const v = c.parsed.y;
-                  const txt = v >= 1 ? " — Deflationary" : v >= 0.5 ? " — Neutral" : " — Inflationary";
+                  const txt = tooltipFn(v);
                   return ` Ratio: ${v.toFixed(4)}${txt}`;
                 },
               },
@@ -2641,6 +2668,87 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           ],
         },
         options: ctxBaseOpts(),
+      });
+    }
+
+    if (tab === "alloc") {
+      // Mint Allocation — doughnut showing cumulative % of mint going to SV / Validators / Apps
+      const totalSV  = ctxData.reduce((a, r) => a + (r.superValidatorRewards || 0), 0);
+      const totalVal = ctxData.reduce((a, r) => a + (r.validatorRewards      || 0), 0);
+      const totalApp = ctxData.reduce((a, r) => a + (r.appRewards            || 0), 0);
+      const totalMint = totalSV + totalVal + totalApp;
+
+      const pctSV  = totalMint ? (totalSV  / totalMint * 100) : 0;
+      const pctVal = totalMint ? (totalVal / totalMint * 100) : 0;
+      const pctApp = totalMint ? (totalApp / totalMint * 100) : 0;
+
+      // KPI boxes
+      document.getElementById("ctx-kpi-alloc").innerHTML = `
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label" style="color:#7ee0ff">Super Validators</span>
+          <span class="ctx-kpi-value" style="color:#7ee0ff">${pctSV.toFixed(1)}%</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label" style="color:#98ffb6">Validators</span>
+          <span class="ctx-kpi-value" style="color:#98ffb6">${pctVal.toFixed(1)}%</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label" style="color:#ffd36b">Apps</span>
+          <span class="ctx-kpi-value" style="color:#ffd36b">${pctApp.toFixed(1)}%</span>
+        </div>`;
+
+      if (ctxCharts.alloc) { ctxCharts.alloc.destroy(); ctxCharts.alloc = null; }
+      const cv  = document.getElementById("ctx-chart-alloc");
+      const ctx = cv.getContext("2d");
+
+      ctxCharts.alloc = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Super Validators", "Validators", "Apps"],
+          datasets: [{
+            data: [pctSV, pctVal, pctApp],
+            backgroundColor: [
+              "rgba(126,224,255,0.75)",
+              "rgba(152,255,182,0.75)",
+              "rgba(255,211,107,0.75)",
+            ],
+            borderColor: [
+              "#7ee0ff",
+              "#98ffb6",
+              "#ffd36b",
+            ],
+            borderWidth: 2,
+            hoverOffset: 8,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          cutout: "58%",
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: {
+                color: "#b6c1d8",
+                font: { family: "Trebuchet MS, Verdana, sans-serif", size: 12 },
+                boxWidth: 14, boxHeight: 14, padding: 16,
+              },
+            },
+            tooltip: {
+              backgroundColor: "#060818",
+              borderColor: "rgba(126,224,255,0.25)",
+              borderWidth: 1,
+              titleColor: "#7ee0ff",
+              bodyColor: "#f7f2e8",
+              titleFont: { family: "Rajdhani, sans-serif", size: 13, weight: "700" },
+              bodyFont:  { family: "Trebuchet MS, sans-serif", size: 12 },
+              padding: 10,
+              callbacks: {
+                label: c => ` ${c.label}: ${c.parsed.toFixed(1)}%`,
+              },
+            },
+          },
+        },
       });
     }
   }
