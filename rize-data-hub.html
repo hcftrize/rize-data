@@ -944,7 +944,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
           </div>
           <!-- Right: Revenue by source -->
           <div>
-            <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px">T-RIZE CC Revenue by Source</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px">T-RIZE Cumulative CC Revenue by Source</div>
             <div class="ctx-chart-wrap" id="rz-chart-sources-wrap" style="height:280px">
               <div class="ctx-loading" id="rz-loading-sources">Loading on-chain data&hellip;</div>
               <canvas id="rz-chart-sources" style="display:none"></canvas>
@@ -1030,8 +1030,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
             <span style="color:var(--muted);font-size:13px">Loading burn events&hellip;</span>
           </div>
           <div id="rz-unlock-pending" class="rz-unlock-panel" style="display:none">
-            <span style="color:var(--muted);font-size:13px">Computing&hellip;</span>
-          </div>
           <div id="rz-unlock-ongoing" class="rz-unlock-panel" style="display:none">
             <span style="color:var(--muted);font-size:13px">Computing&hellip;</span>
           </div>
@@ -2450,7 +2448,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       burnOpts.scales.y.title = { display: true, text: "RIZE burned", color: "#b6c1d8", font: { size: 11 } };
       burnOpts.scales.y.ticks.callback = v => rzFmt(v);
       burnOpts.plugins.legend.labels.padding = 24;
-      burnOpts.layout = { padding: { top: 20 } };
+      burnOpts.layout = { padding: { top: 32 } };
       rzCharts.burns = new Chart(cvBurn.getContext("2d"), {
         type: "line",
         data: {
@@ -2806,23 +2804,26 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           data: {
             labels,
             datasets: [
+              // Validator — big dominant line with fill, shown first
               {
                 label: "Validator Revenue",
                 data: cumValArr,
-                borderColor: "#98ffb6", backgroundColor: "rgba(152,255,182,0.20)",
-                fill: "origin", tension: 0.35, pointRadius: 0, borderWidth: 2, order: 3,
+                borderColor: "#98ffb6", backgroundColor: "rgba(152,255,182,0.15)",
+                fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2,
               },
+              // Platform App — independent line below, no fill
               {
                 label: "T-RIZE Platform App",
-                data: cumValArr.map((v, i) => v + cumAppArr[i]),
-                borderColor: "#ffd36b", backgroundColor: "rgba(255,211,107,0.14)",
-                fill: "-1", tension: 0.35, pointRadius: 0, borderWidth: 1.5, order: 2,
+                data: cumAppArr,
+                borderColor: "#ffd36b", backgroundColor: "transparent",
+                fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.5,
               },
+              // RIZEScore — independent line at bottom, no fill
               {
                 label: "RIZEScore App",
-                data: cumValArr.map((v, i) => v + cumAppArr[i] + cumScoreArr[i]),
-                borderColor: "#ff8ad8", backgroundColor: "rgba(255,138,216,0.10)",
-                fill: "-1", tension: 0.35, pointRadius: 0, borderWidth: 1.5, order: 1,
+                data: cumScoreArr,
+                borderColor: "#ff8ad8", backgroundColor: "transparent",
+                fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.5,
               },
             ],
           },
