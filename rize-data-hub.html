@@ -500,6 +500,8 @@
       pointer-events: none;
     }
     .screenshot-mode .wm-badge { opacity: 0.52; }
+    /* Total Burned: pink in normal view, white on screenshot */
+    .screenshot-mode .rz-burned-val { color: #fff !important; }
 
     .wm-text-tokerize {
       font-family: 'Rajdhani', monospace;
@@ -2121,10 +2123,13 @@ html, body { overflow-x: hidden; max-width: 100%; }
       tw.style.width     = "max-content";
     });
 
-    // Also expand the section itself to fit full content width
+    // For chart sections (contain canvas), fix to rendered width to avoid extreme stretching.
+    // For table sections, expand to max-content so full table is captured.
+    const hasCharts = el.querySelectorAll("canvas").length > 0;
     const savedSectionWidth    = el.style.width;
     const savedSectionOverflow = el.style.overflow;
-    el.style.width    = "max-content";
+    const captureWidth = hasCharts ? el.offsetWidth : el.scrollWidth;
+    el.style.width    = hasCharts ? captureWidth + "px" : "max-content";
     el.style.overflow = "visible";
 
     // Neutralise sticky positioning on th — prevents header row from floating
@@ -2144,8 +2149,8 @@ html, body { overflow-x: hidden; max-width: 100%; }
         scale: 2,
         useCORS: true,
         logging: false,
-        windowWidth: el.scrollWidth,
-        width: el.scrollWidth,
+        windowWidth: captureWidth,
+        width: captureWidth,
       });
       finishDownload(canvas, filename);
     } finally {
@@ -2851,7 +2856,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         </div>
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">Total Burned</span>
-          <span class="ctx-kpi-value" style="color:var(--pink)">-${rzFmt(totalBurn)} CC</span>
+          <span class="ctx-kpi-value rz-burned-val" style="color:var(--pink)">-${rzFmt(totalBurn)} CC</span>
         </div>
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">Net CC Revenue</span>
