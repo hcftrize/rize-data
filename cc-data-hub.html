@@ -779,6 +779,31 @@ html, body { overflow-x: hidden; max-width: 100%; }
     }
 
     /* ═══════════════════════════════════════════════════════════
+       COLLAPSIBLE SECTIONS
+    ═══════════════════════════════════════════════════════════ */
+    .section-titlebar-row { cursor: pointer; user-select: none; }
+    .section-collapse-toggle {
+      width: 28px; height: 28px;
+      border: 1px solid rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-left: 12px;
+      transition: background 0.15s, border-color 0.15s;
+      background: rgba(255,255,255,0.04);
+    }
+    .section-collapse-toggle svg { transition: transform 0.28s ease; }
+    .section-collapse-toggle:hover { background: rgba(126,224,255,0.08); border-color: var(--cyan); }
+    .section.hub-collapsed .section-collapse-toggle svg { transform: rotate(-90deg); }
+    .section-body {
+      overflow: hidden;
+      transition: max-height 0.38s ease, opacity 0.3s ease;
+      max-height: 9999px; opacity: 1;
+    }
+    .section-body.collapsed { max-height: 0; opacity: 0; }
+    /* Screenshot hidden when section is collapsed */
+    .section.hub-collapsed .screenshot-btn { display: none !important; }
+    .section.hub-collapsed .wm-badge { display: none !important; }
+
+    /* ═══════════════════════════════════════════════════════════
        CANTON CONTEXT — tab switcher + charts
     ═══════════════════════════════════════════════════════════ */
     .ctx-tabs {
@@ -1113,11 +1138,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div class="section-titlebar-row">
         <div class="section-titlebar" style="margin:0">
           <span class="section-title">Portfolio Simulation</span>
-          <button onclick="const t=document.getElementById('privacy-tip');t.style.display=t.style.display==='none'?'inline':'none'"
-            style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-left:8px;padding:0;">ⓘ</button>
-          <span id="privacy-tip" style="display:none;font-size:12px;color:var(--muted);margin-left:8px;">
-            Your input is processed locally in your browser only — nothing is stored or transmitted.
-          </span>
         </div>
         <div class="wm-badge">
           <span class="wm-text-tokerize">TOKERIZE.TOP</span>
@@ -2055,10 +2075,13 @@ const compareCoins = [
       tw.style.width     = "max-content";
     });
 
-    // Also expand the section itself to fit full content width
+    // For chart sections (contain canvas), fix to rendered width to avoid extreme stretching.
+    // For table sections, expand to max-content so full table is captured.
+    const hasCharts = el.querySelectorAll("canvas").length > 0;
     const savedSectionWidth    = el.style.width;
     const savedSectionOverflow = el.style.overflow;
-    el.style.width    = "max-content";
+    const captureWidth = hasCharts ? el.offsetWidth : el.scrollWidth;
+    el.style.width    = hasCharts ? captureWidth + "px" : "max-content";
     el.style.overflow = "visible";
 
     await new Promise(r => setTimeout(r, 60));
@@ -2069,8 +2092,8 @@ const compareCoins = [
         scale: 2,
         useCORS: true,
         logging: false,
-        windowWidth: el.scrollWidth,
-        width: el.scrollWidth,
+        windowWidth: captureWidth,
+        width: captureWidth,
       });
       finishDownload(canvas, filename);
     } finally {
@@ -2897,6 +2920,46 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
      INIT — load data on page ready
   ═══════════════════════════════════════════════════════════ */
   document.addEventListener("DOMContentLoaded", loadData);
+
+
+  /* ═══════════════════════════════════════════════════════════
+     COLLAPSIBLE SECTIONS — closed by default
+  ═══════════════════════════════════════════════════════════ */
+  function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+    const body = section.querySelector(".section-body");
+    if (!body) return;
+    const isCollapsed = section.classList.toggle("hub-collapsed");
+    body.classList.toggle("collapsed", isCollapsed);
+  }
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const toggleSVG = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="rgba(126,224,255,0.8)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    document.querySelectorAll(".hub-wrap .section").forEach(function(section) {
+      if (!section.id) return;
+      const titleRow = section.querySelector(".section-titlebar-row");
+      if (!titleRow) return;
+      // Add toggle button
+      const btn = document.createElement("div");
+      btn.className = "section-collapse-toggle";
+      btn.innerHTML = toggleSVG;
+      titleRow.appendChild(btn);
+      titleRow.addEventListener("click", function(e) {
+        if (e.target.closest(".screenshot-btn")) return;
+        toggleSection(section.id);
+      });
+      // Wrap body content
+      const body = document.createElement("div");
+      body.className = "section-body";
+      const children = Array.from(section.childNodes).filter(n => n !== titleRow);
+      children.forEach(n => body.appendChild(n));
+      section.appendChild(body);
+      // Start collapsed by default
+      section.classList.add("hub-collapsed");
+      body.classList.add("collapsed");
+    });
+  });
 
   </script>
 
