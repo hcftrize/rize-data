@@ -778,6 +778,99 @@ html, body { overflow-x: hidden; max-width: 100%; }
       .screenshot-btn { padding: 8px 10px; gap: 0; }
     }
 
+    /* ═══════════════════════════════════════════════════════════
+       CANTON CONTEXT — tab switcher + charts
+    ═══════════════════════════════════════════════════════════ */
+    .ctx-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+    .ctx-tab {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 20px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.18s, border-color 0.18s;
+      white-space: nowrap;
+    }
+    .ctx-tab:hover { color: #fff; }
+    .ctx-tab.active {
+      color: var(--cyan);
+      border-bottom-color: var(--cyan);
+    }
+    .ctx-panel { display: none; }
+    .ctx-panel.active { display: block; }
+
+    .ctx-chart-wrap {
+      width: 100%;
+      height: 260px;
+      position: relative;
+    }
+    .ctx-chart-wrap canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .ctx-kpi-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .ctx-kpi {
+      flex: 1;
+      min-width: 140px;
+      padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: linear-gradient(180deg, rgba(126,224,255,0.03), transparent 60%), rgba(255,255,255,0.015);
+    }
+    .ctx-kpi-label {
+      display: block;
+      font-family: "Trebuchet MS", sans-serif;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .ctx-kpi-value {
+      display: block;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.05;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+    .ctx-kpi-value.deflationary { color: #98ffb6; }
+    .ctx-kpi-value.inflationary { color: var(--pink); }
+    .ctx-kpi-value.neutral      { color: var(--gold); }
+
+    .ctx-loading {
+      display: flex; align-items: center; justify-content: center;
+      height: 260px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+    .ctx-error {
+      padding: 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--pink);
+    }
+
     @media(max-width:700px){
       .wrap { padding:24px 14px; }
       .hero,.section,.search-section { padding: 18px; }
@@ -786,6 +879,11 @@ html, body { overflow-x: hidden; max-width: 100%; }
       .metrics { grid-template-columns: 1fr 1fr; }
       .metric-value { font-size: 26px; }
       td { font-size: 15px; }
+      /* Canton Context mobile */
+      .ctx-tab { font-size: 12px; padding: 8px 12px; letter-spacing: 1px; }
+      .ctx-chart-wrap { height: 200px; }
+      .ctx-kpi { min-width: 100px; }
+      .ctx-kpi-value { font-size: 22px; }
     }
     </style>
 </head>
@@ -863,6 +961,75 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </section>
 
 
+    <!-- ── CANTON CONTEXT ── -->
+    <section class="section" id="canton-ctx-section">
+      <div class="section-titlebar-row">
+        <div class="section-titlebar" style="margin:0">
+          <span class="section-title">Canton Context</span>
+        </div>
+        <div class="wm-badge">
+          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
+        </div>
+        <button class="screenshot-btn" onclick="takeScreenshot('canton-ctx-section','canton-context')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+      </div>
+      <p class="section-sub">On-chain tokenomics from the Canton Network — Data source : CantonScan by ProofGroup</p>
+
+      <!-- Tab switcher -->
+      <div class="ctx-tabs">
+        <button class="ctx-tab active" onclick="ctxSwitch('ratio',this)">Burn / Mint Ratio</button>
+        <button class="ctx-tab" onclick="ctxSwitch('burn',this)">Burn Activity</button>
+        <button class="ctx-tab" onclick="ctxSwitch('mint',this)">Mint Activity</button>
+        <button class="ctx-tab" onclick="ctxSwitch('alloc',this)">Mint Allocation</button>
+      </div>
+
+      <!-- Panel 1 — Burn/Mint Ratio -->
+      <div class="ctx-panel active" id="ctx-panel-ratio">
+        <div class="ctx-chart-wrap" id="ctx-chart-ratio-wrap">
+          <div class="ctx-loading" id="ctx-loading-ratio">Loading on-chain data&hellip;</div>
+          <canvas id="ctx-chart-ratio" style="display:none"></canvas>
+        </div>
+        <div class="ctx-kpi-row" id="ctx-kpi-ratio"></div>
+      </div>
+
+      <!-- Panel 2 — Burn Activity -->
+      <div class="ctx-panel" id="ctx-panel-burn">
+        <div class="ctx-chart-wrap" id="ctx-chart-burn-wrap">
+          <div class="ctx-loading" id="ctx-loading-burn">Loading on-chain data&hellip;</div>
+          <canvas id="ctx-chart-burn" style="display:none"></canvas>
+        </div>
+        <div class="ctx-kpi-row" id="ctx-kpi-burn"></div>
+      </div>
+
+      <!-- Panel 3 — Mint Activity -->
+      <div class="ctx-panel" id="ctx-panel-mint">
+        <div class="ctx-chart-wrap" id="ctx-chart-mint-wrap">
+          <div class="ctx-loading" id="ctx-loading-mint">Loading on-chain data&hellip;</div>
+          <canvas id="ctx-chart-mint" style="display:none"></canvas>
+        </div>
+        <div class="ctx-kpi-row" id="ctx-kpi-mint"></div>
+        <!-- Cantonomics current state -->
+        <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#fff;margin-bottom:6px">Cantonomics Current State</div>
+          <p style="font-family:'Trebuchet MS',sans-serif;font-size:14px;color:var(--muted);margin-bottom:16px;max-width:700px">Since January 2026, 62% of the total rewards pool go to featured applications, representing around 516 million CC shared among app providers every month.</p>
+          <div class="ctx-chart-wrap" id="ctx-chart-cantonomics-wrap" style="height:320px">
+            <canvas id="ctx-chart-cantonomics"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 4 — Mint Allocation -->
+      <div class="ctx-panel" id="ctx-panel-alloc">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:16px;text-align:center">Mint Allocation per Role — Since Genesis</div>
+        <div class="ctx-chart-wrap" id="ctx-chart-alloc-wrap" style="height:300px;display:flex;align-items:center;justify-content:center;">
+          <div class="ctx-loading" id="ctx-loading-alloc">Loading on-chain data&hellip;</div>
+          <canvas id="ctx-chart-alloc" style="display:none;max-width:300px;max-height:300px"></canvas>
+        </div>
+        <div class="ctx-kpi-row" id="ctx-kpi-alloc"></div>
+      </div>
+
+    </section>
+
+
     <!-- ── SECTION 3 : MARKET CONTEXT ── -->
     <section class="section" id="mktctx-section">
       <div class="section-titlebar-row">
@@ -879,7 +1046,38 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </section>
 
 
-    <!-- ── SECTION 4 : RIZE PRICE SIMULATION ── -->
+    <!-- ── SECTION 4 : PERFORMANCE COMPARISON ── -->
+    <section class="section" id="perf-section">
+      <div class="section-titlebar-row">
+        <div class="section-titlebar" style="margin:0">
+          <span class="section-title">Performance Comparison</span>
+        </div>
+        <div class="wm-badge">
+          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
+        </div>
+        <button class="screenshot-btn" onclick="takeScreenshot('perf-section','perf')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+      </div>
+      <p class="section-sub" id="perf-sub">7D, 30D and 90D price performance of selected tokens against USD.</p>
+
+      <!-- Search bar -->
+      <div class="add-row" style="margin-bottom:18px">
+        <div class="search-wrap">
+          <input type="text" id="add-compare-input-footer"
+            placeholder="Add any crypto to compare&hellip;"
+            autocomplete="off" spellcheck="false"
+            style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
+          <div class="autocomplete-dropdown" id="add-compare-autocomplete-footer"></div>
+        </div>
+        <button id="add-compare-btn-footer" class="add-btn" disabled>+ Add</button>
+      </div>
+      <div id="add-compare-error-footer" style="margin-bottom:10px;font-size:13px;color:var(--pink);display:none"></div>
+
+      <!-- Table rendered by JS -->
+      <div id="perf-table-wrap"><div class="loading-text">Loading data&hellip;</div></div>
+    </section>
+
+
+    <!-- ── SECTION 5 : CC PRICE SIMULATION ── -->
     <section class="section" id="comp-section">
       <div class="section-titlebar-row">
         <div class="section-titlebar" style="margin:0">
@@ -910,12 +1108,11 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </section>
 
 
-    <!-- ── SECTION 5 : PORTFOLIO SIMULATION ── -->
+    <!-- ── SECTION 6 : PORTFOLIO SIMULATION ── -->
     <section class="section" id="bag-section">
       <div class="section-titlebar-row">
         <div class="section-titlebar" style="margin:0">
           <span class="section-title">Portfolio Simulation</span>
-          <!-- Privacy info toggle -->
           <button onclick="const t=document.getElementById('privacy-tip');t.style.display=t.style.display==='none'?'inline':'none'"
             style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-left:8px;padding:0;">ⓘ</button>
           <span id="privacy-tip" style="display:none;font-size:12px;color:var(--muted);margin-left:8px;">
@@ -929,6 +1126,19 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
       <p class="section-sub">Estimated value of your CC holdings at each simulated target price.</p>
 
+      <!-- Search bar -->
+      <div class="add-row" style="margin-bottom:18px">
+        <div class="search-wrap">
+          <input type="text" id="add-compare-input-bag"
+            placeholder="Add any crypto to compare&hellip;"
+            autocomplete="off" spellcheck="false"
+            style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
+          <div class="autocomplete-dropdown" id="add-compare-autocomplete-bag"></div>
+        </div>
+        <button id="add-compare-btn-bag" class="add-btn" disabled>+ Add</button>
+      </div>
+      <div id="add-compare-error-bag" style="margin-bottom:10px;font-size:13px;color:var(--pink);display:none"></div>
+
       <!-- Bag size input -->
       <div class="bag-input-row">
         <label class="bag-label">Your position size</label>
@@ -939,54 +1149,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <!-- Table rendered by JS -->
       <div id="bag-simulations"><div class="loading-text">Loading data&hellip;</div></div>
       <p class="section-sub" style="margin-top:18px;margin-bottom:0">Formula: your position size × hypothetical price at same market cap.</p>
-
-      <!-- Mobile duplicate search bar -->
-      <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
-        <div class="add-row">
-          <div class="search-wrap">
-            <input type="text" id="add-compare-input-bag"
-              placeholder="Add any crypto to compare&hellip;"
-              autocomplete="off" spellcheck="false"
-              style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
-            <div class="autocomplete-dropdown" id="add-compare-autocomplete-bag"></div>
-          </div>
-          <button id="add-compare-btn-bag" class="add-btn" disabled>+ Add</button>
-        </div>
-        <div id="add-compare-error-bag" style="margin-top:6px;font-size:13px;color:var(--pink);display:none"></div>
-      </div>
-    </section>
-
-
-    <!-- ── SECTION 6 : PERFORMANCE COMPARISON ── -->
-    <section class="section" id="perf-section">
-      <div class="section-titlebar-row">
-        <div class="section-titlebar" style="margin:0">
-          <span class="section-title">Performance Comparison</span>
-        </div>
-        <div class="wm-badge">
-          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
-        </div>
-        <button class="screenshot-btn" onclick="takeScreenshot('perf-section','perf')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
-      </div>
-      <p class="section-sub" id="perf-sub">7D, 30D and 90D price performance of selected tokens against USD.</p>
-
-      <!-- Table rendered by JS -->
-      <div id="perf-table-wrap"><div class="loading-text">Loading data&hellip;</div></div>
-
-      <!-- Mobile duplicate search bar -->
-      <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
-        <div class="add-row">
-          <div class="search-wrap">
-            <input type="text" id="add-compare-input-footer"
-              placeholder="Add any crypto to compare&hellip;"
-              autocomplete="off" spellcheck="false"
-              style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
-            <div class="autocomplete-dropdown" id="add-compare-autocomplete-footer"></div>
-          </div>
-          <button id="add-compare-btn-footer" class="add-btn" disabled>+ Add</button>
-        </div>
-        <div id="add-compare-error-footer" style="margin-top:6px;font-size:13px;color:var(--pink);display:none"></div>
-      </div>
     </section>
 
 
@@ -1029,6 +1191,12 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
   </div><!-- end .hub-wrap -->
 
+
+  <!-- ═══════════════════════════════════════════════════════════
+       CHART.JS (for Canton Context)
+  ═══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
   <!-- ═══════════════════════════════════════════════════════════
        TRADINGVIEW SCRIPT
@@ -1632,7 +1800,7 @@ const compareCoins = [
         abs >= 0.01  ? abs.toFixed(3) :
         abs.toFixed(4);
       const dsign = deltaB >= 0 ? "+" : "-";
-      return `<span style="color:${col};font-weight:700">${sign}${ratioPct.toFixed(2)}% <span style="font-size:16px;vertical-align:middle">${arr}</span></span> <span style="color:#ffffff;font-weight:700">(${dsign}${formatted} ${coinLabel})</span>`;
+      return `<span style="color:${col};font-weight:700;font-size:20px">${sign}${ratioPct.toFixed(2)}% <span style="font-size:16px;vertical-align:middle">${arr}</span></span> <span style="color:#ffffff;font-weight:700;font-size:20px">(${dsign}${formatted} ${coinLabel})</span>`;
     }
 
     const tbody = rows.map(({ coin, priceB, ratioNow, r7d, r30d, r90d }) => {
@@ -1893,15 +2061,6 @@ const compareCoins = [
     el.style.width    = "max-content";
     el.style.overflow = "visible";
 
-    // Neutralise sticky positioning on th — prevents header row from floating
-    // at its on-screen position while table body expands for the capture.
-    const stickyThs = el.querySelectorAll("th");
-    const savedThPos = [];
-    stickyThs.forEach(function(th) {
-      savedThPos.push(th.style.position);
-      th.style.position = "relative";
-    });
-
     await new Promise(r => setTimeout(r, 60));
 
     try {
@@ -1915,10 +2074,6 @@ const compareCoins = [
       });
       finishDownload(canvas, filename);
     } finally {
-      // Restore th sticky positioning
-      stickyThs.forEach(function(th, i) {
-        th.style.position = savedThPos[i];
-      });
       // Restore all styles
       tableWraps.forEach(function(tw, i) {
         tw.style.overflowX = savedStyles[i].overflowX;
@@ -2212,6 +2367,530 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       document.getElementById("hero-price").textContent = "Error";
     }
   }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     CANTON CONTEXT — on-chain burn/mint module
+  ═══════════════════════════════════════════════════════════ */
+
+  const CTX_API = "https://fossil-outlook-levitate-gloomy.cantonscan.com/api/mining-rounds/timeseries?interval=week";
+
+  // Chart.js instances — kept so we can destroy before re-render
+  const ctxCharts = { ratio: null, mint: null, burn: null, alloc: null, cantonomics: null };
+
+  // Shared data once fetched
+  let ctxData = null;
+
+  // Active tab
+  let ctxActiveTab = "ratio";
+
+  function ctxSwitch(tab, btn) {
+    // Update tabs
+    document.querySelectorAll(".ctx-tab").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+    // Update panels
+    document.querySelectorAll(".ctx-panel").forEach(p => p.classList.remove("active"));
+    document.getElementById("ctx-panel-" + tab).classList.add("active");
+    ctxActiveTab = tab;
+    // If data already loaded, render the newly visible chart
+    if (ctxData) ctxRender(tab);
+  }
+
+  async function ctxLoad() {
+    try {
+      const res = await fetch(CTX_API);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const json = await res.json();
+      const rows = json.data || [];
+      if (!rows.length) throw new Error("No data");
+      // Keep last 26 weeks for ratio; all history for mint & burn
+      ctxData = rows;
+      // Hide all loaders
+      ["ratio","mint","burn","alloc"].forEach(t => {
+        const el = document.getElementById("ctx-loading-" + t);
+        if (el) el.style.display = "none";
+        const cv = document.getElementById("ctx-chart-" + t);
+        if (cv) cv.style.display = "block";
+      });
+      ctxRender("ratio");
+      ctxRender("mint");
+      ctxRender("burn");
+      ctxRender("alloc");
+    } catch(e) {
+      ["ratio","mint","burn","alloc"].forEach(t => {
+        const el = document.getElementById("ctx-loading-" + t);
+        if (el) el.innerHTML = '<span style="color:var(--pink)">⚠ Could not load on-chain data: ' + e.message + '</span>';
+      });
+    }
+  }
+
+  function ctxFmt(n) {
+    if (!n && n !== 0) return "N/A";
+    if (n >= 1e9)  return (n / 1e9).toFixed(2)  + "B";
+    if (n >= 1e6)  return (n / 1e6).toFixed(2)  + "M";
+    if (n >= 1000) return (n / 1e3).toFixed(1)  + "K";
+    return n.toFixed(2);
+  }
+
+  function ctxWeekLabel(iso) {
+    const d = new Date(iso + "T12:00:00Z");
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" });
+  }
+
+  // Mobile-aware tick limit
+  function ctxMaxTicks() {
+    return window.innerWidth < 600 ? 6 : window.innerWidth < 900 ? 9 : 14;
+  }
+
+  // Shared Chart.js defaults that match the hub dark theme
+  function ctxBaseOpts() {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: {
+          labels: {
+            color: "#b6c1d8",
+            font: { family: "Trebuchet MS, Verdana, sans-serif", size: 12 },
+            boxWidth: 12, boxHeight: 12, padding: 16,
+          },
+        },
+        tooltip: {
+          backgroundColor: "#060818",
+          borderColor: "rgba(126,224,255,0.25)",
+          borderWidth: 1,
+          titleColor: "#7ee0ff",
+          bodyColor: "#f7f2e8",
+          titleFont: { family: "Rajdhani, sans-serif", size: 13, weight: "700" },
+          bodyFont:  { family: "Trebuchet MS, sans-serif", size: 12 },
+          padding: 10,
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "#b6c1d8",
+            font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 },
+            maxRotation: 35, autoSkip: true, maxTicksLimit: ctxMaxTicks(),
+          },
+          grid: { color: "rgba(255,255,255,0.04)" },
+        },
+        y: {
+          ticks: {
+            color: "#b6c1d8",
+            font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 },
+            callback: v => ctxFmt(v),
+          },
+          grid: { color: "rgba(255,255,255,0.06)" },
+        },
+      },
+    };
+  }
+
+  function ctxRender(tab) {
+    if (!ctxData) return;
+
+    // Ratio: full history
+    const src    = ctxData;
+    const labels = src.map(r => ctxWeekLabel(r.date));
+
+    if (tab === "ratio") {
+      const ratios = src.map(r => {
+        const mint = r.mintAmount || 0;
+        const burn = r.burnAmount || 0;
+        if (!mint) return 0;
+        return parseFloat((burn / mint).toFixed(4));
+      });
+
+      const latest = ratios[ratios.length - 1];
+
+      // Averages: 1M=4w, 3M=13w, 6M=26w
+      function avgLast(n) {
+        const slice = ratios.slice(-n);
+        return slice.reduce((a, b) => a + b, 0) / slice.length;
+      }
+      const avg1m = avgLast(4);
+      const avg3m = avgLast(13);
+      const avg6m = avgLast(26);
+
+      // Neutral: strictly 0.95–1.05
+      function deflClass(v) { return v > 1.05 ? "deflationary" : v >= 0.95 ? "neutral" : "inflationary"; }
+      function deflText(v)  { return v > 1.05 ? "DEFLATIONARY 🟢" : v >= 0.95 ? "NEUTRAL 🟡" : "INFLATIONARY 🔴"; }
+
+      document.getElementById("ctx-kpi-ratio").innerHTML = `
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">This Week</span>
+          <span class="ctx-kpi-value ${deflClass(latest)}">${latest.toFixed(4)}</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">1M Average</span>
+          <span class="ctx-kpi-value ${deflClass(avg1m)}">${avg1m.toFixed(4)}</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">3M Average</span>
+          <span class="ctx-kpi-value ${deflClass(avg3m)}">${avg3m.toFixed(4)}</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">6M Average</span>
+          <span class="ctx-kpi-value ${deflClass(avg6m)}">${avg6m.toFixed(4)}</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">Tokenomics Status</span>
+          <span class="ctx-kpi-value ${deflClass(latest)}" style="font-size:20px">${deflText(latest)}</span>
+        </div>`;
+
+      // Tooltip label also uses updated thresholds
+      const tooltipFn = v => v > 1.05 ? " — Deflationary" : v >= 0.95 ? " — Neutral" : " — Inflationary";
+
+      if (ctxCharts.ratio) { ctxCharts.ratio.destroy(); ctxCharts.ratio = null; }
+      const cv  = document.getElementById("ctx-chart-ratio");
+      const ctx = cv.getContext("2d");
+      const refLine = labels.map(() => 1);
+
+      ctxCharts.ratio = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Burn / Mint Ratio",
+              data: ratios,
+              borderColor: "#7ee0ff",
+              backgroundColor: "rgba(126,224,255,0.08)",
+              fill: true,
+              tension: 0.35,
+              pointRadius: 3,
+              pointHoverRadius: 5,
+              pointBackgroundColor: "#7ee0ff",
+              borderWidth: 2,
+            },
+            {
+              label: "Equilibrium (1.0)",
+              data: refLine,
+              // ── 3) Gold same as KPI value color ──
+              borderColor: "#ffd36b",
+              borderDash: [5, 4],
+              borderWidth: 2,
+              pointRadius: 0,
+              fill: false,
+              tension: 0,
+            },
+          ],
+        },
+        options: {
+          ...ctxBaseOpts(),
+          plugins: {
+            ...ctxBaseOpts().plugins,
+            tooltip: {
+              ...ctxBaseOpts().plugins.tooltip,
+              callbacks: {
+                label: c => {
+                  if (c.datasetIndex === 1) return null;
+                  const v = c.parsed.y;
+                  const txt = tooltipFn(v);
+                  return ` Ratio: ${v.toFixed(4)}${txt}`;
+                },
+              },
+            },
+          },
+        },
+      });
+    }
+
+    if (tab === "mint") {
+      // Three line charts, full history since genesis
+      const appR = src.map(r => r.appRewards || 0);
+      const valR = src.map(r => r.validatorRewards || 0);
+      const svR  = src.map(r => r.superValidatorRewards || 0);
+
+      // KPIs — overall total mint per period
+      const totalMintSeries = src.map(r => (r.appRewards||0) + (r.validatorRewards||0) + (r.superValidatorRewards||0));
+      function mintAvg(n) {
+        const sl = totalMintSeries.slice(-n);
+        return sl.reduce((a,b) => a+b, 0) / sl.length;
+      }
+      const mintThis = totalMintSeries[totalMintSeries.length - 1];
+      const mint1m   = mintAvg(4);
+      const mint3m   = mintAvg(13);
+      const mint6m   = mintAvg(26);
+
+      document.getElementById("ctx-kpi-mint").innerHTML = `
+        <div style="width:100%;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:4px">Overall Minted</div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">This Week</span>
+          <span class="ctx-kpi-value" style="color:#ffffff">${ctxFmt(mintThis)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">1M Average</span>
+          <span class="ctx-kpi-value" style="color:#ff8ad8">${ctxFmt(mint1m)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">3M Average</span>
+          <span class="ctx-kpi-value" style="color:#98ffb6">${ctxFmt(mint3m)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">6M Average</span>
+          <span class="ctx-kpi-value" style="color:#ffd36b">${ctxFmt(mint6m)} CC</span>
+        </div>`;
+
+      if (ctxCharts.mint) { ctxCharts.mint.destroy(); ctxCharts.mint = null; }
+      const cv  = document.getElementById("ctx-chart-mint");
+      const ctx = cv.getContext("2d");
+
+      // Merge base opts and add Y axis title "CC"
+      const mintOpts = ctxBaseOpts();
+      mintOpts.scales.y.title = { display: true, text: "CC", color: "#b6c1d8", font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 } };
+
+      ctxCharts.mint = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "SV Rewards",
+              data: svR,
+              borderColor: "#7ee0ff",
+              backgroundColor: "rgba(126,224,255,0.05)",
+              fill: false,
+              tension: 0.3,
+              pointRadius: window.innerWidth < 600 ? 1 : 2,
+              pointHoverRadius: 5,
+              borderWidth: 2,
+            },
+            {
+              label: "Validator Rewards",
+              data: valR,
+              borderColor: "#98ffb6",
+              backgroundColor: "rgba(152,255,182,0.05)",
+              fill: false,
+              tension: 0.3,
+              pointRadius: window.innerWidth < 600 ? 1 : 2,
+              pointHoverRadius: 5,
+              borderWidth: 2,
+            },
+            {
+              label: "App Rewards",
+              data: appR,
+              borderColor: "#ffd36b",
+              backgroundColor: "rgba(255,211,107,0.05)",
+              fill: false,
+              tension: 0.3,
+              pointRadius: window.innerWidth < 600 ? 1 : 2,
+              pointHoverRadius: 5,
+              borderWidth: 2,
+            },
+          ],
+        },
+        options: mintOpts,
+      });
+
+      // ── Cantonomics Current State — stacked bar chart ──
+      if (!ctxCharts.cantonomics) {
+        const cvC = document.getElementById("ctx-chart-cantonomics");
+        if (cvC) {
+          const ctxC = cvC.getContext("2d");
+          // Historical schedule from Canton tokenomics (H2 2024 → H1 2029)
+          const canto_labels = ["H2 2024","H1 2025","H2 2025","H1 2026","H2 2026","H1 2027","H2 2027","H1 2028","H2 2028","H1 2029"];
+          const canto_sv  =   [80, 48, 48, 20, 20, 20, 20, 20, 20, 20];
+          const canto_val =   [ 5, 12, 12, 18, 18, 18, 18, 18, 18, 18];
+          const canto_app =   [15, 40, 40, 62, 62, 62, 62, 62, 62, 62];
+
+          const cantoBaseOpts = ctxBaseOpts();
+          cantoBaseOpts.scales.x.stacked = true;
+          cantoBaseOpts.scales.y.stacked = true;
+          cantoBaseOpts.scales.y.ticks.callback = v => v + "%";
+          cantoBaseOpts.scales.y.max = 100;
+          cantoBaseOpts.plugins.datalabels = {
+            display: true,
+            color: "#000",
+            font: { family: "Rajdhani, sans-serif", size: 13, weight: "700" },
+            formatter: v => v + "%",
+            anchor: "center",
+            align: "center",
+          };
+
+          ctxCharts.cantonomics = new Chart(ctxC, {
+            type: "bar",
+            plugins: [ChartDataLabels],
+            data: {
+              labels: canto_labels,
+              datasets: [
+                {
+                  label: "Super Validator reward %",
+                  data: canto_sv,
+                  backgroundColor: "rgba(126,224,255,0.75)",
+                  borderColor: "#7ee0ff",
+                  borderWidth: 1,
+                },
+                {
+                  label: "Validator reward %",
+                  data: canto_val,
+                  backgroundColor: "rgba(152,255,182,0.5)",
+                  borderColor: "#98ffb6",
+                  borderWidth: 1,
+                },
+                {
+                  label: "App provider reward %",
+                  data: canto_app,
+                  backgroundColor: "rgba(255,211,107,0.75)",
+                  borderColor: "#ffd36b",
+                  borderWidth: 1,
+                },
+              ],
+            },
+            options: cantoBaseOpts,
+          });
+        }
+      }
+    }
+
+    if (tab === "burn") {
+      // Line chart with points, full history
+      const burnData = src.map(r => r.burnAmount || 0);
+
+      // KPIs
+      function burnAvg(n) {
+        const sl = burnData.slice(-n);
+        return sl.reduce((a,b) => a+b, 0) / sl.length;
+      }
+      const burnThis = burnData[burnData.length - 1];
+      const burn1m   = burnAvg(4);
+      const burn3m   = burnAvg(13);
+      const burn6m   = burnAvg(26);
+
+      document.getElementById("ctx-kpi-burn").innerHTML = `
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">This Week</span>
+          <span class="ctx-kpi-value" style="color:#ffffff">${ctxFmt(burnThis)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">1M Average</span>
+          <span class="ctx-kpi-value" style="color:#7ee0ff">${ctxFmt(burn1m)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">3M Average</span>
+          <span class="ctx-kpi-value" style="color:#98ffb6">${ctxFmt(burn3m)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">6M Average</span>
+          <span class="ctx-kpi-value" style="color:#ffd36b">${ctxFmt(burn6m)} CC</span>
+        </div>`;
+
+      if (ctxCharts.burn) { ctxCharts.burn.destroy(); ctxCharts.burn = null; }
+      const cv  = document.getElementById("ctx-chart-burn");
+      const ctx = cv.getContext("2d");
+
+      const burnOpts = ctxBaseOpts();
+      burnOpts.scales.y.title = { display: true, text: "CC", color: "#b6c1d8", font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 } };
+
+      ctxCharts.burn = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Total Burned (CC)",
+              data: burnData,
+              borderColor: "#ff8ad8",
+              backgroundColor: "rgba(255,138,216,0.08)",
+              fill: true,
+              tension: 0.3,
+              pointRadius: window.innerWidth < 600 ? 1 : 2,
+              pointHoverRadius: 5,
+              pointBackgroundColor: "#ff8ad8",
+              borderWidth: 2,
+            },
+          ],
+        },
+        options: burnOpts,
+      });
+    }
+
+    if (tab === "alloc") {
+      // Mint Allocation — doughnut showing cumulative % of mint going to SV / Validators / Apps
+      const totalSV  = ctxData.reduce((a, r) => a + (r.superValidatorRewards || 0), 0);
+      const totalVal = ctxData.reduce((a, r) => a + (r.validatorRewards      || 0), 0);
+      const totalApp = ctxData.reduce((a, r) => a + (r.appRewards            || 0), 0);
+      const totalMint = totalSV + totalVal + totalApp;
+
+      const pctSV  = totalMint ? (totalSV  / totalMint * 100) : 0;
+      const pctVal = totalMint ? (totalVal / totalMint * 100) : 0;
+      const pctApp = totalMint ? (totalApp / totalMint * 100) : 0;
+
+      // KPI boxes
+      document.getElementById("ctx-kpi-alloc").innerHTML = `
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label" style="color:#7ee0ff">Super Validators</span>
+          <span class="ctx-kpi-value" style="color:#7ee0ff">${pctSV.toFixed(1)}%</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label" style="color:#98ffb6">Validators</span>
+          <span class="ctx-kpi-value" style="color:#98ffb6">${pctVal.toFixed(1)}%</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label" style="color:#ffd36b">Apps</span>
+          <span class="ctx-kpi-value" style="color:#ffd36b">${pctApp.toFixed(1)}%</span>
+        </div>`;
+
+      if (ctxCharts.alloc) { ctxCharts.alloc.destroy(); ctxCharts.alloc = null; }
+      const cv  = document.getElementById("ctx-chart-alloc");
+      const ctx = cv.getContext("2d");
+
+      ctxCharts.alloc = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Super Validators", "Validators", "Apps"],
+          datasets: [{
+            data: [pctSV, pctVal, pctApp],
+            backgroundColor: [
+              "rgba(126,224,255,0.75)",
+              "rgba(152,255,182,0.75)",
+              "rgba(255,211,107,0.75)",
+            ],
+            borderColor: [
+              "#7ee0ff",
+              "#98ffb6",
+              "#ffd36b",
+            ],
+            borderWidth: 2,
+            hoverOffset: 8,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          cutout: "58%",
+          plugins: {
+            legend: {
+              position: "bottom",
+              labels: {
+                color: "#b6c1d8",
+                font: { family: "Trebuchet MS, Verdana, sans-serif", size: 12 },
+                boxWidth: 14, boxHeight: 14, padding: 16,
+              },
+            },
+            tooltip: {
+              backgroundColor: "#060818",
+              borderColor: "rgba(126,224,255,0.25)",
+              borderWidth: 1,
+              titleColor: "#7ee0ff",
+              bodyColor: "#f7f2e8",
+              titleFont: { family: "Rajdhani, sans-serif", size: 13, weight: "700" },
+              bodyFont:  { family: "Trebuchet MS, sans-serif", size: 12 },
+              padding: 10,
+              callbacks: {
+                label: c => ` ${c.label}: ${c.parsed.toFixed(1)}%`,
+              },
+            },
+          },
+        },
+      });
+    }
+  }
+
+  // Launch Canton Context fetch on DOM ready
+  document.addEventListener("DOMContentLoaded", ctxLoad);
 
 
   /* ═══════════════════════════════════════════════════════════

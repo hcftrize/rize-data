@@ -698,6 +698,7 @@ document.addEventListener("DOMContentLoaded", function() {
     title.style.display='block';text.style.display='block';
     title.textContent=item.role?item.name+' — '+item.role:item.name;
     text.textContent=item.text;
+    box.scrollIntoView({behavior:'smooth', block:'nearest'});
   };
 
   function resetBox(key){const box=document.getElementById(key+'-box');const prompt=box.querySelector('.ib-prompt');const title=document.getElementById(key+'-title');const text=document.getElementById(key+'-text');if(prompt)prompt.style.display='';if(title){title.style.display='none';title.textContent='';}if(text){text.style.display='none';text.innerHTML='';}}

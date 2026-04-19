@@ -873,7 +873,38 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </section>
 
 
-    <!-- ── SECTION 4 : RIZE PRICE SIMULATION ── -->
+    <!-- ── SECTION 4 : PERFORMANCE COMPARISON ── -->
+    <section class="section" id="perf-section">
+      <div class="section-titlebar-row">
+        <div class="section-titlebar" style="margin:0">
+          <span class="section-title">Performance Comparison</span>
+        </div>
+        <div class="wm-badge">
+          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
+        </div>
+        <button class="screenshot-btn" onclick="takeScreenshot('perf-section','perf')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+      </div>
+      <p class="section-sub" id="perf-sub">7D, 30D and 90D price performance of selected tokens against USD.</p>
+
+      <!-- Search bar -->
+      <div class="add-row" style="margin-bottom:18px">
+        <div class="search-wrap">
+          <input type="text" id="add-compare-input-footer"
+            placeholder="Add any crypto to compare&hellip;"
+            autocomplete="off" spellcheck="false"
+            style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
+          <div class="autocomplete-dropdown" id="add-compare-autocomplete-footer"></div>
+        </div>
+        <button id="add-compare-btn-footer" class="add-btn" disabled>+ Add</button>
+      </div>
+      <div id="add-compare-error-footer" style="margin-bottom:10px;font-size:13px;color:var(--pink);display:none"></div>
+
+      <!-- Table rendered by JS -->
+      <div id="perf-table-wrap"><div class="loading-text">Loading data&hellip;</div></div>
+    </section>
+
+
+    <!-- ── SECTION 5 : RIZE PRICE SIMULATION ── -->
     <section class="section" id="comp-section">
       <div class="section-titlebar-row">
         <div class="section-titlebar" style="margin:0">
@@ -904,7 +935,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </section>
 
 
-    <!-- ── SECTION 5 : PORTFOLIO SIMULATION ── -->
+    <!-- ── SECTION 6 : PORTFOLIO SIMULATION ── -->
     <section class="section" id="bag-section">
       <div class="section-titlebar-row">
         <div class="section-titlebar" style="margin:0">
@@ -923,6 +954,19 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
       <p class="section-sub">Estimated value of your RIZE holdings at each simulated target price.</p>
 
+      <!-- Search bar -->
+      <div class="add-row" style="margin-bottom:18px">
+        <div class="search-wrap">
+          <input type="text" id="add-compare-input-bag"
+            placeholder="Add any crypto to compare&hellip;"
+            autocomplete="off" spellcheck="false"
+            style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
+          <div class="autocomplete-dropdown" id="add-compare-autocomplete-bag"></div>
+        </div>
+        <button id="add-compare-btn-bag" class="add-btn" disabled>+ Add</button>
+      </div>
+      <div id="add-compare-error-bag" style="margin-bottom:10px;font-size:13px;color:var(--pink);display:none"></div>
+
       <!-- Bag size input -->
       <div class="bag-input-row">
         <label class="bag-label">Your position size</label>
@@ -933,54 +977,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <!-- Table rendered by JS -->
       <div id="bag-simulations"><div class="loading-text">Loading data&hellip;</div></div>
       <p class="section-sub" style="margin-top:18px;margin-bottom:0">Formula: your position size × hypothetical price at same market cap.</p>
-
-      <!-- Mobile duplicate search bar -->
-      <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
-        <div class="add-row">
-          <div class="search-wrap">
-            <input type="text" id="add-compare-input-bag"
-              placeholder="Add any crypto to compare&hellip;"
-              autocomplete="off" spellcheck="false"
-              style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
-            <div class="autocomplete-dropdown" id="add-compare-autocomplete-bag"></div>
-          </div>
-          <button id="add-compare-btn-bag" class="add-btn" disabled>+ Add</button>
-        </div>
-        <div id="add-compare-error-bag" style="margin-top:6px;font-size:13px;color:var(--pink);display:none"></div>
-      </div>
-    </section>
-
-
-    <!-- ── SECTION 6 : PERFORMANCE COMPARISON ── -->
-    <section class="section" id="perf-section">
-      <div class="section-titlebar-row">
-        <div class="section-titlebar" style="margin:0">
-          <span class="section-title">Performance Comparison</span>
-        </div>
-        <div class="wm-badge">
-          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
-        </div>
-        <button class="screenshot-btn" onclick="takeScreenshot('perf-section','perf')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
-      </div>
-      <p class="section-sub" id="perf-sub">7D, 30D and 90D price performance of selected tokens against USD.</p>
-
-      <!-- Table rendered by JS -->
-      <div id="perf-table-wrap"><div class="loading-text">Loading data&hellip;</div></div>
-
-      <!-- Mobile duplicate search bar -->
-      <div style="margin-top:20px;padding-top:18px;border-top:1px solid var(--border)">
-        <div class="add-row">
-          <div class="search-wrap">
-            <input type="text" id="add-compare-input-footer"
-              placeholder="Add any crypto to compare&hellip;"
-              autocomplete="off" spellcheck="false"
-              style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--text);font-family:'Trebuchet MS',sans-serif;font-size:15px;outline:none"/>
-            <div class="autocomplete-dropdown" id="add-compare-autocomplete-footer"></div>
-          </div>
-          <button id="add-compare-btn-footer" class="add-btn" disabled>+ Add</button>
-        </div>
-        <div id="add-compare-error-footer" style="margin-top:6px;font-size:13px;color:var(--pink);display:none"></div>
-      </div>
     </section>
 
 
