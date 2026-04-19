@@ -774,7 +774,62 @@ html, body { overflow-x: hidden; max-width: 100%; }
       .screenshot-btn { padding: 8px 10px; gap: 0; }
     }
 
+    /* ═══════════════════════════════════════════════════════════
+       RIZE CONTEXT — tab switcher + charts (mirrors Canton Context)
+    ═══════════════════════════════════════════════════════════ */
+    .ctx-tabs {
+      display: flex; gap: 0; margin-bottom: 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+    .ctx-tab {
+      font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted);
+      padding: 10px 20px; cursor: pointer; border: none; background: none;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+      transition: color 0.18s, border-color 0.18s; white-space: nowrap;
+    }
+    .ctx-tab:hover { color: #fff; }
+    .ctx-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+    .ctx-panel { display: none; }
+    .ctx-panel.active { display: block; }
+    .ctx-chart-wrap { width: 100%; height: 280px; position: relative; }
+    .ctx-chart-wrap canvas { width: 100% !important; height: 100% !important; }
+    .ctx-kpi-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .ctx-kpi {
+      flex: 1; min-width: 140px; padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: linear-gradient(180deg, rgba(126,224,255,0.03), transparent 60%), rgba(255,255,255,0.015);
+    }
+    .ctx-kpi-label {
+      display: block; font-family: "Trebuchet MS", sans-serif; font-size: 12px;
+      text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 8px;
+    }
+    .ctx-kpi-value {
+      display: block; font-family: 'Rajdhani', sans-serif; font-size: 26px;
+      font-weight: 700; line-height: 1.05; color: #fff; letter-spacing: 0.5px;
+    }
+    .ctx-loading {
+      display: flex; align-items: center; justify-content: center; height: 280px;
+      font-family: 'DM Mono', monospace; font-size: 13px; color: var(--muted); letter-spacing: 1px;
+    }
+    .ctx-error { padding: 20px; font-family: 'DM Mono', monospace; font-size: 13px; color: var(--pink); }
+
+    /* Tokenomics table */
+    .tok-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    .tok-table th { background: rgba(126,224,255,0.06); color: var(--muted); font-size: 12px;
+      text-transform: uppercase; letter-spacing: 1.2px; padding: 10px 12px; text-align: left;
+      font-family: "Trebuchet MS", sans-serif; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .tok-table td { padding: 10px 12px; font-size: 16px; font-family: 'Rajdhani', sans-serif;
+      font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.05); color: #fff; }
+    .tok-table tr:last-child td { font-weight: 700; color: var(--cyan); border-top: 1px solid rgba(126,224,255,0.2); border-bottom: none; }
+    .tok-table .tok-cat { color: var(--text); }
+
     @media(max-width:700px){
+      .ctx-tab { font-size: 12px; padding: 8px 12px; letter-spacing: 1px; }
+      .ctx-chart-wrap { height: 200px; }
+      .ctx-kpi { min-width: 100px; }
+      .ctx-kpi-value { font-size: 20px; }
+    }
       .wrap { padding:24px 14px; }
       .hero,.section,.search-section { padding: 18px; }
       h1 { font-size: clamp(28px, 8vw, 48px); }
@@ -854,6 +909,80 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
       <p class="section-sub">Live snapshot of RIZE valuation metrics from CoinGecko.</p>
       <div id="main-data"><div class="loading-text">Loading data&hellip;</div></div>
+    </section>
+
+
+    <!-- ── RIZE CONTEXT ── -->
+    <section class="section" id="rize-ctx-section">
+      <div class="section-titlebar-row">
+        <div class="section-titlebar" style="margin:0">
+          <span class="section-title">RIZE Context</span>
+        </div>
+        <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
+        <button class="screenshot-btn" onclick="takeScreenshot('rize-ctx-section','rize-context')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+      </div>
+      <p class="section-sub">On-chain performance of T-RIZE on the Canton Network — live rewards data &amp; RIZE tokenomics. Data source: Lighthouse by Five North</p>
+
+      <div class="ctx-tabs">
+        <button class="ctx-tab active" onclick="rzCtxSwitch('rewards',this)">T-RIZE CC Rewards</button>
+        <button class="ctx-tab" onclick="rzCtxSwitch('tokenomics',this)">RIZE Tokenomics</button>
+      </div>
+
+      <!-- Panel 1 — T-RIZE CC Rewards -->
+      <div class="ctx-panel active" id="rz-panel-rewards">
+        <!-- Cumulative chart -->
+        <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px">Cumulative CC Rewards — Since Genesis</div>
+        <div class="ctx-chart-wrap" id="rz-chart-cumul-wrap">
+          <div class="ctx-loading" id="rz-loading-cumul">Loading on-chain data&hellip;</div>
+          <canvas id="rz-chart-cumul" style="display:none"></canvas>
+        </div>
+        <!-- KPI boxes -->
+        <div class="ctx-kpi-row" id="rz-kpi-rewards"></div>
+        <!-- Weekly breakdown chart -->
+        <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-top:28px;margin-bottom:8px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.07)">Weekly Rewards Breakdown — Validator / Platform App / RIZEScore</div>
+        <div class="ctx-chart-wrap" id="rz-chart-weekly-wrap">
+          <div class="ctx-loading" id="rz-loading-weekly">Loading on-chain data&hellip;</div>
+          <canvas id="rz-chart-weekly" style="display:none"></canvas>
+        </div>
+      </div>
+
+      <!-- Panel 2 — RIZE Tokenomics -->
+      <div class="ctx-panel" id="rz-panel-tokenomics">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start" class="rz-tok-grid">
+          <!-- Doughnut -->
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px;text-align:center">Token Allocation — 5,000,000,000 RIZE</div>
+            <div style="height:300px;display:flex;align-items:center;justify-content:center">
+              <canvas id="rz-chart-alloc"></canvas>
+            </div>
+          </div>
+          <!-- Table -->
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">Allocation &amp; Vesting Schedule</div>
+            <table class="tok-table">
+              <thead><tr><th>Category</th><th>%</th><th>Tokens</th><th>Cliff</th><th>Vesting</th></tr></thead>
+              <tbody>
+                <tr><td class="tok-cat">Seed</td><td style="color:#98ffb6">5%</td><td>250M</td><td>6m</td><td>12m</td></tr>
+                <tr><td class="tok-cat">Partnerships &amp; Growth</td><td style="color:#98ffb6">7%</td><td>350M</td><td>6m</td><td>12m</td></tr>
+                <tr><td class="tok-cat">Marketing &amp; Incubation</td><td style="color:#7ee0ff">3%</td><td>150M</td><td>3m</td><td>9m</td></tr>
+                <tr><td class="tok-cat">Private Sale</td><td style="color:#7ee0ff">7%</td><td>350M</td><td>—</td><td>—</td></tr>
+                <tr><td class="tok-cat">Strategic Reserve</td><td style="color:#ffd36b">10%</td><td>500M</td><td>0m</td><td>12m</td></tr>
+                <tr><td class="tok-cat">Liquidity</td><td style="color:#ffd36b">10%</td><td>500M</td><td>—</td><td>—</td></tr>
+                <tr><td class="tok-cat">Airdrop</td><td style="color:#ff8ad8">4%</td><td>200M</td><td>1m</td><td>6m</td></tr>
+                <tr><td class="tok-cat">Governance</td><td style="color:#ff8ad8">30%</td><td>1,500M</td><td>12m</td><td>36m</td></tr>
+                <tr><td class="tok-cat">Treasury</td><td style="color:#c77dff">10%</td><td>500M</td><td>—</td><td>—</td></tr>
+                <tr><td class="tok-cat">T-RIZE Team</td><td style="color:#c77dff">14%</td><td>700M</td><td>24m</td><td>24m</td></tr>
+                <tr><td><strong>TOTAL</strong></td><td><strong>100%</strong></td><td><strong>5,000M</strong></td><td></td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Vesting chart -->
+        <div style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">Vesting Schedule — Circulating Supply Over Time</div>
+          <div class="ctx-chart-wrap" style="height:300px"><canvas id="rz-chart-vesting"></canvas></div>
+        </div>
+      </div>
     </section>
 
 
@@ -2207,6 +2336,327 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   ═══════════════════════════════════════════════════════════ */
   document.addEventListener("DOMContentLoaded", loadData);
 
+  </script>
+
+  <!-- Chart.js for RIZE Context -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+  <script>
+  /* ═══════════════════════════════════════════════════════════
+     RIZE CONTEXT — on-chain rewards + tokenomics module
+  ═══════════════════════════════════════════════════════════ */
+
+  const RZ_VALIDATOR_ID = "TRIZEGroup-cantonMainnetValidator-1::12206ab3bf15b14410220357d6a6375eb1015f2e7fade1deb449463c2f2a25304889";
+  const RZ_RIZESCORE_ID = "TRIZEGroup-RIZEScore::12206ab3bf15b14410220357d6a6375eb1015f2e7fade1deb449463c2f2a25304889";
+  const RZ_GENESIS      = "2024-07-31T00:00:00.000Z";
+  const RZ_API_BASE     = "https://lighthouse.fivenorth.io/api/parties";
+
+  const rzCharts = { cumul: null, weekly: null, alloc: null, vesting: null };
+  let rzDataLoaded = false;
+
+  function rzCtxSwitch(tab, btn) {
+    document.querySelectorAll(".ctx-tab").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+    document.querySelectorAll("#rize-ctx-section .ctx-panel").forEach(p => p.classList.remove("active"));
+    document.getElementById("rz-panel-" + tab).classList.add("active");
+    if (tab === "tokenomics" && !rzCharts.alloc) rzRenderTokenomics();
+  }
+
+  async function rzFetchRewards(partyId) {
+    const end = new Date().toISOString();
+    const url = `${RZ_API_BASE}/${encodeURIComponent(partyId)}/stats/rewards?start_time=${encodeURIComponent(RZ_GENESIS)}&end_time=${encodeURIComponent(end)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return res.json();
+  }
+
+  function rzFmt(n) {
+    if (!n && n !== 0) return "N/A";
+    if (n >= 1e6)  return (n / 1e6).toFixed(2) + "M";
+    if (n >= 1000) return (n / 1e3).toFixed(1) + "K";
+    return n.toFixed(2);
+  }
+
+  function rzWeekKey(dateStr) {
+    const d = new Date(dateStr);
+    // ISO week start (Monday)
+    const day = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() - day + 1);
+    return d.toISOString().slice(0, 10);
+  }
+
+  function rzWeekLabel(iso) {
+    const d = new Date(iso + "T12:00:00Z");
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" });
+  }
+
+  function rzBaseOpts() {
+    return {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { labels: { color: "#b6c1d8", font: { family: "Trebuchet MS, Verdana, sans-serif", size: 12 }, boxWidth: 12, boxHeight: 12, padding: 16 } },
+        tooltip: {
+          backgroundColor: "#060818", borderColor: "rgba(126,224,255,0.25)", borderWidth: 1,
+          titleColor: "#7ee0ff", bodyColor: "#f7f2e8",
+          titleFont: { family: "Rajdhani, sans-serif", size: 13, weight: "700" },
+          bodyFont:  { family: "Trebuchet MS, sans-serif", size: 12 }, padding: 10,
+        },
+      },
+      scales: {
+        x: { ticks: { color: "#b6c1d8", font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 }, maxRotation: 35, autoSkip: true, maxTicksLimit: window.innerWidth < 600 ? 6 : 14 }, grid: { color: "rgba(255,255,255,0.04)" } },
+        y: { ticks: { color: "#b6c1d8", font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 }, callback: v => rzFmt(v) }, grid: { color: "rgba(255,255,255,0.06)" } },
+      },
+    };
+  }
+
+  async function rzLoad() {
+    try {
+      // Fetch both party rewards in parallel
+      const [valData, scoreData] = await Promise.all([
+        rzFetchRewards(RZ_VALIDATOR_ID),
+        rzFetchRewards(RZ_RIZESCORE_ID),
+      ]);
+
+      // Hide loaders
+      ["cumul","weekly"].forEach(k => {
+        const el = document.getElementById("rz-loading-" + k);
+        if (el) el.style.display = "none";
+        const cv = document.getElementById("rz-chart-" + k);
+        if (cv) cv.style.display = "block";
+      });
+
+      // Build weekly buckets
+      const weekMap = {}; // weekKey → { val, app, score }
+      (valData || []).forEach(r => {
+        const wk = rzWeekKey(r.time);
+        if (!weekMap[wk]) weekMap[wk] = { val: 0, app: 0, score: 0 };
+        weekMap[wk].val   += parseFloat(r.validator_rewards || 0);
+        weekMap[wk].app   += parseFloat(r.app_rewards      || 0);
+      });
+      (scoreData || []).forEach(r => {
+        const wk = rzWeekKey(r.time);
+        if (!weekMap[wk]) weekMap[wk] = { val: 0, app: 0, score: 0 };
+        weekMap[wk].score += parseFloat(r.app_rewards || 0);
+      });
+
+      const weeks   = Object.keys(weekMap).sort();
+      const labels  = weeks.map(rzWeekLabel);
+      const valW    = weeks.map(w => weekMap[w].val);
+      const appW    = weeks.map(w => weekMap[w].app);
+      const scoreW  = weeks.map(w => weekMap[w].score);
+      const totalW  = weeks.map((w, i) => valW[i] + appW[i] + scoreW[i]);
+
+      // Cumulative
+      let cumVal = 0, cumApp = 0, cumScore = 0;
+      const cumValArr = [], cumAppArr = [], cumScoreArr = [], cumTotalArr = [];
+      weeks.forEach((_, i) => {
+        cumVal   += valW[i];   cumValArr.push(cumVal);
+        cumApp   += appW[i];   cumAppArr.push(cumApp);
+        cumScore += scoreW[i]; cumScoreArr.push(cumScore);
+        cumTotalArr.push(cumVal + cumApp + cumScore);
+      });
+
+      const totalRewards    = cumTotalArr[cumTotalArr.length - 1] || 0;
+      const totalVal        = cumValArr[cumValArr.length - 1]     || 0;
+      const totalApp        = cumAppArr[cumAppArr.length - 1]     || 0;
+      const totalScore      = cumScoreArr[cumScoreArr.length - 1] || 0;
+
+      // This week
+      const thisWeekTotal = totalW[totalW.length - 1] || 0;
+      const thisWeekVal   = valW[valW.length - 1]     || 0;
+      const thisWeekApp   = appW[appW.length - 1]     || 0;
+      const thisWeekScore = scoreW[scoreW.length - 1] || 0;
+
+      // KPI boxes
+      document.getElementById("rz-kpi-rewards").innerHTML = `
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">Total CC Earned</span>
+          <span class="ctx-kpi-value" style="color:#7ee0ff">${rzFmt(totalRewards)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">Validator Rewards</span>
+          <span class="ctx-kpi-value" style="color:#ffffff">${rzFmt(totalVal)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">Platform App Rewards</span>
+          <span class="ctx-kpi-value" style="color:#ffd36b">${rzFmt(totalApp)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">RIZEScore Rewards</span>
+          <span class="ctx-kpi-value" style="color:#ff8ad8">${rzFmt(totalScore)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">This Week</span>
+          <span class="ctx-kpi-value" style="color:#98ffb6">${rzFmt(thisWeekTotal)} CC</span>
+        </div>`;
+
+      // ── Chart 1: Cumulative area ──
+      if (rzCharts.cumul) { rzCharts.cumul.destroy(); rzCharts.cumul = null; }
+      const cvC = document.getElementById("rz-chart-cumul");
+      const ctxC = cvC.getContext("2d");
+      const cumulOpts = rzBaseOpts();
+      cumulOpts.scales.y.title = { display: true, text: "CC", color: "#b6c1d8", font: { size: 11 } };
+      rzCharts.cumul = new Chart(ctxC, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Validator Rewards",
+              data: cumValArr,
+              borderColor: "#7ee0ff", backgroundColor: "rgba(126,224,255,0.12)",
+              fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2,
+            },
+            {
+              label: "Platform App Rewards",
+              data: cumAppArr.map((v, i) => v + cumValArr[i]),
+              borderColor: "#ffd36b", backgroundColor: "rgba(255,211,107,0.10)",
+              fill: "-1", tension: 0.3, pointRadius: 0, borderWidth: 2,
+            },
+            {
+              label: "RIZEScore Rewards",
+              data: cumTotalArr,
+              borderColor: "#ff8ad8", backgroundColor: "rgba(255,138,216,0.08)",
+              fill: "-1", tension: 0.3, pointRadius: 0, borderWidth: 2,
+            },
+          ],
+        },
+        options: cumulOpts,
+      });
+
+      // ── Chart 2: Weekly breakdown bars ──
+      if (rzCharts.weekly) { rzCharts.weekly.destroy(); rzCharts.weekly = null; }
+      const cvW = document.getElementById("rz-chart-weekly");
+      const ctxW = cvW.getContext("2d");
+      const weeklyOpts = rzBaseOpts();
+      weeklyOpts.scales.x.stacked = true;
+      weeklyOpts.scales.y.stacked = true;
+      weeklyOpts.scales.y.title = { display: true, text: "CC", color: "#b6c1d8", font: { size: 11 } };
+      rzCharts.weekly = new Chart(ctxW, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Validator Rewards",
+              data: valW,
+              backgroundColor: "rgba(126,224,255,0.65)", borderColor: "#7ee0ff", borderWidth: 1,
+            },
+            {
+              label: "Platform App Rewards",
+              data: appW,
+              backgroundColor: "rgba(255,211,107,0.65)", borderColor: "#ffd36b", borderWidth: 1,
+            },
+            {
+              label: "RIZEScore Rewards",
+              data: scoreW,
+              backgroundColor: "rgba(255,138,216,0.65)", borderColor: "#ff8ad8", borderWidth: 1,
+            },
+          ],
+        },
+        options: weeklyOpts,
+      });
+
+      rzDataLoaded = true;
+
+    } catch(e) {
+      ["cumul","weekly"].forEach(k => {
+        const el = document.getElementById("rz-loading-" + k);
+        if (el) el.innerHTML = '<span style="color:var(--pink)">⚠ Could not load rewards data: ' + e.message + '</span>';
+      });
+    }
+  }
+
+  function rzRenderTokenomics() {
+    // ── Doughnut allocation ──
+    const cvA = document.getElementById("rz-chart-alloc");
+    if (!cvA) return;
+    const ctxA = cvA.getContext("2d");
+    rzCharts.alloc = new Chart(ctxA, {
+      type: "doughnut",
+      data: {
+        labels: ["Seed","Partnerships & Growth","Marketing & Incubation","Private Sale","Strategic Reserve","Liquidity","Airdrop","Governance","Treasury","T-RIZE Team"],
+        datasets: [{
+          data: [5, 7, 3, 7, 10, 10, 4, 30, 10, 14],
+          backgroundColor: [
+            "rgba(152,255,182,0.75)","rgba(152,255,182,0.55)","rgba(152,255,182,0.35)",
+            "rgba(126,224,255,0.65)","rgba(126,224,255,0.45)",
+            "rgba(255,211,107,0.75)","rgba(255,138,216,0.65)",
+            "rgba(199,125,255,0.75)","rgba(199,125,255,0.50)","rgba(255,211,107,0.50)",
+          ],
+          borderColor: ["#98ffb6","#98ffb6","#98ffb6","#7ee0ff","#7ee0ff","#ffd36b","#ff8ad8","#c77dff","#c77dff","#ffd36b"],
+          borderWidth: 2, hoverOffset: 8,
+        }],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, cutout: "55%",
+        plugins: {
+          legend: { position: "bottom", labels: { color: "#b6c1d8", font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 }, boxWidth: 12, boxHeight: 12, padding: 12 } },
+          tooltip: {
+            backgroundColor: "#060818", borderColor: "rgba(126,224,255,0.25)", borderWidth: 1,
+            titleColor: "#7ee0ff", bodyColor: "#f7f2e8",
+            callbacks: { label: c => ` ${c.label}: ${c.parsed}%` },
+          },
+        },
+      },
+    });
+
+    // ── Vesting schedule area chart ──
+    // Build monthly circulating supply from vesting data
+    const TOTAL = 5_000_000_000;
+    const categories = [
+      { name: "Seed",                alloc: 0.05, cliff: 6,  vest: 12 },
+      { name: "Partnerships",        alloc: 0.07, cliff: 6,  vest: 12 },
+      { name: "Marketing",           alloc: 0.03, cliff: 3,  vest: 9  },
+      { name: "Private Sale",        alloc: 0.07, cliff: 0,  vest: 0  },
+      { name: "Strategic Reserve",   alloc: 0.10, cliff: 0,  vest: 12 },
+      { name: "Liquidity",           alloc: 0.10, cliff: 0,  vest: 0  },
+      { name: "Airdrop",             alloc: 0.04, cliff: 1,  vest: 6  },
+      { name: "Governance",          alloc: 0.30, cliff: 12, vest: 36 },
+      { name: "Treasury",            alloc: 0.10, cliff: 0,  vest: 0  },
+      { name: "T-RIZE Team",         alloc: 0.14, cliff: 24, vest: 24 },
+    ];
+    const catColors = ["#98ffb6","rgba(152,255,182,0.6)","rgba(152,255,182,0.4)","#7ee0ff","rgba(126,224,255,0.5)","#ffd36b","#ff8ad8","#c77dff","rgba(199,125,255,0.5)","rgba(255,211,107,0.6)"];
+    const MONTHS = 49;
+    const monthLabels = Array.from({length: MONTHS}, (_, i) => i);
+
+    function unlockedAt(cat, m) {
+      const tokens = TOTAL * cat.alloc;
+      if (cat.vest === 0) return tokens; // fully unlocked at TGE
+      if (m < cat.cliff) return 0;
+      const elapsed = m - cat.cliff;
+      return Math.min(tokens, tokens * (elapsed / cat.vest));
+    }
+
+    const cvV = document.getElementById("rz-chart-vesting");
+    if (!cvV) return;
+    const ctxV = cvV.getContext("2d");
+
+    const vestingOpts = rzBaseOpts();
+    vestingOpts.scales.x.ticks.callback = v => "M" + v;
+    vestingOpts.scales.y.title = { display: true, text: "RIZE", color: "#b6c1d8", font: { size: 11 } };
+    vestingOpts.scales.x.stacked = true;
+    vestingOpts.scales.y.stacked = true;
+
+    rzCharts.vesting = new Chart(ctxV, {
+      type: "line",
+      data: {
+        labels: monthLabels,
+        datasets: categories.map((cat, i) => ({
+          label: cat.name,
+          data: monthLabels.map(m => unlockedAt(cat, m)),
+          borderColor: catColors[i],
+          backgroundColor: catColors[i].startsWith("rgba") ? catColors[i] : catColors[i] + "30",
+          fill: true, tension: 0.2, pointRadius: 0, borderWidth: 1.5,
+        })),
+      },
+      options: vestingOpts,
+    });
+  }
+
+  // Launch on DOM ready
+  document.addEventListener("DOMContentLoaded", rzLoad);
   </script>
 
 
