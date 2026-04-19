@@ -2359,29 +2359,43 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   const rzCharts = { cumul: null, weekly: null, alloc: null, vesting: null };
 
   function rzCtxSwitch(tab, btn) {
-    document.querySelectorAll(".ctx-tab").forEach(t => t.classList.remove("active"));
+    const section = document.getElementById("rize-ctx-section");
+    section.querySelectorAll(".ctx-tab").forEach(t => t.classList.remove("active"));
     btn.classList.add("active");
-    document.querySelectorAll("#rize-ctx-section .ctx-panel").forEach(p => p.classList.remove("active"));
+    section.querySelectorAll(".ctx-panel").forEach(p => p.classList.remove("active"));
     document.getElementById("rz-panel-" + tab).classList.add("active");
-    if (tab === "tokenomics" && !rzCharts.alloc) rzRenderTokenomics();
+    if (tab === "tokenomics") {
+      setTimeout(() => { if (!rzCharts.alloc) rzRenderTokenomics(); }, 50);
+    }
   }
 
   async function rzFetchRewards(partyId) {
     const end = new Date().toISOString();
     const url = `${RZ_API_BASE}/${encodeURIComponent(partyId)}/stats/rewards?start_time=${encodeURIComponent(RZ_GENESIS)}&end_time=${encodeURIComponent(end)}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    return res.json();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return res.json();
+    } catch(e) {
+      clearTimeout(timeout);
+      throw e;
+    }
   }
 
   async function rzFetchBurns(partyId) {
     const end = new Date().toISOString();
     const url = `${RZ_API_BASE}/${encodeURIComponent(partyId)}/stats/burns?start_time=${encodeURIComponent(RZ_GENESIS)}&end_time=${encodeURIComponent(end)}`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
     try {
-      const res = await fetch(url);
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
       if (!res.ok) return [];
       return res.json();
-    } catch(e) { return []; }
+    } catch(e) { clearTimeout(timeout); return []; }
   }
 
   function rzFmt(n) {
@@ -2721,313 +2735,9 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
   document.addEventListener("DOMContentLoaded", rzLoad);
 
-  const rzCharts = { cumul: null, weekly: null, alloc: null, vesting: null };
-  let rzDataLoaded = false;
-
-  function rzCtxSwitch(tab, btn) {
-    document.querySelectorAll(".ctx-tab").forEach(t => t.classList.remove("active"));
-    btn.classList.add("active");
-    document.querySelectorAll("#rize-ctx-section .ctx-panel").forEach(p => p.classList.remove("active"));
-    document.getElementById("rz-panel-" + tab).classList.add("active");
-    if (tab === "tokenomics" && !rzCharts.alloc) rzRenderTokenomics();
-  }
-
-  async function rzFetchRewards(partyId) {
-    const end = new Date().toISOString();
-    const url = `${RZ_API_BASE}/${encodeURIComponent(partyId)}/stats/rewards?start_time=${encodeURIComponent(RZ_GENESIS)}&end_time=${encodeURIComponent(end)}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    return res.json();
-  }
-
-  function rzFmt(n) {
-    if (!n && n !== 0) return "N/A";
-    if (n >= 1e6)  return (n / 1e6).toFixed(2) + "M";
-    if (n >= 1000) return (n / 1e3).toFixed(1) + "K";
-    return n.toFixed(2);
-  }
-
-  function rzWeekKey(dateStr) {
-    const d = new Date(dateStr);
-    // ISO week start (Monday)
-    const day = d.getUTCDay() || 7;
-    d.setUTCDate(d.getUTCDate() - day + 1);
-    return d.toISOString().slice(0, 10);
-  }
-
-  function rzWeekLabel(iso) {
-    const d = new Date(iso + "T12:00:00Z");
-    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" });
-  }
-
-  function rzBaseOpts() {
-    return {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: "index", intersect: false },
-      plugins: {
-        legend: { labels: { color: "#b6c1d8", font: { family: "Trebuchet MS, Verdana, sans-serif", size: 12 }, boxWidth: 12, boxHeight: 12, padding: 16 } },
-        tooltip: {
-          backgroundColor: "#060818", borderColor: "rgba(126,224,255,0.25)", borderWidth: 1,
-          titleColor: "#7ee0ff", bodyColor: "#f7f2e8",
-          titleFont: { family: "Rajdhani, sans-serif", size: 13, weight: "700" },
-          bodyFont:  { family: "Trebuchet MS, sans-serif", size: 12 }, padding: 10,
-        },
-      },
-      scales: {
-        x: { ticks: { color: "#b6c1d8", font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 }, maxRotation: 35, autoSkip: true, maxTicksLimit: window.innerWidth < 600 ? 6 : 14 }, grid: { color: "rgba(255,255,255,0.04)" } },
-        y: { ticks: { color: "#b6c1d8", font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 }, callback: v => rzFmt(v) }, grid: { color: "rgba(255,255,255,0.06)" } },
-      },
-    };
-  }
-
-  async function rzLoad() {
-    try {
-      // Fetch both party rewards in parallel
-      const [valData, scoreData] = await Promise.all([
-        rzFetchRewards(RZ_VALIDATOR_ID),
-        rzFetchRewards(RZ_RIZESCORE_ID),
-      ]);
-
-      // Hide loaders
-      ["cumul","weekly"].forEach(k => {
-        const el = document.getElementById("rz-loading-" + k);
-        if (el) el.style.display = "none";
-        const cv = document.getElementById("rz-chart-" + k);
-        if (cv) cv.style.display = "block";
-      });
-
-      // Build weekly buckets
-      const weekMap = {}; // weekKey → { val, app, score }
-      (valData || []).forEach(r => {
-        const wk = rzWeekKey(r.time);
-        if (!weekMap[wk]) weekMap[wk] = { val: 0, app: 0, score: 0 };
-        weekMap[wk].val   += parseFloat(r.validator_rewards || 0);
-        weekMap[wk].app   += parseFloat(r.app_rewards      || 0);
-      });
-      (scoreData || []).forEach(r => {
-        const wk = rzWeekKey(r.time);
-        if (!weekMap[wk]) weekMap[wk] = { val: 0, app: 0, score: 0 };
-        weekMap[wk].score += parseFloat(r.app_rewards || 0);
-      });
-
-      const weeks   = Object.keys(weekMap).sort();
-      const labels  = weeks.map(rzWeekLabel);
-      const valW    = weeks.map(w => weekMap[w].val);
-      const appW    = weeks.map(w => weekMap[w].app);
-      const scoreW  = weeks.map(w => weekMap[w].score);
-      const totalW  = weeks.map((w, i) => valW[i] + appW[i] + scoreW[i]);
-
-      // Cumulative
-      let cumVal = 0, cumApp = 0, cumScore = 0;
-      const cumValArr = [], cumAppArr = [], cumScoreArr = [], cumTotalArr = [];
-      weeks.forEach((_, i) => {
-        cumVal   += valW[i];   cumValArr.push(cumVal);
-        cumApp   += appW[i];   cumAppArr.push(cumApp);
-        cumScore += scoreW[i]; cumScoreArr.push(cumScore);
-        cumTotalArr.push(cumVal + cumApp + cumScore);
-      });
-
-      const totalRewards    = cumTotalArr[cumTotalArr.length - 1] || 0;
-      const totalVal        = cumValArr[cumValArr.length - 1]     || 0;
-      const totalApp        = cumAppArr[cumAppArr.length - 1]     || 0;
-      const totalScore      = cumScoreArr[cumScoreArr.length - 1] || 0;
-
-      // This week
-      const thisWeekTotal = totalW[totalW.length - 1] || 0;
-      const thisWeekVal   = valW[valW.length - 1]     || 0;
-      const thisWeekApp   = appW[appW.length - 1]     || 0;
-      const thisWeekScore = scoreW[scoreW.length - 1] || 0;
-
-      // KPI boxes
-      document.getElementById("rz-kpi-rewards").innerHTML = `
-        <div class="ctx-kpi">
-          <span class="ctx-kpi-label">Total CC Earned</span>
-          <span class="ctx-kpi-value" style="color:#7ee0ff">${rzFmt(totalRewards)} CC</span>
-        </div>
-        <div class="ctx-kpi">
-          <span class="ctx-kpi-label">Validator Rewards</span>
-          <span class="ctx-kpi-value" style="color:#ffffff">${rzFmt(totalVal)} CC</span>
-        </div>
-        <div class="ctx-kpi">
-          <span class="ctx-kpi-label">Platform App Rewards</span>
-          <span class="ctx-kpi-value" style="color:#ffd36b">${rzFmt(totalApp)} CC</span>
-        </div>
-        <div class="ctx-kpi">
-          <span class="ctx-kpi-label">RIZEScore Rewards</span>
-          <span class="ctx-kpi-value" style="color:#ff8ad8">${rzFmt(totalScore)} CC</span>
-        </div>
-        <div class="ctx-kpi">
-          <span class="ctx-kpi-label">This Week</span>
-          <span class="ctx-kpi-value" style="color:#98ffb6">${rzFmt(thisWeekTotal)} CC</span>
-        </div>`;
-
-      // ── Chart 1: Cumulative area ──
-      if (rzCharts.cumul) { rzCharts.cumul.destroy(); rzCharts.cumul = null; }
-      const cvC = document.getElementById("rz-chart-cumul");
-      const ctxC = cvC.getContext("2d");
-      const cumulOpts = rzBaseOpts();
-      cumulOpts.scales.y.title = { display: true, text: "CC", color: "#b6c1d8", font: { size: 11 } };
-      rzCharts.cumul = new Chart(ctxC, {
-        type: "line",
-        data: {
-          labels,
-          datasets: [
-            {
-              label: "Validator Rewards",
-              data: cumValArr,
-              borderColor: "#7ee0ff", backgroundColor: "rgba(126,224,255,0.12)",
-              fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2,
-            },
-            {
-              label: "Platform App Rewards",
-              data: cumAppArr.map((v, i) => v + cumValArr[i]),
-              borderColor: "#ffd36b", backgroundColor: "rgba(255,211,107,0.10)",
-              fill: "-1", tension: 0.3, pointRadius: 0, borderWidth: 2,
-            },
-            {
-              label: "RIZEScore Rewards",
-              data: cumTotalArr,
-              borderColor: "#ff8ad8", backgroundColor: "rgba(255,138,216,0.08)",
-              fill: "-1", tension: 0.3, pointRadius: 0, borderWidth: 2,
-            },
-          ],
-        },
-        options: cumulOpts,
-      });
-
-      // ── Chart 2: Weekly breakdown bars ──
-      if (rzCharts.weekly) { rzCharts.weekly.destroy(); rzCharts.weekly = null; }
-      const cvW = document.getElementById("rz-chart-weekly");
-      const ctxW = cvW.getContext("2d");
-      const weeklyOpts = rzBaseOpts();
-      weeklyOpts.scales.x.stacked = true;
-      weeklyOpts.scales.y.stacked = true;
-      weeklyOpts.scales.y.title = { display: true, text: "CC", color: "#b6c1d8", font: { size: 11 } };
-      rzCharts.weekly = new Chart(ctxW, {
-        type: "bar",
-        data: {
-          labels,
-          datasets: [
-            {
-              label: "Validator Rewards",
-              data: valW,
-              backgroundColor: "rgba(126,224,255,0.65)", borderColor: "#7ee0ff", borderWidth: 1,
-            },
-            {
-              label: "Platform App Rewards",
-              data: appW,
-              backgroundColor: "rgba(255,211,107,0.65)", borderColor: "#ffd36b", borderWidth: 1,
-            },
-            {
-              label: "RIZEScore Rewards",
-              data: scoreW,
-              backgroundColor: "rgba(255,138,216,0.65)", borderColor: "#ff8ad8", borderWidth: 1,
-            },
-          ],
-        },
-        options: weeklyOpts,
-      });
-
-      rzDataLoaded = true;
-
-    } catch(e) {
-      ["cumul","weekly"].forEach(k => {
-        const el = document.getElementById("rz-loading-" + k);
-        if (el) el.innerHTML = '<span style="color:var(--pink)">⚠ Could not load rewards data: ' + e.message + '</span>';
-      });
-    }
-  }
-
-  function rzRenderTokenomics() {
-    // ── Doughnut allocation ──
-    const cvA = document.getElementById("rz-chart-alloc");
-    if (!cvA) return;
-    const ctxA = cvA.getContext("2d");
-    rzCharts.alloc = new Chart(ctxA, {
-      type: "doughnut",
-      data: {
-        labels: ["Seed","Partnerships & Growth","Marketing & Incubation","Private Sale","Strategic Reserve","Liquidity","Airdrop","Governance","Treasury","T-RIZE Team"],
-        datasets: [{
-          data: [5, 7, 3, 7, 10, 10, 4, 30, 10, 14],
-          backgroundColor: [
-            "rgba(152,255,182,0.75)","rgba(152,255,182,0.55)","rgba(152,255,182,0.35)",
-            "rgba(126,224,255,0.65)","rgba(126,224,255,0.45)",
-            "rgba(255,211,107,0.75)","rgba(255,138,216,0.65)",
-            "rgba(199,125,255,0.75)","rgba(199,125,255,0.50)","rgba(255,211,107,0.50)",
-          ],
-          borderColor: ["#98ffb6","#98ffb6","#98ffb6","#7ee0ff","#7ee0ff","#ffd36b","#ff8ad8","#c77dff","#c77dff","#ffd36b"],
-          borderWidth: 2, hoverOffset: 8,
-        }],
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false, cutout: "55%",
-        plugins: {
-          legend: { position: "bottom", labels: { color: "#b6c1d8", font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 }, boxWidth: 12, boxHeight: 12, padding: 12 } },
-          tooltip: {
-            backgroundColor: "#060818", borderColor: "rgba(126,224,255,0.25)", borderWidth: 1,
-            titleColor: "#7ee0ff", bodyColor: "#f7f2e8",
-            callbacks: { label: c => ` ${c.label}: ${c.parsed}%` },
-          },
-        },
-      },
-    });
-
-    // ── Vesting schedule area chart ──
-    // Build monthly circulating supply from vesting data
-    const TOTAL = 5_000_000_000;
-    const categories = [
-      { name: "Seed",                alloc: 0.05, cliff: 6,  vest: 12 },
-      { name: "Partnerships",        alloc: 0.07, cliff: 6,  vest: 12 },
-      { name: "Marketing",           alloc: 0.03, cliff: 3,  vest: 9  },
-      { name: "Private Sale",        alloc: 0.07, cliff: 0,  vest: 0  },
-      { name: "Strategic Reserve",   alloc: 0.10, cliff: 0,  vest: 12 },
-      { name: "Liquidity",           alloc: 0.10, cliff: 0,  vest: 0  },
-      { name: "Airdrop",             alloc: 0.04, cliff: 1,  vest: 6  },
-      { name: "Governance",          alloc: 0.30, cliff: 12, vest: 36 },
-      { name: "Treasury",            alloc: 0.10, cliff: 0,  vest: 0  },
-      { name: "T-RIZE Team",         alloc: 0.14, cliff: 24, vest: 24 },
-    ];
-    const catColors = ["#98ffb6","rgba(152,255,182,0.6)","rgba(152,255,182,0.4)","#7ee0ff","rgba(126,224,255,0.5)","#ffd36b","#ff8ad8","#c77dff","rgba(199,125,255,0.5)","rgba(255,211,107,0.6)"];
-    const MONTHS = 49;
-    const monthLabels = Array.from({length: MONTHS}, (_, i) => i);
-
-    function unlockedAt(cat, m) {
-      const tokens = TOTAL * cat.alloc;
-      if (cat.vest === 0) return tokens; // fully unlocked at TGE
-      if (m < cat.cliff) return 0;
-      const elapsed = m - cat.cliff;
-      return Math.min(tokens, tokens * (elapsed / cat.vest));
-    }
-
-    const cvV = document.getElementById("rz-chart-vesting");
-    if (!cvV) return;
-    const ctxV = cvV.getContext("2d");
-
-    const vestingOpts = rzBaseOpts();
-    vestingOpts.scales.x.ticks.callback = v => "M" + v;
-    vestingOpts.scales.y.title = { display: true, text: "RIZE", color: "#b6c1d8", font: { size: 11 } };
-    vestingOpts.scales.x.stacked = true;
-    vestingOpts.scales.y.stacked = true;
-
-    rzCharts.vesting = new Chart(ctxV, {
-      type: "line",
-      data: {
-        labels: monthLabels,
-        datasets: categories.map((cat, i) => ({
-          label: cat.name,
-          data: monthLabels.map(m => unlockedAt(cat, m)),
-          borderColor: catColors[i],
-          backgroundColor: catColors[i].startsWith("rgba") ? catColors[i] : catColors[i] + "30",
-          fill: true, tension: 0.2, pointRadius: 0, borderWidth: 1.5,
-        })),
-      },
-      options: vestingOpts,
-    });
-  }
-
-  // Launch on DOM ready
-  document.addEventListener("DOMContentLoaded", rzLoad);
   </script>
+
+
 
 
   <!-- ═══════════════════════════════════════════════════════════
