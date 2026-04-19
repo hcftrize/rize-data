@@ -861,6 +861,14 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
     /* Tokenomics table */
     .tok-table { width: 100%; border-collapse: collapse; margin-top: 16px; min-width: unset !important; }
+    /* Responsive tokenomics header text */
+    .tok-vest-short { display: none; }
+    .tok-vest-full  { display: inline; }
+    @media (max-width: 700px) {
+      .tok-title-desktop { display: none; }
+      .tok-vest-full  { display: none; }
+      .tok-vest-short { display: inline; }
+    }
     .tok-table th { background: rgba(126,224,255,0.06); color: var(--muted); font-size: 12px;
       text-transform: uppercase; letter-spacing: 1.2px; padding: 10px 12px; text-align: left;
       font-family: "Trebuchet MS", sans-serif; border-bottom: 1px solid rgba(255,255,255,0.08); }
@@ -1056,10 +1064,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
           </div>
           <!-- Table -->
           <div>
-            <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">Allocation &amp; Vesting Schedule — <span style="color:var(--cyan)">5B RIZE Tokens</span></div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">Allocation &amp; Vesting Schedule<span class="tok-title-desktop"> — <span style="color:var(--cyan)">5B RIZE Tokens</span></span></div>
             <div style="overflow-x:auto">
             <table class="tok-table">
-              <thead><tr><th>Category</th><th>%</th><th>Tokens</th><th>Cliff</th><th>Vesting</th></tr></thead>
+              <thead><tr><th>Category</th><th>%</th><th>Tokens</th><th>Cliff</th><th><span class="tok-vest-full">Vesting</span><span class="tok-vest-short">Vest.</span></th></tr></thead>
               <tbody>
                 <tr><td class="tok-cat">Seed</td><td style="color:#98ffb6">5%</td><td>250M</td><td>6m</td><td>12m</td></tr>
                 <tr><td class="tok-cat">Partnerships &amp; Growth</td><td style="color:#98ffb6">7%</td><td>350M</td><td>6m</td><td>12m</td></tr>
