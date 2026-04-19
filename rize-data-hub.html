@@ -944,10 +944,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div class="ctx-loading" id="rz-loading-weekly">Loading on-chain data&hellip;</div>
           <canvas id="rz-chart-weekly" style="display:none"></canvas>
         </div>
-        <!-- Understand this chart -->
-        <div style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#fff;margin-bottom:6px">Understand This Chart: CC Tokenomics Influence</div>
-          <p style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);line-height:1.7;max-width:760px;margin-bottom:16px">CC tokenomics evolved in a positive way recently for T-RIZE roles on Canton: since January 2026, 62% of the total rewards pool go to featured applications, representing around 516 million CC shared among app providers every month — more than before. The rewards allocated to validators also increased from 12% to 18%.</p>
+        <!-- Understand CC tokenomics influence — directly under weekly chart, no separator -->
+        <div style="margin-top:20px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px">Understand CC Tokenomics Influence</div>
+          <p style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);line-height:1.7;max-width:760px;margin-bottom:16px">CC tokenomics evolved in a positive way recently for T-RIZE roles on Canton: since January 2026, 62% of the total rewards pool go to featured applications, representing around 516 million CC shared among app providers every month. The rewards allocated to validators also increased from 12% to 18%.</p>
           <div class="ctx-chart-wrap" id="rz-chart-cantonomics-wrap" style="height:320px">
             <canvas id="rz-chart-cantonomics"></canvas>
           </div>
@@ -977,10 +977,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
                 <tr><td class="tok-cat">Strategic Reserve</td><td style="color:#ffd36b">10%</td><td>500M</td><td>0m</td><td>12m</td></tr>
                 <tr><td class="tok-cat">Liquidity</td><td style="color:#ffd36b">10%</td><td>500M</td><td>—</td><td>—</td></tr>
                 <tr><td class="tok-cat">Airdrop</td><td style="color:#ff8ad8">4%</td><td>200M</td><td>1m</td><td>6m</td></tr>
-                <tr><td class="tok-cat">Governance</td><td style="color:#ff8ad8">30%</td><td>1,500M</td><td>12m</td><td>36m</td></tr>
+                <tr><td class="tok-cat">Governance</td><td style="color:#ff8ad8">30%</td><td>1.5B</td><td>12m</td><td>36m</td></tr>
                 <tr><td class="tok-cat">Treasury</td><td style="color:#c77dff">10%</td><td>500M</td><td>—</td><td>—</td></tr>
                 <tr><td class="tok-cat">T-RIZE Team</td><td style="color:#c77dff">14%</td><td>700M</td><td>24m</td><td>24m</td></tr>
-                <tr><td><strong>TOTAL</strong></td><td><strong>100%</strong></td><td><strong>5,000M</strong></td><td></td><td></td></tr>
+                <tr><td><strong>TOTAL</strong></td><td><strong>100%</strong></td><td><strong>5B</strong></td><td></td><td></td></tr>
               </tbody>
             </table>
           </div>
@@ -990,17 +990,25 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">Vesting Schedule — Circulating Supply Over Time</div>
           <div class="ctx-chart-wrap" style="height:300px"><canvas id="rz-chart-vesting"></canvas></div>
         </div>
-        <!-- Next unlock events with pagination -->
+        <!-- Unlock events — 3 tabs -->
         <div style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:14px">(1) Next Supply Unlock Events</div>
-          <div id="rz-unlock-next"><span style="color:var(--muted);font-size:13px">Computing unlock schedule&hellip;</span></div>
-          <div id="rz-unlock-next-pager" style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;align-items:center"></div>
-        </div>
-        <!-- Past unlock events with pagination -->
-        <div style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:14px">(2) Past Supply Unlock Events — Already Circulating</div>
-          <div id="rz-unlock-past"><span style="color:var(--muted);font-size:13px">Computing past unlocks&hellip;</span></div>
-          <div id="rz-unlock-past-pager" style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;align-items:center"></div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:14px">Supply Unlock Events</div>
+          <!-- Tab switcher — same style as main ctx-tabs -->
+          <div class="ctx-tabs" id="rz-unlock-tabs">
+            <button class="ctx-tab active" onclick="rzUnlockSwitch('pending',this)">Next Unlocks</button>
+            <button class="ctx-tab" onclick="rzUnlockSwitch('ongoing',this)">Ongoing Releases</button>
+            <button class="ctx-tab" onclick="rzUnlockSwitch('done',this)">Past Unlocks</button>
+          </div>
+          <div id="rz-unlock-pending" class="rz-unlock-panel">
+            <span style="color:var(--muted);font-size:13px">Computing&hellip;</span>
+          </div>
+          <div id="rz-unlock-ongoing" class="rz-unlock-panel" style="display:none">
+            <span style="color:var(--muted);font-size:13px">Computing&hellip;</span>
+          </div>
+          <div id="rz-unlock-done" class="rz-unlock-panel" style="display:none">
+            <span style="color:var(--muted);font-size:13px">Computing&hellip;</span>
+          </div>
+          <div id="rz-unlock-pager" style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;align-items:center"></div>
         </div>
       </div>
     </section>
@@ -2384,6 +2392,15 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     }
   }
 
+  function rzUnlockSwitch(tab, btn) {
+    document.querySelectorAll("#rz-unlock-tabs .ctx-tab").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+    ["pending","ongoing","done"].forEach(k => {
+      const el = document.getElementById("rz-unlock-" + k);
+      if (el) el.style.display = k === tab ? "block" : "none";
+    });
+  }
+
   async function rzFetchRewards(partyId) {
     const end = new Date().toISOString();
     const url = `${RZ_API_BASE}/${encodeURIComponent(partyId)}/stats/rewards?start_time=${encodeURIComponent(RZ_GENESIS)}&end_time=${encodeURIComponent(end)}`;
@@ -2516,14 +2533,27 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         cumScoreArr.push(cumScore);
       });
 
+      // Compute period revenues
+      const now = new Date();
+      function sumNetLast(days) {
+        const cutoff = new Date(now - days * 86400000);
+        return weeks.reduce((acc, wk, i) => {
+          const wkDate = new Date(wk);
+          return wkDate >= cutoff ? acc + netW[i] : acc;
+        }, 0);
+      }
+      const rev1w  = sumNetLast(7);
+      const rev1m  = sumNetLast(30);
+      const rev1y  = sumNetLast(365);
+      const rev2y  = sumNetLast(730);
+
       const totalNet   = cumNetArr[cumNetArr.length - 1]   || 0;
       const totalVal   = cumValArr[cumValArr.length - 1]   || 0;
       const totalApp   = cumAppArr[cumAppArr.length - 1]   || 0;
       const totalScore = cumScoreArr[cumScoreArr.length - 1] || 0;
       const totalBurn  = cumBurn;
-      const thisWeekNet = netW[netW.length - 1] || 0;
 
-      // KPI boxes
+      // KPI boxes — row 1: totals, row 2: period revenues
       document.getElementById("rz-kpi-rewards").innerHTML = `
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">Net CC Revenue</span>
@@ -2531,7 +2561,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         </div>
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">Validator Revenue</span>
-          <span class="ctx-kpi-value" style="color:#ffffff">${rzFmt(totalVal)} CC</span>
+          <span class="ctx-kpi-value" style="color:#98ffb6">${rzFmt(totalVal)} CC</span>
         </div>
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">T-RIZE Platform App</span>
@@ -2545,12 +2575,27 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           <span class="ctx-kpi-label">Total Burned</span>
           <span class="ctx-kpi-value" style="color:var(--muted)">${rzFmt(totalBurn)} CC</span>
         </div>
+        <div style="width:100%;border-top:1px solid rgba(255,255,255,0.06);margin:4px 0"></div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">This Week (Net)</span>
-          <span class="ctx-kpi-value" style="color:#98ffb6">${rzFmt(thisWeekNet)} CC</span>
+          <span class="ctx-kpi-label">1W Revenue (Net)</span>
+          <span class="ctx-kpi-value" style="color:#98ffb6">${rzFmt(rev1w)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">1M Revenue (Net)</span>
+          <span class="ctx-kpi-value" style="color:#98ffb6">${rzFmt(rev1m)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">1Y Revenue (Net)</span>
+          <span class="ctx-kpi-value" style="color:#98ffb6">${rzFmt(rev1y)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">2Y Revenue (Net)</span>
+          <span class="ctx-kpi-value" style="color:#98ffb6">${rzFmt(rev2y)} CC</span>
         </div>`;
 
-      // ── Chart 1: Cumulative — net fill + 3 solid composition lines, taller ──
+      // ── Chart 1: Cumulative — stacked fills show composition, net line on top ──
+      // Logic: val + app + score = gross; net = gross - burns
+      // Show each source as stacked fill, Net as the clean top line
       if (rzCharts.cumul) { rzCharts.cumul.destroy(); rzCharts.cumul = null; }
       const cvC  = document.getElementById("rz-chart-cumul");
       cvC.closest(".ctx-chart-wrap").style.height = "380px";
@@ -2558,34 +2603,36 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const cumulOpts = rzBaseOpts();
       cumulOpts.scales.y.title = { display: true, text: "CC", color: "#b6c1d8", font: { size: 11 } };
       cumulOpts.scales.y.type = "linear";
+      // Stacked so fills layer properly
+      cumulOpts.scales.y.stacked = false; // we use fill:true with specific targets
       rzCharts.cumul = new Chart(ctxC, {
         type: "line",
         data: {
           labels,
           datasets: [
             {
-              label: "Net CC Revenue",
-              data: cumNetArr,
-              borderColor: "#7ee0ff", backgroundColor: "rgba(126,224,255,0.10)",
-              fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2.5, order: 4,
-            },
-            {
               label: "Validator Revenue",
               data: cumValArr,
-              borderColor: "#98ffb6", backgroundColor: "transparent",
-              fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.8, order: 1,
+              borderColor: "#98ffb6", backgroundColor: "rgba(152,255,182,0.18)",
+              fill: "origin", tension: 0.35, pointRadius: 0, borderWidth: 1.8, order: 3,
             },
             {
               label: "T-RIZE Platform App",
-              data: cumAppArr,
-              borderColor: "#ffd36b", backgroundColor: "transparent",
-              fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.8, order: 2,
+              data: cumValArr.map((v, i) => v + cumAppArr[i]),
+              borderColor: "#ffd36b", backgroundColor: "rgba(255,211,107,0.14)",
+              fill: "-1", tension: 0.35, pointRadius: 0, borderWidth: 1.8, order: 2,
             },
             {
               label: "RIZEScore App",
-              data: cumScoreArr,
-              borderColor: "#ff8ad8", backgroundColor: "transparent",
-              fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.8, order: 3,
+              data: cumValArr.map((v, i) => v + cumAppArr[i] + cumScoreArr[i]),
+              borderColor: "#ff8ad8", backgroundColor: "rgba(255,138,216,0.10)",
+              fill: "-1", tension: 0.35, pointRadius: 0, borderWidth: 1.8, order: 1,
+            },
+            {
+              label: "Net CC Revenue (after burns)",
+              data: cumNetArr,
+              borderColor: "#7ee0ff", backgroundColor: "transparent",
+              fill: false, tension: 0.35, pointRadius: 0, borderWidth: 3, order: 0,
             },
           ],
         },
@@ -2671,15 +2718,25 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           responsive: true, maintainAspectRatio: false, cutout: "55%",
           plugins: {
             legend: { position: "bottom", labels: { color: "#b6c1d8", font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 }, boxWidth: 12, boxHeight: 12, padding: 10 } },
-            tooltip: { backgroundColor: "#060818", borderColor: "rgba(126,224,255,0.25)", borderWidth: 1, titleColor: "#7ee0ff", bodyColor: "#f7f2e8", callbacks: { label: c => ` ${c.label}: ${c.parsed}%` } },
+            tooltip: {
+              backgroundColor: "#060818", borderColor: "rgba(126,224,255,0.25)", borderWidth: 1,
+              titleColor: "#7ee0ff", bodyColor: "#f7f2e8",
+              callbacks: {
+                label: c => ` ${c.label}: ${Math.round(c.parsed * 10) / 10}%`
+              },
+            },
           },
         },
       });
     }
 
-    // ── Vesting schedule area chart ──
+    // ── Vesting schedule — x-axis as real dates ──
     const MONTHS = 49;
-    const monthLabels = Array.from({length: MONTHS}, (_, i) => "M" + i);
+    const vestLabels = Array.from({length: MONTHS}, (_, m) => {
+      const d = new Date(TGE);
+      d.setUTCMonth(d.getUTCMonth() + m);
+      return d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+    });
     const cvV = document.getElementById("rz-chart-vesting");
     if (cvV && !rzCharts.vesting) {
       const vestOpts = rzBaseOpts();
@@ -2689,7 +2746,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       rzCharts.vesting = new Chart(cvV.getContext("2d"), {
         type: "line",
         data: {
-          labels: monthLabels,
+          labels: vestLabels,
           datasets: categories.map(cat => ({
             label: cat.name,
             data: Array.from({length: MONTHS}, (_, m) => unlockedAt(cat, m)),
@@ -2715,35 +2772,32 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         cantoOpts.scales.y.stacked = true;
         cantoOpts.scales.y.ticks.callback = v => v + "%";
         cantoOpts.scales.y.max = 100;
-        // Inline datalabels via custom plugin (no CDN needed)
         const datalabelsPlugin = {
           id: "rzDatalabels",
           afterDatasetsDraw(chart) {
-            const ctx = chart.ctx;
+            const ctx2 = chart.ctx;
             chart.data.datasets.forEach((ds, i) => {
-              const meta = chart.getDatasetMeta(i);
-              meta.data.forEach((bar, j) => {
+              chart.getDatasetMeta(i).data.forEach((bar, j) => {
                 const val = ds.data[j];
                 if (!val) return;
-                ctx.save();
-                ctx.fillStyle = "#000";
-                ctx.font = "bold 12px Rajdhani, sans-serif";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText(val + "%", bar.x, bar.y + bar.height / 2);
-                ctx.restore();
+                ctx2.save();
+                ctx2.fillStyle = "#000";
+                ctx2.font = "bold 12px Rajdhani, sans-serif";
+                ctx2.textAlign = "center";
+                ctx2.textBaseline = "middle";
+                ctx2.fillText(val + "%", bar.x, bar.y + bar.height / 2);
+                ctx2.restore();
               });
             });
           }
         };
         rzCharts.cantonomics = new Chart(cvCanto.getContext("2d"), {
-          type: "bar",
-          plugins: [datalabelsPlugin],
+          type: "bar", plugins: [datalabelsPlugin],
           data: {
             labels: canto_labels,
             datasets: [
               { label: "Super Validator reward %", data: canto_sv, backgroundColor: "rgba(126,224,255,0.75)", borderColor: "#7ee0ff", borderWidth: 1 },
-              { label: "Validator reward %",        data: canto_val, backgroundColor: "rgba(152,255,182,0.5)", borderColor: "#98ffb6", borderWidth: 1 },
+              { label: "Validator reward %",        data: canto_val, backgroundColor: "rgba(152,255,182,0.5)",  borderColor: "#98ffb6", borderWidth: 1 },
               { label: "App provider reward %",     data: canto_app, backgroundColor: "rgba(255,211,107,0.75)", borderColor: "#ffd36b", borderWidth: 1 },
             ],
           },
@@ -2752,20 +2806,23 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       }
     }
 
-    // ── Build all unlock events ──
+    // ── Unlock events — 3 categories ──
     function fmtDate(d) { return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }); }
+    function fmtTokens(n) {
+      if (n >= 1.5e9) return (n / 1e9).toFixed(1) + "B";
+      if (n >= 1e9)   return (n / 1e9).toFixed(2) + "B";
+      if (n >= 1e6)   return Math.round(n / 1e6) + "M";
+      return n.toLocaleString();
+    }
 
-    const allEvents = [];
+    const pendingEvts = []; // cliff not reached yet
+    const ongoingEvts = []; // cliff passed, vesting in progress
+    const doneEvts    = []; // vesting complete
+
     categories.forEach(cat => {
       const tokens = TOTAL * cat.alloc;
       if (cat.vest === 0) {
-        // Instant unlock at TGE
-        allEvents.push({
-          date: new Date(TGE), label: cat.name + " — Full unlock at TGE",
-          daily: 0, type: "tge",
-          tokens, cliff: cat.cliff === 0 ? "—" : cat.cliff + "m",
-          vesting: "—", vestEnd: new Date(TGE),
-        });
+        doneEvts.push({ date: new Date(TGE), label: cat.name, daily: 0, tokens, cliff: "—", vesting: "—", vestEnd: new Date(TGE) });
         return;
       }
       const cliffDate = new Date(TGE);
@@ -2774,107 +2831,62 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const dailyRelease = Math.round(tokens / vestDays);
       const vestEndDate = new Date(cliffDate);
       vestEndDate.setUTCDate(vestEndDate.getUTCDate() + vestDays);
-      // Vesting is ONGOING if cliff has passed AND vest end is in future
-      const vestingActive = cliffDate <= today && vestEndDate > today;
-      // Vesting is PENDING if cliff hasn't passed yet
-      const vestingPending = cliffDate > today;
 
-      const milestones = [0, 0.25, 0.5, 0.75, 1.0];
-      milestones.forEach(pct => {
-        const daysAfterCliff = Math.round(pct * vestDays);
-        const d = new Date(cliffDate);
-        d.setUTCDate(d.getUTCDate() + daysAfterCliff);
-        const label = pct === 0
-          ? cat.name + " — Cliff ends, vesting begins"
-          : cat.name + " — " + Math.round(pct * 100) + "% vested";
-        const type = pct === 0 ? "cliff" : "vest";
-        // Status: ongoing only if vesting is currently active (cliff passed, not yet done)
-        // pending if cliff hasn't passed yet
-        // completed if vest end has passed
-        let status;
-        if (vestEndDate <= today) { status = "completed"; }
-        else if (vestingPending) { status = "pending"; }
-        else { status = "ongoing"; }
+      const ev = {
+        date: cliffDate, label: cat.name,
+        daily: dailyRelease, tokens,
+        cliff: cat.cliff === 0 ? "0m" : cat.cliff + "m",
+        vesting: cat.vest + "m", vestEnd: vestEndDate,
+      };
 
-        allEvents.push({
-          date: d, label, daily: dailyRelease, type, status,
-          vestEnd: vestEndDate,
-          tokens: Math.round(tokens),
-          cliff: cat.cliff === 0 ? "0m" : cat.cliff + "m",
-          vesting: cat.vest + "m",
-        });
-      });
+      if (vestEndDate <= today)    doneEvts.push(ev);
+      else if (cliffDate > today)  pendingEvts.push(ev);
+      else                         ongoingEvts.push(ev);
     });
 
-    allEvents.sort((a, b) => a.date - b.date);
-    const futureEvents = allEvents.filter(e => e.date >= today);
-    const pastEvents   = allEvents.filter(e => e.date < today).reverse(); // most recent first
+    pendingEvts.sort((a, b) => a.date - b.date);
+    ongoingEvts.sort((a, b) => a.vestEnd - b.vestEnd);
+    doneEvts.sort((a, b) => b.date - a.date);
 
-    function renderTable(events) {
-      if (!events.length) return '<p style="color:var(--muted);font-size:13px">No events.</p>';
+    function buildTable(events, type) {
+      if (!events.length) return '<p style="color:var(--muted);font-size:13px;padding:12px 0">No events in this category.</p>';
+      const thDate   = type === "pending" ? "First Release Date" : type === "ongoing" ? "Vesting Started" : "Completed";
+      const thTime   = type === "pending" ? "Starts In" : type === "ongoing" ? "Ends In" : "Ended";
       return `<div style="overflow-x:auto"><table class="tok-table" style="margin-top:0">
-        <thead><tr>
-          <th>Date</th><th>In / Ago</th><th>Event</th><th>Total RIZE</th><th>Cliff</th><th>Vest</th>
-          <th style="text-align:right">Daily Release</th><th style="text-align:center">Status</th><th>Release End</th>
-        </tr></thead>
+        <thead><tr><th>${thDate}</th><th>${thTime}</th><th>Category</th><th>Total RIZE</th><th>Cliff</th><th>Vesting</th><th style="text-align:right">Daily Release</th><th>Release End</th></tr></thead>
         <tbody>${events.map(e => {
-          const daysLeft = Math.round((e.date - today) / 86400000);
-          const daysAgo  = Math.abs(daysLeft);
-          const timeStr  = daysLeft >= 0 ? daysLeft + "d" : daysAgo + "d ago";
-          const typeColor = e.type === "tge" ? "#98ffb6" : e.type === "cliff" ? "#ffd36b" : "#7ee0ff";
-          let statusBadge;
-          if (e.status === "ongoing") {
-            statusBadge = `<span style="color:#98ffb6;font-size:12px;font-weight:700;letter-spacing:1px">● ONGOING</span>`;
-          } else if (e.status === "pending") {
-            statusBadge = `<span style="color:#ffd36b;font-size:12px;font-weight:700;letter-spacing:1px">● PENDING</span>`;
-          } else {
-            statusBadge = `<span style="color:var(--muted);font-size:12px;font-weight:700;letter-spacing:1px">✓ DONE</span>`;
-          }
-          const dailyStr = e.daily > 0 ? e.daily.toLocaleString() + " RIZE/day" : "—";
-          const totalStr = e.tokens ? (e.tokens / 1e6).toFixed(0) + "M RIZE" : "—";
+          let timeVal;
+          if (type === "pending")       timeVal = Math.round((e.date - today) / 86400000) + "d";
+          else if (type === "ongoing")  timeVal = Math.round((e.vestEnd - today) / 86400000) + "d";
+          else                          timeVal = Math.round((today - e.vestEnd) / 86400000) + "d ago";
+          const dateColor = type === "pending" ? "#ffd36b" : type === "ongoing" ? "#98ffb6" : "var(--muted)";
+          const dailyStr  = e.daily > 0 ? e.daily.toLocaleString() + " /day" : "—";
           return `<tr>
-            <td style="color:${typeColor};white-space:nowrap">${fmtDate(e.date)}</td>
-            <td style="color:var(--muted)">${timeStr}</td>
-            <td style="min-width:220px">${e.label}</td>
-            <td style="color:#fff">${totalStr}</td>
-            <td style="color:var(--muted)">${e.cliff || "—"}</td>
-            <td style="color:var(--muted)">${e.vesting || "—"}</td>
+            <td style="color:${dateColor};white-space:nowrap">${fmtDate(e.date)}</td>
+            <td style="color:var(--muted)">${timeVal}</td>
+            <td style="font-weight:700;color:#fff">${e.label}</td>
+            <td style="color:#fff">${fmtTokens(e.tokens)}</td>
+            <td style="color:var(--muted)">${e.cliff}</td>
+            <td style="color:var(--muted)">${e.vesting}</td>
             <td style="color:#fff;text-align:right">${dailyStr}</td>
-            <td style="text-align:center;white-space:nowrap">${statusBadge}</td>
-            <td style="color:var(--muted);white-space:nowrap">${e.vestEnd ? fmtDate(e.vestEnd) : "—"}</td>
+            <td style="color:var(--muted);white-space:nowrap">${fmtDate(e.vestEnd)}</td>
           </tr>`;
         }).join("")}</tbody>
       </table></div>`;
     }
 
-    function renderPaginated(events, containerEl, pagerEl, perPage) {
-      let page = 0;
-      const pages = Math.ceil(events.length / perPage);
-      function render() {
-        const slice = events.slice(page * perPage, page * perPage + perPage);
-        containerEl.innerHTML = renderTable(slice);
-        // Pager
-        let pagerHtml = `<span style="color:var(--muted);font-size:13px;margin-right:8px">${events.length} events</span>`;
-        for (let i = 0; i < pages; i++) {
-          pagerHtml += `<button onclick="this.closest('[data-pager]') && this.closest('[data-pager]').dispatchEvent(new CustomEvent('rzpage',{detail:${i}}))" 
-            style="padding:4px 10px;background:${i===page?'rgba(126,224,255,0.2)':'rgba(255,255,255,0.05)'};border:1px solid ${i===page?'var(--cyan)':'rgba(255,255,255,0.15)'};color:${i===page?'var(--cyan)':'var(--muted)'};font-family:Rajdhani,sans-serif;font-size:13px;cursor:pointer">${i+1}</button>`;
-        }
-        pagerEl.innerHTML = pagerHtml;
-        // Wire buttons
-        pagerEl.querySelectorAll("button").forEach((btn, i) => {
-          btn.onclick = () => { page = i; render(); };
-        });
-      }
-      render();
-    }
+    const pendingEl = document.getElementById("rz-unlock-pending");
+    const ongoingEl = document.getElementById("rz-unlock-ongoing");
+    const doneEl    = document.getElementById("rz-unlock-done");
+    if (pendingEl) pendingEl.innerHTML = buildTable(pendingEvts, "pending");
+    if (ongoingEl) ongoingEl.innerHTML = buildTable(ongoingEvts, "ongoing");
+    if (doneEl)    doneEl.innerHTML    = buildTable(doneEvts,    "done");
 
-    const nextEl = document.getElementById("rz-unlock-next");
-    const nextPagerEl = document.getElementById("rz-unlock-next-pager");
-    const pastEl = document.getElementById("rz-unlock-past");
-    const pastPagerEl = document.getElementById("rz-unlock-past-pager");
-
-    if (nextEl && nextPagerEl) renderPaginated(futureEvents, nextEl, nextPagerEl, 5);
-    if (pastEl && pastPagerEl) renderPaginated(pastEvents, pastEl, pastPagerEl, 5);
+    // Update tab labels with counts
+    const tabBtns = document.querySelectorAll("#rz-unlock-tabs .ctx-tab");
+    if (tabBtns[0]) tabBtns[0].textContent = `Next Unlocks (${pendingEvts.length})`;
+    if (tabBtns[1]) tabBtns[1].textContent = `Ongoing Releases (${ongoingEvts.length})`;
+    if (tabBtns[2]) tabBtns[2].textContent = `Past Unlocks (${doneEvts.length})`;
   }
 
   document.addEventListener("DOMContentLoaded", rzLoad);
