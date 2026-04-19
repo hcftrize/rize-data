@@ -802,20 +802,25 @@ html, body { overflow-x: hidden; max-width: 100%; }
     .section.hub-collapsed .wm-badge { display: none !important; }
 
     /* Collapsed sub-description: shown only when section is folded */
+    /* Sits on its own line below the titlebar row */
     .section-collapsed-sub {
       display: none;
-      font-size: 13px;
+      font-size: 15px;
       color: var(--muted);
       font-family: "Trebuchet MS", "Verdana", sans-serif;
-      flex: 1;
-      min-width: 0;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      margin-left: 8px;
-      align-self: center;
+      margin-top: 8px;
+      line-height: 1.5;
     }
     .section.hub-collapsed .section-collapsed-sub { display: block; }
+
+    /* When collapsed, allow titlebar-row to wrap so sub appears below */
+    .section.hub-collapsed .section-titlebar-row {
+      flex-wrap: wrap;
+    }
+    /* The titlebar (title + cyan bar) takes full width when collapsed so sub wraps below */
+    .section.hub-collapsed .section-titlebar-row .section-titlebar {
+      flex: 1 1 100%;
+    }
 
     /* Mobile — scrollable wide tables & charts */
     @media(max-width:768px) {
@@ -1271,7 +1276,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         </div>
         <button class="screenshot-btn" onclick="takeScreenshot('ratio-section','ratio-analysis')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
       </div>
-      <p class="section-sub">How does your bag perform against other assets? Enter your position size and compare gains and losses expressed directly in compared asset units. This allows you to monitor arbitrage opportunities between assets, in clicks.</p>
+      <p class="section-sub">Compare gains and losses expressed directly in compared asset units. Monitor arbitrage opportunities between assets, in clicks.</p>
 
       <!-- Controls row: search + position size -->
       <div style="display:flex;gap:10px;align-items:stretch;margin-bottom:18px;flex-wrap:wrap">
