@@ -778,6 +778,99 @@ html, body { overflow-x: hidden; max-width: 100%; }
       .screenshot-btn { padding: 8px 10px; gap: 0; }
     }
 
+    /* ═══════════════════════════════════════════════════════════
+       CANTON CONTEXT — tab switcher + charts
+    ═══════════════════════════════════════════════════════════ */
+    .ctx-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+    .ctx-tab {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 10px 20px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.18s, border-color 0.18s;
+      white-space: nowrap;
+    }
+    .ctx-tab:hover { color: #fff; }
+    .ctx-tab.active {
+      color: var(--cyan);
+      border-bottom-color: var(--cyan);
+    }
+    .ctx-panel { display: none; }
+    .ctx-panel.active { display: block; }
+
+    .ctx-chart-wrap {
+      width: 100%;
+      height: 260px;
+      position: relative;
+    }
+    .ctx-chart-wrap canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    .ctx-kpi-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .ctx-kpi {
+      flex: 1;
+      min-width: 140px;
+      padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: linear-gradient(180deg, rgba(126,224,255,0.03), transparent 60%), rgba(255,255,255,0.015);
+    }
+    .ctx-kpi-label {
+      display: block;
+      font-family: "Trebuchet MS", sans-serif;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .ctx-kpi-value {
+      display: block;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.05;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+    .ctx-kpi-value.deflationary { color: #98ffb6; }
+    .ctx-kpi-value.inflationary { color: var(--pink); }
+    .ctx-kpi-value.neutral      { color: var(--gold); }
+
+    .ctx-loading {
+      display: flex; align-items: center; justify-content: center;
+      height: 260px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+    .ctx-error {
+      padding: 20px;
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--pink);
+    }
+
     @media(max-width:700px){
       .wrap { padding:24px 14px; }
       .hero,.section,.search-section { padding: 18px; }
@@ -1027,8 +1120,61 @@ html, body { overflow-x: hidden; max-width: 100%; }
     </section>
 
 
+    <!-- ── CANTON CONTEXT ── -->
+    <section class="section" id="canton-ctx-section">
+      <div class="section-titlebar-row">
+        <div class="section-titlebar" style="margin:0">
+          <span class="section-title">Canton Context</span>
+        </div>
+        <div class="wm-badge">
+          <span class="wm-text-tokerize">TOKERIZE.TOP</span>
+        </div>
+        <button class="screenshot-btn" onclick="takeScreenshot('canton-ctx-section','canton-context')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+      </div>
+      <p class="section-sub">On-chain tokenomics from the Canton Network Global Synchronizer — weekly burn &amp; mint activity sourced directly from CantonScan.</p>
+
+      <!-- Tab switcher -->
+      <div class="ctx-tabs">
+        <button class="ctx-tab active" onclick="ctxSwitch('ratio',this)">Burn / Mint Ratio</button>
+        <button class="ctx-tab" onclick="ctxSwitch('mint',this)">Mint Activity</button>
+        <button class="ctx-tab" onclick="ctxSwitch('burn',this)">Burn Activity</button>
+      </div>
+
+      <!-- Panel 1 — Burn/Mint Ratio -->
+      <div class="ctx-panel active" id="ctx-panel-ratio">
+        <div class="ctx-chart-wrap" id="ctx-chart-ratio-wrap">
+          <div class="ctx-loading" id="ctx-loading-ratio">Loading on-chain data&hellip;</div>
+          <canvas id="ctx-chart-ratio" style="display:none"></canvas>
+        </div>
+        <div class="ctx-kpi-row" id="ctx-kpi-ratio"></div>
+      </div>
+
+      <!-- Panel 2 — Mint Activity -->
+      <div class="ctx-panel" id="ctx-panel-mint">
+        <div class="ctx-chart-wrap" id="ctx-chart-mint-wrap">
+          <div class="ctx-loading" id="ctx-loading-mint">Loading on-chain data&hellip;</div>
+          <canvas id="ctx-chart-mint" style="display:none"></canvas>
+        </div>
+      </div>
+
+      <!-- Panel 3 — Burn Activity -->
+      <div class="ctx-panel" id="ctx-panel-burn">
+        <div class="ctx-chart-wrap" id="ctx-chart-burn-wrap">
+          <div class="ctx-loading" id="ctx-loading-burn">Loading on-chain data&hellip;</div>
+          <canvas id="ctx-chart-burn" style="display:none"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+
   </div><!-- end .hub-wrap -->
 
+
+  <!-- ═══════════════════════════════════════════════════════════
+       CHART.JS (for Canton Context)
+  ═══════════════════════════════════════════════════════════ -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
   <!-- ═══════════════════════════════════════════════════════════
        TRADINGVIEW SCRIPT
@@ -1893,15 +2039,6 @@ const compareCoins = [
     el.style.width    = "max-content";
     el.style.overflow = "visible";
 
-    // Neutralise sticky positioning on th — prevents header row from floating
-    // at its on-screen position while table body expands for the capture.
-    const stickyThs = el.querySelectorAll("th");
-    const savedThPos = [];
-    stickyThs.forEach(function(th) {
-      savedThPos.push(th.style.position);
-      th.style.position = "relative";
-    });
-
     await new Promise(r => setTimeout(r, 60));
 
     try {
@@ -1915,10 +2052,6 @@ const compareCoins = [
       });
       finishDownload(canvas, filename);
     } finally {
-      // Restore th sticky positioning
-      stickyThs.forEach(function(th, i) {
-        th.style.position = savedThPos[i];
-      });
       // Restore all styles
       tableWraps.forEach(function(tw, i) {
         tw.style.overflowX = savedStyles[i].overflowX;
@@ -2212,6 +2345,298 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       document.getElementById("hero-price").textContent = "Error";
     }
   }
+
+
+  /* ═══════════════════════════════════════════════════════════
+     CANTON CONTEXT — on-chain burn/mint module
+  ═══════════════════════════════════════════════════════════ */
+
+  const CTX_API = "https://fossil-outlook-levitate-gloomy.cantonscan.com/api/mining-rounds/timeseries?interval=week";
+
+  // Chart.js instances — kept so we can destroy before re-render
+  const ctxCharts = { ratio: null, mint: null, burn: null };
+
+  // Shared data once fetched
+  let ctxData = null;
+
+  // Active tab
+  let ctxActiveTab = "ratio";
+
+  function ctxSwitch(tab, btn) {
+    // Update tabs
+    document.querySelectorAll(".ctx-tab").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+    // Update panels
+    document.querySelectorAll(".ctx-panel").forEach(p => p.classList.remove("active"));
+    document.getElementById("ctx-panel-" + tab).classList.add("active");
+    ctxActiveTab = tab;
+    // If data already loaded, render the newly visible chart
+    if (ctxData) ctxRender(tab);
+  }
+
+  async function ctxLoad() {
+    try {
+      const res = await fetch(CTX_API);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const json = await res.json();
+      const rows = json.data || [];
+      if (!rows.length) throw new Error("No data");
+      // Keep last 26 weeks (~6 months) — exclude current partial week
+      ctxData = rows.slice(-26);
+      // Hide all loaders
+      ["ratio","mint","burn"].forEach(t => {
+        const el = document.getElementById("ctx-loading-" + t);
+        if (el) el.style.display = "none";
+        const cv = document.getElementById("ctx-chart-" + t);
+        if (cv) cv.style.display = "block";
+      });
+      ctxRender("ratio");
+      ctxRender("mint");
+      ctxRender("burn");
+    } catch(e) {
+      ["ratio","mint","burn"].forEach(t => {
+        const el = document.getElementById("ctx-loading-" + t);
+        if (el) el.innerHTML = '<span style="color:var(--pink)">⚠ Could not load on-chain data: ' + e.message + '</span>';
+      });
+    }
+  }
+
+  function ctxFmt(n) {
+    if (!n && n !== 0) return "N/A";
+    if (n >= 1e9)  return (n / 1e9).toFixed(2)  + "B";
+    if (n >= 1e6)  return (n / 1e6).toFixed(2)  + "M";
+    if (n >= 1000) return (n / 1e3).toFixed(1)  + "K";
+    return n.toFixed(2);
+  }
+
+  function ctxWeekLabel(iso) {
+    // e.g. "2025-03-03" → "Mar 3"
+    const d = new Date(iso + "T12:00:00Z");
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  }
+
+  // Shared Chart.js defaults that match the hub dark theme
+  function ctxBaseOpts(title) {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: {
+          labels: {
+            color: "#b6c1d8",
+            font: { family: "Trebuchet MS, Verdana, sans-serif", size: 12 },
+            boxWidth: 12, boxHeight: 12, padding: 16,
+          },
+        },
+        tooltip: {
+          backgroundColor: "#060818",
+          borderColor: "rgba(126,224,255,0.25)",
+          borderWidth: 1,
+          titleColor: "#7ee0ff",
+          bodyColor: "#f7f2e8",
+          titleFont: { family: "Rajdhani, sans-serif", size: 13, weight: "700" },
+          bodyFont:  { family: "Trebuchet MS, sans-serif", size: 12 },
+          padding: 10,
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "#b6c1d8",
+            font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 },
+            maxRotation: 35, autoSkip: true, maxTicksLimit: 13,
+          },
+          grid: { color: "rgba(255,255,255,0.04)" },
+        },
+        y: {
+          ticks: {
+            color: "#b6c1d8",
+            font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 },
+            callback: v => ctxFmt(v),
+          },
+          grid: { color: "rgba(255,255,255,0.06)" },
+        },
+      },
+    };
+  }
+
+  function ctxRender(tab) {
+    if (!ctxData) return;
+
+    const labels = ctxData.map(r => ctxWeekLabel(r.date));
+
+    if (tab === "ratio") {
+      const ratios = ctxData.map(r => {
+        const mint = r.mintAmount || 0;
+        const burn = r.burnAmount || 0;
+        if (!mint) return 0;
+        return parseFloat((burn / mint).toFixed(4));
+      });
+
+      const latest = ratios[ratios.length - 1];
+      const avg    = ratios.reduce((a, b) => a + b, 0) / ratios.length;
+
+      // KPI boxes
+      const deflClass = latest >= 1 ? "deflationary" : latest >= 0.5 ? "neutral" : "inflationary";
+      const deflText  = latest >= 1 ? "DEFLATIONARY 🟢" : latest >= 0.5 ? "NEUTRAL 🟡" : "INFLATIONARY 🔴";
+      document.getElementById("ctx-kpi-ratio").innerHTML = `
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">Latest Weekly Ratio</span>
+          <span class="ctx-kpi-value ${deflClass}">${latest.toFixed(4)}</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">26-Week Average</span>
+          <span class="ctx-kpi-value" style="color:var(--muted)">${avg.toFixed(4)}</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">Network Status</span>
+          <span class="ctx-kpi-value ${deflClass}" style="font-size:20px">${deflText}</span>
+        </div>`;
+
+      if (ctxCharts.ratio) { ctxCharts.ratio.destroy(); ctxCharts.ratio = null; }
+      const cv = document.getElementById("ctx-chart-ratio");
+      const ctx = cv.getContext("2d");
+
+      // Reference line at 1
+      const refLine = labels.map(() => 1);
+
+      ctxCharts.ratio = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Burn / Mint Ratio",
+              data: ratios,
+              borderColor: "#7ee0ff",
+              backgroundColor: "rgba(126,224,255,0.08)",
+              fill: true,
+              tension: 0.35,
+              pointRadius: 3,
+              pointHoverRadius: 5,
+              pointBackgroundColor: "#7ee0ff",
+              borderWidth: 2,
+            },
+            {
+              label: "Equilibrium (1.0)",
+              data: refLine,
+              borderColor: "rgba(255,211,107,0.5)",
+              borderDash: [5,4],
+              borderWidth: 1.5,
+              pointRadius: 0,
+              fill: false,
+              tension: 0,
+            },
+          ],
+        },
+        options: {
+          ...ctxBaseOpts("Burn / Mint Ratio"),
+          plugins: {
+            ...ctxBaseOpts().plugins,
+            tooltip: {
+              ...ctxBaseOpts().plugins?.tooltip,
+              callbacks: {
+                label: ctx => {
+                  if (ctx.datasetIndex === 1) return null;
+                  const v = ctx.parsed.y;
+                  const txt = v >= 1 ? " — Deflationary" : v >= 0.5 ? " — Neutral" : " — Inflationary";
+                  return ` Ratio: ${v.toFixed(4)}${txt}`;
+                },
+              },
+            },
+          },
+        },
+      });
+    }
+
+    if (tab === "mint") {
+      const appR = ctxData.map(r => r.appRewards || 0);
+      const valR = ctxData.map(r => r.validatorRewards || 0);
+      const svR  = ctxData.map(r => r.superValidatorRewards || 0);
+
+      if (ctxCharts.mint) { ctxCharts.mint.destroy(); ctxCharts.mint = null; }
+      const cv  = document.getElementById("ctx-chart-mint");
+      const ctx = cv.getContext("2d");
+
+      ctxCharts.mint = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "SV Rewards",
+              data: svR,
+              backgroundColor: "rgba(126,224,255,0.55)",
+              borderColor: "rgba(126,224,255,0.85)",
+              borderWidth: 1,
+              stack: "mint",
+            },
+            {
+              label: "Validator Rewards",
+              data: valR,
+              backgroundColor: "rgba(152,255,182,0.55)",
+              borderColor: "rgba(152,255,182,0.85)",
+              borderWidth: 1,
+              stack: "mint",
+            },
+            {
+              label: "App Rewards",
+              data: appR,
+              backgroundColor: "rgba(255,211,107,0.55)",
+              borderColor: "rgba(255,211,107,0.85)",
+              borderWidth: 1,
+              stack: "mint",
+            },
+          ],
+        },
+        options: {
+          ...ctxBaseOpts("Weekly Mint Activity"),
+          scales: {
+            ...ctxBaseOpts().scales,
+            x: { ...ctxBaseOpts().scales.x, stacked: true },
+            y: { ...ctxBaseOpts().scales.y, stacked: true },
+          },
+        },
+      });
+    }
+
+    if (tab === "burn") {
+      const burnData = ctxData.map(r => r.burnAmount || 0);
+
+      if (ctxCharts.burn) { ctxCharts.burn.destroy(); ctxCharts.burn = null; }
+      const cv  = document.getElementById("ctx-chart-burn");
+      const ctx = cv.getContext("2d");
+
+      // Color bars: deeper pink when higher burn
+      const maxB = Math.max(...burnData);
+      const barColors = burnData.map(v => {
+        const intensity = maxB > 0 ? v / maxB : 0;
+        const alpha = 0.35 + intensity * 0.5;
+        return `rgba(255,138,216,${alpha})`;
+      });
+
+      ctxCharts.burn = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Total Burned (CC)",
+              data: burnData,
+              backgroundColor: barColors,
+              borderColor: "rgba(255,138,216,0.85)",
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: ctxBaseOpts("Weekly Burn Activity"),
+      });
+    }
+  }
+
+  // Launch Canton Context fetch on DOM ready
+  document.addEventListener("DOMContentLoaded", ctxLoad);
 
 
   /* ═══════════════════════════════════════════════════════════
