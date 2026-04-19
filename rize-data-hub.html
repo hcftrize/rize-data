@@ -925,6 +925,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
       <div class="ctx-tabs">
         <button class="ctx-tab active" onclick="rzCtxSwitch('rewards',this)">T-RIZE Public Revenue</button>
+        <button class="ctx-tab" onclick="rzCtxSwitch('burns',this)">RIZE Burns</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('tokenomics',this)">RIZE Tokenomics</button>
       </div>
 
@@ -954,7 +955,16 @@ html, body { overflow-x: hidden; max-width: 100%; }
         </div>
       </div>
 
-      <!-- Panel 2 — RIZE Tokenomics -->
+      <!-- Panel 2 — RIZE Burns -->
+      <div class="ctx-panel" id="rz-panel-burns">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">RIZE Burns — Since TGE</div>
+        <div class="ctx-chart-wrap" style="height:240px"><canvas id="rz-chart-burns"></canvas></div>
+        <div style="margin-top:20px" id="rz-burn-events-table">
+          <span style="color:var(--muted);font-size:13px">Loading burn events&hellip;</span>
+        </div>
+      </div>
+
+      <!-- Panel 3 — RIZE Tokenomics -->
       <div class="ctx-panel" id="rz-panel-tokenomics">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start" class="rz-tok-grid">
           <!-- Doughnut -->
@@ -985,11 +995,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
             </table>
           </div>
         </div>
-        <!-- RIZE Burns since TGE -->
-        <div style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">RIZE Burns — Since TGE</div>
-          <div class="ctx-chart-wrap" style="height:220px"><canvas id="rz-chart-burns"></canvas></div>
-        </div>
         <!-- Vesting chart -->
         <div style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
           <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">Vesting Schedule — Circulating Supply Over Time</div>
@@ -1000,12 +1005,15 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:14px">Burn &amp; Supply Unlock Events</div>
           <!-- Tab switcher — same style as main ctx-tabs -->
           <div class="ctx-tabs" id="rz-unlock-tabs">
-            <button class="ctx-tab active" onclick="rzUnlockSwitch('pending',this)">Next Unlocks</button>
+            <button class="ctx-tab active" onclick="rzUnlockSwitch('burn',this)">Burn Events (1)</button>
+            <button class="ctx-tab" onclick="rzUnlockSwitch('pending',this)">Next Unlocks</button>
             <button class="ctx-tab" onclick="rzUnlockSwitch('ongoing',this)">Ongoing Releases</button>
             <button class="ctx-tab" onclick="rzUnlockSwitch('done',this)">Past Unlocks</button>
-            <button class="ctx-tab" onclick="rzUnlockSwitch('burn',this)">Burn Events</button>
           </div>
-          <div id="rz-unlock-pending" class="rz-unlock-panel">
+          <div id="rz-unlock-burn" class="rz-unlock-panel">
+            <span style="color:var(--muted);font-size:13px">Loading burn events&hellip;</span>
+          </div>
+          <div id="rz-unlock-pending" class="rz-unlock-panel" style="display:none">
             <span style="color:var(--muted);font-size:13px">Computing&hellip;</span>
           </div>
           <div id="rz-unlock-ongoing" class="rz-unlock-panel" style="display:none">
@@ -1013,9 +1021,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
           </div>
           <div id="rz-unlock-done" class="rz-unlock-panel" style="display:none">
             <span style="color:var(--muted);font-size:13px">Computing&hellip;</span>
-          </div>
-          <div id="rz-unlock-burn" class="rz-unlock-panel" style="display:none">
-            <span style="color:var(--muted);font-size:13px">Loading burn events&hellip;</span>
           </div>
           <div id="rz-unlock-pager" style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;align-items:center"></div>
         </div>
@@ -2400,6 +2405,88 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       setTimeout(() => { if (!rzCharts.alloc) rzRenderTokenomics(); else rzRenderCantoChart(); }, 50);
     } else if (tab === "rewards") {
       setTimeout(() => rzRenderCantoChart(), 50);
+    } else if (tab === "burns") {
+      setTimeout(() => rzRenderBurnsPanel(), 50);
+    }
+  }
+
+  function rzRenderBurnsPanel() {
+    // Burns chart — in the RIZE Burns panel
+    const rizeBurnEvents = [
+      { date: "2025-12-22", amount: 50_000_000, tx: "https://basescan.org/tx/0xf38598cddf8f4a9a222b994748ba00d917a55f2282f92c048b9afee76951dfa3" },
+    ];
+    const cvBurn = document.getElementById("rz-chart-burns");
+    if (cvBurn && !rzCharts.burns) {
+      const today2 = new Date();
+      const burnLabels = [], burnData = [];
+      let cumBurnRize = 0;
+      let cur = new Date("2025-12-01T00:00:00Z"); // start from Dec 2025 so burn is visible
+      while (cur <= today2) {
+        const iso = cur.toISOString().slice(0, 10);
+        rizeBurnEvents.forEach(ev => { if (ev.date === iso) cumBurnRize += ev.amount; });
+        if (cur.getUTCDate() === 1 || iso === "2025-12-22" || iso === today2.toISOString().slice(0,10)) {
+          burnLabels.push(iso === "2025-12-22" ? "Dec 22, 25" : cur.toLocaleDateString("en-US", { month: "short", year: "2-digit" }));
+          burnData.push(cumBurnRize);
+        }
+        cur.setUTCDate(cur.getUTCDate() + 1);
+      }
+      const burnOpts = rzBaseOpts();
+      burnOpts.scales.y.title = { display: true, text: "RIZE burned", color: "#b6c1d8", font: { size: 11 } };
+      burnOpts.scales.y.ticks.callback = v => rzFmt(v);
+      rzCharts.burns = new Chart(cvBurn.getContext("2d"), {
+        type: "line",
+        data: {
+          labels: burnLabels,
+          datasets: [{
+            label: "Cumulative RIZE Burned",
+            data: burnData,
+            borderColor: "#ff8ad8", backgroundColor: "rgba(255,138,216,0.10)",
+            fill: true, tension: 0, pointRadius: 3, pointHoverRadius: 6,
+            borderWidth: 2, stepped: "before",
+          }],
+        },
+        options: burnOpts,
+      });
+    }
+    // Burn events table — in RIZE Burns panel
+    const rizeBurnEvents2 = [
+      { date: "2025-12-22", amount: 50_000_000, tx: "https://basescan.org/tx/0xf38598cddf8f4a9a222b994748ba00d917a55f2282f92c048b9afee76951dfa3" },
+    ];
+    const today3 = new Date();
+    const burnTableEl = document.getElementById("rz-burn-events-table");
+    if (burnTableEl && burnTableEl.querySelector("span")) {
+      const rows = rizeBurnEvents2.map(ev => {
+        const d = new Date(ev.date);
+        const dAgo = Math.round((today3 - d) / 86400000);
+        return `<tr>
+          <td style="color:#98ffb6;white-space:nowrap">${d.toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"})}</td>
+          <td style="color:var(--muted)">${dAgo}d ago</td>
+          <td style="color:#fff;font-weight:700">${(ev.amount / 1e6).toFixed(0)}M RIZE</td>
+          <td><a href="${ev.tx}" target="_blank" rel="noopener" style="color:var(--cyan);font-family:'DM Mono',monospace;font-size:12px">View on Basescan ↗</a></td>
+        </tr>`;
+      }).join("");
+      burnTableEl.innerHTML = `<table class="tok-table" style="margin-top:0">
+        <thead><tr><th>Date</th><th>Ago</th><th>Amount Burned</th><th>Transaction</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    }
+    // Also populate the burn tab in the unlock section
+    const burnUnlockEl = document.getElementById("rz-unlock-burn");
+    if (burnUnlockEl && burnUnlockEl.querySelector("span")) {
+      const rows2 = rizeBurnEvents2.map(ev => {
+        const d = new Date(ev.date);
+        const dAgo = Math.round((today3 - d) / 86400000);
+        return `<tr>
+          <td style="color:#98ffb6;white-space:nowrap">${d.toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"})}</td>
+          <td style="color:var(--muted)">${dAgo}d ago</td>
+          <td style="color:#fff;font-weight:700">${(ev.amount / 1e6).toFixed(0)}M RIZE</td>
+          <td><a href="${ev.tx}" target="_blank" rel="noopener" style="color:var(--cyan);font-family:'DM Mono',monospace;font-size:12px">View on Basescan ↗</a></td>
+        </tr>`;
+      }).join("");
+      burnUnlockEl.innerHTML = `<table class="tok-table" style="margin-top:0">
+        <thead><tr><th>Date</th><th>Ago</th><th>Amount Burned</th><th>Transaction</th></tr></thead>
+        <tbody>${rows2}</tbody>
+      </table>`;
     }
   }
 
@@ -2658,7 +2745,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const cumulOpts = rzBaseOpts();
       cumulOpts.scales.y.title = { display: true, text: "CC", color: "#b6c1d8", font: { size: 11 } };
       cumulOpts.scales.y.type = "linear";
-      // Custom tooltip: show actual per-source values, not stacked offsets
+      // Custom tooltip: show actual per-source values
       cumulOpts.plugins.tooltip.callbacks = {
         label: c => {
           const i = c.dataIndex;
@@ -2673,24 +2760,28 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         data: {
           labels,
           datasets: [
+            // Layer 1 (bottom, biggest): Validator
             {
               label: "Validator Revenue",
               data: cumValArr,
-              borderColor: "#98ffb6", backgroundColor: "rgba(152,255,182,0.18)",
-              fill: "origin", tension: 0.35, pointRadius: 0, borderWidth: 1.8, order: 3,
+              borderColor: "#98ffb6", backgroundColor: "rgba(152,255,182,0.20)",
+              fill: "origin", tension: 0.35, pointRadius: 0, borderWidth: 2, order: 3,
             },
+            // Layer 2: Platform App — stacked on Validator
             {
               label: "T-RIZE Platform App",
               data: cumValArr.map((v, i) => v + cumAppArr[i]),
               borderColor: "#ffd36b", backgroundColor: "rgba(255,211,107,0.14)",
-              fill: "-1", tension: 0.35, pointRadius: 0, borderWidth: 1.8, order: 2,
+              fill: "-1", tension: 0.35, pointRadius: 0, borderWidth: 1.5, order: 2,
             },
+            // Layer 3 (top, smallest): RIZEScore — stacked on top
             {
               label: "RIZEScore App",
               data: cumValArr.map((v, i) => v + cumAppArr[i] + cumScoreArr[i]),
               borderColor: "#ff8ad8", backgroundColor: "rgba(255,138,216,0.10)",
-              fill: "-1", tension: 0.35, pointRadius: 0, borderWidth: 1.8, order: 1,
+              fill: "-1", tension: 0.35, pointRadius: 0, borderWidth: 1.5, order: 1,
             },
+            // Net line: below gross total because burns are deducted
             {
               label: "Net CC Revenue (after burns)",
               data: cumNetArr,
@@ -2827,66 +2918,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
     // ── Cantonomics — delegated to rzRenderCantoChart (called from rzLoad and tab switch) ──
     rzRenderCantoChart();
-
-    // ── RIZE Burns since TGE — static data, manually updated ──
-    const rizeBurnEvents = [
-      { date: "2025-12-22", amount: 50_000_000, tx: "https://basescan.org/tx/0xf38598cddf8f4a9a222b994748ba00d917a55f2282f92c048b9afee76951dfa3" },
-    ];
-    const cvBurn = document.getElementById("rz-chart-burns");
-    if (cvBurn && !rzCharts.burns) {
-      // Build a simple cumulative step chart from TGE to today
-      const burnStart = new Date("2025-05-15");
-      const burnEnd   = new Date();
-      const burnLabels = [], burnData = [];
-      let cumBurnRize = 0;
-      let cur = new Date(burnStart);
-      while (cur <= burnEnd) {
-        const iso = cur.toISOString().slice(0, 10);
-        rizeBurnEvents.forEach(ev => { if (ev.date === iso) cumBurnRize += ev.amount; });
-        // Monthly labels only
-        if (cur.getUTCDate() === 1 || iso === burnStart.toISOString().slice(0,10) || iso === burnEnd.toISOString().slice(0,10)) {
-          burnLabels.push(cur.toLocaleDateString("en-US", { month: "short", year: "2-digit" }));
-          burnData.push(cumBurnRize);
-        }
-        cur.setUTCDate(cur.getUTCDate() + 1);
-      }
-      const burnOpts = rzBaseOpts();
-      burnOpts.scales.y.title = { display: true, text: "RIZE burned", color: "#b6c1d8", font: { size: 11 } };
-      burnOpts.scales.y.ticks.callback = v => rzFmt(v);
-      rzCharts.burns = new Chart(cvBurn.getContext("2d"), {
-        type: "line",
-        data: {
-          labels: burnLabels,
-          datasets: [{
-            label: "Cumulative RIZE Burned",
-            data: burnData,
-            borderColor: "#ff8ad8", backgroundColor: "rgba(255,138,216,0.10)",
-            fill: true, tension: 0, pointRadius: 3, pointHoverRadius: 6,
-            borderWidth: 2, stepped: "before",
-          }],
-        },
-        options: burnOpts,
-      });
-    }
-
-    // ── Burn Events table ──
-    const burnEl = document.getElementById("rz-unlock-burn");
-    if (burnEl) {
-      const burnRows = rizeBurnEvents.map(ev => {
-        const d = new Date(ev.date);
-        const dAgo = Math.round((today - d) / 86400000);
-        return `<tr>
-          <td style="color:#ff8ad8;white-space:nowrap">${d.toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"})}</td>
-          <td style="color:var(--muted)">${dAgo}d ago</td>
-          <td style="color:#fff;font-weight:700">${(ev.amount / 1e6).toFixed(0)}M RIZE</td>
-          <td><a href="${ev.tx}" target="_blank" rel="noopener" style="color:var(--cyan);font-family:'DM Mono',monospace;font-size:12px;word-break:break-all">View on Basescan ↗</a></td>
-        </tr>`;
-      }).join("");
-      burnEl.innerHTML = `<div style="overflow-x:auto"><table class="tok-table" style="margin-top:0">
-        <thead><tr><th>Date</th><th>Ago</th><th>Amount Burned</th><th>Transaction</th></tr></thead>
-        <tbody>${burnRows}</tbody>
-      </table></div>`;
-    }
+    // ── Burns — populate burn panel and unlock burn sub-tab ──
+    rzRenderBurnsPanel();
 
     // ── Unlock events — 3 categories ──
     function fmtDate(d) { return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }); }
@@ -2942,7 +2975,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           else if (type === "ongoing")  timeVal = Math.round((e.vestEnd - today) / 86400000) + "d";
           else                          timeVal = Math.round((today - e.vestEnd) / 86400000) + "d ago";
           const dateColor = type === "pending" ? "#ffd36b" : type === "ongoing" ? "#98ffb6" : "var(--muted)";
-          const dailyStr  = e.daily > 0 ? e.daily.toLocaleString() + " /day" : "—";
+          const dailyStr  = (type === "done" || e.daily === 0) ? "—" : e.daily.toLocaleString() + " /day";
           return `<tr>
             <td style="color:${dateColor};white-space:nowrap">${fmtDate(e.date)}</td>
             <td style="color:var(--muted)">${timeVal}</td>
@@ -2964,11 +2997,12 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     if (ongoingEl) ongoingEl.innerHTML = buildTable(ongoingEvts, "ongoing");
     if (doneEl)    doneEl.innerHTML    = buildTable(doneEvts,    "done");
 
-    // Update tab labels with counts
+    // Update pending/ongoing/done tab labels with counts
     const tabBtns = document.querySelectorAll("#rz-unlock-tabs .ctx-tab");
-    if (tabBtns[0]) tabBtns[0].textContent = `Next Unlocks (${pendingEvts.length})`;
-    if (tabBtns[1]) tabBtns[1].textContent = `Ongoing Releases (${ongoingEvts.length})`;
-    if (tabBtns[2]) tabBtns[2].textContent = `Past Unlocks (${doneEvts.length})`;
+    if (tabBtns[0]) tabBtns[0].textContent = `Burn Events (${1})`;
+    if (tabBtns[1]) tabBtns[1].textContent = `Next Unlocks (${pendingEvts.length})`;
+    if (tabBtns[2]) tabBtns[2].textContent = `Ongoing Releases (${ongoingEvts.length})`;
+    if (tabBtns[3]) tabBtns[3].textContent = `Past Unlocks (${doneEvts.length})`;
   }
 
   document.addEventListener("DOMContentLoaded", rzLoad);
