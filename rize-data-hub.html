@@ -837,6 +837,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
       .metric-value { font-size: 26px; }
       td { font-size: 15px; }
       .rz-tok-grid { grid-template-columns: 1fr !important; }
+      .rz-rev-grid { grid-template-columns: 1fr !important; }
     }
     </style>
 </head>
@@ -931,12 +932,27 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
       <!-- Panel 1 — T-RIZE CC Rewards -->
       <div class="ctx-panel active" id="rz-panel-rewards">
-        <!-- Cumulative chart -->
-        <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px">Cumulative T-RIZE CC Revenue — Burn Adjusted, Since They Joined Canton</div>
-        <div class="ctx-chart-wrap" id="rz-chart-cumul-wrap">
-          <div class="ctx-loading" id="rz-loading-cumul">Loading on-chain data&hellip;</div>
-          <canvas id="rz-chart-cumul" style="display:none"></canvas>
+        <!-- Two charts side by side -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start" class="rz-rev-grid">
+          <!-- Left: Cumulative net -->
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px">Cumulative T-RIZE CC Revenue — Burn Adjusted</div>
+            <div class="ctx-chart-wrap" id="rz-chart-cumul-wrap" style="height:280px">
+              <div class="ctx-loading" id="rz-loading-cumul">Loading on-chain data&hellip;</div>
+              <canvas id="rz-chart-cumul" style="display:none"></canvas>
+            </div>
+          </div>
+          <!-- Right: Revenue by source -->
+          <div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px">T-RIZE CC Revenue by Source</div>
+            <div class="ctx-chart-wrap" id="rz-chart-sources-wrap" style="height:280px">
+              <div class="ctx-loading" id="rz-loading-sources">Loading on-chain data&hellip;</div>
+              <canvas id="rz-chart-sources" style="display:none"></canvas>
+            </div>
+          </div>
         </div>
+        <!-- Thin separator -->
+        <div style="height:1px;background:rgba(255,255,255,0.07);margin:20px 0"></div>
         <!-- KPI boxes -->
         <div class="ctx-kpi-row" id="rz-kpi-rewards"></div>
         <!-- Weekly breakdown chart -->
@@ -2393,7 +2409,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   const RZ_GENESIS      = "2024-07-31T00:00:00.000Z";
   const RZ_API_BASE     = "https://lighthouse.fivenorth.io/api/parties";
 
-  const rzCharts = { cumul: null, weekly: null, alloc: null, vesting: null, cantonomics: null, burns: null };
+  const rzCharts = { cumul: null, sources: null, weekly: null, alloc: null, vesting: null, cantonomics: null, burns: null };
 
   function rzCtxSwitch(tab, btn) {
     const section = document.getElementById("rize-ctx-section");
@@ -2433,6 +2449,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const burnOpts = rzBaseOpts();
       burnOpts.scales.y.title = { display: true, text: "RIZE burned", color: "#b6c1d8", font: { size: 11 } };
       burnOpts.scales.y.ticks.callback = v => rzFmt(v);
+      burnOpts.plugins.legend.labels.padding = 24;
+      burnOpts.layout = { padding: { top: 20 } };
       rzCharts.burns = new Chart(cvBurn.getContext("2d"), {
         type: "line",
         data: {
@@ -2462,7 +2480,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           <td style="color:#98ffb6;white-space:nowrap">${d.toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"})}</td>
           <td style="color:var(--muted)">${dAgo}d ago</td>
           <td style="color:#fff;font-weight:700">${(ev.amount / 1e6).toFixed(0)}M RIZE</td>
-          <td><a href="${ev.tx}" target="_blank" rel="noopener" style="color:var(--cyan);font-family:'DM Mono',monospace;font-size:12px">View on Basescan ↗</a></td>
+          <td><a href="${ev.tx}" target="_blank" rel="noopener" style="color:#ffffff;font-family:'DM Mono',monospace;font-size:12px">View on Basescan ↗</a></td>
         </tr>`;
       }).join("");
       burnTableEl.innerHTML = `<table class="tok-table" style="margin-top:0">
@@ -2480,7 +2498,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           <td style="color:#98ffb6;white-space:nowrap">${d.toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"})}</td>
           <td style="color:var(--muted)">${dAgo}d ago</td>
           <td style="color:#fff;font-weight:700">${(ev.amount / 1e6).toFixed(0)}M RIZE</td>
-          <td><a href="${ev.tx}" target="_blank" rel="noopener" style="color:var(--cyan);font-family:'DM Mono',monospace;font-size:12px">View on Basescan ↗</a></td>
+          <td><a href="${ev.tx}" target="_blank" rel="noopener" style="color:#ffffff;font-family:'DM Mono',monospace;font-size:12px">View on Basescan ↗</a></td>
         </tr>`;
       }).join("");
       burnUnlockEl.innerHTML = `<table class="tok-table" style="margin-top:0">
@@ -2737,61 +2755,80 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           <span class="ctx-kpi-value" style="color:#98ffb6">${rzFmt(rev2y)} CC</span>
         </div>`;
 
-      // ── Chart 1: Cumulative — stacked fills show composition, net line on top ──
+      // ── Chart 1: Cumulative NET — clean single area line ──
       if (rzCharts.cumul) { rzCharts.cumul.destroy(); rzCharts.cumul = null; }
       const cvC  = document.getElementById("rz-chart-cumul");
-      cvC.closest(".ctx-chart-wrap").style.height = "380px";
+      const el_loading_cumul = document.getElementById("rz-loading-cumul");
+      if (el_loading_cumul) el_loading_cumul.style.display = "none";
+      cvC.style.display = "block";
       const ctxC = cvC.getContext("2d");
       const cumulOpts = rzBaseOpts();
       cumulOpts.scales.y.title = { display: true, text: "CC", color: "#b6c1d8", font: { size: 11 } };
       cumulOpts.scales.y.type = "linear";
-      // Custom tooltip: show actual per-source values
+      cumulOpts.plugins.legend.display = false;
       cumulOpts.plugins.tooltip.callbacks = {
-        label: c => {
-          const i = c.dataIndex;
-          if (c.datasetIndex === 0) return ` Validator Revenue: ${rzFmt(cumValArr[i])} CC`;
-          if (c.datasetIndex === 1) return ` T-RIZE Platform App: ${rzFmt(cumAppArr[i])} CC`;
-          if (c.datasetIndex === 2) return ` RIZEScore App: ${rzFmt(cumScoreArr[i])} CC`;
-          return ` Net CC Revenue: ${rzFmt(cumNetArr[i])} CC`;
-        }
+        label: c => ` Net CC Revenue: ${rzFmt(c.parsed.y)} CC`
       };
       rzCharts.cumul = new Chart(ctxC, {
         type: "line",
         data: {
           labels,
-          datasets: [
-            // Layer 1 (bottom, biggest): Validator
-            {
-              label: "Validator Revenue",
-              data: cumValArr,
-              borderColor: "#98ffb6", backgroundColor: "rgba(152,255,182,0.20)",
-              fill: "origin", tension: 0.35, pointRadius: 0, borderWidth: 2, order: 3,
-            },
-            // Layer 2: Platform App — stacked on Validator
-            {
-              label: "T-RIZE Platform App",
-              data: cumValArr.map((v, i) => v + cumAppArr[i]),
-              borderColor: "#ffd36b", backgroundColor: "rgba(255,211,107,0.14)",
-              fill: "-1", tension: 0.35, pointRadius: 0, borderWidth: 1.5, order: 2,
-            },
-            // Layer 3 (top, smallest): RIZEScore — stacked on top
-            {
-              label: "RIZEScore App",
-              data: cumValArr.map((v, i) => v + cumAppArr[i] + cumScoreArr[i]),
-              borderColor: "#ff8ad8", backgroundColor: "rgba(255,138,216,0.10)",
-              fill: "-1", tension: 0.35, pointRadius: 0, borderWidth: 1.5, order: 1,
-            },
-            // Net line: below gross total because burns are deducted
-            {
-              label: "Net CC Revenue (after burns)",
-              data: cumNetArr,
-              borderColor: "#7ee0ff", backgroundColor: "transparent",
-              fill: false, tension: 0.35, pointRadius: 0, borderWidth: 3, order: 0,
-            },
-          ],
+          datasets: [{
+            label: "Net CC Revenue",
+            data: cumNetArr,
+            borderColor: "#7ee0ff", backgroundColor: "rgba(126,224,255,0.15)",
+            fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2.5,
+          }],
         },
         options: cumulOpts,
       });
+
+      // ── Chart 2: Revenue by source — stacked area, brut (no burns) ──
+      if (rzCharts.sources) { rzCharts.sources.destroy(); rzCharts.sources = null; }
+      const cvS  = document.getElementById("rz-chart-sources");
+      const el_loading_sources = document.getElementById("rz-loading-sources");
+      if (el_loading_sources) el_loading_sources.style.display = "none";
+      if (cvS) {
+        cvS.style.display = "block";
+        const ctxS = cvS.getContext("2d");
+        const sourcesOpts = rzBaseOpts();
+        sourcesOpts.scales.y.title = { display: true, text: "CC", color: "#b6c1d8", font: { size: 11 } };
+        sourcesOpts.plugins.tooltip.callbacks = {
+          label: c => {
+            const i = c.dataIndex;
+            if (c.datasetIndex === 0) return ` Validator: ${rzFmt(cumValArr[i])} CC`;
+            if (c.datasetIndex === 1) return ` T-RIZE Platform App: ${rzFmt(cumAppArr[i])} CC`;
+            return ` RIZEScore App: ${rzFmt(cumScoreArr[i])} CC`;
+          }
+        };
+        rzCharts.sources = new Chart(ctxS, {
+          type: "line",
+          data: {
+            labels,
+            datasets: [
+              {
+                label: "Validator Revenue",
+                data: cumValArr,
+                borderColor: "#98ffb6", backgroundColor: "rgba(152,255,182,0.20)",
+                fill: "origin", tension: 0.35, pointRadius: 0, borderWidth: 2, order: 3,
+              },
+              {
+                label: "T-RIZE Platform App",
+                data: cumValArr.map((v, i) => v + cumAppArr[i]),
+                borderColor: "#ffd36b", backgroundColor: "rgba(255,211,107,0.14)",
+                fill: "-1", tension: 0.35, pointRadius: 0, borderWidth: 1.5, order: 2,
+              },
+              {
+                label: "RIZEScore App",
+                data: cumValArr.map((v, i) => v + cumAppArr[i] + cumScoreArr[i]),
+                borderColor: "#ff8ad8", backgroundColor: "rgba(255,138,216,0.10)",
+                fill: "-1", tension: 0.35, pointRadius: 0, borderWidth: 1.5, order: 1,
+              },
+            ],
+          },
+          options: sourcesOpts,
+        });
+      }
 
       // Render cantonomics on first load (it lives in the rewards panel which is visible)
       setTimeout(() => rzRenderCantoChart(), 120);
