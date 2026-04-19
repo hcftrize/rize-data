@@ -2536,58 +2536,75 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           <span class="ctx-kpi-value" style="color:#98ffb6">${rzFmt(thisWeekNet)} CC</span>
         </div>`;
 
-      // ── Chart 1: Cumulative NET area — linear scale, no log ──
+      // ── Chart 1: Cumulative — net fill + 3 composition lines, taller ──
       if (rzCharts.cumul) { rzCharts.cumul.destroy(); rzCharts.cumul = null; }
       const cvC  = document.getElementById("rz-chart-cumul");
+      cvC.closest(".ctx-chart-wrap").style.height = "380px";
       const ctxC = cvC.getContext("2d");
       const cumulOpts = rzBaseOpts();
-      cumulOpts.scales.y.title = { display: true, text: "CC (Net)", color: "#b6c1d8", font: { size: 11 } };
-      // Linear scale — no log — so ATH peaks are visually dramatic
+      cumulOpts.scales.y.title = { display: true, text: "CC", color: "#b6c1d8", font: { size: 11 } };
       cumulOpts.scales.y.type = "linear";
       rzCharts.cumul = new Chart(ctxC, {
         type: "line",
         data: {
           labels,
-          datasets: [{
-            label: "Net CC Revenue (Burn Adjusted)",
-            data: cumNetArr,
-            borderColor: "#7ee0ff",
-            backgroundColor: "rgba(126,224,255,0.12)",
-            fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2.5,
-          }],
+          datasets: [
+            {
+              label: "Net CC Revenue (Burn Adj.)",
+              data: cumNetArr,
+              borderColor: "#7ee0ff", backgroundColor: "rgba(126,224,255,0.10)",
+              fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2.5, order: 4,
+            },
+            {
+              label: "Validator Revenue",
+              data: cumValArr,
+              borderColor: "rgba(255,255,255,0.55)", backgroundColor: "transparent",
+              fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.5, borderDash: [4,3], order: 1,
+            },
+            {
+              label: "T-RIZE Platform App",
+              data: cumAppArr,
+              borderColor: "rgba(255,211,107,0.7)", backgroundColor: "transparent",
+              fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.5, borderDash: [4,3], order: 2,
+            },
+            {
+              label: "RIZEScore App",
+              data: cumScoreArr,
+              borderColor: "rgba(255,138,216,0.7)", backgroundColor: "transparent",
+              fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.5, borderDash: [4,3], order: 3,
+            },
+          ],
         },
         options: cumulOpts,
       });
 
-      // ── Chart 2: Weekly breakdown — 3 LINE curves with points ──
+      // ── Chart 2: Weekly breakdown — stacked bar (back to original) ──
       if (rzCharts.weekly) { rzCharts.weekly.destroy(); rzCharts.weekly = null; }
       const cvW  = document.getElementById("rz-chart-weekly");
       const ctxW = cvW.getContext("2d");
       const weeklyOpts = rzBaseOpts();
+      weeklyOpts.scales.x.stacked = true;
+      weeklyOpts.scales.y.stacked = true;
       weeklyOpts.scales.y.title = { display: true, text: "CC / week", color: "#b6c1d8", font: { size: 11 } };
-      const ptR = window.innerWidth < 600 ? 2 : 3;
       rzCharts.weekly = new Chart(ctxW, {
-        type: "line",
+        type: "bar",
         data: {
           labels,
           datasets: [
             {
               label: "Validator Revenue",
               data: valW,
-              borderColor: "#7ee0ff", backgroundColor: "rgba(126,224,255,0.0)",
-              fill: false, tension: 0.3, pointRadius: ptR, pointHoverRadius: 6, borderWidth: 2,
+              backgroundColor: "rgba(126,224,255,0.65)", borderColor: "#7ee0ff", borderWidth: 1,
             },
             {
               label: "T-RIZE Platform App Revenue",
               data: appW,
-              borderColor: "#ffd36b", backgroundColor: "rgba(255,211,107,0.0)",
-              fill: false, tension: 0.3, pointRadius: ptR, pointHoverRadius: 6, borderWidth: 2,
+              backgroundColor: "rgba(255,211,107,0.65)", borderColor: "#ffd36b", borderWidth: 1,
             },
             {
               label: "RIZEScore Revenue",
               data: scoreW,
-              borderColor: "#ff8ad8", backgroundColor: "rgba(255,138,216,0.0)",
-              fill: false, tension: 0.3, pointRadius: ptR, pointHoverRadius: 6, borderWidth: 2,
+              backgroundColor: "rgba(255,138,216,0.65)", borderColor: "#ff8ad8", borderWidth: 1,
             },
           ],
         },
@@ -2682,53 +2699,57 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     categories.forEach(cat => {
       const tokens = TOTAL * cat.alloc;
       if (cat.vest === 0) {
-        // Fully unlocked at TGE
-        const d = new Date(TGE);
-        events.push({ date: d, label: cat.name + " — Full unlock at TGE", daily: tokens, type: "tge" });
+        // Fully unlocked at TGE — skip, already in the past
         return;
       }
-      // Cliff unlock start
       const cliffDate = new Date(TGE);
       cliffDate.setUTCMonth(cliffDate.getUTCMonth() + cat.cliff);
-      // Daily release during vesting period
-      const vestDays = cat.vest * 30; // approx
-      const dailyRelease = tokens / vestDays;
-      // Find next milestone dates: cliff start, 25%, 50%, 75%, 100%
+      const vestDays = cat.vest * 30;
+      const dailyRelease = Math.round(tokens / vestDays);
+      const vestEndDate = new Date(cliffDate);
+      vestEndDate.setUTCDate(vestEndDate.getUTCDate() + vestDays);
+
       const milestones = [0, 0.25, 0.5, 0.75, 1.0];
       milestones.forEach(pct => {
         const daysAfterCliff = Math.round(pct * vestDays);
         const d = new Date(cliffDate);
         d.setUTCDate(d.getUTCDate() + daysAfterCliff);
-        if (d < today) return; // skip past dates
-        const amount = pct === 0 ? 0 : tokens * pct;
-        if (pct === 0) {
-          events.push({ date: d, label: cat.name + " — Cliff ends, vesting begins", daily: Math.round(dailyRelease), type: "cliff" });
-        } else {
-          events.push({ date: d, label: cat.name + " — " + Math.round(pct * 100) + "% vested", daily: Math.round(dailyRelease), type: "vest" });
-        }
+        if (d < today) return; // skip past milestones
+        const label = pct === 0
+          ? cat.name + " — Cliff ends, vesting begins"
+          : cat.name + " — " + Math.round(pct * 100) + "% vested";
+        const type = pct === 0 ? "cliff" : "vest";
+        // Status: ongoing if cliff already passed (vesting in progress), pending otherwise
+        const status = cliffDate <= today ? "ongoing" : "pending";
+        events.push({ date: d, label, daily: dailyRelease, type, status, vestEnd: vestEndDate });
       });
     });
 
-    // Sort by date, take next 15 future events
     events.sort((a, b) => a.date - b.date);
     const future = events.filter(e => e.date >= today).slice(0, 15);
 
     if (!future.length) { unlockEl.innerHTML = '<p style="color:var(--muted);font-size:14px">All major unlock milestones have passed.</p>'; return; }
 
+    function fmtDate(d) { return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }); }
+
     const rows = future.map(e => {
-      const dateStr = e.date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
       const daysLeft = Math.round((e.date - today) / 86400000);
-      const typeColor = e.type === "tge" ? "#98ffb6" : e.type === "cliff" ? "#ffd36b" : "#7ee0ff";
+      const typeColor = e.type === "cliff" ? "#ffd36b" : "#7ee0ff";
+      const statusBadge = e.status === "ongoing"
+        ? `<span style="color:#98ffb6;font-size:12px;font-weight:700;letter-spacing:1px">● ONGOING</span>`
+        : `<span style="color:var(--muted);font-size:12px;font-weight:700;letter-spacing:1px">○ PENDING</span>`;
       return `<tr>
-        <td style="color:${typeColor};white-space:nowrap">${dateStr}</td>
+        <td style="color:${typeColor};white-space:nowrap">${fmtDate(e.date)}</td>
         <td style="color:var(--muted)">${daysLeft}d</td>
         <td>${e.label}</td>
         <td style="color:#fff;text-align:right">${e.daily.toLocaleString()} RIZE/day</td>
+        <td style="white-space:nowrap;text-align:center">${statusBadge}</td>
+        <td style="color:var(--muted);white-space:nowrap">${fmtDate(e.vestEnd)}</td>
       </tr>`;
     }).join("");
 
     unlockEl.innerHTML = `<table class="tok-table" style="margin-top:0">
-      <thead><tr><th>Date</th><th>In</th><th>Event</th><th style="text-align:right">Daily Release</th></tr></thead>
+      <thead><tr><th>Date</th><th>In</th><th>Event</th><th style="text-align:right">Daily Release</th><th style="text-align:center">Status</th><th>Release End</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
   }
