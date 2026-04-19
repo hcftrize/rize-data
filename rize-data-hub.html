@@ -921,10 +921,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
         <button class="screenshot-btn" onclick="takeScreenshot('rize-ctx-section','rize-context')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
       </div>
-      <p class="section-sub">T-RIZE known revenue on Canton Network &amp; RIZE tokenomics — Data source : Lighthouse by Five North and Rizenet docs</p>
+      <p class="section-sub">T-RIZE public revenue on Canton Network &amp; RIZE tokenomics — Data source : Lighthouse by Five North and Rizenet docs</p>
 
       <div class="ctx-tabs">
-        <button class="ctx-tab active" onclick="rzCtxSwitch('rewards',this)">T-RIZE CC Revenue</button>
+        <button class="ctx-tab active" onclick="rzCtxSwitch('rewards',this)">T-RIZE Public Revenue</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('tokenomics',this)">RIZE Tokenomics</button>
       </div>
 
@@ -947,7 +947,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <!-- Understand CC tokenomics influence — directly under weekly chart, no separator -->
         <div style="margin-top:20px">
           <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px">Understand CC Tokenomics Influence</div>
-          <p style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);line-height:1.7;max-width:760px;margin-bottom:16px">CC tokenomics evolved in a positive way recently for T-RIZE roles on Canton: since January 2026, 62% of the total rewards pool go to featured applications, representing around 516 million CC shared among app providers every month. The rewards allocated to validators also increased from 12% to 18%.</p>
+          <p style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);line-height:1.7;max-width:100%;margin-bottom:16px">CC tokenomics evolved in a positive way recently for T-RIZE roles in Canton: since January 2026, 62% of the total rewards pool go to featured applications, representing around 516 million CC shared among app providers every month. The rewards allocated to validators also increased from 12% to 18%.</p>
           <div class="ctx-chart-wrap" id="rz-chart-cantonomics-wrap" style="height:320px">
             <canvas id="rz-chart-cantonomics"></canvas>
           </div>
@@ -985,6 +985,11 @@ html, body { overflow-x: hidden; max-width: 100%; }
             </table>
           </div>
         </div>
+        <!-- RIZE Burns since TGE -->
+        <div style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">RIZE Burns — Since TGE</div>
+          <div class="ctx-chart-wrap" style="height:220px"><canvas id="rz-chart-burns"></canvas></div>
+        </div>
         <!-- Vesting chart -->
         <div style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
           <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">Vesting Schedule — Circulating Supply Over Time</div>
@@ -992,12 +997,13 @@ html, body { overflow-x: hidden; max-width: 100%; }
         </div>
         <!-- Unlock events — 3 tabs -->
         <div style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:14px">Supply Unlock Events</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:14px">Burn &amp; Supply Unlock Events</div>
           <!-- Tab switcher — same style as main ctx-tabs -->
           <div class="ctx-tabs" id="rz-unlock-tabs">
             <button class="ctx-tab active" onclick="rzUnlockSwitch('pending',this)">Next Unlocks</button>
             <button class="ctx-tab" onclick="rzUnlockSwitch('ongoing',this)">Ongoing Releases</button>
             <button class="ctx-tab" onclick="rzUnlockSwitch('done',this)">Past Unlocks</button>
+            <button class="ctx-tab" onclick="rzUnlockSwitch('burn',this)">Burn Events</button>
           </div>
           <div id="rz-unlock-pending" class="rz-unlock-panel">
             <span style="color:var(--muted);font-size:13px">Computing&hellip;</span>
@@ -1007,6 +1013,9 @@ html, body { overflow-x: hidden; max-width: 100%; }
           </div>
           <div id="rz-unlock-done" class="rz-unlock-panel" style="display:none">
             <span style="color:var(--muted);font-size:13px">Computing&hellip;</span>
+          </div>
+          <div id="rz-unlock-burn" class="rz-unlock-panel" style="display:none">
+            <span style="color:var(--muted);font-size:13px">Loading burn events&hellip;</span>
           </div>
           <div id="rz-unlock-pager" style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;align-items:center"></div>
         </div>
@@ -2379,7 +2388,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   const RZ_GENESIS      = "2024-07-31T00:00:00.000Z";
   const RZ_API_BASE     = "https://lighthouse.fivenorth.io/api/parties";
 
-  const rzCharts = { cumul: null, weekly: null, alloc: null, vesting: null, cantonomics: null };
+  const rzCharts = { cumul: null, weekly: null, alloc: null, vesting: null, cantonomics: null, burns: null };
 
   function rzCtxSwitch(tab, btn) {
     const section = document.getElementById("rize-ctx-section");
@@ -2388,16 +2397,64 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     section.querySelectorAll(".ctx-panel").forEach(p => p.classList.remove("active"));
     document.getElementById("rz-panel-" + tab).classList.add("active");
     if (tab === "tokenomics") {
-      setTimeout(() => { if (!rzCharts.alloc) rzRenderTokenomics(); }, 50);
+      setTimeout(() => { if (!rzCharts.alloc) rzRenderTokenomics(); else rzRenderCantoChart(); }, 50);
+    } else if (tab === "rewards") {
+      setTimeout(() => rzRenderCantoChart(), 50);
     }
   }
 
   function rzUnlockSwitch(tab, btn) {
     document.querySelectorAll("#rz-unlock-tabs .ctx-tab").forEach(t => t.classList.remove("active"));
     btn.classList.add("active");
-    ["pending","ongoing","done"].forEach(k => {
+    ["pending","ongoing","done","burn"].forEach(k => {
       const el = document.getElementById("rz-unlock-" + k);
       if (el) el.style.display = k === tab ? "block" : "none";
+    });
+  }
+
+  function rzRenderCantoChart() {
+    if (rzCharts.cantonomics) return;
+    const cvCanto = document.getElementById("rz-chart-cantonomics");
+    if (!cvCanto) return;
+    const canto_labels = ["H2 2024","H1 2025","H2 2025","H1 2026","H2 2026","H1 2027","H2 2027","H1 2028","H2 2028","H1 2029"];
+    const canto_sv  = [80, 48, 48, 20, 20, 20, 20, 20, 20, 20];
+    const canto_val = [ 5, 12, 12, 18, 18, 18, 18, 18, 18, 18];
+    const canto_app = [15, 40, 40, 62, 62, 62, 62, 62, 62, 62];
+    const cantoOpts = rzBaseOpts();
+    cantoOpts.scales.x.stacked = true;
+    cantoOpts.scales.y.stacked = true;
+    cantoOpts.scales.y.ticks.callback = v => v + "%";
+    cantoOpts.scales.y.max = 100;
+    const datalabelsPlugin = {
+      id: "rzDatalabels",
+      afterDatasetsDraw(chart) {
+        const ctx2 = chart.ctx;
+        chart.data.datasets.forEach((ds, i) => {
+          chart.getDatasetMeta(i).data.forEach((bar, j) => {
+            const val = ds.data[j];
+            if (!val) return;
+            ctx2.save();
+            ctx2.fillStyle = "#000";
+            ctx2.font = "bold 12px Rajdhani, sans-serif";
+            ctx2.textAlign = "center";
+            ctx2.textBaseline = "middle";
+            ctx2.fillText(val + "%", bar.x, bar.y + bar.height / 2);
+            ctx2.restore();
+          });
+        });
+      }
+    };
+    rzCharts.cantonomics = new Chart(cvCanto.getContext("2d"), {
+      type: "bar", plugins: [datalabelsPlugin],
+      data: {
+        labels: canto_labels,
+        datasets: [
+          { label: "Super Validator reward %", data: canto_sv, backgroundColor: "rgba(126,224,255,0.75)", borderColor: "#7ee0ff", borderWidth: 1 },
+          { label: "Validator reward %",        data: canto_val, backgroundColor: "rgba(152,255,182,0.5)",  borderColor: "#98ffb6", borderWidth: 1 },
+          { label: "App provider reward %",     data: canto_app, backgroundColor: "rgba(255,211,107,0.75)", borderColor: "#ffd36b", borderWidth: 1 },
+        ],
+      },
+      options: cantoOpts,
     });
   }
 
@@ -2594,8 +2651,6 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         </div>`;
 
       // ── Chart 1: Cumulative — stacked fills show composition, net line on top ──
-      // Logic: val + app + score = gross; net = gross - burns
-      // Show each source as stacked fill, Net as the clean top line
       if (rzCharts.cumul) { rzCharts.cumul.destroy(); rzCharts.cumul = null; }
       const cvC  = document.getElementById("rz-chart-cumul");
       cvC.closest(".ctx-chart-wrap").style.height = "380px";
@@ -2603,8 +2658,16 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const cumulOpts = rzBaseOpts();
       cumulOpts.scales.y.title = { display: true, text: "CC", color: "#b6c1d8", font: { size: 11 } };
       cumulOpts.scales.y.type = "linear";
-      // Stacked so fills layer properly
-      cumulOpts.scales.y.stacked = false; // we use fill:true with specific targets
+      // Custom tooltip: show actual per-source values, not stacked offsets
+      cumulOpts.plugins.tooltip.callbacks = {
+        label: c => {
+          const i = c.dataIndex;
+          if (c.datasetIndex === 0) return ` Validator Revenue: ${rzFmt(cumValArr[i])} CC`;
+          if (c.datasetIndex === 1) return ` T-RIZE Platform App: ${rzFmt(cumAppArr[i])} CC`;
+          if (c.datasetIndex === 2) return ` RIZEScore App: ${rzFmt(cumScoreArr[i])} CC`;
+          return ` Net CC Revenue: ${rzFmt(cumNetArr[i])} CC`;
+        }
+      };
       rzCharts.cumul = new Chart(ctxC, {
         type: "line",
         data: {
@@ -2638,6 +2701,9 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         },
         options: cumulOpts,
       });
+
+      // Render cantonomics on first load (it lives in the rewards panel which is visible)
+      setTimeout(() => rzRenderCantoChart(), 120);
 
       // ── Chart 2: Weekly breakdown — stacked bar (back to original) ──
       if (rzCharts.weekly) { rzCharts.weekly.destroy(); rzCharts.weekly = null; }
@@ -2759,51 +2825,67 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       });
     }
 
-    // ── Cantonomics Current State chart ──
-    if (!rzCharts.cantonomics) {
-      const cvCanto = document.getElementById("rz-chart-cantonomics");
-      if (cvCanto) {
-        const canto_labels = ["H2 2024","H1 2025","H2 2025","H1 2026","H2 2026","H1 2027","H2 2027","H1 2028","H2 2028","H1 2029"];
-        const canto_sv  = [80, 48, 48, 20, 20, 20, 20, 20, 20, 20];
-        const canto_val = [ 5, 12, 12, 18, 18, 18, 18, 18, 18, 18];
-        const canto_app = [15, 40, 40, 62, 62, 62, 62, 62, 62, 62];
-        const cantoOpts = rzBaseOpts();
-        cantoOpts.scales.x.stacked = true;
-        cantoOpts.scales.y.stacked = true;
-        cantoOpts.scales.y.ticks.callback = v => v + "%";
-        cantoOpts.scales.y.max = 100;
-        const datalabelsPlugin = {
-          id: "rzDatalabels",
-          afterDatasetsDraw(chart) {
-            const ctx2 = chart.ctx;
-            chart.data.datasets.forEach((ds, i) => {
-              chart.getDatasetMeta(i).data.forEach((bar, j) => {
-                const val = ds.data[j];
-                if (!val) return;
-                ctx2.save();
-                ctx2.fillStyle = "#000";
-                ctx2.font = "bold 12px Rajdhani, sans-serif";
-                ctx2.textAlign = "center";
-                ctx2.textBaseline = "middle";
-                ctx2.fillText(val + "%", bar.x, bar.y + bar.height / 2);
-                ctx2.restore();
-              });
-            });
-          }
-        };
-        rzCharts.cantonomics = new Chart(cvCanto.getContext("2d"), {
-          type: "bar", plugins: [datalabelsPlugin],
-          data: {
-            labels: canto_labels,
-            datasets: [
-              { label: "Super Validator reward %", data: canto_sv, backgroundColor: "rgba(126,224,255,0.75)", borderColor: "#7ee0ff", borderWidth: 1 },
-              { label: "Validator reward %",        data: canto_val, backgroundColor: "rgba(152,255,182,0.5)",  borderColor: "#98ffb6", borderWidth: 1 },
-              { label: "App provider reward %",     data: canto_app, backgroundColor: "rgba(255,211,107,0.75)", borderColor: "#ffd36b", borderWidth: 1 },
-            ],
-          },
-          options: cantoOpts,
-        });
+    // ── Cantonomics — delegated to rzRenderCantoChart (called from rzLoad and tab switch) ──
+    rzRenderCantoChart();
+
+    // ── RIZE Burns since TGE — static data, manually updated ──
+    const rizeBurnEvents = [
+      { date: "2025-12-22", amount: 50_000_000, tx: "https://basescan.org/tx/0xf38598cddf8f4a9a222b994748ba00d917a55f2282f92c048b9afee76951dfa3" },
+    ];
+    const cvBurn = document.getElementById("rz-chart-burns");
+    if (cvBurn && !rzCharts.burns) {
+      // Build a simple cumulative step chart from TGE to today
+      const burnStart = new Date("2025-05-15");
+      const burnEnd   = new Date();
+      const burnLabels = [], burnData = [];
+      let cumBurnRize = 0;
+      let cur = new Date(burnStart);
+      while (cur <= burnEnd) {
+        const iso = cur.toISOString().slice(0, 10);
+        rizeBurnEvents.forEach(ev => { if (ev.date === iso) cumBurnRize += ev.amount; });
+        // Monthly labels only
+        if (cur.getUTCDate() === 1 || iso === burnStart.toISOString().slice(0,10) || iso === burnEnd.toISOString().slice(0,10)) {
+          burnLabels.push(cur.toLocaleDateString("en-US", { month: "short", year: "2-digit" }));
+          burnData.push(cumBurnRize);
+        }
+        cur.setUTCDate(cur.getUTCDate() + 1);
       }
+      const burnOpts = rzBaseOpts();
+      burnOpts.scales.y.title = { display: true, text: "RIZE burned", color: "#b6c1d8", font: { size: 11 } };
+      burnOpts.scales.y.ticks.callback = v => rzFmt(v);
+      rzCharts.burns = new Chart(cvBurn.getContext("2d"), {
+        type: "line",
+        data: {
+          labels: burnLabels,
+          datasets: [{
+            label: "Cumulative RIZE Burned",
+            data: burnData,
+            borderColor: "#ff8ad8", backgroundColor: "rgba(255,138,216,0.10)",
+            fill: true, tension: 0, pointRadius: 3, pointHoverRadius: 6,
+            borderWidth: 2, stepped: "before",
+          }],
+        },
+        options: burnOpts,
+      });
+    }
+
+    // ── Burn Events table ──
+    const burnEl = document.getElementById("rz-unlock-burn");
+    if (burnEl) {
+      const burnRows = rizeBurnEvents.map(ev => {
+        const d = new Date(ev.date);
+        const dAgo = Math.round((today - d) / 86400000);
+        return `<tr>
+          <td style="color:#ff8ad8;white-space:nowrap">${d.toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric"})}</td>
+          <td style="color:var(--muted)">${dAgo}d ago</td>
+          <td style="color:#fff;font-weight:700">${(ev.amount / 1e6).toFixed(0)}M RIZE</td>
+          <td><a href="${ev.tx}" target="_blank" rel="noopener" style="color:var(--cyan);font-family:'DM Mono',monospace;font-size:12px;word-break:break-all">View on Basescan ↗</a></td>
+        </tr>`;
+      }).join("");
+      burnEl.innerHTML = `<div style="overflow-x:auto"><table class="tok-table" style="margin-top:0">
+        <thead><tr><th>Date</th><th>Ago</th><th>Amount Burned</th><th>Transaction</th></tr></thead>
+        <tbody>${burnRows}</tbody>
+      </table></div>`;
     }
 
     // ── Unlock events — 3 categories ──
