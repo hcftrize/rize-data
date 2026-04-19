@@ -775,6 +775,52 @@ html, body { overflow-x: hidden; max-width: 100%; }
     }
 
     /* ═══════════════════════════════════════════════════════════
+       COLLAPSIBLE SECTIONS
+    ═══════════════════════════════════════════════════════════ */
+    .section-titlebar-row { cursor: pointer; user-select: none; }
+    .section-collapse-toggle {
+      width: 28px; height: 28px;
+      border: 1px solid rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-left: 12px;
+      transition: background 0.15s, border-color 0.15s;
+      background: rgba(255,255,255,0.04);
+    }
+    .section-collapse-toggle svg { transition: transform 0.28s ease; }
+    .section-collapse-toggle:hover { background: rgba(126,224,255,0.08); border-color: var(--cyan); }
+    .section.hub-collapsed .section-collapse-toggle svg { transform: rotate(-90deg); }
+    .section-body {
+      overflow: hidden;
+      transition: max-height 0.38s ease, opacity 0.3s ease;
+      max-height: 9999px; opacity: 1;
+    }
+    .section-body.collapsed { max-height: 0; opacity: 0; }
+
+    /* Mobile — scrollable wide tables & charts */
+    @media(max-width:768px) {
+      .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      #rz-chart-weekly-wrap { height: 260px !important; }
+      /* All dynamic table containers scrollable */
+      #perf-data, #main-data, #market-context,
+      #ratio-section .section-body, #bag-section .section-body,
+      #comp-section .section-body, #perf-section .section-body {
+        overflow-x: auto;
+      }
+      /* Allocation table on mobile */
+      .rz-tok-grid table { font-size: 12px; }
+      .rz-tok-grid th, .rz-tok-grid td { padding: 6px 8px; }
+      /* Doughnut smaller on mobile */
+      .rz-tok-grid > div:first-child { height: 260px; }
+      /* KPI row wrap nicely */
+      .ctx-kpi-row { gap: 8px; }
+      .ctx-kpi { min-width: 120px; padding: 12px 14px; }
+      /* Burns table scrollable */
+      #rz-burn-events-table { overflow-x: auto; }
+      #rz-unlock-burn, #rz-unlock-pending,
+      #rz-unlock-ongoing, #rz-unlock-done { overflow-x: auto; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
        RIZE CONTEXT — tab switcher + charts (mirrors Canton Context)
     ═══════════════════════════════════════════════════════════ */
     .ctx-tabs {
@@ -833,6 +879,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
       .hero,.section,.search-section { padding: 18px; }
       h1 { font-size: clamp(28px, 8vw, 48px); }
       .section-title { font-size: 26px; }
+      .section-sub { font-size: 13px; line-height: 1.5; word-break: break-word; }
       .metrics { grid-template-columns: 1fr 1fr; }
       .metric-value { font-size: 26px; }
       td { font-size: 14px; }
@@ -840,11 +887,20 @@ html, body { overflow-x: hidden; max-width: 100%; }
       td { padding: 8px 8px; }
       .rz-tok-grid { grid-template-columns: 1fr !important; }
       .rz-rev-grid { grid-template-columns: 1fr !important; }
+      /* Rev grid charts on mobile */
+      .rz-rev-grid .ctx-chart-wrap { height: 220px !important; }
       /* Unlock tabs — wrap on mobile */
       #rz-unlock-tabs { flex-wrap: wrap; }
       #rz-unlock-tabs .ctx-tab { font-size: 11px; padding: 7px 10px; }
       /* Burns chart height on mobile */
-      #rz-panel-burns .ctx-chart-wrap { height: 180px !important; }
+      #rz-panel-burns .ctx-chart-wrap { height: 200px !important; }
+      /* Section titlebar on mobile */
+      .section-titlebar-row { flex-wrap: nowrap; gap: 8px; }
+      .screenshot-btn .screenshot-label { display: none; }
+      /* All tables scrollable */
+      table { min-width: 400px; }
+      .section-body, #rz-unlock-burn, #rz-unlock-pending,
+      #rz-unlock-ongoing, #rz-unlock-done, #rz-burn-events-table { overflow-x: auto; }
     }
 
     /* Unlock sub-tab active state — independent from main ctx-tab active */
@@ -938,7 +994,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <p class="section-sub">T-RIZE public revenue on Canton Network &amp; RIZE tokenomics — Data source : Lighthouse by Five North and Rizenet docs</p>
 
       <div class="ctx-tabs">
-        <button class="ctx-tab active" onclick="rzCtxSwitch('rewards',this)">T-RIZE Public Revenue</button>
+        <button class="ctx-tab active" onclick="rzCtxSwitch('rewards',this)">T-RIZE Canton Revenue</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('burns',this)">RIZE Burns</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('tokenomics',this)">RIZE Tokenomics</button>
       </div>
@@ -969,18 +1025,15 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <!-- KPI boxes -->
         <div class="ctx-kpi-row" id="rz-kpi-rewards"></div>
         <!-- Weekly breakdown chart -->
-        <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-top:28px;margin-bottom:8px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.07)">Weekly Revenue Breakdown — Validator / T-RIZE Platform App / RIZEScore</div>
-        <div class="ctx-chart-wrap" id="rz-chart-weekly-wrap">
+        <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-top:28px;margin-bottom:8px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.07)">Weekly Revenue Breakdown</div>
+        <div class="ctx-chart-wrap" id="rz-chart-weekly-wrap" style="height:260px">
           <div class="ctx-loading" id="rz-loading-weekly">Loading on-chain data&hellip;</div>
           <canvas id="rz-chart-weekly" style="display:none"></canvas>
         </div>
-        <!-- Understand CC tokenomics influence — directly under weekly chart, no separator -->
-        <div style="margin-top:20px">
+        <!-- Understand CC tokenomics influence -->
+        <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.07)">
           <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px">Understand CC Tokenomics Influence</div>
-          <p style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);line-height:1.7;max-width:100%;margin-bottom:16px">CC tokenomics evolved in a positive way recently for T-RIZE roles in Canton: since January 2026, 62% of the total rewards pool go to featured applications, representing around 516 million CC shared among app providers every month. The rewards allocated to validators also increased from 12% to 18%.</p>
-          <div class="ctx-chart-wrap" id="rz-chart-cantonomics-wrap" style="height:320px">
-            <canvas id="rz-chart-cantonomics"></canvas>
-          </div>
+          <p style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:0">CC tokenomics evolved in a positive way recently for T-RIZE roles in Canton: since January 2026, 62% of the total rewards pool go to featured applications, representing around 516 million CC shared among app providers every month. The rewards allocated to validators also increased from 12% to 18%.</p>
         </div>
       </div>
 
@@ -1006,6 +1059,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <!-- Table -->
           <div>
             <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">Allocation &amp; Vesting Schedule</div>
+            <div style="overflow-x:auto">
             <table class="tok-table">
               <thead><tr><th>Category</th><th>%</th><th>Tokens</th><th>Cliff</th><th>Vesting</th></tr></thead>
               <tbody>
@@ -1022,12 +1076,8 @@ html, body { overflow-x: hidden; max-width: 100%; }
                 <tr><td><strong>TOTAL</strong></td><td><strong>100%</strong></td><td><strong>5B</strong></td><td></td><td></td></tr>
               </tbody>
             </table>
+            </div><!-- end overflow-x:auto -->
           </div>
-        </div>
-        <!-- Vesting chart -->
-        <div style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">Vesting Schedule — Circulating Supply Over Time</div>
-          <div class="ctx-chart-wrap" style="height:300px"><canvas id="rz-chart-vesting"></canvas></div>
         </div>
         <!-- Unlock events — 3 tabs -->
         <div style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
@@ -2403,6 +2453,44 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
 
   /* ═══════════════════════════════════════════════════════════
+     COLLAPSIBLE SECTIONS
+  ═══════════════════════════════════════════════════════════ */
+  function toggleSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+    const body = section.querySelector(".section-body");
+    if (!body) return;
+    const isCollapsed = section.classList.toggle("hub-collapsed");
+    body.classList.toggle("collapsed", isCollapsed);
+  }
+
+  // Auto-wire all sections with collapse toggle on DOM ready
+  document.addEventListener("DOMContentLoaded", function() {
+    const toggleSVG = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="rgba(126,224,255,0.8)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    document.querySelectorAll(".hub-wrap .section").forEach(function(section) {
+      if (!section.id) return;
+      const titleRow = section.querySelector(".section-titlebar-row");
+      if (!titleRow) return;
+      // Add toggle button to titlebar row
+      const btn = document.createElement("div");
+      btn.className = "section-collapse-toggle";
+      btn.innerHTML = toggleSVG;
+      titleRow.appendChild(btn);
+      titleRow.addEventListener("click", function(e) {
+        // Don't intercept screenshot btn clicks
+        if (e.target.closest(".screenshot-btn")) return;
+        toggleSection(section.id);
+      });
+      // Wrap all content after titlebar in a section-body div
+      const body = document.createElement("div");
+      body.className = "section-body";
+      const children = Array.from(section.childNodes).filter(n => n !== titleRow);
+      children.forEach(n => body.appendChild(n));
+      section.appendChild(body);
+    });
+  });
+
+  /* ═══════════════════════════════════════════════════════════
      INIT — load data on page ready
   ═══════════════════════════════════════════════════════════ */
   document.addEventListener("DOMContentLoaded", loadData);
@@ -2497,10 +2585,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           <td><a href="${ev.tx}" target="_blank" rel="noopener" style="color:#ffffff;font-family:'DM Mono',monospace;font-size:12px">View on Basescan ↗</a></td>
         </tr>`;
       }).join("");
-      burnTableEl.innerHTML = `<table class="tok-table" style="margin-top:0">
+      burnTableEl.innerHTML = `<div style="overflow-x:auto"><table class="tok-table" style="margin-top:0">
         <thead><tr><th>Date</th><th>Ago</th><th>Amount Burned</th><th>Transaction</th></tr></thead>
         <tbody>${rows}</tbody>
-      </table>`;
+      </table></div>`;
     }
     // Also populate the burn tab in the unlock section
     const burnUnlockEl = document.getElementById("rz-unlock-burn");
@@ -2515,10 +2603,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           <td><a href="${ev.tx}" target="_blank" rel="noopener" style="color:#ffffff;font-family:'DM Mono',monospace;font-size:12px">View on Basescan ↗</a></td>
         </tr>`;
       }).join("");
-      burnUnlockEl.innerHTML = `<table class="tok-table" style="margin-top:0">
+      burnUnlockEl.innerHTML = `<div style="overflow-x:auto"><table class="tok-table" style="margin-top:0">
         <thead><tr><th>Date</th><th>Ago</th><th>Amount Burned</th><th>Transaction</th></tr></thead>
         <tbody>${rows2}</tbody>
-      </table>`;
+      </table></div>`;
     }
   }
 
@@ -2753,19 +2841,19 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         </div>
         <div style="width:100%;border-top:1px solid rgba(255,255,255,0.06);margin:4px 0"></div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">1W Revenue (Net)</span>
+          <span class="ctx-kpi-label">1W Revenue</span>
           <span class="ctx-kpi-value" style="color:#98ffb6">${rzFmt(rev1w)} CC</span>
         </div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">1M Revenue (Net)</span>
+          <span class="ctx-kpi-label">1M Revenue</span>
           <span class="ctx-kpi-value" style="color:#98ffb6">${rzFmt(rev1m)} CC</span>
         </div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">1Y Revenue (Net)</span>
+          <span class="ctx-kpi-label">1Y Revenue</span>
           <span class="ctx-kpi-value" style="color:#98ffb6">${rzFmt(rev1y)} CC</span>
         </div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">2Y Revenue (Net)</span>
+          <span class="ctx-kpi-label">2Y Revenue</span>
           <span class="ctx-kpi-value" style="color:#98ffb6">${rzFmt(rev2y)} CC</span>
         </div>`;
 
