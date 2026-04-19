@@ -500,8 +500,6 @@
       pointer-events: none;
     }
     .screenshot-mode .wm-badge { opacity: 0.52; }
-    /* Total Burned: pink in normal view, white on screenshot */
-    .screenshot-mode .rz-burned-val { color: #fff !important; }
 
     .wm-text-tokerize {
       font-family: 'Rajdhani', monospace;
@@ -886,11 +884,13 @@ html, body { overflow-x: hidden; max-width: 100%; }
       td { font-size: 15px; }
       th { font-size: 12px; padding: 8px 8px; }
       td { padding: 8px 8px; }
-      .rz-tok-grid { grid-template-columns: 1fr !important; }
+      .rz-tok-grid { grid-template-columns: 1fr !important; overflow: hidden !important; }
       .rz-tok-grid > div:first-child { display: flex !important; justify-content: center !important; }
-      .rz-tok-grid > div:first-child > div { width: 240px !important; height: 240px !important; max-width: 240px !important; }
-      .rz-tok-grid .tok-table { min-width: unset !important; }
-      .rz-tok-grid .tok-table th, .rz-tok-grid .tok-table td { padding: 7px 8px !important; font-size: 13px !important; }
+      .rz-tok-grid > div:first-child > div { width: 220px !important; height: 220px !important; max-width: 220px !important; }
+      .rz-tok-grid .tok-table { min-width: unset !important; width: 100% !important; }
+      .rz-tok-grid .tok-table th, .rz-tok-grid .tok-table td { padding: 6px 6px !important; font-size: 12px !important; }
+      /* Tokenomics panel top section: no overflow scroll */
+      #rz-panel-tokenomics > div:first-child { overflow: hidden !important; }
       /* Unlock tabs — wrap on mobile */
       #rz-unlock-tabs { flex-wrap: wrap; }
       #rz-unlock-tabs .ctx-tab { font-size: 12px; padding: 8px 12px; }
@@ -2652,6 +2652,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     const datalabelsPlugin = {
       id: "rzDatalabels",
       afterDatasetsDraw(chart) {
+        if (window.innerWidth < 700) return; // hide % on mobile
         const ctx2 = chart.ctx;
         chart.data.datasets.forEach((ds, i) => {
           chart.getDatasetMeta(i).data.forEach((bar, j) => {
@@ -2850,7 +2851,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         </div>
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">Total Burned</span>
-          <span class="ctx-kpi-value rz-burned-val" style="color:var(--pink)">-${rzFmt(totalBurn)} CC</span>
+          <span class="ctx-kpi-value" style="color:#fff">-${rzFmt(totalBurn)} CC</span>
         </div>
         <div class="ctx-kpi">
           <span class="ctx-kpi-label">Net CC Revenue</span>
@@ -2941,7 +2942,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
                 label: "RIZEScore App",
                 data: cumScoreArr,
                 borderColor: "#ff8ad8", backgroundColor: "rgba(255,138,216,0.25)",
-                fill: true, tension: 0.35, pointRadius: 0, borderWidth: 1.5,
+                fill: true, tension: 0.35, pointRadius: 0, pointHoverRadius: 4,
+                borderWidth: 1.5, borderDash: [], segment: undefined,
               },
             ],
           },
@@ -3162,6 +3164,18 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   }
 
   document.addEventListener("DOMContentLoaded", rzLoad);
+
+  // Dismiss chart tooltips on tap outside canvas (mobile)
+  document.addEventListener("click", function(e) {
+    if (!e.target.closest("canvas")) {
+      Object.values(rzCharts).forEach(function(chart) {
+        if (chart && chart.tooltip) {
+          chart.tooltip.setActiveElements([], {x:0,y:0});
+          chart.update("none");
+        }
+      });
+    }
+  });
 
   </script>
 
