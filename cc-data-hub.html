@@ -879,6 +879,11 @@ html, body { overflow-x: hidden; max-width: 100%; }
       .metrics { grid-template-columns: 1fr 1fr; }
       .metric-value { font-size: 26px; }
       td { font-size: 15px; }
+      /* Canton Context mobile */
+      .ctx-tab { font-size: 12px; padding: 8px 12px; letter-spacing: 1px; }
+      .ctx-chart-wrap { height: 200px; }
+      .ctx-kpi { min-width: 100px; }
+      .ctx-kpi-value { font-size: 22px; }
     }
     </style>
 </head>
@@ -2381,8 +2386,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const json = await res.json();
       const rows = json.data || [];
       if (!rows.length) throw new Error("No data");
-      // Keep last 26 weeks (~6 months) — exclude current partial week
-      ctxData = rows.slice(-26);
+      // Keep last 26 weeks for ratio; all history for mint & burn
+      ctxData = rows;
       // Hide all loaders
       ["ratio","mint","burn"].forEach(t => {
         const el = document.getElementById("ctx-loading-" + t);
@@ -2410,13 +2415,17 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   }
 
   function ctxWeekLabel(iso) {
-    // e.g. "2025-03-03" → "Mar 3"
     const d = new Date(iso + "T12:00:00Z");
-    return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" });
+  }
+
+  // Mobile-aware tick limit
+  function ctxMaxTicks() {
+    return window.innerWidth < 600 ? 6 : window.innerWidth < 900 ? 9 : 14;
   }
 
   // Shared Chart.js defaults that match the hub dark theme
-  function ctxBaseOpts(title) {
+  function ctxBaseOpts() {
     return {
       responsive: true,
       maintainAspectRatio: false,
@@ -2445,7 +2454,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           ticks: {
             color: "#b6c1d8",
             font: { family: "Trebuchet MS, Verdana, sans-serif", size: 11 },
-            maxRotation: 35, autoSkip: true, maxTicksLimit: 13,
+            maxRotation: 35, autoSkip: true, maxTicksLimit: ctxMaxTicks(),
           },
           grid: { color: "rgba(255,255,255,0.04)" },
         },
@@ -2464,10 +2473,12 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   function ctxRender(tab) {
     if (!ctxData) return;
 
-    const labels = ctxData.map(r => ctxWeekLabel(r.date));
+    // Ratio: last 26 weeks only; mint & burn: full history
+    const src    = (tab === "ratio") ? ctxData.slice(-26) : ctxData;
+    const labels = src.map(r => ctxWeekLabel(r.date));
 
     if (tab === "ratio") {
-      const ratios = ctxData.map(r => {
+      const ratios = src.map(r => {
         const mint = r.mintAmount || 0;
         const burn = r.burnAmount || 0;
         if (!mint) return 0;
@@ -2477,7 +2488,6 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const latest = ratios[ratios.length - 1];
       const avg    = ratios.reduce((a, b) => a + b, 0) / ratios.length;
 
-      // KPI boxes
       const deflClass = latest >= 1 ? "deflationary" : latest >= 0.5 ? "neutral" : "inflationary";
       const deflText  = latest >= 1 ? "DEFLATIONARY 🟢" : latest >= 0.5 ? "NEUTRAL 🟡" : "INFLATIONARY 🔴";
       document.getElementById("ctx-kpi-ratio").innerHTML = `
@@ -2495,10 +2505,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         </div>`;
 
       if (ctxCharts.ratio) { ctxCharts.ratio.destroy(); ctxCharts.ratio = null; }
-      const cv = document.getElementById("ctx-chart-ratio");
+      const cv  = document.getElementById("ctx-chart-ratio");
       const ctx = cv.getContext("2d");
-
-      // Reference line at 1
       const refLine = labels.map(() => 1);
 
       ctxCharts.ratio = new Chart(ctx, {
@@ -2521,9 +2529,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
             {
               label: "Equilibrium (1.0)",
               data: refLine,
-              borderColor: "rgba(255,211,107,0.5)",
-              borderDash: [5,4],
-              borderWidth: 1.5,
+              // ── 3) Gold same as KPI value color ──
+              borderColor: "#ffd36b",
+              borderDash: [5, 4],
+              borderWidth: 2,
               pointRadius: 0,
               fill: false,
               tension: 0,
@@ -2531,15 +2540,15 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           ],
         },
         options: {
-          ...ctxBaseOpts("Burn / Mint Ratio"),
+          ...ctxBaseOpts(),
           plugins: {
             ...ctxBaseOpts().plugins,
             tooltip: {
-              ...ctxBaseOpts().plugins?.tooltip,
+              ...ctxBaseOpts().plugins.tooltip,
               callbacks: {
-                label: ctx => {
-                  if (ctx.datasetIndex === 1) return null;
-                  const v = ctx.parsed.y;
+                label: c => {
+                  if (c.datasetIndex === 1) return null;
+                  const v = c.parsed.y;
                   const txt = v >= 1 ? " — Deflationary" : v >= 0.5 ? " — Neutral" : " — Inflationary";
                   return ` Ratio: ${v.toFixed(4)}${txt}`;
                 },
@@ -2551,86 +2560,87 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     }
 
     if (tab === "mint") {
-      const appR = ctxData.map(r => r.appRewards || 0);
-      const valR = ctxData.map(r => r.validatorRewards || 0);
-      const svR  = ctxData.map(r => r.superValidatorRewards || 0);
+      // ── 4) Three separate line charts, full history since genesis ──
+      const appR = src.map(r => r.appRewards || 0);
+      const valR = src.map(r => r.validatorRewards || 0);
+      const svR  = src.map(r => r.superValidatorRewards || 0);
 
       if (ctxCharts.mint) { ctxCharts.mint.destroy(); ctxCharts.mint = null; }
       const cv  = document.getElementById("ctx-chart-mint");
       const ctx = cv.getContext("2d");
 
       ctxCharts.mint = new Chart(ctx, {
-        type: "bar",
+        type: "line",
         data: {
           labels,
           datasets: [
             {
               label: "SV Rewards",
               data: svR,
-              backgroundColor: "rgba(126,224,255,0.55)",
-              borderColor: "rgba(126,224,255,0.85)",
-              borderWidth: 1,
-              stack: "mint",
+              borderColor: "#7ee0ff",
+              backgroundColor: "rgba(126,224,255,0.05)",
+              fill: false,
+              tension: 0.3,
+              pointRadius: window.innerWidth < 600 ? 1 : 2,
+              pointHoverRadius: 5,
+              borderWidth: 2,
             },
             {
               label: "Validator Rewards",
               data: valR,
-              backgroundColor: "rgba(152,255,182,0.55)",
-              borderColor: "rgba(152,255,182,0.85)",
-              borderWidth: 1,
-              stack: "mint",
+              borderColor: "#98ffb6",
+              backgroundColor: "rgba(152,255,182,0.05)",
+              fill: false,
+              tension: 0.3,
+              pointRadius: window.innerWidth < 600 ? 1 : 2,
+              pointHoverRadius: 5,
+              borderWidth: 2,
             },
             {
               label: "App Rewards",
               data: appR,
-              backgroundColor: "rgba(255,211,107,0.55)",
-              borderColor: "rgba(255,211,107,0.85)",
-              borderWidth: 1,
-              stack: "mint",
+              borderColor: "#ffd36b",
+              backgroundColor: "rgba(255,211,107,0.05)",
+              fill: false,
+              tension: 0.3,
+              pointRadius: window.innerWidth < 600 ? 1 : 2,
+              pointHoverRadius: 5,
+              borderWidth: 2,
             },
           ],
         },
-        options: {
-          ...ctxBaseOpts("Weekly Mint Activity"),
-          scales: {
-            ...ctxBaseOpts().scales,
-            x: { ...ctxBaseOpts().scales.x, stacked: true },
-            y: { ...ctxBaseOpts().scales.y, stacked: true },
-          },
-        },
+        options: ctxBaseOpts(),
       });
     }
 
     if (tab === "burn") {
-      const burnData = ctxData.map(r => r.burnAmount || 0);
+      // ── 5) Line chart with points, full history ──
+      const burnData = src.map(r => r.burnAmount || 0);
 
       if (ctxCharts.burn) { ctxCharts.burn.destroy(); ctxCharts.burn = null; }
       const cv  = document.getElementById("ctx-chart-burn");
       const ctx = cv.getContext("2d");
 
-      // Color bars: deeper pink when higher burn
-      const maxB = Math.max(...burnData);
-      const barColors = burnData.map(v => {
-        const intensity = maxB > 0 ? v / maxB : 0;
-        const alpha = 0.35 + intensity * 0.5;
-        return `rgba(255,138,216,${alpha})`;
-      });
-
       ctxCharts.burn = new Chart(ctx, {
-        type: "bar",
+        type: "line",
         data: {
           labels,
           datasets: [
             {
               label: "Total Burned (CC)",
               data: burnData,
-              backgroundColor: barColors,
-              borderColor: "rgba(255,138,216,0.85)",
-              borderWidth: 1,
+              borderColor: "#ff8ad8",
+              backgroundColor: "rgba(255,138,216,0.08)",
+              fill: true,
+              tension: 0.3,
+              pointRadius: window.innerWidth < 600 ? 1 : 2,
+              pointHoverRadius: 5,
+              pointBackgroundColor: "#ff8ad8",
+              borderWidth: 2,
             },
           ],
         },
-        options: ctxBaseOpts("Weekly Burn Activity"),
+        options: ctxBaseOpts(),
       });
     }
   }
