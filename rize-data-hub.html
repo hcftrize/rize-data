@@ -825,19 +825,32 @@ html, body { overflow-x: hidden; max-width: 100%; }
     .tok-table .tok-cat { color: var(--text); }
 
     @media(max-width:700px){
-      .ctx-tab { font-size: 12px; padding: 8px 12px; letter-spacing: 1px; }
+      .ctx-tab { font-size: 12px; padding: 8px 10px; letter-spacing: 1px; }
       .ctx-chart-wrap { height: 200px; }
-      .ctx-kpi { min-width: 100px; }
-      .ctx-kpi-value { font-size: 20px; }
+      .ctx-kpi { min-width: 90px; }
+      .ctx-kpi-value { font-size: 18px; }
       .wrap { padding:24px 14px; }
       .hero,.section,.search-section { padding: 18px; }
       h1 { font-size: clamp(28px, 8vw, 48px); }
       .section-title { font-size: 26px; }
       .metrics { grid-template-columns: 1fr 1fr; }
       .metric-value { font-size: 26px; }
-      td { font-size: 15px; }
+      td { font-size: 14px; }
+      th { font-size: 12px; padding: 8px 8px; }
+      td { padding: 8px 8px; }
       .rz-tok-grid { grid-template-columns: 1fr !important; }
       .rz-rev-grid { grid-template-columns: 1fr !important; }
+      /* Unlock tabs — wrap on mobile */
+      #rz-unlock-tabs { flex-wrap: wrap; }
+      #rz-unlock-tabs .ctx-tab { font-size: 11px; padding: 7px 10px; }
+      /* Burns chart height on mobile */
+      #rz-panel-burns .ctx-chart-wrap { height: 180px !important; }
+    }
+
+    /* Unlock sub-tab active state — independent from main ctx-tab active */
+    .rz-unlock-active {
+      color: var(--cyan) !important;
+      border-bottom-color: var(--cyan) !important;
     }
     </style>
 </head>
@@ -973,8 +986,8 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
       <!-- Panel 2 — RIZE Burns -->
       <div class="ctx-panel" id="rz-panel-burns">
-        <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">RIZE Burns — Since TGE</div>
-        <div class="ctx-chart-wrap" style="height:240px"><canvas id="rz-chart-burns"></canvas></div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:4px">RIZE Burns — Since TGE</div>
+        <div class="ctx-chart-wrap" style="height:260px"><canvas id="rz-chart-burns"></canvas></div>
         <div style="margin-top:20px" id="rz-burn-events-table">
           <span style="color:var(--muted);font-size:13px">Loading burn events&hellip;</span>
         </div>
@@ -1021,7 +1034,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:14px">Burn &amp; Supply Unlock Events</div>
           <!-- Tab switcher — same style as main ctx-tabs -->
           <div class="ctx-tabs" id="rz-unlock-tabs">
-            <button class="ctx-tab active" onclick="rzUnlockSwitch('burn',this)">Burn Events (1)</button>
+            <button class="ctx-tab rz-unlock-active" onclick="rzUnlockSwitch('burn',this)">Burn Events (1)</button>
             <button class="ctx-tab" onclick="rzUnlockSwitch('pending',this)">Next Unlocks</button>
             <button class="ctx-tab" onclick="rzUnlockSwitch('ongoing',this)">Ongoing Releases</button>
             <button class="ctx-tab" onclick="rzUnlockSwitch('done',this)">Past Unlocks</button>
@@ -1030,6 +1043,8 @@ html, body { overflow-x: hidden; max-width: 100%; }
             <span style="color:var(--muted);font-size:13px">Loading burn events&hellip;</span>
           </div>
           <div id="rz-unlock-pending" class="rz-unlock-panel" style="display:none">
+            <span style="color:var(--muted);font-size:13px">Computing&hellip;</span>
+          </div>
           <div id="rz-unlock-ongoing" class="rz-unlock-panel" style="display:none">
             <span style="color:var(--muted);font-size:13px">Computing&hellip;</span>
           </div>
@@ -2447,8 +2462,9 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const burnOpts = rzBaseOpts();
       burnOpts.scales.y.title = { display: true, text: "RIZE burned", color: "#b6c1d8", font: { size: 11 } };
       burnOpts.scales.y.ticks.callback = v => rzFmt(v);
-      burnOpts.plugins.legend.labels.padding = 24;
-      burnOpts.layout = { padding: { top: 32 } };
+      burnOpts.plugins.legend.labels.padding = 20;
+      burnOpts.plugins.legend.position = "top";
+      burnOpts.layout = { padding: { top: 8, bottom: 0 } };
       rzCharts.burns = new Chart(cvBurn.getContext("2d"), {
         type: "line",
         data: {
@@ -2507,8 +2523,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   }
 
   function rzUnlockSwitch(tab, btn) {
-    document.querySelectorAll("#rz-unlock-tabs .ctx-tab").forEach(t => t.classList.remove("active"));
-    btn.classList.add("active");
+    document.querySelectorAll("#rz-unlock-tabs .ctx-tab").forEach(t => t.classList.remove("rz-unlock-active"));
+    btn.classList.add("rz-unlock-active");
     ["pending","ongoing","done","burn"].forEach(k => {
       const el = document.getElementById("rz-unlock-" + k);
       if (el) el.style.display = k === tab ? "block" : "none";
@@ -2804,26 +2820,23 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           data: {
             labels,
             datasets: [
-              // Validator — big dominant line with fill, shown first
               {
                 label: "Validator Revenue",
                 data: cumValArr,
-                borderColor: "#98ffb6", backgroundColor: "rgba(152,255,182,0.15)",
+                borderColor: "#98ffb6", backgroundColor: "rgba(152,255,182,0.18)",
                 fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2,
               },
-              // Platform App — independent line below, no fill
               {
                 label: "T-RIZE Platform App",
                 data: cumAppArr,
-                borderColor: "#ffd36b", backgroundColor: "transparent",
-                fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.5,
+                borderColor: "#ffd36b", backgroundColor: "rgba(255,211,107,0.20)",
+                fill: true, tension: 0.35, pointRadius: 0, borderWidth: 1.5,
               },
-              // RIZEScore — independent line at bottom, no fill
               {
                 label: "RIZEScore App",
                 data: cumScoreArr,
-                borderColor: "#ff8ad8", backgroundColor: "transparent",
-                fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.5,
+                borderColor: "#ff8ad8", backgroundColor: "rgba(255,138,216,0.25)",
+                fill: true, tension: 0.35, pointRadius: 0, borderWidth: 1.5,
               },
             ],
           },
