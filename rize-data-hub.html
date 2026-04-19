@@ -801,25 +801,28 @@ html, body { overflow-x: hidden; max-width: 100%; }
     .section.hub-collapsed .screenshot-btn { display: none !important; }
     .section.hub-collapsed .wm-badge { display: none !important; }
 
-    /* Collapsed sub-description: shown only when section is folded */
-    /* Sits on its own line below the titlebar row */
+    /* Collapsed sub-description: shown below via flex order, never breaks the title row */
     .section-collapsed-sub {
       display: none;
       font-size: 15px;
       color: var(--muted);
       font-family: "Trebuchet MS", "Verdana", sans-serif;
-      margin-top: 8px;
       line-height: 1.5;
+      width: 100%;
+      order: 99;
+      padding-top: 8px;
     }
     .section.hub-collapsed .section-collapsed-sub { display: block; }
 
-    /* When collapsed, allow titlebar-row to wrap so sub appears below */
+    /* When collapsed: allow wrap so sub flows below, keep items top-aligned */
     .section.hub-collapsed .section-titlebar-row {
       flex-wrap: wrap;
+      align-items: flex-start;
     }
-    /* The titlebar (title + cyan bar) takes full width when collapsed so sub wraps below */
-    .section.hub-collapsed .section-titlebar-row .section-titlebar {
-      flex: 1 1 100%;
+    /* Toggle always top-aligned so its position matches open state */
+    .section-collapse-toggle {
+      align-self: flex-start;
+      flex-shrink: 0;
     }
 
     /* Mobile — scrollable wide tables & charts */
