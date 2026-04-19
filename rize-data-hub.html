@@ -944,6 +944,14 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div class="ctx-loading" id="rz-loading-weekly">Loading on-chain data&hellip;</div>
           <canvas id="rz-chart-weekly" style="display:none"></canvas>
         </div>
+        <!-- Understand this chart -->
+        <div style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#fff;margin-bottom:6px">Understand This Chart: CC Tokenomics Influence</div>
+          <p style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);line-height:1.7;max-width:760px;margin-bottom:16px">CC tokenomics evolved in a positive way recently for T-RIZE roles on Canton: since January 2026, 62% of the total rewards pool go to featured applications, representing around 516 million CC shared among app providers every month — more than before. The rewards allocated to validators also increased from 12% to 18%.</p>
+          <div class="ctx-chart-wrap" id="rz-chart-cantonomics-wrap" style="height:320px">
+            <canvas id="rz-chart-cantonomics"></canvas>
+          </div>
+        </div>
       </div>
 
       <!-- Panel 2 — RIZE Tokenomics -->
@@ -982,10 +990,17 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">Vesting Schedule — Circulating Supply Over Time</div>
           <div class="ctx-chart-wrap" style="height:300px"><canvas id="rz-chart-vesting"></canvas></div>
         </div>
-        <!-- Next unlock events -->
+        <!-- Next unlock events with pagination -->
         <div style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:14px">Next Supply Unlock Events</div>
-          <div id="rz-unlock-table"><span style="color:var(--muted);font-size:13px">Computing unlock schedule&hellip;</span></div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:14px">(1) Next Supply Unlock Events</div>
+          <div id="rz-unlock-next"><span style="color:var(--muted);font-size:13px">Computing unlock schedule&hellip;</span></div>
+          <div id="rz-unlock-next-pager" style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;align-items:center"></div>
+        </div>
+        <!-- Past unlock events with pagination -->
+        <div style="margin-top:28px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07)">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:14px">(2) Past Supply Unlock Events — Already Circulating</div>
+          <div id="rz-unlock-past"><span style="color:var(--muted);font-size:13px">Computing past unlocks&hellip;</span></div>
+          <div id="rz-unlock-past-pager" style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;align-items:center"></div>
         </div>
       </div>
     </section>
@@ -2356,7 +2371,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   const RZ_GENESIS      = "2024-07-31T00:00:00.000Z";
   const RZ_API_BASE     = "https://lighthouse.fivenorth.io/api/parties";
 
-  const rzCharts = { cumul: null, weekly: null, alloc: null, vesting: null };
+  const rzCharts = { cumul: null, weekly: null, alloc: null, vesting: null, cantonomics: null };
 
   function rzCtxSwitch(tab, btn) {
     const section = document.getElementById("rize-ctx-section");
@@ -2469,14 +2484,13 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         if (!weekMap[wk]) weekMap[wk] = { val: 0, app: 0, score: 0, burn: 0 };
         weekMap[wk].score += parseFloat(r.app_rewards || 0);
       });
-      // Add burns (negative) — both validator + rizescore burns combined
+      // Add burns — correct field is "total_burned"
       const allBurns = [...(valBurns || []), ...(scoreBurns || [])];
       allBurns.forEach(r => {
-        const wk = rzWeekKey(r.time || r.date || "");
+        const wk = rzWeekKey(r.time || "");
         if (!wk) return;
         if (!weekMap[wk]) weekMap[wk] = { val: 0, app: 0, score: 0, burn: 0 };
-        // burns may have field "burn_amount" or "amount"
-        weekMap[wk].burn += parseFloat(r.burn_amount || r.amount || 0);
+        weekMap[wk].burn += parseFloat(r.total_burned || 0);
       });
 
       const weeks  = Object.keys(weekMap).sort();
@@ -2512,7 +2526,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       // KPI boxes
       document.getElementById("rz-kpi-rewards").innerHTML = `
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">Net CC Revenue (Burn Adj.)</span>
+          <span class="ctx-kpi-label">Net CC Revenue</span>
           <span class="ctx-kpi-value" style="color:#7ee0ff">${rzFmt(totalNet)} CC</span>
         </div>
         <div class="ctx-kpi">
@@ -2536,7 +2550,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           <span class="ctx-kpi-value" style="color:#98ffb6">${rzFmt(thisWeekNet)} CC</span>
         </div>`;
 
-      // ── Chart 1: Cumulative — net fill + 3 composition lines, taller ──
+      // ── Chart 1: Cumulative — net fill + 3 solid composition lines, taller ──
       if (rzCharts.cumul) { rzCharts.cumul.destroy(); rzCharts.cumul = null; }
       const cvC  = document.getElementById("rz-chart-cumul");
       cvC.closest(".ctx-chart-wrap").style.height = "380px";
@@ -2550,7 +2564,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           labels,
           datasets: [
             {
-              label: "Net CC Revenue (Burn Adj.)",
+              label: "Net CC Revenue",
               data: cumNetArr,
               borderColor: "#7ee0ff", backgroundColor: "rgba(126,224,255,0.10)",
               fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2.5, order: 4,
@@ -2558,20 +2572,20 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
             {
               label: "Validator Revenue",
               data: cumValArr,
-              borderColor: "rgba(255,255,255,0.55)", backgroundColor: "transparent",
-              fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.5, borderDash: [4,3], order: 1,
+              borderColor: "#98ffb6", backgroundColor: "transparent",
+              fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.8, order: 1,
             },
             {
               label: "T-RIZE Platform App",
               data: cumAppArr,
-              borderColor: "rgba(255,211,107,0.7)", backgroundColor: "transparent",
-              fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.5, borderDash: [4,3], order: 2,
+              borderColor: "#ffd36b", backgroundColor: "transparent",
+              fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.8, order: 2,
             },
             {
               label: "RIZEScore App",
               data: cumScoreArr,
-              borderColor: "rgba(255,138,216,0.7)", backgroundColor: "transparent",
-              fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.5, borderDash: [4,3], order: 3,
+              borderColor: "#ff8ad8", backgroundColor: "transparent",
+              fill: false, tension: 0.35, pointRadius: 0, borderWidth: 1.8, order: 3,
             },
           ],
         },
@@ -2621,8 +2635,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
   function rzRenderTokenomics() {
     const TOTAL = 5_000_000_000;
-    // TGE date: May 15 2025
     const TGE = new Date("2025-05-15T00:00:00Z");
+    const today = new Date();
 
     const categories = [
       { name: "Seed",                alloc: 0.05, cliff: 6,  vest: 12, color: "#98ffb6" },
@@ -2641,8 +2655,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const tokens = TOTAL * cat.alloc;
       if (cat.vest === 0) return tokens;
       if (m < cat.cliff) return 0;
-      const elapsed = m - cat.cliff;
-      return Math.min(tokens, tokens * (elapsed / cat.vest));
+      return Math.min(tokens, tokens * ((m - cat.cliff) / cat.vest));
     }
 
     // ── Doughnut ──
@@ -2664,7 +2677,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       });
     }
 
-    // ── Vesting schedule area chart (months 0–48 from TGE) ──
+    // ── Vesting schedule area chart ──
     const MONTHS = 49;
     const monthLabels = Array.from({length: MONTHS}, (_, i) => "M" + i);
     const cvV = document.getElementById("rz-chart-vesting");
@@ -2689,17 +2702,70 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       });
     }
 
-    // ── Next big unlocks table ──
-    const unlockEl = document.getElementById("rz-unlock-table");
-    if (!unlockEl) return;
+    // ── Cantonomics Current State chart ──
+    if (!rzCharts.cantonomics) {
+      const cvCanto = document.getElementById("rz-chart-cantonomics");
+      if (cvCanto) {
+        const canto_labels = ["H2 2024","H1 2025","H2 2025","H1 2026","H2 2026","H1 2027","H2 2027","H1 2028","H2 2028","H1 2029"];
+        const canto_sv  = [80, 48, 48, 20, 20, 20, 20, 20, 20, 20];
+        const canto_val = [ 5, 12, 12, 18, 18, 18, 18, 18, 18, 18];
+        const canto_app = [15, 40, 40, 62, 62, 62, 62, 62, 62, 62];
+        const cantoOpts = rzBaseOpts();
+        cantoOpts.scales.x.stacked = true;
+        cantoOpts.scales.y.stacked = true;
+        cantoOpts.scales.y.ticks.callback = v => v + "%";
+        cantoOpts.scales.y.max = 100;
+        // Inline datalabels via custom plugin (no CDN needed)
+        const datalabelsPlugin = {
+          id: "rzDatalabels",
+          afterDatasetsDraw(chart) {
+            const ctx = chart.ctx;
+            chart.data.datasets.forEach((ds, i) => {
+              const meta = chart.getDatasetMeta(i);
+              meta.data.forEach((bar, j) => {
+                const val = ds.data[j];
+                if (!val) return;
+                ctx.save();
+                ctx.fillStyle = "#000";
+                ctx.font = "bold 12px Rajdhani, sans-serif";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(val + "%", bar.x, bar.y + bar.height / 2);
+                ctx.restore();
+              });
+            });
+          }
+        };
+        rzCharts.cantonomics = new Chart(cvCanto.getContext("2d"), {
+          type: "bar",
+          plugins: [datalabelsPlugin],
+          data: {
+            labels: canto_labels,
+            datasets: [
+              { label: "Super Validator reward %", data: canto_sv, backgroundColor: "rgba(126,224,255,0.75)", borderColor: "#7ee0ff", borderWidth: 1 },
+              { label: "Validator reward %",        data: canto_val, backgroundColor: "rgba(152,255,182,0.5)", borderColor: "#98ffb6", borderWidth: 1 },
+              { label: "App provider reward %",     data: canto_app, backgroundColor: "rgba(255,211,107,0.75)", borderColor: "#ffd36b", borderWidth: 1 },
+            ],
+          },
+          options: cantoOpts,
+        });
+      }
+    }
 
-    // Generate day-level unlock events from TGE
-    const events = [];
-    const today = new Date();
+    // ── Build all unlock events ──
+    function fmtDate(d) { return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }); }
+
+    const allEvents = [];
     categories.forEach(cat => {
       const tokens = TOTAL * cat.alloc;
       if (cat.vest === 0) {
-        // Fully unlocked at TGE — skip, already in the past
+        // Instant unlock at TGE
+        allEvents.push({
+          date: new Date(TGE), label: cat.name + " — Full unlock at TGE",
+          daily: 0, type: "tge",
+          tokens, cliff: cat.cliff === 0 ? "—" : cat.cliff + "m",
+          vesting: "—", vestEnd: new Date(TGE),
+        });
         return;
       }
       const cliffDate = new Date(TGE);
@@ -2708,50 +2774,107 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const dailyRelease = Math.round(tokens / vestDays);
       const vestEndDate = new Date(cliffDate);
       vestEndDate.setUTCDate(vestEndDate.getUTCDate() + vestDays);
+      // Vesting is ONGOING if cliff has passed AND vest end is in future
+      const vestingActive = cliffDate <= today && vestEndDate > today;
+      // Vesting is PENDING if cliff hasn't passed yet
+      const vestingPending = cliffDate > today;
 
       const milestones = [0, 0.25, 0.5, 0.75, 1.0];
       milestones.forEach(pct => {
         const daysAfterCliff = Math.round(pct * vestDays);
         const d = new Date(cliffDate);
         d.setUTCDate(d.getUTCDate() + daysAfterCliff);
-        if (d < today) return; // skip past milestones
         const label = pct === 0
           ? cat.name + " — Cliff ends, vesting begins"
           : cat.name + " — " + Math.round(pct * 100) + "% vested";
         const type = pct === 0 ? "cliff" : "vest";
-        // Status: ongoing if cliff already passed (vesting in progress), pending otherwise
-        const status = cliffDate <= today ? "ongoing" : "pending";
-        events.push({ date: d, label, daily: dailyRelease, type, status, vestEnd: vestEndDate });
+        // Status: ongoing only if vesting is currently active (cliff passed, not yet done)
+        // pending if cliff hasn't passed yet
+        // completed if vest end has passed
+        let status;
+        if (vestEndDate <= today) { status = "completed"; }
+        else if (vestingPending) { status = "pending"; }
+        else { status = "ongoing"; }
+
+        allEvents.push({
+          date: d, label, daily: dailyRelease, type, status,
+          vestEnd: vestEndDate,
+          tokens: Math.round(tokens),
+          cliff: cat.cliff === 0 ? "0m" : cat.cliff + "m",
+          vesting: cat.vest + "m",
+        });
       });
     });
 
-    events.sort((a, b) => a.date - b.date);
-    const future = events.filter(e => e.date >= today).slice(0, 15);
+    allEvents.sort((a, b) => a.date - b.date);
+    const futureEvents = allEvents.filter(e => e.date >= today);
+    const pastEvents   = allEvents.filter(e => e.date < today).reverse(); // most recent first
 
-    if (!future.length) { unlockEl.innerHTML = '<p style="color:var(--muted);font-size:14px">All major unlock milestones have passed.</p>'; return; }
+    function renderTable(events) {
+      if (!events.length) return '<p style="color:var(--muted);font-size:13px">No events.</p>';
+      return `<div style="overflow-x:auto"><table class="tok-table" style="margin-top:0">
+        <thead><tr>
+          <th>Date</th><th>In / Ago</th><th>Event</th><th>Total RIZE</th><th>Cliff</th><th>Vest</th>
+          <th style="text-align:right">Daily Release</th><th style="text-align:center">Status</th><th>Release End</th>
+        </tr></thead>
+        <tbody>${events.map(e => {
+          const daysLeft = Math.round((e.date - today) / 86400000);
+          const daysAgo  = Math.abs(daysLeft);
+          const timeStr  = daysLeft >= 0 ? daysLeft + "d" : daysAgo + "d ago";
+          const typeColor = e.type === "tge" ? "#98ffb6" : e.type === "cliff" ? "#ffd36b" : "#7ee0ff";
+          let statusBadge;
+          if (e.status === "ongoing") {
+            statusBadge = `<span style="color:#98ffb6;font-size:12px;font-weight:700;letter-spacing:1px">● ONGOING</span>`;
+          } else if (e.status === "pending") {
+            statusBadge = `<span style="color:#ffd36b;font-size:12px;font-weight:700;letter-spacing:1px">● PENDING</span>`;
+          } else {
+            statusBadge = `<span style="color:var(--muted);font-size:12px;font-weight:700;letter-spacing:1px">✓ DONE</span>`;
+          }
+          const dailyStr = e.daily > 0 ? e.daily.toLocaleString() + " RIZE/day" : "—";
+          const totalStr = e.tokens ? (e.tokens / 1e6).toFixed(0) + "M RIZE" : "—";
+          return `<tr>
+            <td style="color:${typeColor};white-space:nowrap">${fmtDate(e.date)}</td>
+            <td style="color:var(--muted)">${timeStr}</td>
+            <td style="min-width:220px">${e.label}</td>
+            <td style="color:#fff">${totalStr}</td>
+            <td style="color:var(--muted)">${e.cliff || "—"}</td>
+            <td style="color:var(--muted)">${e.vesting || "—"}</td>
+            <td style="color:#fff;text-align:right">${dailyStr}</td>
+            <td style="text-align:center;white-space:nowrap">${statusBadge}</td>
+            <td style="color:var(--muted);white-space:nowrap">${e.vestEnd ? fmtDate(e.vestEnd) : "—"}</td>
+          </tr>`;
+        }).join("")}</tbody>
+      </table></div>`;
+    }
 
-    function fmtDate(d) { return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }); }
+    function renderPaginated(events, containerEl, pagerEl, perPage) {
+      let page = 0;
+      const pages = Math.ceil(events.length / perPage);
+      function render() {
+        const slice = events.slice(page * perPage, page * perPage + perPage);
+        containerEl.innerHTML = renderTable(slice);
+        // Pager
+        let pagerHtml = `<span style="color:var(--muted);font-size:13px;margin-right:8px">${events.length} events</span>`;
+        for (let i = 0; i < pages; i++) {
+          pagerHtml += `<button onclick="this.closest('[data-pager]') && this.closest('[data-pager]').dispatchEvent(new CustomEvent('rzpage',{detail:${i}}))" 
+            style="padding:4px 10px;background:${i===page?'rgba(126,224,255,0.2)':'rgba(255,255,255,0.05)'};border:1px solid ${i===page?'var(--cyan)':'rgba(255,255,255,0.15)'};color:${i===page?'var(--cyan)':'var(--muted)'};font-family:Rajdhani,sans-serif;font-size:13px;cursor:pointer">${i+1}</button>`;
+        }
+        pagerEl.innerHTML = pagerHtml;
+        // Wire buttons
+        pagerEl.querySelectorAll("button").forEach((btn, i) => {
+          btn.onclick = () => { page = i; render(); };
+        });
+      }
+      render();
+    }
 
-    const rows = future.map(e => {
-      const daysLeft = Math.round((e.date - today) / 86400000);
-      const typeColor = e.type === "cliff" ? "#ffd36b" : "#7ee0ff";
-      const statusBadge = e.status === "ongoing"
-        ? `<span style="color:#98ffb6;font-size:12px;font-weight:700;letter-spacing:1px">● ONGOING</span>`
-        : `<span style="color:var(--muted);font-size:12px;font-weight:700;letter-spacing:1px">○ PENDING</span>`;
-      return `<tr>
-        <td style="color:${typeColor};white-space:nowrap">${fmtDate(e.date)}</td>
-        <td style="color:var(--muted)">${daysLeft}d</td>
-        <td>${e.label}</td>
-        <td style="color:#fff;text-align:right">${e.daily.toLocaleString()} RIZE/day</td>
-        <td style="white-space:nowrap;text-align:center">${statusBadge}</td>
-        <td style="color:var(--muted);white-space:nowrap">${fmtDate(e.vestEnd)}</td>
-      </tr>`;
-    }).join("");
+    const nextEl = document.getElementById("rz-unlock-next");
+    const nextPagerEl = document.getElementById("rz-unlock-next-pager");
+    const pastEl = document.getElementById("rz-unlock-past");
+    const pastPagerEl = document.getElementById("rz-unlock-past-pager");
 
-    unlockEl.innerHTML = `<table class="tok-table" style="margin-top:0">
-      <thead><tr><th>Date</th><th>In</th><th>Event</th><th style="text-align:right">Daily Release</th><th style="text-align:center">Status</th><th>Release End</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
+    if (nextEl && nextPagerEl) renderPaginated(futureEvents, nextEl, nextPagerEl, 5);
+    if (pastEl && pastPagerEl) renderPaginated(pastEvents, pastEl, pastPagerEl, 5);
   }
 
   document.addEventListener("DOMContentLoaded", rzLoad);
