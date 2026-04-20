@@ -1002,16 +1002,75 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
         <button class="screenshot-btn" onclick="takeScreenshot('rize-ctx-section','rize-context')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
       </div>
-      <p class="section-sub">T-RIZE public revenue on Canton Network &amp; RIZE tokenomics — Data source : Lighthouse by Five North and Rizenet docs</p>
+      <p class="section-sub">T-RIZE revenue &amp; RIZE tokenomics. Canton source : Lighthouse by Five North.</p>
 
       <div class="ctx-tabs">
-        <button class="ctx-tab active" onclick="rzCtxSwitch('rewards',this)">T-RIZE Canton Revenue</button>
+        <button class="ctx-tab active" onclick="rzCtxSwitch('rwa',this)">T-RIZE RWA Revenue</button>
+        <button class="ctx-tab" onclick="rzCtxSwitch('rewards',this)">T-RIZE Canton Revenue</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('burns',this)">RIZE Burns</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('tokenomics',this)">RIZE Tokenomics</button>
       </div>
 
+      <!-- Panel 0 — T-RIZE RWA Revenue -->
+      <div class="ctx-panel active" id="rz-panel-rwa">
+
+        <!-- Chart -->
+        <div style="margin-bottom:24px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px">T-RIZE RWA Tokenization Revenue — Cumulative (USD)</div>
+          <div class="ctx-chart-wrap" style="height:260px">
+            <canvas id="rz-chart-rwa"></canvas>
+          </div>
+        </div>
+
+        <!-- Revenue table -->
+        <div style="margin-top:4px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">Public Revenue Entries</div>
+          <div style="overflow-x:auto">
+            <table class="tok-table" style="margin-top:0">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Project</th>
+                  <th>Tranche</th>
+                  <th>Tokenization Fees</th>
+                  <th>Est. Fees</th>
+                  <th>Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="color:var(--muted);white-space:nowrap">03/25</td>
+                  <td style="color:#fff;font-weight:700">VISION 87</td>
+                  <td style="color:var(--muted)">1st tranche</td>
+                  <td style="color:#98ffb6;font-weight:700">$210,000</td>
+                  <td style="color:var(--muted)">—</td>
+                  <td><a href="https://vision85.com/#Proceeds" target="_blank" rel="noopener" style="color:var(--cyan);font-family:'DM Mono',monospace;font-size:12px">vision85.com ↗</a></td>
+                </tr>
+                <tr>
+                  <td style="color:var(--muted);white-space:nowrap">08/25</td>
+                  <td style="color:#fff;font-weight:700">VISION 60</td>
+                  <td style="color:var(--muted)">1st tranche</td>
+                  <td style="color:var(--muted);font-style:italic">Unknown / NDA</td>
+                  <td style="color:var(--muted)">Unknown</td>
+                  <td style="color:var(--muted)">—</td>
+                </tr>
+                <tr>
+                  <td style="color:var(--muted);white-space:nowrap">03/26</td>
+                  <td style="color:#fff;font-weight:700">KAIROS PROGRAMME</td>
+                  <td style="color:var(--muted)">1st tranche</td>
+                  <td style="color:var(--muted);font-style:italic">Unknown / NDA</td>
+                  <td style="color:var(--muted)">Unknown</td>
+                  <td style="color:var(--muted)">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- end rz-panel-rwa -->
+
       <!-- Panel 1 — T-RIZE CC Rewards -->
-      <div class="ctx-panel active" id="rz-panel-rewards">
+      <div class="ctx-panel" id="rz-panel-rewards">
         <!-- Single chart with toggle -->
         <div style="margin-bottom:24px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
@@ -2515,7 +2574,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   const RZ_GENESIS      = "2024-07-31T00:00:00.000Z";
   const RZ_API_BASE     = "https://lighthouse.fivenorth.io/api/parties";
 
-  const rzCharts = { cumul: null, sources: null, weekly: null, alloc: null, vesting: null, cantonomics: null, burns: null };
+  const rzCharts = { rwa: null, cumul: null, sources: null, weekly: null, alloc: null, vesting: null, cantonomics: null, burns: null };
 
   function rzCtxSwitch(tab, btn) {
     const section = document.getElementById("rize-ctx-section");
@@ -2523,13 +2582,170 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     btn.classList.add("active");
     section.querySelectorAll(".ctx-panel").forEach(p => p.classList.remove("active"));
     document.getElementById("rz-panel-" + tab).classList.add("active");
-    if (tab === "tokenomics") {
+    if (tab === "rwa") {
+      setTimeout(() => rzRenderRwaChart(), 50);
+    } else if (tab === "tokenomics") {
       setTimeout(() => { if (!rzCharts.alloc) rzRenderTokenomics(); else rzRenderCantoChart(); }, 50);
     } else if (tab === "rewards") {
       setTimeout(() => rzRenderCantoChart(), 50);
     } else if (tab === "burns") {
       setTimeout(() => rzRenderBurnsPanel(), 50);
     }
+  }
+
+  /* ─── RWA Revenue chart ──────────────────────────────────────────────── */
+  function rzRenderRwaChart() {
+    const cv = document.getElementById("rz-chart-rwa");
+    if (!cv) return;
+    if (rzCharts.rwa) { rzCharts.rwa.update(); return; }
+
+    // RWA revenue data points — add entries here as new data becomes available
+    // { date: "YYYY-MM-DD", label: "Project Name", amount: USD_value_or_null }
+    const rwaEntries = [
+      { date: "2025-03-01", label: "VISION 87",        amount: 210000 },
+      { date: "2025-08-01", label: "VISION 60",         amount: null   },
+      { date: "2026-03-01", label: "KAIROS PROGRAMME",  amount: null   },
+    ];
+
+    // Build a monthly timeline from first entry to today
+    const startDate = new Date("2025-01-01T00:00:00Z");
+    const today     = new Date();
+    const labels    = [];
+    const cumData   = [];   // cumulative confirmed revenue
+    const pointData = [];   // null except at named project dates
+    const pointLabels = []; // label for each named point
+
+    let cumSum = 0;
+    let cur = new Date(startDate);
+    while (cur <= today) {
+      const iso = cur.toISOString().slice(0, 7); // YYYY-MM
+      const label = cur.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+      labels.push(label);
+
+      // Add revenue if a known entry falls in this month
+      rwaEntries.forEach(e => {
+        if (e.date.slice(0, 7) === iso && e.amount !== null) {
+          cumSum += e.amount;
+        }
+      });
+      cumData.push(cumSum);
+
+      // Named point annotation
+      const namedEntry = rwaEntries.find(e => e.date.slice(0, 7) === iso);
+      pointData.push(namedEntry ? (cumSum || 0) : null);
+      pointLabels.push(namedEntry ? namedEntry.label : null);
+
+      cur.setUTCMonth(cur.getUTCMonth() + 1);
+    }
+
+    const opts = rzBaseOpts();
+    opts.scales.y.title = { display: true, text: "USD", color: "#b6c1d8", font: { size: 11 } };
+    opts.scales.y.ticks.callback = v => {
+      if (v >= 1e6) return "$" + (v / 1e6).toFixed(1) + "M";
+      if (v >= 1000) return "$" + (v / 1000).toFixed(0) + "K";
+      return "$" + v;
+    };
+    opts.plugins.tooltip.callbacks = {
+      label: function(c) {
+        if (c.datasetIndex === 0) {
+          return " Cumulative Revenue: $" + c.parsed.y.toLocaleString();
+        }
+        const lbl = pointLabels[c.dataIndex];
+        const entry = rwaEntries.find(e => e.label === lbl);
+        if (!entry) return "";
+        const feeStr = entry.amount !== null ? "$" + entry.amount.toLocaleString() : "Unknown / NDA";
+        return [" Project: " + lbl, " Fees: " + feeStr];
+      },
+      title: function(items) {
+        return items[0].label;
+      }
+    };
+
+    rzCharts.rwa = new Chart(cv.getContext("2d"), {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Cumulative RWA Revenue",
+            data: cumData,
+            borderColor: "#7ee0ff",
+            backgroundColor: "rgba(126,224,255,0.12)",
+            fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2.5,
+            order: 2,
+          },
+          {
+            label: "Project Milestone",
+            data: pointData,
+            borderColor: "transparent",
+            backgroundColor: "#ffd36b",
+            pointRadius: 7,
+            pointHoverRadius: 10,
+            pointStyle: "circle",
+            pointBorderColor: "#ffd36b",
+            pointBorderWidth: 2,
+            showLine: false,
+            order: 1,
+          },
+        ],
+      },
+      options: opts,
+    });
+
+    // Draw project labels above milestone points
+    const labelPlugin = {
+      id: "rzRwaLabels",
+      afterDatasetsDraw(chart) {
+        if (window.innerWidth < 500) return;
+        const meta = chart.getDatasetMeta(1);
+        const ctx2 = chart.ctx;
+        meta.data.forEach(function(point, i) {
+          const lbl = pointLabels[i];
+          if (!lbl) return;
+          ctx2.save();
+          ctx2.font = "bold 11px Rajdhani, sans-serif";
+          ctx2.fillStyle = "#ffd36b";
+          ctx2.textAlign = "center";
+          ctx2.textBaseline = "bottom";
+          ctx2.fillText(lbl, point.x, point.y - 10);
+          ctx2.restore();
+        });
+      }
+    };
+
+    // Re-register with label plugin
+    rzCharts.rwa.destroy();
+    rzCharts.rwa = new Chart(cv.getContext("2d"), {
+      type: "line",
+      plugins: [labelPlugin],
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Cumulative RWA Revenue",
+            data: cumData,
+            borderColor: "#7ee0ff",
+            backgroundColor: "rgba(126,224,255,0.12)",
+            fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2.5,
+            order: 2,
+          },
+          {
+            label: "Project Milestone",
+            data: pointData,
+            borderColor: "transparent",
+            backgroundColor: "#ffd36b",
+            pointRadius: 7,
+            pointHoverRadius: 10,
+            pointStyle: "circle",
+            pointBorderColor: "#ffd36b",
+            pointBorderWidth: 2,
+            showLine: false,
+            order: 1,
+          },
+        ],
+      },
+      options: opts,
+    });
   }
 
   let rzBurnAdjVisible = false;
@@ -3172,6 +3388,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   }
 
   document.addEventListener("DOMContentLoaded", rzLoad);
+  // RWA is the default active tab — render its chart on load
+  document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(rzRenderRwaChart, 100);
+  });
 
   // Dismiss chart tooltips on tap outside canvas (mobile)
   document.addEventListener("click", function(e) {
