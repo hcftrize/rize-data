@@ -869,10 +869,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
       .tok-vest-full  { display: none; }
       .tok-vest-short { display: inline; }
     }
-    .tok-table th { background: rgba(126,224,255,0.06); color: var(--muted); font-size: 12px;
+    .tok-table th { background: rgba(126,224,255,0.06); color: var(--muted); font-size: 16px;
       text-transform: uppercase; letter-spacing: 1.2px; padding: 10px 12px; text-align: left;
       font-family: "Trebuchet MS", sans-serif; border-bottom: 1px solid rgba(255,255,255,0.08); }
-    .tok-table td { padding: 10px 12px; font-size: 16px; font-family: 'Rajdhani', sans-serif;
+    .tok-table td { padding: 10px 12px; font-size: 20px; font-family: 'Rajdhani', sans-serif;
       font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.05); color: #fff; }
     .tok-table tr:last-child td { font-weight: 700; color: var(--cyan); border-top: 1px solid rgba(126,224,255,0.2); border-bottom: none; }
     .tok-table .tok-cat { color: var(--text); }
@@ -1016,7 +1016,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
         <!-- Chart -->
         <div style="margin-bottom:24px">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px">T-RIZE RWA Tokenization Revenue — Cumulative (USD)</div>
+          <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px;text-align:center">T-RIZE RWA Tokenization Revenue — Cumulative (USD)</div>
           <div class="ctx-chart-wrap" style="height:260px">
             <canvas id="rz-chart-rwa"></canvas>
           </div>
@@ -1078,7 +1078,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <!-- Single chart with toggle -->
         <div style="margin-bottom:24px">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
-            <div id="rz-chart-main-label" style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted)">T-RIZE Cumulative CC Revenue by Source</div>
+            <div id="rz-chart-main-label" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;flex:1">T-RIZE Cumulative CC Revenue by Source</div>
             <button id="rz-toggle-burn-adj" onclick="rzToggleBurnAdjChart()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.15);padding:6px 14px;cursor:pointer;transition:background 0.15s,color 0.15s;white-space:nowrap">Display Burn Adjusted ↗</button>
           </div>
           <div class="ctx-chart-wrap" id="rz-chart-sources-wrap" style="height:260px">
@@ -1095,7 +1095,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <!-- KPI boxes -->
         <div class="ctx-kpi-row" id="rz-kpi-rewards"></div>
         <!-- Weekly breakdown chart -->
-        <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-top:28px;margin-bottom:8px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.07)">Weekly Revenue Breakdown</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-top:28px;margin-bottom:8px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.07);text-align:center">Weekly Revenue Breakdown</div>
         <div class="ctx-chart-wrap" id="rz-chart-weekly-wrap" style="height:260px">
           <div class="ctx-loading" id="rz-loading-weekly">Loading on-chain data&hellip;</div>
           <canvas id="rz-chart-weekly" style="display:none"></canvas>
@@ -1103,13 +1103,13 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <!-- Understand CC tokenomics influence -->
         <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.07)">
           <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px">Understand CC Tokenomics Influence</div>
-          <p style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:0">CC tokenomics evolved in a positive way recently for T-RIZE roles in Canton: since January 2026, 62% of the total rewards pool go to featured applications, representing around 516 million CC shared among app providers every month. The rewards allocated to validators also increased from 12% to 18%.</p>
+          <p style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:0">CC tokenomics shifted positively for T-RIZE: since Jan 2026, 62% of rewards go to app providers (~516M CC/month), and validator allocation rose from 12% to 18%. Yet T-RIZE validator revenue declined — because the CC burn/mint ratio is approaching equilibrium. More CC burned &amp; less minted shrinks CC unit rewards, but supports CC price appreciation. Track these dynamics in the CC Market Data Hub.</p>
         </div>
       </div>
 
       <!-- Panel 2 — RIZE Burns -->
       <div class="ctx-panel" id="rz-panel-burns">
-        <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:4px">RIZE Burns — Since TGE</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px;text-align:center">RIZE Burns — Since TGE</div>
         <div class="ctx-chart-wrap" style="height:260px"><canvas id="rz-chart-burns"></canvas></div>
         <div style="margin-top:20px" id="rz-burn-events-table">
           <span style="color:var(--muted);font-size:13px">Loading burn events&hellip;</span>
@@ -1127,7 +1127,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
           </div>
           <!-- Table -->
           <div>
-            <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px">Allocation &amp; Vesting Schedule<span class="tok-title-desktop"> — <span style="color:var(--cyan)">5B RIZE Tokens</span></span></div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:12px;text-align:center">Allocation &amp; Vesting Schedule<span class="tok-title-desktop"> — <span style="color:var(--cyan)">5B RIZE Tokens</span></span></div>
             <div style="overflow-x:auto">
             <table class="tok-table">
               <thead><tr><th>Category</th><th>%</th><th>Tokens</th><th>Cliff</th><th><span class="tok-vest-full">Vesting</span><span class="tok-vest-short">Vest.</span></th></tr></thead>
