@@ -192,6 +192,18 @@ html,body{overflow-x:hidden;max-width:100%;}
   .lc-sep{margin:0 16px;}
   .ib-text{text-align:left!important;}
   p,.ib-text{text-align:left!important;}
+
+  /* Token Standards — 2 cols, ISO last takes full width */
+  #standards-grid{grid-template-columns:repeat(2,1fr)!important;padding-left:16px!important;padding-right:16px!important;}
+  #standards-grid .std-bubble:last-child{grid-column:1/-1;}
+
+  /* Reg tags — bigger tap targets on mobile */
+  .reg-tag{font-size:13px!important;padding:8px 16px!important;margin-bottom:6px!important;}
+  .reg-tags{gap:8px!important;}
+
+  /* EY chart — slidable on mobile */
+  #ey-chart-wrap{overflow-x:auto!important;-webkit-overflow-scrolling:touch;}
+  #ey-chart-wrap svg{min-width:600px!important;width:600px!important;}
 }
 @media(max-width:600px){
   .actor-grid,.asset-grid{grid-template-columns:1fr;}
@@ -519,7 +531,7 @@ html,body{overflow-x:hidden;max-width:100%;}
      MODULE 7 — REGULATORY FRAMEWORKS
 ═══════════════════════════════════════════════════════ -->
 <div class="lc collapsed" id="reg-lc">
-  <div class="lc-header" onclick="toggleLc('reg-lc');regAutoOpen();">
+  <div class="lc-header" onclick="toggleLc('reg-lc')">
     <div class="lc-header-text">
       <h2><span class="mod-num">07</span> STO Regulatory Frameworks</h2>
       <p>How the US and EU approach security token offerings — exemptions, frameworks, and the evolving legal landscape</p>
@@ -727,26 +739,39 @@ document.addEventListener('DOMContentLoaded', function() {
   // Defer Citi chart to when assets module is opened (DOM element may not be ready)
 });
 
-/* Patch toggleLc to trigger chart renders on first open */
+/* Patch toggleLc to trigger chart renders and pre-fill learn boxes on first open */
 const _origToggle = window.toggleLc;
 window.toggleLc = function(id) {
   _origToggle(id);
-  if (id === 'market-lc') {
-    setTimeout(function() {
+  const lc = document.getElementById(id);
+  const isOpen = lc && !lc.classList.contains('collapsed');
+  if (!isOpen) return;
+
+  setTimeout(function() {
+    // Module 02 — Globe: pre-fill first benefit
+    if (id === 'benefits-lc' && !window._benefitsInited) {
+      window._benefitsInited = true;
+      globeIdx = 0;
+      globeSetLabel(0);
+      renderGlobeDots();
+      pick('benefits', GLOBE_ITEMS[0].key);
+    }
+    // Module 04 — Monitor: pre-fill first actor
+    if (id === 'actors-lc' && !window._actorsInited) {
+      window._actorsInited = true;
+      actorIdx = 0;
+      actorSetMonitor(0);
+      renderActorDots();
+      pick('actors', ACTOR_ITEMS[0].key);
+    }
+    // Module 06 — Market: render citi chart
+    if (id === 'market-lc') {
       const w = document.getElementById('citi-chart-wrap');
       if (w && !w._rendered) { renderCitiChart(); w._rendered = true; }
-    }, 50);
-  }
-};
-
-/* Auto-open first reg sub-item when module header clicked */
-window.regAutoOpen = function() {
-  // Only fire when the module is being opened (not closed)
-  const lc = document.getElementById('reg-lc');
-  if (!lc) return;
-  // It's toggled before this runs, so if NOT collapsed = just opened
-  setTimeout(function() {
-    if (!lc.classList.contains('collapsed')) {
+    }
+    // Module 07 — Reg: pre-fill Howey Test
+    if (id === 'reg-lc' && !window._regInited) {
+      window._regInited = true;
       pickReg('us', 'howey');
     }
   }, 60);
