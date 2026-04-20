@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Asset Tokenization Industry — Learn Center — Tokerize</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+@font-face{font-family:'Rajdhani';src:url('/assets/fonts/rajdhani.semibold.ttf') format('truetype');font-weight:600;font-style:normal;}
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap');
+:root{--black:#000;--navy:#0d2d4e;--navy2:#1a3a5c;--bluelt:#e8f0f7;--white:#fff;--off:#f7f7f5;--text:#111;--muted:#666;--border:#e0e0e0;--shadow:0 2px 20px rgba(0,0,0,0.08);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text);min-height:100vh;}
+.site-header{width:100%;background:var(--black);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:96px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,0.08);}
+.site-header-logo img{height:72px;display:block;}
+.site-nav{display:flex;align-items:center;gap:0;}
+.site-nav a{color:rgba(255,255,255,1.0);text-decoration:none;font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:6px 20px;transition:color 0.2s;border-right:1px solid rgba(255,255,255,0.1);}
+.site-nav a:first-child{border-left:1px solid rgba(255,255,255,0.1);}
+.site-nav a:hover{color:#fff;}
+.site-nav a.nav-hub{color:#fff;background:var(--navy);border:none;padding:8px 20px;margin-left:16px;letter-spacing:1.5px;transition:background 0.2s;}
+.site-nav a.nav-hub:hover{background:var(--navy2);}
+.site-footer{background:var(--black);color:rgba(255,255,255,0.5);padding:40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-top:80px;border-top:1px solid rgba(255,255,255,0.08);}
+.footer-logo img{height:60px;opacity:1;}
+.footer-nav{display:flex;gap:24px;}
+.footer-nav a{color:rgba(255,255,255,1.0);text-decoration:none;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;letter-spacing:2px;text-transform:uppercase;transition:color 0.2s;}
+.footer-nav a:hover{color:#fff;}
+.footer-copy{font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.85);}
+.footer-disclaimer{font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.3px;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:#f0f0f0;}::-webkit-scrollbar-thumb{background:var(--navy);}
+@media(max-width:768px){
+  .site-header{padding:0 16px;height:68px;}.site-header-logo img{height:48px;}
+  .site-nav a{font-size:11px;padding:5px 10px;letter-spacing:1.2px;}
+  .site-nav a.nav-hub{margin-left:8px;padding:6px 12px;}
+  .site-footer{flex-direction:column;align-items:flex-start;padding:28px 16px;gap:16px;}
+}
+
+/* ═══ HERO ═══ */
+.eco-hero{background:var(--black);padding:48px 40px 40px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:48px;}
+.back-to-hub{display:inline-flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,0.35);padding:6px 16px;margin-bottom:24px;background:rgba(255,255,255,0.07);transition:background 0.2s;}
+.back-to-hub:hover{background:rgba(255,255,255,0.14);}
+.eco-eyebrow{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:14px;display:block;}
+.eco-hero h1{font-family:'Rajdhani',sans-serif;font-size:clamp(28px,4vw,52px);font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#fff;margin-bottom:12px;}
+.eco-hero p{font-family:'DM Mono',monospace;font-size:14px;color:rgba(255,255,255,0.75);line-height:1.7;max-width:640px;}
+
+/* ═══ LAYOUT ═══ */
+.eco-wrap{max-width:1200px;margin:0 auto;padding:0 28px 80px;}
+
+/* ═══ MODULE (LC = Learn Container) ═══ */
+.lc{margin-bottom:48px;border:1px solid #e0e0e0;border-top:3px solid var(--navy);background:#fff;}
+.lc-header{padding:28px 32px 20px;display:flex;align-items:flex-start;justify-content:space-between;cursor:pointer;user-select:none;}
+.lc-header-text{flex:1;}
+.lc-header h2{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--navy);margin:0 0 4px;}
+.lc-header p{font-family:'DM Mono',monospace;font-size:13px;color:#555;margin:4px 0 0;}
+.lc-toggle{width:32px;height:32px;border:1px solid #dde4ed;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:16px;margin-top:2px;transition:background 0.15s,border-color 0.15s;}
+.lc-toggle svg{transition:transform 0.28s ease;}
+.lc-toggle:hover{background:#eef3f8;border-color:var(--navy);}
+.lc-body{overflow:hidden;transition:max-height 0.35s ease,opacity 0.28s ease;max-height:4000px;opacity:1;}
+.lc-body.collapsed{max-height:0;opacity:0;}
+.lc.collapsed .lc-toggle svg{transform:rotate(-90deg);}
+
+/* ═══ MODULE NUMBER BADGE ═══ */
+.mod-num{display:inline-flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:var(--navy);color:#fff;padding:4px 14px;margin-right:12px;vertical-align:middle;line-height:1;}
+
+/* ═══ INTERACTIVE CHARTS ═══ */
+.chart-section{padding:20px 32px 0;}
+.chart-title{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--navy);margin-bottom:16px;}
+.chart-source{font-family:'DM Mono',monospace;font-size:10px;color:#aaa;margin-top:8px;letter-spacing:0.3px;}
+
+/* SVG Bar Chart */
+.chart-svg-wrap{width:100%;overflow-x:auto;}
+.chart-svg-wrap svg{display:block;}
+
+/* Pie chart wrap */
+.pie-wrap{display:flex;align-items:center;gap:32px;flex-wrap:wrap;}
+.pie-legend{display:flex;flex-direction:column;gap:8px;}
+.pie-legend-item{display:flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:12px;color:#333;}
+.pie-legend-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0;}
+
+/* ═══ BUBBLE GRIDS ═══ */
+.bubble-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:20px 32px 0;}
+.bubble-grid-2{grid-template-columns:repeat(2,1fr);}
+.bubble-grid-3{grid-template-columns:repeat(3,1fr);}
+.bubble-grid-5{grid-template-columns:repeat(5,1fr);}
+.bubble-grid-6{grid-template-columns:repeat(6,1fr);}
+
+.bubble{display:flex;flex-direction:column;align-items:center;padding:20px 14px;border:1px solid #e8e8e8;cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s;text-align:center;background:#fafafa;user-select:none;min-height:100px;justify-content:center;}
+.bubble:hover{border-color:var(--navy);box-shadow:0 2px 10px rgba(13,45,78,0.08);}
+.bubble.on{border-color:var(--navy);background:#eef3f8;}
+.b-icon{font-size:28px;margin-bottom:10px;line-height:1;}
+.b-name{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#111;line-height:1.2;}
+.b-sub{font-family:'DM Mono',monospace;font-size:11px;color:#888;margin-top:4px;}
+
+/* Standard bubbles — token standards */
+.std-bubble{display:flex;flex-direction:column;padding:18px 20px;border:1px solid #e8e8e8;cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s;background:#fafafa;user-select:none;}
+.std-bubble:hover{border-color:var(--navy);box-shadow:0 2px 8px rgba(13,45,78,0.08);}
+.std-bubble.on{border-color:var(--navy);background:#eef3f8;}
+.std-id{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--navy);letter-spacing:1px;margin-bottom:4px;}
+.std-name{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;color:#333;margin-bottom:8px;}
+.std-tag{display:inline-block;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border:1px solid #dde4ed;color:#666;margin-right:4px;margin-bottom:4px;}
+.std-tag.fungible{border-color:#b8cce0;color:#0d2d4e;background:#eef3f8;}
+.std-tag.security{border-color:#a8d8bc;color:#1a7a4a;background:#e8f5ee;}
+.std-tag.nft{border-color:#d8c8a0;color:#7a5a1a;background:#f5f0e8;}
+.std-tag.iso{border-color:#e0b0b0;color:#a02020;background:#faeaea;}
+
+/* Regulatory boxes */
+.reg-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:20px 32px 0;}
+.reg-box{border:2px solid #dde4ed;background:#f7f9fc;cursor:pointer;transition:border-color 0.2s;}
+.reg-box:hover{border-color:var(--navy);}
+.reg-box.on{border-color:var(--navy);background:#eef3f8;}
+.reg-box-header{padding:16px 20px;border-bottom:1px solid #e0e0e0;}
+.reg-flag{font-size:22px;margin-right:10px;}
+.reg-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);}
+.reg-subtitle{font-family:'DM Mono',monospace;font-size:11px;color:#888;margin-top:2px;}
+.reg-body{padding:14px 20px;}
+.reg-tags{display:flex;flex-wrap:wrap;gap:6px;}
+.reg-tag{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border:1px solid #dde4ed;color:#555;background:#fff;cursor:pointer;transition:all 0.15s;}
+.reg-tag:hover,.reg-tag.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* ═══ INFO BOX ═══ */
+.info-box{margin:20px 32px 32px;border:1px solid #e0e0e0;border-left:3px solid var(--navy);background:#f7f9fc;padding:24px 28px;min-height:80px;}
+.ib-prompt{font-family:'DM Mono',monospace;font-size:13px;color:#777;font-style:italic;}
+.ib-title{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);margin-bottom:14px;display:none;}
+.ib-text{font-family:'DM Mono',monospace;font-size:14px;color:#111;line-height:1.85;text-align:justify;display:none;}
+.ib-tag{display:inline-block;font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;background:var(--navy);padding:3px 10px;margin-bottom:12px;}
+.ib-highlight{background:#eef3f8;border-left:3px solid var(--navy);padding:12px 16px;margin-top:14px;font-family:'DM Mono',monospace;font-size:13px;color:#333;line-height:1.7;}
+
+
+/* ═══ SEPARATOR ═══ */
+.lc-sep{height:1px;background:#ebebeb;margin:0 32px;}
+
+/* ═══ GLOBE 3D ═══ */
+#globe-svg { perspective: 600px; transform-style: preserve-3d; transition: transform 0.2s ease; }
+
+/* ═══ MONITOR OVERLAY ═══ */
+#actors-monitor-section { user-select: none; }
+#monitor-btn-wrap { display: flex; align-items: center; justify-content: center; }
+
+/* ═══ CHART WRAPPERS ═══ */
+#ey-chart-section, #re-chart-section { border-top: 1px solid #ebebeb; margin-top: 8px; }
+
+/* Module 06 — mobile horizontal scroll for citi chart */
+@media(max-width:700px){
+  #citi-chart-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #citi-chart-wrap svg { min-width: 560px; width: 560px; }
+}
+
+
+/* ═══ ASSET CHART WRAP ═══ */
+.rwa-chart-wrap{padding:20px 32px 0;overflow-x:auto;}
+
+/* Actor grid */
+.actor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:20px 32px 0;}
+.actor-card{border:1px solid #e8e8e8;background:#fafafa;cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s;padding:20px;}
+.actor-card:hover{border-color:var(--navy);box-shadow:0 2px 8px rgba(13,45,78,0.08);}
+.actor-card.on{border-color:var(--navy);background:#eef3f8;}
+.actor-icon{font-size:24px;margin-bottom:10px;}
+.actor-name{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--navy);margin-bottom:6px;}
+.actor-short{font-family:'DM Mono',monospace;font-size:12px;color:#666;line-height:1.5;}
+
+/* ═══ ASSET CLASS BUBBLES ═══ */
+.asset-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:20px 32px 0;}
+.asset-card{border:1px solid #e8e8e8;background:#fafafa;cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s;padding:24px 20px;text-align:center;}
+.asset-card:hover{border-color:var(--navy);box-shadow:0 2px 8px rgba(13,45,78,0.08);}
+.asset-card.on{border-color:var(--navy);background:#eef3f8;}
+.asset-icon{font-size:36px;margin-bottom:12px;}
+.asset-name{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);margin-bottom:6px;}
+.asset-sub{font-family:'DM Mono',monospace;font-size:11px;color:#888;}
+
+/* Mobile */
+html,body{overflow-x:hidden;max-width:100%;}
+.nav-toggle{display:none;}
+.nav-toggle-label{display:none;cursor:pointer;flex-direction:column;gap:5px;padding:8px;margin-left:auto;}
+.nav-toggle-label span{display:block;width:24px;height:2px;background:#fff;transition:transform 0.2s,opacity 0.2s;}
+.nav-toggle:checked ~ .site-nav{display:flex;}
+.nav-toggle:checked + .nav-toggle-label span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.nav-toggle:checked + .nav-toggle-label span:nth-child(2){opacity:0;}
+.nav-toggle:checked + .nav-toggle-label span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+@media(max-width:768px){
+  .nav-toggle-label{display:flex;}
+  .site-nav{display:none;position:absolute;top:68px;left:0;right:0;background:#000;flex-direction:column;gap:0;z-index:99;border-bottom:1px solid rgba(255,255,255,0.1);padding:8px 0;}
+  .site-nav a{font-size:14px!important;padding:12px 20px!important;border-right:none!important;border-left:none!important;border-bottom:1px solid rgba(255,255,255,0.07);letter-spacing:1.5px!important;width:100%;}
+  .site-nav a:first-child{border-left:none!important;}
+  .site-nav a.nav-hub{margin-left:0!important;background:var(--navy);text-align:center;}
+  .site-header{position:relative;flex-wrap:wrap;}
+  .eco-hero{padding:32px 16px;}
+  .eco-wrap{padding:0 12px 60px;}
+  .lc-header{padding:18px 16px 16px;}
+  .bubble-grid,.bubble-grid-5,.bubble-grid-6{grid-template-columns:repeat(2,1fr)!important;padding-left:16px;padding-right:16px;}
+  .bubble-grid-2,.reg-grid{grid-template-columns:1fr;padding-left:16px;padding-right:16px;}
+  .actor-grid,.asset-grid{grid-template-columns:1fr 1fr;padding-left:16px;padding-right:16px;}
+  .chart-section,.rwa-chart-wrap{padding-left:16px;padding-right:16px;}
+  .info-box{margin:14px 16px 20px;padding:18px 16px;}
+  .lc-sep{margin:0 16px;}
+  .ib-text{text-align:left!important;}
+  p,.ib-text{text-align:left!important;}
+}
+@media(max-width:600px){
+  .actor-grid,.asset-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="/" class="site-header-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></a>
+  <input type="checkbox" id="nav-toggle" class="nav-toggle"><label for="nav-toggle" class="nav-toggle-label"><span></span><span></span><span></span></label>
+  <nav class="site-nav">
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <a href="/hub" class="nav-hub">Tokerize Data Hub</a>
+  </nav>
+</header>
+
+<div class="eco-hero">
+  <div style="max-width:1200px;margin:0 auto">
+    <a href="/hub" class="back-to-hub">&larr; Back to Tokerize Data Hub</a>
+    <span class="eco-eyebrow">Asset Tokenization — Learn Center</span>
+    <h1>Asset Tokenization Industry</h1>
+    <p>A structured deep-dive into the mechanics, standards, actors and market opportunities of asset tokenization — from fundamentals to regulatory frameworks. Click any module to explore.</p>
+  </div>
+</div>
+
+<div class="eco-wrap">
+
+<!-- ═══════════════════════════════════════════════════════
+     MODULE 1 — TOKENIZATION BASICS
+═══════════════════════════════════════════════════════ -->
+<div class="lc collapsed" id="basics-lc">
+  <div class="lc-header" onclick="toggleLc('basics-lc')">
+    <div class="lc-header-text">
+      <h2><span class="mod-num">01</span> Tokenization Basics</h2>
+      <p>What is asset tokenization, how tokens are classified, and how security tokens relate to traditional securities</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="lc-body collapsed" id="basics-lc-body">
+
+    <div class="bubble-grid bubble-grid-2" style="grid-template-columns:repeat(2,1fr);gap:14px">
+      <div class="bubble" onclick="pick('basics','fungible')">
+        <div class="b-icon"><img src="/assets/asset-tokenization-learn/ft.png" alt="Fungible Tokens" style="width:48px;height:48px;border-radius:50%;object-fit:cover;"/></div>
+        <div class="b-name">Fungible Tokens</div>
+        <div class="b-sub" style="color:#111;font-size:12px">Identical, interchangeable</div>
+      </div>
+      <div class="bubble" onclick="pick('basics','nonfungible')">
+        <div class="b-icon"><img src="/assets/asset-tokenization-learn/nft.png" alt="Non-Fungible Tokens" style="width:48px;height:48px;border-radius:50%;object-fit:cover;"/></div>
+        <div class="b-name">Non-Fungible Tokens</div>
+        <div class="b-sub" style="color:#111;font-size:12px">Unique, one-of-a-kind</div>
+      </div>
+      <div class="bubble" onclick="pick('basics','tokenizedsec')">
+        <div class="b-icon"><img src="/assets/asset-tokenization-learn/ts.png" alt="Tokenized Securities" style="width:48px;height:48px;border-radius:50%;object-fit:cover;"/></div>
+        <div class="b-name">Tokenized Securities</div>
+        <div class="b-sub" style="color:#111;font-size:12px">Digital wrapper on existing securities</div>
+      </div>
+      <div class="bubble" onclick="pick('basics','securitytokens')">
+        <div class="b-icon"><img src="/assets/asset-tokenization-learn/st.png" alt="Security Tokens" style="width:48px;height:48px;border-radius:50%;object-fit:cover;"/></div>
+        <div class="b-name">Security Tokens</div>
+        <div class="b-sub" style="color:#111;font-size:12px">Native blockchain securities</div>
+      </div>
+    </div>
+
+    <div class="info-box" id="basics-box">
+      <p class="ib-prompt">Click on any token type to learn its definition, characteristics, and role in the tokenization ecosystem.</p>
+      <div class="ib-title" id="basics-title"></div>
+      <div class="ib-text" id="basics-text"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODULE 2 — TOKENIZATION BENEFITS
+═══════════════════════════════════════════════════════ -->
+<div class="lc collapsed" id="benefits-lc">
+  <div class="lc-header" onclick="toggleLc('benefits-lc')">
+    <div class="lc-header-text">
+      <h2><span class="mod-num">02</span> Tokenization Benefits</h2>
+      <p>The five transformative advantages unlocked by tokenizing real-world assets</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="lc-body collapsed" id="benefits-lc-body">
+
+    <!-- Interactive Globe for Module 2 -->
+    <div style="display:flex;flex-direction:column;align-items:center;padding:28px 32px 0;" id="benefits-globe-section">
+      <div style="position:relative;width:260px;height:260px;margin-bottom:8px;">
+        <!-- SVG Globe with CSS rotation effect -->
+        <svg id="globe-svg" viewBox="0 0 200 200" width="260" height="260" style="display:block;">
+          <defs>
+            <radialGradient id="globeGrad" cx="38%" cy="35%" r="60%">
+              <stop offset="0%" stop-color="#b8d4f0"/>
+              <stop offset="60%" stop-color="#2a6aad"/>
+              <stop offset="100%" stop-color="#0d2d4e"/>
+            </radialGradient>
+            <clipPath id="circClip">
+              <circle cx="100" cy="100" r="88"/>
+            </clipPath>
+          </defs>
+          <!-- Globe base -->
+          <circle cx="100" cy="100" r="88" fill="url(#globeGrad)" stroke="#b8cce0" stroke-width="1.5"/>
+          <!-- Meridians (animated via JS) -->
+          <g id="globe-meridians" clip-path="url(#circClip)">
+            <ellipse cx="100" cy="100" rx="28" ry="88" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+            <ellipse cx="100" cy="100" rx="56" ry="88" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+            <ellipse cx="100" cy="100" rx="80" ry="88" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+            <ellipse cx="100" cy="100" rx="88" ry="88" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+          </g>
+          <!-- Parallels -->
+          <g clip-path="url(#circClip)">
+            <ellipse cx="100" cy="66" rx="78" ry="18" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+            <ellipse cx="100" cy="100" rx="88" ry="22" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+            <ellipse cx="100" cy="134" rx="78" ry="18" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+          </g>
+          <!-- Highlight -->
+          <ellipse cx="76" cy="72" rx="22" ry="14" fill="rgba(255,255,255,0.12)" transform="rotate(-20 76 72)"/>
+          <!-- Center label button -->
+          <g id="globe-center-label">
+            <rect x="30" y="82" width="140" height="36" rx="18" fill="rgba(13,45,78,0.88)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/>
+            <text id="globe-label-text" x="100" y="105" font-family="Rajdhani,sans-serif" font-size="13" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="0.5">Increased Liquidity</text>
+          </g>
+        </svg>
+      </div>
+      <!-- Navigation arrows -->
+      <div style="display:flex;align-items:center;gap:32px;margin-top:4px;">
+        <button onclick="globeNav(-1)" style="width:40px;height:40px;border-radius:50%;border:2px solid var(--navy);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--navy);transition:background 0.2s;" onmouseover="this.style.background='#eef3f8'" onmouseout="this.style.background='#fff'">&#8592;</button>
+        <span id="globe-dots" style="display:flex;gap:6px;"></span>
+        <button onclick="globeNav(1)" style="width:40px;height:40px;border-radius:50%;border:2px solid var(--navy);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--navy);transition:background 0.2s;" onmouseover="this.style.background='#eef3f8'" onmouseout="this.style.background='#fff'">&#8594;</button>
+      </div>
+    </div>
+
+    <div class="info-box" id="benefits-box">
+      <p class="ib-prompt">Use the arrows to navigate between benefits.</p>
+      <div class="ib-title" id="benefits-title"></div>
+      <div class="ib-text" id="benefits-text"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODULE 3 — TOKEN STANDARDS
+═══════════════════════════════════════════════════════ -->
+<div class="lc collapsed" id="standards-lc">
+  <div class="lc-header" onclick="toggleLc('standards-lc')">
+    <div class="lc-header-text">
+      <h2><span class="mod-num">03</span> Token Standards</h2>
+      <p>The technical frameworks that define how tokens are created, transferred and compliant across blockchains</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="lc-body collapsed" id="standards-lc-body">
+
+    <div style="padding:20px 32px 0;display:grid;grid-template-columns:repeat(5,1fr);gap:14px" id="standards-grid">
+      <div class="std-bubble" onclick="pick('standards','erc20')" style="align-items:center;text-align:center;">
+        <img src="/assets/asset-tokenization-learn/erc-20.png" alt="ERC-20" style="width:48px;height:48px;border-radius:50%;object-fit:contain;margin-bottom:8px;"/>
+        <div class="std-id">ERC-20</div>
+        <div class="std-name">Fungible Token Standard</div>
+        <span class="std-tag fungible">Fungible</span>
+        <span class="std-tag">Ethereum</span>
+      </div>
+      <div class="std-bubble" onclick="pick('standards','erc721')" style="align-items:center;text-align:center;">
+        <img src="/assets/asset-tokenization-learn/erc-721.png" alt="ERC-721" style="width:48px;height:48px;border-radius:50%;object-fit:contain;margin-bottom:8px;"/>
+        <div class="std-id">ERC-721</div>
+        <div class="std-name">NFT Standard</div>
+        <span class="std-tag nft">Non-Fungible</span>
+        <span class="std-tag">Ethereum</span>
+      </div>
+      <div class="std-bubble" onclick="pick('standards','erc1400')" style="align-items:center;text-align:center;">
+        <img src="/assets/asset-tokenization-learn/erc-1400.png" alt="ERC-1400" style="width:48px;height:48px;border-radius:50%;object-fit:contain;margin-bottom:8px;"/>
+        <div class="std-id">ERC-1400</div>
+        <div class="std-name">Security Token Standard</div>
+        <span class="std-tag security">Security</span>
+        <span class="std-tag">Polymath</span>
+      </div>
+      <div class="std-bubble" onclick="pick('standards','erc3643')" style="align-items:center;text-align:center;">
+        <img src="/assets/asset-tokenization-learn/erc-3643.png" alt="ERC-3643" style="width:48px;height:48px;border-radius:50%;object-fit:contain;margin-bottom:8px;"/>
+        <div class="std-id">ERC-3643</div>
+        <div class="std-name">T-Rex Protocol</div>
+        <span class="std-tag security">Security</span>
+        <span class="std-tag">Tokeny</span>
+      </div>
+      <div class="std-bubble" onclick="pick('standards','iso')" style="align-items:center;text-align:center;">
+        <img src="/assets/asset-tokenization-learn/iso.png" alt="ISO/TC 307" style="width:48px;height:48px;border-radius:50%;object-fit:contain;margin-bottom:8px;"/>
+        <div class="std-id">ISO/TC 307</div>
+        <div class="std-name">International Standard</div>
+        <span class="std-tag iso">ISO</span>
+        <span class="std-tag">Global</span>
+      </div>
+    </div>
+
+    <div class="info-box" id="standards-box">
+      <p class="ib-prompt">Click on a standard to understand its technical architecture, purpose, and role in the tokenization ecosystem.</p>
+      <div class="ib-title" id="standards-title"></div>
+      <div class="ib-text" id="standards-text"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODULE 4 — ACTORS OF THE INDUSTRY
+═══════════════════════════════════════════════════════ -->
+<div class="lc collapsed" id="actors-lc">
+  <div class="lc-header" onclick="toggleLc('actors-lc')">
+    <div class="lc-header-text">
+      <h2><span class="mod-num">04</span> Actors of the Industry</h2>
+      <p>The six categories of players building the global asset tokenization infrastructure</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="lc-body collapsed" id="actors-lc-body">
+
+    <!-- Monitor interactive section -->
+    <div style="display:flex;flex-direction:column;align-items:center;padding:28px 32px 0;" id="actors-monitor-section">
+      <div style="position:relative;width:340px;max-width:100%;">
+        <img src="/assets/asset-tokenization-learn/learn-module-monitor.png" alt="Monitor" style="width:100%;display:block;"/>
+        <!-- Overlay button centered on monitor screen -->
+        <div style="position:absolute;top:22%;left:50%;transform:translateX(-50%);width:68%;text-align:center;" id="monitor-btn-wrap">
+          <div id="monitor-active-btn" style="background:rgba(13,45,78,0.92);color:#fff;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 18px;border-radius:4px;cursor:pointer;user-select:none;border:1.5px solid rgba(255,255,255,0.25);transition:background 0.2s;" onclick="actorMonitorClick()">Issuance Platforms</div>
+        </div>
+      </div>
+      <!-- Arrows -->
+      <div style="display:flex;align-items:center;gap:32px;margin-top:12px;">
+        <button onclick="actorNav(-1)" style="width:40px;height:40px;border-radius:50%;border:2px solid var(--navy);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--navy);transition:background 0.2s;" onmouseover="this.style.background='#eef3f8'" onmouseout="this.style.background='#fff'">&#8592;</button>
+        <span id="actor-dots" style="display:flex;gap:6px;"></span>
+        <button onclick="actorNav(1)" style="width:40px;height:40px;border-radius:50%;border:2px solid var(--navy);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--navy);transition:background 0.2s;" onmouseover="this.style.background='#eef3f8'" onmouseout="this.style.background='#fff'">&#8594;</button>
+      </div>
+    </div>
+
+    <div class="info-box" id="actors-box">
+      <p class="ib-prompt">Use the arrows to navigate between industry actors.</p>
+      <div class="ib-title" id="actors-title"></div>
+      <div class="ib-text" id="actors-text"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODULE 5 — ASSET CLASSES
+═══════════════════════════════════════════════════════ -->
+<div class="lc collapsed" id="assets-lc">
+  <div class="lc-header" onclick="toggleLc('assets-lc')">
+    <div class="lc-header-text">
+      <h2><span class="mod-num">05</span> Asset Classes</h2>
+      <p>The three major asset classes being tokenized — financial instruments, real estate, and private equity</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="lc-body collapsed" id="assets-lc-body">
+
+    <!-- Asset class cards -->
+    <div class="asset-grid" style="padding:20px 32px 0;">
+      <div class="asset-card" onclick="pick('assets','financial')">
+        <div class="asset-icon"><img src="/assets/asset-tokenization-learn/financial-instruments.png" alt="Financial Instruments" style="width:48px;height:48px;border-radius:50%;object-fit:cover;"/></div>
+        <div class="asset-name">Financial Instruments</div>
+      </div>
+      <div class="asset-card" onclick="pick('assets','realestate')">
+        <div class="asset-icon"><img src="/assets/asset-tokenization-learn/real-estate.png" alt="Real Estate" style="width:48px;height:48px;border-radius:50%;object-fit:cover;"/></div>
+        <div class="asset-name">Real Estate</div>
+      </div>
+      <div class="asset-card" onclick="pick('assets','privateequity')">
+        <div class="asset-icon"><img src="/assets/asset-tokenization-learn/private-equity.png" alt="Private Equity &amp; STOs" style="width:48px;height:48px;border-radius:50%;object-fit:cover;"/></div>
+        <div class="asset-name">Private Equity &amp; STOs</div>
+      </div>
+    </div>
+
+    <!-- EY Parthenon chart - shown for Financial Instruments and Private Equity -->
+    <div id="ey-chart-section" style="display:none;padding:20px 32px 0;">
+      <div class="chart-title" style="padding:0 0 12px">Investor Interest in Tokenized Alternatives — EY Parthenon, 2023</div>
+      <div id="ey-chart-wrap" style="width:100%;max-width:900px;margin:0 auto;"></div>
+      <div class="chart-source">Data source: EY Parthenon, 2023</div>
+    </div>
+
+    <!-- Real Estate pie chart -->
+    <div id="re-chart-section" style="display:none;padding:20px 32px 0;">
+      <div class="chart-title" style="padding:0 0 12px">Distribution of Global Real Estate Value — Savills Research</div>
+      <div id="re-pie-wrap" style="width:100%;max-width:520px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap;"></div>
+      <div class="chart-source">Data source: Savills Research</div>
+    </div>
+
+    <div class="info-box" id="assets-box">
+      <p class="ib-prompt">Click on an asset class to explore its tokenization story and real-world examples.</p>
+      <div class="ib-title" id="assets-title"></div>
+      <div class="ib-text" id="assets-text"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODULE 6 — MARKET OPPORTUNITY
+═══════════════════════════════════════════════════════ -->
+<div class="lc collapsed" id="market-lc">
+  <div class="lc-header" onclick="toggleLc('market-lc')">
+    <div class="lc-header-text">
+      <h2><span class="mod-num">06</span> Market Opportunity</h2>
+      <p>The trillion-dollar tokenization TAM — 2030 estimates by asset category (Citigroup, 2023)</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="lc-body collapsed" id="market-lc-body">
+
+    <!-- Citigroup 2030E large interactive bar chart — bars are the clickable bubbles -->
+    <div style="padding:28px 32px 0;">
+      <div class="chart-title" style="padding:0 0 16px;font-size:15px;">2030 Estimated Tokenized Assets by Category — Citigroup, 2023</div>
+      <div id="citi-chart-wrap" style="width:100%;max-width:860px;margin:0 auto;position:relative;"></div>
+      <div class="chart-source" style="margin-top:12px;">Source: Citigroup, 2023</div>
+    </div>
+
+    <div id="market-box" class="info-box">
+      <p class="ib-prompt">Click on a bar to explore the tokenization story for that asset category.</p>
+      <div class="ib-title" id="market-title"></div>
+      <div class="ib-text" id="market-text"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODULE 7 — REGULATORY FRAMEWORKS
+═══════════════════════════════════════════════════════ -->
+<div class="lc collapsed" id="reg-lc">
+  <div class="lc-header" onclick="toggleLc('reg-lc');regAutoOpen();">
+    <div class="lc-header-text">
+      <h2><span class="mod-num">07</span> STO Regulatory Frameworks</h2>
+      <p>How the US and EU approach security token offerings — exemptions, frameworks, and the evolving legal landscape</p>
+    </div>
+    <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="lc-body collapsed" id="reg-lc-body">
+
+    <div class="reg-grid">
+      <!-- US box -->
+      <div class="reg-box" id="reg-us-box" onclick="pickReg('us','howey')" style="cursor:pointer;">
+        <div class="reg-box-header">
+          <img src="/assets/asset-tokenization-learn/us.png" alt="US" style="height:22px;vertical-align:middle;margin-right:10px;border-radius:2px;"/><span class="reg-title">United States</span>
+          <div class="reg-subtitle">SEC Framework — Howey Test — Exemptions</div>
+        </div>
+        <div class="reg-body">
+          <div class="reg-tags">
+            <button class="reg-tag" data-key="howey" onclick="event.stopPropagation();pickReg('us','howey')">Howey Test</button>
+            <button class="reg-tag" data-key="regd" onclick="event.stopPropagation();pickReg('us','regd')">Regulation D</button>
+            <button class="reg-tag" data-key="regaplus" onclick="event.stopPropagation();pickReg('us','regaplus')">Regulation A+</button>
+            <button class="reg-tag" data-key="regs" onclick="event.stopPropagation();pickReg('us','regs')">Regulation S</button>
+          </div>
+        </div>
+      </div>
+      <!-- EU box -->
+      <div class="reg-box" id="reg-eu-box" onclick="pickReg('eu','mifid')" style="cursor:pointer;">
+        <div class="reg-box-header">
+          <img src="/assets/asset-tokenization-learn/eu.png" alt="EU" style="height:22px;vertical-align:middle;margin-right:10px;border-radius:2px;"/><span class="reg-title">European Union</span>
+          <div class="reg-subtitle">MiFID II — MiCA — DLT Pilot Regime</div>
+        </div>
+        <div class="reg-body">
+          <div class="reg-tags">
+            <button class="reg-tag" data-key="mifid" onclick="event.stopPropagation();pickReg('eu','mifid')">MiFID II</button>
+            <button class="reg-tag" data-key="mica" onclick="event.stopPropagation();pickReg('eu','mica')">MiCA</button>
+            <button class="reg-tag" data-key="dlt" onclick="event.stopPropagation();pickReg('eu','dlt')">DLT Pilot Regime</button>
+            <button class="reg-tag" data-key="listing" onclick="event.stopPropagation();pickReg('eu','listing')">Listing Act</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box" id="reg-box">
+      <p class="ib-prompt">Select a jurisdiction and click a regulatory framework to understand its mechanics, exemptions, and implications for STOs.</p>
+      <div class="ib-title" id="reg-title"></div>
+      <div class="ib-text" id="reg-text"></div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- end eco-wrap -->
+
+<footer class="site-footer">
+  <div class="footer-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></div>
+  <nav class="footer-nav">
+    <a href="/">Home</a><a href="/about">About</a><a href="/hub">Tokerize Data Hub</a>
+  </nav>
+  <div>
+    <p class="footer-copy">Tokerize &mdash; Asset Tokenization Learn Center</p>
+    <p class="footer-disclaimer">Tokerize is a community built website.</p>
+  </div>
+</footer>
+
+<script>
+/* ═══ COLLAPSE / EXPAND ═══ */
+window.toggleLc = function(id) {
+  const lc = document.getElementById(id);
+  const body = document.getElementById(id + '-body');
+  if (!lc || !body) return;
+  const collapsed = lc.classList.toggle('collapsed');
+  body.classList.toggle('collapsed', collapsed);
+};
+
+/* ═══ GENERIC PICK ═══ */
+function showInfo(boxId, titleId, textId, title, html, tag) {
+  const box = document.getElementById(boxId);
+  const titleEl = document.getElementById(titleId);
+  const textEl = document.getElementById(textId);
+  if (!box || !titleEl || !textEl) return;
+  box.querySelector('.ib-prompt').style.display = 'none';
+  titleEl.style.display = 'block';
+  textEl.style.display = 'block';
+  titleEl.innerHTML = (tag ? '<span class="ib-tag">' + tag + '</span><br>' : '') + title;
+  textEl.innerHTML = html;
+  box.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+/* ═══════════════════════════════════════
+   MODULE 1 DATA
+═══════════════════════════════════════ */
+const BASICS = {
+  fungible: {
+    title: 'Fungible Tokens',
+    tag: 'Token Type',
+    text: `<p>A fungible token is one where every unit within the same class is identical — perfectly interchangeable with any other token of the same type. One token can replace another with zero difference in value or utility, just like euro banknotes: a €10 note is the same as any other €10 note.</p>
+    <p style="margin-top:12px">The dominant standard for fungible tokens on Ethereum is <strong>ERC-20</strong>, created in 2015 by Fabian Vogelsteller. It defines a minimal interface — six mandatory functions including Transfer, Approve, and Allowance — that allows wallets and exchanges to integrate any token without custom code for each one.</p>
+    <p style="margin-top:12px">Fungible tokens are the natural choice for tokenizing fungible real-world assets: fractional ownership in a gold reserve, oil barrels, carbon credits, or electricity. When all the underlying units are identical, the tokens representing them should be too.</p>
+    <div class="ib-highlight">Key insight: Fungibility is not just a technical property — it defines the market. Fungible tokens can be listed on exchanges, priced continuously, and bought/sold in any quantity. This is the foundation of liquidity.</div>`
+  },
+  nonfungible: {
+    title: 'Non-Fungible Tokens (NFTs)',
+    tag: 'Token Type',
+    text: `<p>Non-fungible tokens represent unique, one-of-a-kind assets. Unlike ERC-20 tokens, no two ERC-721 tokens are identical — each carries its own identity and metadata. The standard was created by William Entriken and first deployed in late 2017 with CryptoKitties.</p>
+    <p style="margin-top:12px">NFTs are the natural format for tokenizing unique real-world assets: a specific piece of real estate, a Monet painting, a diamond, a rare car, a software license, or a legal contract. Each token is unique because the underlying asset is unique.</p>
+    <p style="margin-top:12px">Beyond collectibles, NFTs carry important institutional use cases: proof of ownership, provenance certification, unique contractual rights, and access tokens. The market had a dramatic bubble in 2021–2022, but the underlying technology remains relevant for institutional tokenization of unique assets.</p>
+    <div class="ib-highlight">Regulatory note: NFTs exist in a legal grey zone in many jurisdictions. Depending on the rights attached to them, they may or may not qualify as securities — making legal structuring critical before any public offering.</div>`
+  },
+  tokenizedsec: {
+    title: 'Tokenized Securities',
+    tag: 'Token Type',
+    text: `<p>Tokenized securities are existing, already-classified securities — stocks, bonds, ETFs, derivatives — that receive a digital blockchain layer without changing their legal structure. Think of it as wrapping a traditional financial instrument in a smart contract coat.</p>
+    <p style="margin-top:12px">This "digital wrapper" doesn't alter the underlying security, but it enables programmability: automated dividend distribution, fractionalisation, 24/7 trading on digital exchanges, and faster settlement. The compliance requirements remain those of the underlying security — straightforward in most jurisdictions since they already have securities status.</p>
+    <p style="margin-top:12px">Examples include BlackRock's BUIDL tokenized money market fund, the EIB's Project Venus digital bond (€100M, Goldman Sachs), UBS's CHF 375M digital bond on SIX Digital Exchange, and tokenized Treasury ETFs like Ondo Finance's OUSG referencing BlackRock's US Treasuries fund.</p>
+    <div class="ib-highlight">Larry Fink (BlackRock, January 2025): "If we can tokenize bonds and stocks… it will democratise investing in ways we can't imagine. I want the SEC to rapidly approve the tokenization of bonds and stocks."</div>
+    <p style="margin-top:12px">The main limitation: tokenized securities cannot fully leverage smart contract programmability if the underlying asset still exists on traditional infrastructure. Over a 10-year transitional period, they are expected to be gradually replaced by native security tokens.</p>`
+  },
+  securitytokens: {
+    title: 'Security Tokens',
+    tag: 'Token Type',
+    text: `<p>Security tokens are tokens that, from a legal perspective, have the characteristics of a security, but they represent assets that were not already securities before tokenization. The token itself brings the asset into the securities world.</p>
+    <p style="margin-top:12px">Examples include: equity in a private, unlisted company; real estate directly tokenized as fractional ownership; private debt instruments; commodity-backed tokens not already securitized. The tokenization event is what creates the security, not a pre-existing regulatory classification.</p>
+    <p style="margin-top:12px"><strong>The key legal question:</strong> When exactly does a token become a security? This depends on jurisdiction.</p>
+    <ul style="margin-top:10px;padding-left:20px;font-family:'DM Mono',monospace;font-size:13px;line-height:1.9">
+      <li><strong>EU (MiFID II):</strong> A token is a security if it is a "Transferable Security" — classes of securities negotiable on the capital market, including shares, bonds, or instruments giving the right to acquire such securities.</li>
+      <li><strong>US (Howey Test):</strong> A token is a security if it involves: (1) investment of money, (2) in a common enterprise, (3) with expectation of profits, (4) derived from the efforts of others.</li>
+    </ul>`
+  }
+};
+
+window.pick = function(module, key) {
+  const map = {basics: BASICS, benefits: BENEFITS, standards: STANDARDS, actors: ACTORS, assets: ASSETS};
+  const data = map[module];
+  if (!data || !data[key]) return;
+  const d = data[key];
+  const container = document.getElementById(module + '-lc');
+  if (container) {
+    container.querySelectorAll('.bubble,.std-bubble,.actor-card,.asset-card').forEach(b => b.classList.remove('on'));
+    const allBubbles = container.querySelectorAll('[onclick*="' + key + '"]');
+    if (allBubbles.length) allBubbles[0].classList.add('on');
+  }
+  showInfo(module + '-box', module + '-title', module + '-text', d.title, d.text, d.tag);
+
+  // Show/hide contextual charts in module 5
+  if (module === 'assets') {
+    const eySection = document.getElementById('ey-chart-section');
+    const reSection = document.getElementById('re-chart-section');
+    if (eySection) eySection.style.display = (key === 'financial' || key === 'privateequity') ? 'block' : 'none';
+    if (reSection) reSection.style.display = key === 'realestate' ? 'block' : 'none';
+    if ((key === 'financial' || key === 'privateequity') && !window._eyRendered) { renderEYChart(); window._eyRendered = true; }
+    if (key === 'realestate' && !window._reRendered) { renderREPie(); window._reRendered = true; }
+  }
+};
+
+/* ═══════════════════════════════════════
+   GLOBE NAVIGATION — MODULE 2
+═══════════════════════════════════════ */
+const GLOBE_ITEMS = [
+  {key:'liquidity', label:'Increased Liquidity'},
+  {key:'trading247', label:'24/7 Global Trading'},
+  {key:'posttrade', label:'Post-Trade Efficiency'},
+  {key:'automatedcompliance', label:'Automated Compliance'},
+  {key:'democratisation', label:'Democratisation'}
+];
+let globeIdx = 0;
+
+function renderGlobeDots() {
+  const el = document.getElementById('globe-dots');
+  if (!el) return;
+  el.innerHTML = GLOBE_ITEMS.map((_, i) =>
+    `<span style="width:8px;height:8px;border-radius:50%;background:${i===globeIdx?'var(--navy)':'#ccc'};display:inline-block;transition:background 0.2s;cursor:pointer;" onclick="globeJump(${i})"></span>`
+  ).join('');
+}
+
+function globeSetLabel(idx) {
+  const el = document.getElementById('globe-label-text');
+  if (el) el.textContent = GLOBE_ITEMS[idx].label;
+}
+
+window.globeNav = function(dir) {
+  globeIdx = (globeIdx + dir + GLOBE_ITEMS.length) % GLOBE_ITEMS.length;
+  globeSetLabel(globeIdx);
+  renderGlobeDots();
+  pick('benefits', GLOBE_ITEMS[globeIdx].key);
+  // Animate globe spin feel
+  const svg = document.getElementById('globe-svg');
+  if (svg) {
+    svg.style.transition = 'transform 0.18s ease';
+    svg.style.transform = `rotateY(${dir > 0 ? 15 : -15}deg) scale(1.03)`;
+    setTimeout(() => { svg.style.transform = 'rotateY(0deg) scale(1)'; }, 200);
+  }
+};
+
+window.globeJump = function(idx) {
+  const dir = idx > globeIdx ? 1 : -1;
+  globeIdx = idx;
+  globeSetLabel(globeIdx);
+  renderGlobeDots();
+  pick('benefits', GLOBE_ITEMS[globeIdx].key);
+};
+
+/* Auto-init on load */
+document.addEventListener('DOMContentLoaded', function() {
+  renderGlobeDots();
+  renderActorDots();
+  // Defer Citi chart to when assets module is opened (DOM element may not be ready)
+});
+
+/* Patch toggleLc to trigger chart renders on first open */
+const _origToggle = window.toggleLc;
+window.toggleLc = function(id) {
+  _origToggle(id);
+  if (id === 'market-lc') {
+    setTimeout(function() {
+      const w = document.getElementById('citi-chart-wrap');
+      if (w && !w._rendered) { renderCitiChart(); w._rendered = true; }
+    }, 50);
+  }
+};
+
+/* Auto-open first reg sub-item when module header clicked */
+window.regAutoOpen = function() {
+  // Only fire when the module is being opened (not closed)
+  const lc = document.getElementById('reg-lc');
+  if (!lc) return;
+  // It's toggled before this runs, so if NOT collapsed = just opened
+  setTimeout(function() {
+    if (!lc.classList.contains('collapsed')) {
+      pickReg('us', 'howey');
+    }
+  }, 60);
+};
+
+/* ═══════════════════════════════════════
+   ACTOR MONITOR NAVIGATION — MODULE 4
+═══════════════════════════════════════ */
+const ACTOR_ITEMS = [
+  {key:'issuance', label:'Issuance Platforms'},
+  {key:'custodians', label:'Custodians'},
+  {key:'exchanges', label:'Exchanges'},
+  {key:'lawyers', label:'Law Firms'},
+  {key:'serviceproviders', label:'Service Providers'},
+  {key:'institutional', label:'Institutional Players'}
+];
+let actorIdx = 0;
+
+function renderActorDots() {
+  const el = document.getElementById('actor-dots');
+  if (!el) return;
+  el.innerHTML = ACTOR_ITEMS.map((_, i) =>
+    `<span style="width:8px;height:8px;border-radius:50%;background:${i===actorIdx?'var(--navy)':'#ccc'};display:inline-block;transition:background 0.2s;cursor:pointer;" onclick="actorJump(${i})"></span>`
+  ).join('');
+}
+
+function actorSetMonitor(idx) {
+  const el = document.getElementById('monitor-active-btn');
+  if (el) el.textContent = ACTOR_ITEMS[idx].label;
+}
+
+window.actorNav = function(dir) {
+  actorIdx = (actorIdx + dir + ACTOR_ITEMS.length) % ACTOR_ITEMS.length;
+  actorSetMonitor(actorIdx);
+  renderActorDots();
+  pick('actors', ACTOR_ITEMS[actorIdx].key);
+};
+
+window.actorJump = function(idx) {
+  actorIdx = idx;
+  actorSetMonitor(actorIdx);
+  renderActorDots();
+  pick('actors', ACTOR_ITEMS[actorIdx].key);
+};
+
+window.actorMonitorClick = function() {
+  pick('actors', ACTOR_ITEMS[actorIdx].key);
+};
+
+/* ═══════════════════════════════════════
+   CITIGROUP 2030E INTERACTIVE BAR CHART — MODULE 6
+   Bars are clickable → trigger market learn box
+═══════════════════════════════════════ */
+function renderCitiChart() {
+  const wrap = document.getElementById('citi-chart-wrap');
+  if (!wrap) return;
+  const data = [
+    {key:'debt',       label:'Corporate &\nSov. Debt',    val:1.9,  color:'#6baed6'},
+    {key:'realestate', label:'Real Estate\nFunds',        val:1.5,  color:'#74c476'},
+    {key:'pe',         label:'Private Equity\n& VC',      val:0.7,  color:'#fd8d3c'},
+    {key:'securities', label:'Securities\nFinancing',     val:0.75, color:'#9e9ac8'},
+    {key:'trade',      label:'Trade\nFinance',            val:1.0,  color:'#f768a1'}
+  ];
+  const maxVal = 2.3;
+  const W = 860, H = 360, padL = 64, padR = 24, padT = 40, padB = 72;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+  const groupW = chartW / data.length;
+  const barW = Math.floor(groupW * 0.6);
+
+  const bars = data.map((d, i) => {
+    const bh = Math.round((d.val / maxVal) * chartH);
+    const bx = padL + i * groupW + (groupW - barW) / 2;
+    const by = padT + chartH - bh;
+    const lx = bx + barW / 2;
+    const lines = d.label.split('\n');
+    return `
+      <g style="cursor:pointer;" onclick="citiBarClick('${d.key}')">
+        <rect id="citi-bar-${d.key}" x="${bx}" y="${by}" width="${barW}" height="${bh}" fill="${d.color}" rx="4" opacity="0.82"
+          style="transition:opacity 0.18s;"
+          onmouseenter="this.style.opacity=1;"
+          onmouseleave="if(!this.dataset.active)this.style.opacity=0.82;"/>
+        <text x="${lx}" y="${by - 9}" font-family="Rajdhani,sans-serif" font-size="15" font-weight="700" text-anchor="middle" fill="#333">$${d.val}T</text>
+        ${lines.map((ln, li) => `<text x="${lx}" y="${H - padB + 18 + li*17}" font-family="DM Mono,monospace" font-size="11" text-anchor="middle" fill="#555">${ln}</text>`).join('')}
+      </g>`;
+  }).join('');
+
+  const ticks = [0, 0.5, 1.0, 1.5, 2.0];
+  const yLines = ticks.map(v => {
+    const ty = padT + chartH - Math.round((v / maxVal) * chartH);
+    return `<line x1="${padL}" y1="${ty}" x2="${W-padR}" y2="${ty}" stroke="#f0f0f0" stroke-dasharray="4 4" stroke-width="1"/>
+    <text x="${padL-8}" y="${ty+4}" font-family="DM Mono,monospace" font-size="11" text-anchor="end" fill="#888">$${v}T</text>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px;display:block;overflow:visible;">
+      <text x="${W/2}" y="20" font-family="Rajdhani,sans-serif" font-size="13" font-weight="700" letter-spacing="1.5" text-anchor="middle" fill="#aaa">CLICK A BAR TO EXPLORE</text>
+      <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT+chartH}" stroke="#ddd" stroke-width="1"/>
+      <line x1="${padL}" y1="${padT+chartH}" x2="${W-padR}" y2="${padT+chartH}" stroke="#333" stroke-width="1.5"/>
+      ${yLines}
+      ${bars}
+    </svg>`;
+}
+
+window.citiBarClick = function(key) {
+  const keys = ['debt','realestate','pe','securities','trade'];
+  keys.forEach(k => {
+    const b = document.getElementById('citi-bar-' + k);
+    if (b) { b.style.opacity = k === key ? '1' : '0.4'; b.dataset.active = k === key ? '1' : ''; }
+  });
+  const d = TAM_DATA[key];
+  if (!d) return;
+  const box = document.getElementById('market-box');
+  const titleEl = document.getElementById('market-title');
+  const textEl = document.getElementById('market-text');
+  if (!box || !titleEl || !textEl) return;
+  const prompt = box.querySelector('.ib-prompt');
+  if (prompt) prompt.style.display = 'none';
+  titleEl.style.display = 'block';
+  textEl.style.display = 'block';
+  titleEl.innerHTML = '<span class="ib-tag">Market Data</span><br>' + d.title;
+  textEl.innerHTML = d.text;
+  box.scrollIntoView({behavior:'smooth', block:'nearest'});
+};
+
+
+/* ═══════════════════════════════════════
+   EY PARTHENON GROUPED BAR CHART
+═══════════════════════════════════════ */
+function renderEYChart() {
+  const wrap = document.getElementById('ey-chart-wrap');
+  if (!wrap) return;
+  const categories = ['Private equity','Real estate','Private debt','Commodities','Infrastructure','Hedge funds'];
+  const institutional = [63, 59, 27, 19, 25, 15];
+  const hnw = [56, 49, 28, 19, 22, 17];
+  const colors = { inst: '#5b8dd9', hnw: '#f4a942' };
+  const W = 860, H = 380, padL = 56, padR = 24, padT = 40, padB = 90;
+  const chartW = W - padL - padR;
+  const chartH = H - padT - padB;
+  const maxVal = 75;
+  const groupW = chartW / categories.length;
+  const bW = Math.floor(groupW * 0.35);
+  const gap = 5;
+
+  const bars = categories.map((cat, i) => {
+    const gx = padL + i * groupW + groupW * 0.07;
+    const bh1 = Math.round((institutional[i] / maxVal) * chartH);
+    const bh2 = Math.round((hnw[i] / maxVal) * chartH);
+    const by1 = padT + chartH - bh1;
+    const by2 = padT + chartH - bh2;
+    const bx2 = gx + bW + gap;
+    const catLines = cat.split(' ');
+    return `
+      <g>
+        <rect x="${gx}" y="${by1}" width="${bW}" height="${bh1}" fill="${colors.inst}" rx="3" opacity="0.85" style="transition:opacity 0.15s;" onmouseenter="eyTip('${cat} — Institutional: ${institutional[i]}%');this.style.opacity=1" onmouseleave="eyTipHide();this.style.opacity=0.85"/>
+        <text x="${gx+bW/2}" y="${by1-7}" font-family="Rajdhani,sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#333">${institutional[i]}%</text>
+        <rect x="${bx2}" y="${by2}" width="${bW}" height="${bh2}" fill="${colors.hnw}" rx="3" opacity="0.85" style="transition:opacity 0.15s;" onmouseenter="eyTip('${cat} — HNW Investors: ${hnw[i]}%');this.style.opacity=1" onmouseleave="eyTipHide();this.style.opacity=0.85"/>
+        <text x="${bx2+bW/2}" y="${by2-7}" font-family="Rajdhani,sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#333">${hnw[i]}%</text>
+        ${catLines.map((ln, li) => `<text x="${gx+bW+gap/2}" y="${H - padB + 18 + li*16}" font-family="DM Mono,monospace" font-size="12" text-anchor="middle" fill="#555">${ln}</text>`).join('')}
+      </g>`;
+  }).join('');
+
+  const ticks = [0,20,40,60];
+  const yLines = ticks.map(v => {
+    const ty = padT + chartH - Math.round((v / maxVal) * chartH);
+    return `<line x1="${padL}" y1="${ty}" x2="${W-padR}" y2="${ty}" stroke="#f0f0f0" stroke-dasharray="3 3" stroke-width="1"/>
+    <text x="${padL-8}" y="${ty+4}" font-family="DM Mono,monospace" font-size="11" text-anchor="end" fill="#888">${v}%</text>`;
+  }).join('');
+
+  wrap.innerHTML = `
+    <div style="position:relative;">
+      <svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px;display:block;overflow:visible;">
+        <text x="${W/2}" y="20" font-family="Rajdhani,sans-serif" font-size="15" font-weight="700" text-anchor="middle" fill="#0d2d4e">Investor Interest in Tokenized Alternatives</text>
+        <line x1="${padL}" y1="${padT+chartH}" x2="${W-padR}" y2="${padT+chartH}" stroke="#333" stroke-width="1.5"/>
+        <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT+chartH}" stroke="#ccc" stroke-width="1"/>
+        ${yLines}
+        ${bars}
+        <!-- Legend -->
+        <rect x="${W-200}" y="8" width="14" height="12" fill="${colors.inst}" rx="2"/>
+        <text x="${W-181}" y="19" font-family="DM Mono,monospace" font-size="11" fill="#333">Institutional Investors</text>
+        <rect x="${W-200}" y="27" width="14" height="12" fill="${colors.hnw}" rx="2"/>
+        <text x="${W-181}" y="38" font-family="DM Mono,monospace" font-size="11" fill="#333">HNW Investors</text>
+      </svg>
+      <div id="ey-tooltip" style="display:none;position:absolute;background:rgba(13,45,78,0.92);color:#fff;font-family:'DM Mono',monospace;font-size:12px;padding:6px 12px;border-radius:4px;pointer-events:none;white-space:nowrap;top:8px;left:50%;transform:translateX(-50%);"></div>
+    </div>`;
+}
+
+window.eyTip = function(txt) {
+  const tip = document.getElementById('ey-tooltip');
+  if (tip) { tip.textContent = txt; tip.style.display = 'block'; }
+};
+window.eyTipHide = function() {
+  const tip = document.getElementById('ey-tooltip');
+  if (tip) tip.style.display = 'none';
+};
+
+/* ═══════════════════════════════════════
+   REAL ESTATE PIE CHART
+═══════════════════════════════════════ */
+function renderREPie() {
+  const wrap = document.getElementById('re-pie-wrap');
+  if (!wrap) return;
+  const slices = [
+    {label:'Residential Real Estate', pct:57, color:'#5b8dd9'},
+    {label:'Commercial Real Estate', pct:33, color:'#74c476'},
+    {label:'Industrial Real Estate', pct:5, color:'#fd8d3c'},
+    {label:'Agricultural Real Estate', pct:5, color:'#9e9ac8'}
+  ];
+  const cx = 130, cy = 130, r = 110;
+  let startAngle = -90;
+  const paths = slices.map(s => {
+    const angle = (s.pct / 100) * 360;
+    const endAngle = startAngle + angle;
+    const rad1 = startAngle * Math.PI / 180;
+    const rad2 = endAngle * Math.PI / 180;
+    const x1 = cx + r * Math.cos(rad1);
+    const y1 = cy + r * Math.sin(rad1);
+    const x2 = cx + r * Math.cos(rad2);
+    const y2 = cy + r * Math.sin(rad2);
+    const large = angle > 180 ? 1 : 0;
+    // Label position
+    const midRad = (startAngle + angle/2) * Math.PI / 180;
+    const lx = cx + (r * 0.65) * Math.cos(midRad);
+    const ly = cy + (r * 0.65) * Math.sin(midRad);
+    const path = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
+    startAngle = endAngle;
+    return `<path d="${path}" fill="${s.color}" stroke="#fff" stroke-width="2" opacity="0.88" style="transition:opacity 0.15s;" onmouseenter="reTip('${s.label}: ${s.pct}%');this.style.opacity=1" onmouseleave="reTipHide();this.style.opacity=0.88"/>
+      <text x="${lx}" y="${ly}" font-family="Rajdhani,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#fff">${s.pct}%</text>`;
+  }).join('');
+
+  const legend = slices.map((s, i) =>
+    `<div style="display:flex;align-items:center;gap:8px;font-family:'DM Mono',monospace;font-size:12px;color:#333;">
+      <span style="width:14px;height:14px;border-radius:3px;background:${s.color};flex-shrink:0;display:inline-block;"></span>
+      <span>${s.label} (${s.pct}%)</span>
+    </div>`
+  ).join('');
+
+  wrap.innerHTML = `
+    <div style="position:relative;flex-shrink:0;">
+      <svg viewBox="0 0 260 260" width="260" height="260" style="display:block;overflow:visible;">
+        <text x="130" y="18" font-family="Rajdhani,sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#0d2d4e">Distribution of Global Real Estate Value</text>
+        ${paths}
+      </svg>
+      <div id="re-tooltip" style="display:none;position:absolute;background:rgba(13,45,78,0.92);color:#fff;font-family:'DM Mono',monospace;font-size:12px;padding:6px 12px;border-radius:4px;pointer-events:none;white-space:nowrap;bottom:-30px;left:50%;transform:translateX(-50%);"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;">${legend}</div>`;
+}
+
+window.reTip = function(txt) {
+  const tip = document.getElementById('re-tooltip');
+  if (tip) { tip.textContent = txt; tip.style.display = 'block'; }
+};
+window.reTipHide = function() {
+  const tip = document.getElementById('re-tooltip');
+  if (tip) tip.style.display = 'none';
+};
+
+/* ═══════════════════════════════════════
+   MODULE 2 DATA
+═══════════════════════════════════════ */
+const BENEFITS = {
+  liquidity: {
+    title: 'Increased Liquidity',
+    tag: 'Benefit',
+    text: `<p>Liquidity is arguably the most important financial property of any asset. Illiquid assets trade at a discount — the "illiquidity premium" — because buyers are scarce and timing sales is difficult. Tokenization directly attacks this problem through fractionalisation and broader market access.</p>
+    <p style="margin-top:12px">Consider a Claude Monet painting worth $50M. Its buyer pool is tiny. To sell quickly, the owner must accept a steep discount. Now imagine fractionalising it into 10,000 tokens at $5,000 each. The potential buyer pool explodes. The asset's economic value becomes more realisable.</p>
+    <p style="margin-top:12px">The same logic applies daily across thousands of real-world markets: private real estate properties sitting unsold, private equity stakes with no exit window, private debt instruments with no secondary market. Tokenization + fractionalisation deepens these markets by lowering ticket size and enabling easier transfer of ownership.</p>
+    <div class="ib-highlight">Moody's (April 2024): "One of the most significant advantages of tokenization is the enhancement of liquidity for traditionally illiquid assets. By breaking down large assets into smaller, tradable tokens, investors can buy and sell their stakes in dedicated secondary markets with much greater ease."</div>
+    <p style="margin-top:12px"><strong>The caveat:</strong> Liquidity only materialises if there is a functioning secondary market. Currently, most tokenized asset secondary markets are immature. Liquidity remains a promise more than a reality for most asset classes — except financial instruments on established digital exchanges.</p>`
+  },
+  trading247: {
+    title: '24/7 Global Trading',
+    tag: 'Benefit',
+    text: `<p>Traditional securities exchanges operate 9am–5pm on weekdays, within single time zones. A European investor wanting to trade a US-listed bond at 10pm local time simply cannot. Tokenized assets on blockchain-based trading platforms break this constraint entirely.</p>
+    <p style="margin-top:12px">Tokens can be traded around the clock, 365 days a year, on any approved digital exchange worldwide. For a global asset class, this is transformative: it means price discovery happens continuously, market access is equal regardless of geography or time zone, and reactions to news events can be immediate.</p>
+    <p style="margin-top:12px">The regulatory caveat: not all jurisdictions allow unrestricted 24/7 trading of security tokens. Jurisdictional rules, accreditation requirements, and KYC/AML checks still apply — meaning the framework allows global access but compliance filters limit who can actually participate.</p>
+    <div class="ib-highlight">The vision: a near-frictionless, global, 24/7/365 market for securities. The reality today: several approved exchanges operate extended hours, but full adoption requires deeper regulatory alignment across jurisdictions.</div>`
+  },
+  posttrade: {
+    title: 'Post-Trade Efficiency',
+    tag: 'Benefit',
+    text: `<p>Post-trade — clearing, settlement, reconciliation, custody — accounts for a disproportionate share of financial market costs. Today's infrastructure involves multiple intermediaries (clearinghouses, CSDs, custodians, brokers) each running their own data silos, requiring constant reconciliation. Settlement takes T+1 or T+2 days.</p>
+    <p style="margin-top:12px">Tokenization enables atomic settlement: the simultaneous, instant exchange of tokens for payment on a shared blockchain ledger. No counterparty risk during a settlement delay. No reconciliation needed between separate systems. Fewer intermediaries in the chain.</p>
+    <p style="margin-top:12px">The GFMA estimates potential savings of ~$20 billion per year globally in clearing and settlement costs if tokenization reaches scale. This is the primary reason institutional players have been drawn to the space since 2022 — not ideology, but cost reduction at scale.</p>
+    <div class="ib-highlight">Citigroup on the incumbent infrastructure: "Today, different parts of the financial market infrastructure run on different rails, some built in the days of COBOL and Telex. Payment runs on its own tech stack, as does asset discovery and pre-trade matching, while clearing and settlement is on yet another stack."</div>
+    <p style="margin-top:12px"><strong>Trade-off:</strong> Instant settlement requires buyers to have capital ready at trade time — no T+1 buffer. This imposes stricter liquidity requirements but ultimately drives better discipline in capital management.</p>`
+  },
+  automatedcompliance: {
+    title: 'Automated Compliance',
+    tag: 'Benefit',
+    text: `<p>Compliance in securities markets is non-negotiable and expensive. KYC/AML checks, accreditation verification, jurisdictional transfer rules, reporting obligations: each transaction requires multiple layers of verification, especially across borders.</p>
+    <p style="margin-top:12px">Smart contracts make compliance self-executing. Instead of manually verifying each transfer, the token itself contains the rules. A transfer can only complete if the recipient passes KYC, is in an approved jurisdiction, and meets accreditation requirements. The code checks these automatically, every time, with zero human intervention.</p>
+    <p style="margin-top:12px">This is the core innovation of standards like ERC-3643 (T-Rex Protocol), which integrates on-chain identity verification (ONCHAINID) directly into the transfer mechanism, hardcoding compliance at the smart contract level so no administrator can bypass it.</p>
+    <div class="ib-highlight">Benefits: reduced compliance costs, lower error rates, faster execution, easier cross-border offering (rules encoded per jurisdiction), and full auditability on-chain, creating a transparent, tamper-proof compliance trail.</div>`
+  },
+  democratisation: {
+    title: 'Democratisation Through Fractionalisation',
+    tag: 'Benefit',
+    text: `<p>Most high-value assets — a commercial property, a private equity fund, an institutional bond — have minimum ticket sizes of hundreds of thousands or millions of dollars. This locks out the vast majority of investors.</p>
+    <p style="margin-top:12px">Tokenization enables fractional ownership at any granularity: $100 stakes in a $50M building, $1,000 positions in a $500M private fund. This broadens the investor base, increases market depth, and — in theory — contributes to financial inclusion.</p>
+    <p style="margin-top:12px">Fractionalisation without blockchain is possible but enormously complex: manual legal contracts for each investor, manually administered cap tables, no easy exit path. Tokenization radically simplifies the process and makes it scalable to thousands of holders simultaneously.</p>
+    <div class="ib-highlight">The democratisation caveat: In most jurisdictions, security tokens are still restricted to accredited or professional investors. Regulation D Rule 506(c) in the US, for example, limits participation to accredited investors only. Full democratisation to retail investors requires regulatory evolution — which is happening, but slowly.</div>
+    <p style="margin-top:12px">An important exception: Exodus, the crypto wallet company, used Regulation A+ to raise $75M from 6,800 investors — 92% non-accredited. This is the democratisation model in action, though it remains rare due to the complexity and cost of Reg A+.</p>`
+  }
+};
+
+/* ═══════════════════════════════════════
+   MODULE 3 DATA
+═══════════════════════════════════════ */
+const STANDARDS = {
+  erc20: {
+    title: 'ERC-20 — The Foundation of Fungible Tokens',
+    tag: 'Standard',
+    text: `<p>ERC-20 is the original and most widely adopted token standard. Created in November 2015 by Fabian Vogelsteller at the Ethereum Foundation, it defines a minimal, standardised interface for fungible tokens — ensuring every ERC-20 token can be handled by any wallet or exchange without custom integration.</p>
+    <p style="margin-top:12px">The standard defines three optional functions (Name, Symbol, Decimals) and six mandatory ones (TotalSupply, BalanceOf, Transfer, TransferFrom, Approve, Allowance). This small surface area is the key to its success: by agreeing on just these functions, the entire ecosystem of wallets, DEXes, and DeFi protocols can interact with any token automatically.</p>
+    <p style="margin-top:12px">Vogelsteller on why standards matter: <em>"Standards are critical, especially on a smart contract-based blockchain where everybody can make small programs. Without standards, everybody would make different smart contracts for tokens, and they would have different connections on various parameters, and then no wallet or exchange could integrate all these tokens because they would have to adapt to each one separately."</em></p>
+    <div class="ib-highlight">ERC-20 enabled the ICO boom of 2017–2018 — any project could issue a compliant token in hours. It also enabled the DeFi explosion of 2020. It is the ISO 9001 of blockchain tokens: a minimal quality standard that unlocks industrial-scale interoperability.</div>`
+  },
+  erc721: {
+    title: 'ERC-721 — The NFT Standard',
+    tag: 'Standard',
+    text: `<p>ERC-721 was created by William Entriken specifically for non-fungible tokens. Where ERC-20 makes all tokens identical, ERC-721 makes every token unique — each has its own ID and can carry distinct metadata. The standard was first deployed with CryptoKitties in late 2017.</p>
+    <p style="margin-top:12px">ERC-721 is the natural format for tokenizing unique real-world assets: a specific property at 123 Rue Saint-Paul, Montreal; a particular Hockney painting; a unique contractual right; a provenance certificate for a vintage car. The non-fungibility is a feature, not a limitation.</p>
+    <p style="margin-top:12px">From an institutional tokenization perspective, ERC-721's most important capabilities are: proof of uniqueness and provenance for native digital assets, certificates and credentials that cannot be duplicated, and unique legal instruments where identity of the specific asset matters.</p>
+    <div class="ib-highlight">The NFT market had a dramatic bubble in 2021 (inflated by speculative art trading) followed by a collapse in 2022. The technology itself remains sound — the problem was speculative excess around a narrow use case, not the underlying standard. Institutional NFT use for provenance, certificates, and unique contract rights continues to develop quietly.</div>
+    <p style="margin-top:12px">Regulatory complexity: NFTs sit in a legal grey zone. Depending on the rights attached (ownership, revenue share, governance), they may qualify as securities under the Howey Test or MiFID II. Always requires case-by-case legal analysis before public offering.</p>`
+  },
+  erc1400: {
+    title: 'ERC-1400 — The First Security Token Standard',
+    tag: 'Standard',
+    text: `<p>ERC-1400 was developed in 2018 through a 50-person roundtable of technical and regulatory experts hosted by Polymath — including Fabian Vogelsteller (creator of ERC-20). It was the first serious attempt to create a standard specifically for security tokens, solving the fundamental tension between blockchain's global nature and securities law's jurisdictional specificity.</p>
+    <p style="margin-top:12px">The standard works as an overarching framework plus a library of sub-standards for specific use cases: ERC-1410 (differentiated ownership/transparent restrictions), ERC-1594 (on-chain restriction checking + off-chain data injection), ERC-1643 (document management), ERC-1644 (controller operations / force transfer).</p>
+    <p style="margin-top:12px">Key requirements all ERC-1400 tokens must meet:</p>
+    <ul style="margin-top:8px;padding-left:20px;font-family:'DM Mono',monospace;font-size:13px;line-height:1.9">
+      <li>Standard interface to query whether a transfer would succeed, with reason for failure</li>
+      <li>Ability to perform forced transfer for legal action or fund recovery</li>
+      <li>Support for KYC/AML metadata attached to token holder balances</li>
+      <li>Full ERC-20 compatibility</li>
+    </ul>
+    <div class="ib-highlight">Main limitation of ERC-1400: transfer validations rely on off-chain generated keys. This introduces risk — if a key is lost or compromised, the entire validation process is at risk. This was the primary motivation for developing ERC-3643.</div>`
+  },
+  erc3643: {
+    title: 'ERC-3643 (T-Rex Protocol) — The Streamlined Security Standard',
+    tag: 'Standard',
+    text: `<p>ERC-3643, developed by European company Tokeny (Luxembourg) and marked Final in December 2023, is the current leading standard for compliant security tokens. It builds on ERC-1400's philosophy but simplifies implementation and eliminates the off-chain key risk that was ERC-1400's main vulnerability.</p>
+    <p style="margin-top:12px">The key innovation: ERC-3643 handles all transfer validation <strong>automatically on-chain</strong> via a built-in ONCHAINID feature. Identity validation, jurisdiction checks, accreditation verification — all executed in the smart contract itself with no off-chain keys to lose or compromise.</p>
+    <p style="margin-top:12px">Why ERC-3643 is preferred by many practitioners:</p>
+    <ul style="margin-top:8px;padding-left:20px;font-family:'DM Mono',monospace;font-size:13px;line-height:1.9">
+      <li><strong>More secure:</strong> Fully on-chain validation, no off-chain key risk</li>
+      <li><strong>More scalable:</strong> Handles multiple rules and jurisdictions without sub-token partitions</li>
+      <li><strong>More user-friendly:</strong> Compatible with any ERC-20 wallet or exchange</li>
+      <li><strong>Officially recognized:</strong> The only permissioned token standard merged into Ethereum's main EIP repository</li>
+    </ul>
+    <div class="ib-highlight">ERC-3643 is now the only permissioned token standard merged into Ethereum's main EIP repository, and is widely regarded as the leading compliance-ready standard for security tokens globally.</div>`
+  },
+  iso: {
+    title: 'ISO/TC 307 — The International Standards Track',
+    tag: 'Standard',
+    text: `<p>The International Organization for Standardization (ISO) has established a dedicated technical committee, ISO/TC 307, for blockchain and distributed ledger technologies. It consists of multiple sub-standards at various stages of development — some published, some still in progress.</p>
+    <p style="margin-top:12px">Most relevant to asset tokenization: <strong>ISO/CD 20435</strong>, described as "a framework for representing physical assets using tokens." As of 2024, it is still under review by the relevant ISO committee — meaning the formal global standard for asset tokenization itself has not yet been finalized.</p>
+    <p style="margin-top:12px">Already published: <strong>ISO/TR 23455:2019</strong> — "Overview of and interactions between smart contracts in blockchain and distributed ledger technology systems." This provides foundational guidance on how smart contracts operate across different DLT environments.</p>
+    <div class="ib-highlight">The significance of ISO involvement: Standards bodies like ISO signal industry maturity. When ISO produces a framework for tokenizing physical assets, it will provide the common language needed for cross-border, cross-jurisdiction token issuance at scale — the same role ISO 20022 plays in cross-border payments today.</div>
+    <p style="margin-top:12px">Professor Andrew Tanenbaum once quipped: "The nice thing about standards is that you have so many to choose from." In tokenization, this remains partially true — but the field is converging, with ERC-3643 leading the security token space and ISO work providing the longer-term global reference framework.</p>`
+  }
+};
+
+/* ═══════════════════════════════════════
+   MODULE 4 DATA
+═══════════════════════════════════════ */
+const ACTORS = {
+  issuance: {
+    title: 'Issuance Platforms — The Pioneers',
+    tag: 'Industry Actor',
+    text: `<p>Issuance platforms are the companies that enable asset owners to structure, tokenize, and launch security tokens. They are the architects of the new industry — the first to envision tokenization as a regulated, institutional-grade activity beyond the ICO model.</p>
+    <p style="margin-top:12px">The earliest platforms emerged around 2017–2018: Polymath (Toronto, est. 2017) led the way, building ERC-1400 and later pivoting to Polymesh, a blockchain purpose-built for security tokens. Others included Harbor, Neufund, Liquefy, and Securitize. Many of the early players didn't survive the 2018–2021 winter — insufficient revenue, high regulatory costs, and a market that hadn't yet arrived.</p>
+    <p style="margin-top:12px">Key functions: structuring the token economics (tokenomics), handling the legal and compliance wrapping, issuing the actual tokens on the chosen blockchain, managing the investor onboarding (KYC/AML), and coordinating with exchanges for listing.</p>
+    <div class="ib-highlight">Industry insight (Archax CEO Graham Rodford, 2019): "The number of issuance platforms is too high, it's not a sustainable business model, and I expect that we will start to see some consolidation in the market soon." — This consolidation did occur through 2020–2022.</div>
+    <p style="margin-top:12px">Today, survivors include Securitize (which assisted BlackRock's BUIDL fund), Polymath/Polymesh, and newer entrants like Tokeny (ERC-3643 developer).</p>`
+  },
+  custodians: {
+    title: 'Custodians — Securing Institutional Assets',
+    tag: 'Industry Actor',
+    text: `<p>Custody is the safekeeping of assets on behalf of clients. In traditional finance, this is handled by banks and specialized custodians. In tokenized asset markets, custody of private keys determines ownership — creating a unique set of challenges and opportunities.</p>
+    <p style="margin-top:12px">Self-custody (managing your own private key) is the blockchain ideal — maximum decentralization, no counterparty risk. But it's impractical for institutions: a private key lost or stolen means assets are gone forever. World Federation of Exchanges: <em>"Self-custody is the equivalent of stuffing dollars under the mattress."</em></p>
+    <p style="margin-top:12px">The custody market has evolved into two camps:</p>
+    <ul style="margin-top:8px;padding-left:20px;font-family:'DM Mono',monospace;font-size:13px;line-height:1.9">
+      <li><strong>Crypto-native custodians:</strong> Fireblocks (MPC-based), BitGo, Copper, Hex Trust — built specifically for digital assets, offering institutional-grade key management</li>
+      <li><strong>TradFi incumbents entering the space:</strong> BNY Mellon (Digital Asset Custody Platform, October 2022), HSBC (Harmonize platform, 2024), enabling clients to hold tokenized assets alongside traditional investments</li>
+    </ul>
+    <div class="ib-highlight">The strategic importance of MPC custody: Multi-Party Computation fragments private keys across multiple entities that must collaborate to sign transactions, without ever reconstructing the full key. This separation between the node environment and the signature environment is a recognized institutional-grade risk-reduction approach.</div>`
+  },
+  exchanges: {
+    title: 'Exchanges — The Secondary Market Challenge',
+    tag: 'Industry Actor',
+    text: `<p>For tokenized assets to deliver on their liquidity promise, there must be functioning secondary markets where tokens can be bought and sold after initial issuance. The Who's Who Guide 2024 lists 62 digital asset exchanges worldwide — but trading volumes remain a fraction of traditional exchange activity.</p>
+    <p style="margin-top:12px">The chicken-and-egg problem: without a sufficient number of listed security tokens, there are no investors. Without investors, asset owners won't tokenize. Solving this requires simultaneous growth in issuance quality, investor education, and regulatory clarity — a collective coordination problem.</p>
+    <p style="margin-top:12px">Bright spots: SIX Digital Exchange (Switzerland) and Luxembourg Stock Exchange have listed their first security tokens. Luxembourg listed a Société Générale token in January 2022. tZERO has been trading security tokens since 2019. Archax (London) operates as an FCA-regulated exchange and custodian.</p>
+    <div class="ib-highlight">Market snapshot (RWA.xyz, April 2026): Tokenized RWAs reached $29.4B on April 19, 2026 — up from $5.8B on January 1, 2025, a +407% increase in 16 months. US Treasury Debt leads at $13.8B, followed by Commodities at $5.4B and Asset-Backed Credit at $2.6B. Impressive growth rate, but still a fraction of traditional market volumes — the runway ahead is vast.</div>
+    <p style="margin-top:12px">The most important near-term development: the US Treasury Department's TBAC published an analysis of tokenized US Treasury markets in October 2024, listing nine active projects. When the world's largest bond market starts taking tokenization seriously at the regulatory level, exchanges will follow.</p>`
+  },
+  lawyers: {
+    title: 'Law Firms — The Essential Complexity Navigators',
+    tag: 'Industry Actor',
+    text: `<p>Asset tokenization is inherently cross-jurisdictional — the technology is global but securities law is national. Every tokenization project must navigate the specific regulations of each jurisdiction where tokens will be offered. This creates structural demand for legal expertise that will not disappear as the industry matures.</p>
+    <p style="margin-top:12px">The Who's Who Guide 2024 lists 70 law firms specializing in tokenization — across three categories:</p>
+    <ul style="margin-top:8px;padding-left:20px;font-family:'DM Mono',monospace;font-size:13px;line-height:1.9">
+      <li><strong>Boutique specialists:</strong> Bull Blockchain Law (US), Crypto Legal (UK), Samar Law (DK), Nägele (Liechtenstein), Law Beam (UK/UAE). Deep blockchain expertise, primarily serve startups</li>
+      <li><strong>Mid-market multi-practice:</strong> MME (Switzerland), Tanner de Witt (HK), Rasma Legal (UAE), Stadler Völkel (Austria). Serve mid-to-large companies across sectors</li>
+      <li><strong>Global majors:</strong> DLA Piper, Baker McKenzie, Dentons, Hogan Lovells, Cooley, K&L Gates. Dedicated tokenization teams, serve the largest institutional players</li>
+    </ul>
+    <div class="ib-highlight">The strategic role of large law firms: Their entry adds institutional credibility. A major tokenization project backed by DLA Piper or Baker McKenzie sends a signal that the transaction meets standards that global financial institutions already trust — lowering the barrier for institutional adoption.</div>`
+  },
+  serviceproviders: {
+    title: 'Service Providers — The Broadest Category',
+    tag: 'Industry Actor',
+    text: `<p>Service providers are the most numerous category in the tokenization ecosystem — 109 listed in the Who's Who Guide 2024. The category is extraordinarily diverse, covering the entire technology and business stack around tokenization.</p>
+    <p style="margin-top:12px">What service providers do:</p>
+    <ul style="margin-top:8px;padding-left:20px;font-family:'DM Mono',monospace;font-size:13px;line-height:1.9">
+      <li>Technical infrastructure: blockchain nodes, smart contract audits, DLT middleware, wallet infrastructure</li>
+      <li>Compliance technology: KYC/AML automation, identity verification (ONCHAINID, etc.)</li>
+      <li>Data and analytics: Kaiko, Coin Metrics, Nansen — providing market data for tokenized assets</li>
+      <li>Market-making and brokerage services for token liquidity</li>
+      <li>STO planning and structuring consultancy</li>
+      <li>Communication, marketing and community building for token projects</li>
+    </ul>
+    <div class="ib-highlight">Quality signal challenge: The NFT wave brought opacity and pseudonymity into parts of the service provider world — teams of anonymous avatars offering unverifiable services. As the institutional market matures, transparency and track record are becoming the key selection criteria. Most serious tokenization service providers now operate with full corporate transparency.</div>`
+  },
+  institutional: {
+    title: 'Institutional Players — The Game-Changers',
+    tag: 'Industry Actor',
+    text: `<p>Since approximately 2022, large institutional financial players have entered asset tokenization in earnest — and their arrival changes everything. They don't just add capital; they add credibility, regulatory influence, and market infrastructure.</p>
+    <p style="margin-top:12px">Key participants and milestones:</p>
+    <ul style="margin-top:8px;padding-left:20px;font-family:'DM Mono',monospace;font-size:13px;line-height:1.9">
+      <li><strong>BlackRock:</strong> BUIDL tokenized money market fund (March 2024, $500M+ AUM), iShares Bitcoin ETF (SEC approved September 2024). Larry Fink: "Step two is going to be the tokenization of every financial asset."</li>
+      <li><strong>J.P. Morgan:</strong> Onyx platform, Tokenized Collateral Network — processing billions in intraday repo settlements on blockchain</li>
+      <li><strong>Goldman Sachs:</strong> GS DAP™ tokenization platform, Project Venus with EIB (€100M digital bond, 2022)</li>
+      <li><strong>Franklin Templeton:</strong> Spot Bitcoin ETF, Ethereum ETF, and a direct tokenized fund on blockchain</li>
+      <li><strong>Hamilton Lane & KKR:</strong> Tokenized portions of their private equity funds via Securitize</li>
+    </ul>
+    <div class="ib-highlight">The flywheel effect: When a BlackRock or JPMorgan enters, they don't just bring capital — they force regulators to create clearer frameworks, they bring established client relationships, and they validate the technology for thousands of smaller institutions watching from the sidelines. As Tal Elyashiv (SPiCE VC) noted: "You need to see top-down adoption" — and that shift began decisively in 2022.</div>`
+  }
+};
+
+/* ═══════════════════════════════════════
+   MODULE 5 DATA
+═══════════════════════════════════════ */
+const ASSETS = {
+  financial: {
+    title: 'Financial Instruments — The Near-Term Driver',
+    tag: 'Asset Class',
+    text: `<p>No asset class will drive the tokenization industry faster in the near term than financial instruments tokenized by major financial institutions. The math is simple: banks and asset managers process billions in daily transactions on aging infrastructure. Post-trade optimization through tokenization = direct, measurable cost savings.</p>
+    <p style="margin-top:12px"><strong>Current landscape:</strong></p>
+    <ul style="margin-top:8px;padding-left:20px;font-family:'DM Mono',monospace;font-size:13px;line-height:1.9">
+      <li><strong>Tokenized government bonds:</strong> EIB €100M bond (Goldman Sachs, 2022); UBS CHF 375M digital bond on SIX Digital Exchange; US Treasury TBAC analysis (October 2024) listing 9 active tokenization projects</li>
+      <li><strong>Tokenized funds:</strong> BlackRock BUIDL (November 2024 expansion, $500M+); KKR and Hamilton Lane tokenized PE funds via Securitize; Franklin Templeton tokenized money market fund</li>
+      <li><strong>Tokenized ETFs:</strong> Ondo Finance OUSG (referencing BlackRock US Treasuries ETF, 2023); growing ecosystem of yield-bearing tokenized T-bill products</li>
+    </ul>
+    <div class="ib-highlight">The trajectory: Phase 1 (now) — "tokenized securities" where existing instruments receive a digital wrapper. Phase 2 — native security tokens issued directly on blockchain, without a traditional parallel. Phase 3 — all securities issued natively on blockchain, traditional issuance phased out. Former NASDAQ Chairman Bob Greifeld (2018): "100% of stocks and bonds on Wall Street will be tokenized in 5 years." Still hasn't happened, but the direction is clear, with a longer timeline.</div>`
+  },
+  realestate: {
+    title: 'Real Estate — The World\'s Largest Asset Class',
+    tag: 'Asset Class',
+    text: `<p>Global real estate has an estimated total value of $379 trillion (2022) — larger than stocks, shares, and bonds combined. It is the most valuable standalone asset class on earth, which explains why it attracted tokenization pioneers from the very beginning. And why the gap between hype and reality has been so painful.</p>
+    <p style="margin-top:12px"><strong>The structural challenge:</strong> In most jurisdictions, you cannot directly tokenize real estate. Laws don't recognize fractional blockchain ownership of property. Instead, you must first create a Special Purpose Vehicle (SPV) or Series LLC whose sole purpose is to own the property — then tokenize the SPV. You are tokenizing a legal entity, not the building itself.</p>
+    <p style="margin-top:12px"><strong>The added value problem:</strong> Real estate investors already have functional (if imperfect) tools: REITs, private real estate funds, direct ownership. Tokenization must demonstrate measurable improvement — faster exit, lower costs, access to capital from previously unreachable markets — to justify the complexity and cost of tokenizing. As MakerDAO founder Rune Christensen noted in 2019: "There always has to be that other reason beyond tokenization just for the sake of tokenization."</p>
+    <div class="ib-highlight">State Street (2024): "The holy grail of tokenizing individual commercial or residential properties where tokens represent genuine fractional ownership will take longer to develop. It will only happen once tokenization technology is fully established and legislation defines tokenized fractional ownership for real assets."</div>`
+  },
+  privateequity: {
+    title: 'Private Equity & STOs — The Original Promise',
+    tag: 'Asset Class',
+    text: `<p>Private equity tokenization — security token offerings (STOs) for unlisted company equity — was the original driving vision behind the post-ICO regulatory turn. Over 333 million companies exist globally; less than 0.02% are publicly listed. The other 99.98% have no efficient path to raise capital from a broad investor base. STOs were supposed to fix this.</p>
+    <p style="margin-top:12px"><strong>What happened instead:</strong> The STO market never exploded. Fewer than 500 true STOs globally since 2017. The 2018 crypto winter, complex compliance requirements, immature secondary markets, and the chicken-and-egg liquidity problem combined to keep volumes low. State Street (2024): "Tokenized equity is very rare."</p>
+    <p style="margin-top:12px"><strong>Why the potential still exists:</strong></p>
+    <ul style="margin-top:8px;padding-left:20px;font-family:'DM Mono',monospace;font-size:13px;line-height:1.9">
+      <li>63% of institutional investors and 59% of HNW investors indicate interest in tokenized private equity (EY-Parthenon, 2023)</li>
+      <li>Roland Berger projects $1.4T in tokenized private equity by 2030 (part of $10.9T total)</li>
+      <li>The exit problem for private equity investors (waiting for IPO/acquisition/merger) is directly solved by tokenization + secondary market</li>
+      <li>Bain & Company: "Private equity, private debt, and private real estate probably have the most to gain" from tokenization</li>
+    </ul>
+    <div class="ib-highlight">The success story: Exodus (crypto wallet) raised $75M under Regulation A+ in 60 days with 6,800 investors — 92% non-accredited. EXOD subsequently listed on the New York Stock Exchange on December 18, 2024. This is the democratization model fully realized — but remains a rare exception, not the norm.</div>
+    <p style="margin-top:12px">Three barriers to acceleration: (1) Immature secondary markets and lack of liquidity; (2) Regulatory uncertainty in several jurisdictions; (3) Lack of knowledge on issuer and investor side on how to execute tokenization properly.</p>`
+  }
+};
+
+/* ═══════════════════════════════════════
+   TAM PICK
+═══════════════════════════════════════ */
+const TAM_DATA = {
+  debt: { title: 'Non-Financial Corporate & Quasi Sovereign Debt — $187T TAM', text: `<p>The single largest tokenization opportunity. Corporate and quasi-sovereign bonds represent $187 trillion in total market value — Citigroup estimates $1.9 trillion (approx. 1%) will be tokenized by 2030. This is the bond market's "digital wrapper" opportunity: applying blockchain settlement to existing bonds to reduce post-trade costs, enable instant settlement, and open 24/7 trading.</p><p style="margin-top:10px">This sector is already moving: UBS (CHF 375M digital bond on SIX Digital Exchange), EIB (€100M Project Venus bond, Goldman Sachs), and the US Treasury's TBAC analysis signal that the world's most important debt markets are beginning the tokenization transition.</p>` },
+  realestate: { title: 'Real Estate Funds — $20T TAM', text: `<p>Real estate fund tokenization is more tractable than direct property tokenization because fund units are already securities — they can be wrapped in tokens without the SPV complexity required for direct real estate. Citigroup projects $1.5T tokenized by 2030.</p>` },
+  pe: { title: 'Private Equity & Venture Capital — $7T TAM', text: `<p>$7T in PE/VC assets with $0.7T projected tokenized by 2030. The opportunity is solving the illiquidity problem for private investors — transforming assets that typically require 7–10 year lock-ups into tokens that can be traded on secondary markets. EY-Parthenon (2023): 63% of institutional investors are interested in tokenized private equity.</p>` },
+  securities: { title: 'Securities Financing & Collateral — $42T TAM', text: `<p>One of the most technically mature tokenization use cases. J.P. Morgan's Onyx platform already processes billions in intraday repo settlements using tokenized collateral. The $42T securities financing market stands to gain enormously from atomic settlement (eliminating T+0 to T+2 delays) and programmable collateral management. Projected tokenized by 2030: $0.5–1.0T.</p>` },
+  trade: { title: 'Trade Finance — $12T TAM', text: `<p>Trade finance is notoriously paper-intensive, slow, and fraud-prone — letters of credit and bills of lading still rely on physical documents in many cases. Tokenization + smart contracts + DLT can reduce settlement times from weeks to hours, lower fraud risk, and open access to smaller businesses currently excluded from trade finance. Citigroup projects $1.0T tokenized by 2030.</p>` }
+};
+
+/* ═══════════════════════════════════════
+   MODULE 7 DATA
+═══════════════════════════════════════ */
+const REG_DATA = {
+  us_howey: {
+    title: 'The Howey Test — US Definition of a Security',
+    tag: 'US Framework',
+    text: `<p>The Howey Test is the foundational legal framework used by the SEC to determine whether any instrument — including a digital token — qualifies as a security. It stems from a 1946 Supreme Court case. For a token to be a security under Howey, four prongs must all be met:</p>
+    <ul style="margin-top:10px;padding-left:20px;font-family:'DM Mono',monospace;font-size:13px;line-height:2">
+      <li><strong>Investment of money:</strong> The investor puts capital into the venture</li>
+      <li><strong>In a common enterprise:</strong> Investors and the company "rise and fall together" — their fortunes are interwoven</li>
+      <li><strong>Expectation of profits:</strong> The investor expects a return (dividends, appreciation)</li>
+      <li><strong>Derived from the efforts of others:</strong> The investor is passive — profits come from management's work, not the investor's own effort</li>
+    </ul>
+    <div class="ib-highlight">The SEC applied the Howey Test aggressively to ICO-era tokens in 2017–2019, classifying many "utility tokens" as unregistered securities. The same test applies to security tokens today — making clear legal structuring essential for any US token offering.</div>
+    <p style="margin-top:12px">In 2019, the SEC published a framework for "Investment Contract Analysis of Digital Assets" to provide guidance on when digital tokens are investment contracts. A token claiming to be a utility token but functioning like an investment contract remains subject to SEC regulation.</p>`
+  },
+  us_regd: {
+    title: 'Regulation D — The Primary US STO Pathway',
+    tag: 'US Exemption',
+    text: `<p>Most US STOs have used Regulation D, which exempts issuers from the full SEC registration process required for an IPO. Reg D comes in three rules:</p>
+    <ul style="margin-top:10px;padding-left:20px;font-family:'DM Mono',monospace;font-size:13px;line-height:2">
+      <li><strong>Rule 504:</strong> Open to retail investors, but caps raises at $10M over 12 months and prohibits general solicitation (advertising). Securities are restricted — can't trade freely. Rarely used for STOs.</li>
+      <li><strong>Rule 506(b):</strong> Up to 35 non-accredited "sophisticated" investors plus unlimited accredited investors. No cap on raise amount. No general solicitation allowed — finding investors is challenging.</li>
+      <li><strong>Rule 506(c):</strong> The most popular STO route. Accredited investors only, but no raise cap and general solicitation IS permitted — the issuer can market publicly.</li>
+    </ul>
+    <div class="ib-highlight">The accreditation barrier: In the US, an accredited investor requires annual income >$200K or net worth >$1M. This effectively excludes most retail investors from Reg D STOs — the democratization promise of tokenization runs directly into this regulatory wall.</div>`
+  },
+  us_regaplus: {
+    title: 'Regulation A+ — The Mini-IPO',
+    tag: 'US Exemption',
+    text: `<p>Regulation A+ (also called the mini-IPO) is the only US pathway that allows security token offerings to retail investors. It allows up to $75M raised over 12 months, with public solicitation permitted and no lock-up restrictions.</p>
+    <p style="margin-top:12px">The catch: Reg A+ is expensive and complex. It requires filing with the SEC, producing an offering circular (similar to a prospectus), SEC qualification process, and ongoing reporting. The cost and time commitment makes it inaccessible for most small companies.</p>
+    <div class="ib-highlight">Success story: Exodus (crypto wallet provider) raised $75M in 60 days using Reg A+ via Securitize in 2021. 6,800 investors participated — 92% non-accredited. The CFO later noted: "Retail investors who bought a couple shares got the exact same deal as billionaires. That felt true to the spirit of blockchain." Exodus listed on the NYSE as EXOD on December 18, 2024.</div>
+    <p style="margin-top:12px">The question remains: Can the US create a simpler path for SMEs and startups that want to include retail investors? The EU's evolving Listing Act may provide inspiration.</p>`
+  },
+  us_regs: {
+    title: 'Regulation S — Offerings Outside the US',
+    tag: 'US Exemption',
+    text: `<p>Regulation S allows US issuers to offer securities outside the United States to non-US persons without SEC registration. This is the pathway used by many STOs that want to access European, Asian, or other international investor bases while keeping their US offering separate and compliant under Reg D.</p>
+    <p style="margin-top:12px">Key requirement: The offering must take place entirely outside the US, and no "directed selling efforts" may be made within the United States. For global token offerings, Reg S is typically combined with Reg D 506(c) — US accredited investors via Reg D, non-US investors via Reg S.</p>`
+  },
+  eu_mifid: {
+    title: 'MiFID II — The EU Security Token Framework',
+    tag: 'EU Framework',
+    text: `<p>The Markets in Financial Instruments Directive II (MiFID II) is the primary EU framework governing security tokens — even though MiFID II predates security tokens (first published 2014, in force 2018) and never mentions them.</p>
+    <p style="margin-top:12px">The key concept is <strong>Transferable Securities</strong> (Article 4(1)(44)): "those classes of securities which are negotiable on the capital market... including shares in companies, bonds or other forms of securitised debt, and any securities giving the right to acquire or sell such transferable securities."</p>
+    <p style="margin-top:12px">Legal experts broadly agree that security tokens meeting these characteristics fall under MiFID II — meaning they must be treated as traditional securities for regulatory purposes. This interpretation is confirmed by MiCA (2023), which excludes from its scope any "crypto-assets that qualify as financial instruments" under MiFID II Article 4(1)(15).</p>
+    <div class="ib-highlight">Practical implication: A security token issued in the EU must comply with the same investor protection, disclosure, and trading requirements as any listed security. This is demanding — but it also means EU investors have a clear, established legal framework for investing in security tokens, which reduces uncertainty.</div>`
+  },
+  eu_mica: {
+    title: 'MiCA — Markets in Crypto-Assets Regulation',
+    tag: 'EU Framework',
+    text: `<p>MiCA (Regulation EU 2023/1114) entered into force on June 29, 2023 and represents the EU's comprehensive regulatory framework for crypto-assets. It is significant for the tokenization industry primarily for what it does NOT cover: security tokens and tokenized securities are explicitly excluded from MiCA's scope and remain under MiFID II.</p>
+    <p style="margin-top:12px">What MiCA does regulate: utility tokens, asset-referenced tokens (stablecoins), and e-money tokens. For operators of crypto-asset services (exchanges, custodians), MiCA requires authorization as a CASP (Crypto-Asset Service Provider).</p>
+    <div class="ib-highlight">Why MiCA matters for tokenization: By providing regulatory clarity for non-security crypto-assets, MiCA reduces overall uncertainty in the European digital asset market — creating a more stable environment in which security token infrastructure can develop. It also establishes clear definitions that help issuers determine which regulatory framework applies to their instrument.</div>
+    <p style="margin-top:12px">The EU's approach — acknowledging that DLT can be transformative for finance while maintaining investor protections — is seen by many practitioners as a model for balanced innovation-enabling regulation.</p>`
+  },
+  eu_dlt: {
+    title: 'DLT Pilot Regime — The EU\'s Regulatory Sandbox',
+    tag: 'EU Framework',
+    text: `<p>The DLT Pilot Regime (Regulation EU 2022/858) is the EU's most direct intervention in the tokenized securities infrastructure space. Effective March 2023, it creates a temporary regulatory sandbox allowing DLT-based trading and settlement systems to operate with certain standard requirements eased — enabling real-world testing of tokenized asset infrastructure.</p>
+    <p style="margin-top:12px">Three types of DLT infrastructure are covered: DLT multilateral trading facilities, DLT settlement systems, and DLT trading and settlement systems. The target operators are investment firms, regulated market operators, and central securities depositories (CSDs).</p>
+    <div class="ib-highlight">Why it matters for STOs (indirectly): The DLT Pilot Regime doesn't regulate how STOs are conducted — but it creates the secondary market infrastructure that will determine whether STOs generate real liquidity. Without functioning DLT-based settlement systems, security tokens remain illiquid after their initial offering. The Pilot Regime is building the rails that future STO liquidity will run on.</div>
+    <p style="margin-top:12px">Austrian law firm Lansky (October 2022): "The introduction of this regulation promises to become a real 'game changer' for the importance of security tokens and their emissions."</p>`
+  },
+  eu_listing: {
+    title: 'EU Listing Act — Opening the Capital Markets',
+    tag: 'EU Framework',
+    text: `<p>The EU Listing Act (Regulation EU 2024/2809), adopted October 8, 2024 (applying from June 5, 2026), is a legislative package specifically designed to make capital markets more accessible to SMEs and startups. Its direct relevance to STOs comes through amendments to the Prospectus Regulation:</p>
+    <ul style="margin-top:10px;padding-left:20px;font-family:'DM Mono',monospace;font-size:13px;line-height:2">
+      <li><strong>Raised threshold:</strong> The exemption from producing a prospectus rises from €8M to <strong>€12M</strong> (per issuer, over 12 months). Below this threshold, STOs don't need a full prospectus. Member States may choose a lower €5M threshold.</li>
+      <li><strong>Simplified prospectus:</strong> For offerings above the threshold, the new law caps ordinary prospectuses at 300 pages (vs 800+ previously), standardizes format, and simplifies structure</li>
+      <li><strong>SME-specific provisions:</strong> ESMA given mandate to develop simplified disclosure standards for growth companies</li>
+    </ul>
+    <div class="ib-highlight">Bird & Bird (March 2023): "It is a new way for SMEs in the European economy to access capital markets. With the right incentives, SMEs may find it convenient to finance their investments through direct placements of tokenized shares or bonds in the DLT markets (STOs), as they can attract a broad audience of direct investors."</div>
+    <p style="margin-top:12px">The US comparison: The EU Listing Act may actually be ahead of the US in this regard — providing a clearer, less costly path for SMEs to raise capital from retail investors through STOs. The US Reg A+ theoretically achieves the same, but with higher compliance costs and less regulatory support structure.</p>`
+  }
+};
+
+window.pickReg = function(jurisdiction, key) {
+  const fullKey = jurisdiction + '_' + key;
+  const d = REG_DATA[fullKey];
+  if (!d) return;
+  // Clear all highlights
+  document.querySelectorAll('.reg-tag').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.reg-box').forEach(b => b.classList.remove('on'));
+  // Highlight the matching reg-box
+  const boxEl = document.getElementById('reg-' + jurisdiction + '-box');
+  if (boxEl) {
+    boxEl.classList.add('on');
+    // Highlight the matching tag by data-key
+    const tagBtn = boxEl.querySelector('.reg-tag[data-key="' + key + '"]');
+    if (tagBtn) tagBtn.classList.add('on');
+  }
+  showInfo('reg-box', 'reg-title', 'reg-text', d.title, d.text, d.tag);
+};
+
+</script>
+</body>
+</html>
