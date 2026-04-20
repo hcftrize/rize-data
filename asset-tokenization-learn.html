@@ -537,10 +537,10 @@ html,body{overflow-x:hidden;max-width:100%;}
         </div>
         <div class="reg-body">
           <div class="reg-tags">
-            <button class="reg-tag" onclick="event.stopPropagation();pickReg('us','howey')">Howey Test</button>
-            <button class="reg-tag" onclick="event.stopPropagation();pickReg('us','regd')">Regulation D</button>
-            <button class="reg-tag" onclick="event.stopPropagation();pickReg('us','regaplus')">Regulation A+</button>
-            <button class="reg-tag" onclick="event.stopPropagation();pickReg('us','regs')">Regulation S</button>
+            <button class="reg-tag" data-key="howey" onclick="event.stopPropagation();pickReg('us','howey')">Howey Test</button>
+            <button class="reg-tag" data-key="regd" onclick="event.stopPropagation();pickReg('us','regd')">Regulation D</button>
+            <button class="reg-tag" data-key="regaplus" onclick="event.stopPropagation();pickReg('us','regaplus')">Regulation A+</button>
+            <button class="reg-tag" data-key="regs" onclick="event.stopPropagation();pickReg('us','regs')">Regulation S</button>
           </div>
         </div>
       </div>
@@ -552,10 +552,10 @@ html,body{overflow-x:hidden;max-width:100%;}
         </div>
         <div class="reg-body">
           <div class="reg-tags">
-            <button class="reg-tag" onclick="event.stopPropagation();pickReg('eu','mifid')">MiFID II</button>
-            <button class="reg-tag" onclick="event.stopPropagation();pickReg('eu','mica')">MiCA</button>
-            <button class="reg-tag" onclick="event.stopPropagation();pickReg('eu','dlt')">DLT Pilot Regime</button>
-            <button class="reg-tag" onclick="event.stopPropagation();pickReg('eu','listing')">Listing Act</button>
+            <button class="reg-tag" data-key="mifid" onclick="event.stopPropagation();pickReg('eu','mifid')">MiFID II</button>
+            <button class="reg-tag" data-key="mica" onclick="event.stopPropagation();pickReg('eu','mica')">MiCA</button>
+            <button class="reg-tag" data-key="dlt" onclick="event.stopPropagation();pickReg('eu','dlt')">DLT Pilot Regime</button>
+            <button class="reg-tag" data-key="listing" onclick="event.stopPropagation();pickReg('eu','listing')">Listing Act</button>
           </div>
         </div>
       </div>
@@ -1326,22 +1326,16 @@ window.pickReg = function(jurisdiction, key) {
   const fullKey = jurisdiction + '_' + key;
   const d = REG_DATA[fullKey];
   if (!d) return;
-  // Clear all tag highlights
+  // Clear all highlights
   document.querySelectorAll('.reg-tag').forEach(b => b.classList.remove('on'));
-  // Clear reg-box highlights
   document.querySelectorAll('.reg-box').forEach(b => b.classList.remove('on'));
   // Highlight the matching reg-box
   const boxEl = document.getElementById('reg-' + jurisdiction + '-box');
-  if (boxEl) boxEl.classList.add('on');
-  // Highlight the matching tag button by finding it within the box
   if (boxEl) {
-    const allTags = boxEl.querySelectorAll('.reg-tag');
-    allTags.forEach(btn => {
-      if (btn.textContent.trim().toLowerCase().replace(/[^a-z0-9]/g,'') ===
-          key.toLowerCase().replace(/[^a-z0-9]/g,'')) {
-        btn.classList.add('on');
-      }
-    });
+    boxEl.classList.add('on');
+    // Highlight the matching tag by data-key
+    const tagBtn = boxEl.querySelector('.reg-tag[data-key="' + key + '"]');
+    if (tagBtn) tagBtn.classList.add('on');
   }
   showInfo('reg-box', 'reg-title', 'reg-text', d.title, d.text, d.tag);
 };
