@@ -2679,8 +2679,9 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
             data: cumData,
             borderColor: "#7ee0ff",
             backgroundColor: "rgba(126,224,255,0.12)",
-            fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2.5,
+            fill: true, tension: 0, pointRadius: 0, borderWidth: 2.5,
             spanGaps: true,
+            segment: { borderDash: () => [] },
             order: 2,
           },
           {
@@ -2735,8 +2736,9 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
             data: cumData,
             borderColor: "#7ee0ff",
             backgroundColor: "rgba(126,224,255,0.12)",
-            fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2.5,
+            fill: true, tension: 0, pointRadius: 0, borderWidth: 2.5,
             spanGaps: true,
+            segment: { borderDash: () => [] },
             order: 2,
           },
           {
