@@ -548,17 +548,17 @@
     .autocomplete-item {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 9px 14px;
+      gap: 12px;
+      padding: 11px 14px;
       cursor: pointer;
       border-bottom: 1px solid rgba(255,255,255,0.04);
       font-family: "Trebuchet MS", "Verdana", sans-serif;
       transition: background 0.12s;
     }
     .autocomplete-item:hover { background: rgba(126,224,255,0.06); }
-    .autocomplete-item img { width: 18px; height: 18px; border-radius: 50%; }
-    .autocomplete-symbol { font-family: 'Rajdhani', monospace; font-size: 13px; font-weight: 700; color: var(--gold); min-width: 44px; }
-    .autocomplete-name   { font-size: 13px; color: var(--muted); }
+    .autocomplete-item img { width: 28px; height: 28px; border-radius: 50%; }
+    .autocomplete-symbol { font-family: 'Rajdhani', monospace; font-size: 17px; font-weight: 700; color: var(--gold); min-width: 54px; }
+    .autocomplete-name   { font-size: 15px; color: var(--muted); }
 
     /* Shared add button style */
     .add-btn {
@@ -827,7 +827,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
       flex-wrap: wrap;
     }
     .ctx-tab {
-      font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700;
+      font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700;
       letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted);
       padding: 10px 20px; cursor: pointer; border: none; background: none;
       border-bottom: 2px solid transparent; margin-bottom: -1px;
@@ -910,6 +910,9 @@ html, body { overflow-x: hidden; max-width: 100%; }
       /* All tables scrollable */
       table:not(.tok-table) { min-width: 400px; }
       .tok-table { min-width: unset !important; }
+      /* tok-table mobile: revert to small sizes */
+      .tok-table th { font-size: 12px !important; padding: 7px 8px !important; }
+      .tok-table td { font-size: 13px !important; padding: 7px 8px !important; }
       .section-body, #rz-unlock-burn, #rz-unlock-pending,
       #rz-unlock-ongoing, #rz-unlock-done, #rz-burn-events-table { overflow-x: auto; }
     }
@@ -918,6 +921,39 @@ html, body { overflow-x: hidden; max-width: 100%; }
     .rz-unlock-active {
       color: var(--cyan) !important;
       border-bottom-color: var(--cyan) !important;
+    }
+
+    /* Mobile ctx-tabs: native select */
+    .ctx-tabs-mobile-wrap { display: none; }
+    .ctx-tabs-select {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(6,8,24,0.95);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      outline: none;
+      margin-bottom: 20px;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 7 6-7' stroke='%237ee0ff' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 40px;
+    }
+    .ctx-tabs-select option {
+      background: #060818;
+      color: #fff;
+      font-size: 15px;
+    }
+    @media (max-width: 700px) {
+      .ctx-tabs-mobile-wrap { display: block; }
+      .ctx-tabs-desktop { display: none !important; }
     }
     </style>
 </head>
@@ -1004,7 +1040,17 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
       <p class="section-sub">T-RIZE revenue &amp; RIZE tokenomics. Canton source : Lighthouse by Five North.</p>
 
-      <div class="ctx-tabs">
+      <!-- Mobile: native select dropdown -->
+      <div class="ctx-tabs-mobile-wrap">
+        <select class="ctx-tabs-select" id="rz-ctx-select" onchange="rzCtxSelectChange(this)">
+          <option value="rwa">T-RIZE RWA Revenue</option>
+          <option value="rewards">T-RIZE Canton Revenue</option>
+          <option value="burns">RIZE Burns</option>
+          <option value="tokenomics">RIZE Tokenomics</option>
+        </select>
+      </div>
+      <!-- Desktop: tab buttons (hidden on mobile) -->
+      <div class="ctx-tabs ctx-tabs-desktop">
         <button class="ctx-tab active" onclick="rzCtxSwitch('rwa',this)">T-RIZE RWA Revenue</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('rewards',this)">T-RIZE Canton Revenue</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('burns',this)">RIZE Burns</button>
@@ -2586,6 +2632,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     btn.classList.add("active");
     section.querySelectorAll(".ctx-panel").forEach(p => p.classList.remove("active"));
     document.getElementById("rz-panel-" + tab).classList.add("active");
+    const sel = document.getElementById("rz-ctx-select");
+    if (sel) sel.value = tab;
     if (tab === "rwa") {
       setTimeout(() => rzRenderRwaChart(), 50);
     } else if (tab === "tokenomics") {
@@ -2757,6 +2805,16 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         ],
       },
       options: opts,
+    });
+  }
+
+  function rzCtxSelectChange(sel) {
+    const tab = sel.value;
+    // Mirror to desktop tabs
+    const desktopTabs = document.querySelectorAll("#rize-ctx-section .ctx-tabs-desktop .ctx-tab");
+    desktopTabs.forEach(function(btn) {
+      const btnTab = btn.getAttribute("onclick").match(/'([^']+)'/)[1];
+      if (btnTab === tab) rzCtxSwitch(tab, btn);
     });
   }
 
@@ -3134,6 +3192,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
             data: cumNetArr,
             borderColor: "#7ee0ff", backgroundColor: "rgba(126,224,255,0.15)",
             fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2.5,
+            spanGaps: true, segment: { borderDash: () => [] },
           }],
         },
         options: cumulOpts,
@@ -3167,19 +3226,21 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
                 data: cumValArr,
                 borderColor: "#98ffb6", backgroundColor: "rgba(152,255,182,0.18)",
                 fill: true, tension: 0.35, pointRadius: 0, borderWidth: 2,
+                spanGaps: true, segment: { borderDash: () => [] },
               },
               {
                 label: "T-RIZE Platform App",
                 data: cumAppArr,
                 borderColor: "#ffd36b", backgroundColor: "rgba(255,211,107,0.20)",
                 fill: true, tension: 0.35, pointRadius: 0, borderWidth: 1.5,
+                spanGaps: true, segment: { borderDash: () => [] },
               },
               {
                 label: "RIZEScore App",
                 data: cumScoreArr,
                 borderColor: "#ff8ad8", backgroundColor: "rgba(255,138,216,0.25)",
                 fill: true, tension: 0.35, pointRadius: 0, pointHoverRadius: 4,
-                borderWidth: 1.5, borderDash: [], segment: undefined,
+                borderWidth: 1.5, spanGaps: true, segment: { borderDash: () => [] },
               },
             ],
           },
