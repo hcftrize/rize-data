@@ -2611,9 +2611,13 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       { date: "2026-03-01", label: "KAIROS PROGRAMME",  amount: null   },
     ];
 
-    // Build a monthly timeline from first entry to today
+    // Build a monthly timeline from first entry to last entry (+ 1 month buffer)
+    // Always include all entries even if future, so the full chart renders on all devices
     const startDate = new Date("2025-01-01T00:00:00Z");
+    const lastEntryDate = new Date(rwaEntries[rwaEntries.length - 1].date);
+    lastEntryDate.setUTCMonth(lastEntryDate.getUTCMonth() + 1); // +1 month buffer
     const today     = new Date();
+    const endDate   = lastEntryDate > today ? lastEntryDate : today;
     const labels    = [];
     const cumData   = [];   // cumulative confirmed revenue
     const pointData = [];   // null except at named project dates
@@ -2621,7 +2625,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
     let cumSum = 0;
     let cur = new Date(startDate);
-    while (cur <= today) {
+    while (cur <= endDate) {
       const iso = cur.toISOString().slice(0, 7); // YYYY-MM
       const label = cur.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
       labels.push(label);
@@ -2676,6 +2680,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
             borderColor: "#7ee0ff",
             backgroundColor: "rgba(126,224,255,0.12)",
             fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2.5,
+            spanGaps: true,
             order: 2,
           },
           {
@@ -2731,6 +2736,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
             borderColor: "#7ee0ff",
             backgroundColor: "rgba(126,224,255,0.12)",
             fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2.5,
+            spanGaps: true,
             order: 2,
           },
           {
