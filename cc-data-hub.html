@@ -552,17 +552,17 @@
     .autocomplete-item {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 9px 14px;
+      gap: 12px;
+      padding: 11px 14px;
       cursor: pointer;
       border-bottom: 1px solid rgba(255,255,255,0.04);
       font-family: "Trebuchet MS", "Verdana", sans-serif;
       transition: background 0.12s;
     }
     .autocomplete-item:hover { background: rgba(126,224,255,0.06); }
-    .autocomplete-item img { width: 18px; height: 18px; border-radius: 50%; }
-    .autocomplete-symbol { font-family: 'Rajdhani', monospace; font-size: 13px; font-weight: 700; color: var(--gold); min-width: 44px; }
-    .autocomplete-name   { font-size: 13px; color: var(--muted); }
+    .autocomplete-item img { width: 28px; height: 28px; border-radius: 50%; }
+    .autocomplete-symbol { font-family: 'Rajdhani', monospace; font-size: 17px; font-weight: 700; color: var(--gold); min-width: 54px; }
+    .autocomplete-name   { font-size: 15px; color: var(--muted); }
 
     /* Shared add button style */
     .add-btn {
@@ -815,7 +815,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
     }
     .ctx-tab {
       font-family: 'Rajdhani', sans-serif;
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 700;
       letter-spacing: 1.5px;
       text-transform: uppercase;
@@ -911,6 +911,34 @@ html, body { overflow-x: hidden; max-width: 100%; }
       .ctx-kpi { min-width: 100px; }
       .ctx-kpi-value { font-size: 22px; }
     }
+    /* Mobile ctx-tabs: native select */
+    .ctx-tabs-mobile-wrap { display: none; }
+    .ctx-tabs-select {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(6,8,24,0.95);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      cursor: pointer;
+      outline: none;
+      margin-bottom: 20px;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 7 6-7' stroke='%237ee0ff' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 40px;
+    }
+    .ctx-tabs-select option { background: #060818; color: #fff; font-size: 15px; }
+    @media (max-width: 700px) {
+      .ctx-tabs-mobile-wrap { display: block; }
+      .ctx-tabs-desktop { display: none !important; }
+    }
     </style>
 </head>
 <body>
@@ -1001,7 +1029,17 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <p class="section-sub">On-chain tokenomics from the Canton Network — Data source : CantonScan by ProofGroup</p>
 
       <!-- Tab switcher -->
-      <div class="ctx-tabs">
+      <!-- Mobile: native select dropdown -->
+      <div class="ctx-tabs-mobile-wrap">
+        <select class="ctx-tabs-select" id="cc-ctx-select" onchange="ccCtxSelectChange(this)">
+          <option value="ratio">Burn / Mint Ratio</option>
+          <option value="burn">Burn Activity</option>
+          <option value="mint">Mint Activity</option>
+          <option value="alloc">Mint Allocation</option>
+        </select>
+      </div>
+      <!-- Desktop: tab buttons (hidden on mobile) -->
+      <div class="ctx-tabs ctx-tabs-desktop">
         <button class="ctx-tab active" onclick="ctxSwitch('ratio',this)">Burn / Mint Ratio</button>
         <button class="ctx-tab" onclick="ctxSwitch('burn',this)">Burn Activity</button>
         <button class="ctx-tab" onclick="ctxSwitch('mint',this)">Mint Activity</button>
@@ -2411,6 +2449,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   function ctxSwitch(tab, btn) {
     // Update tabs
     document.querySelectorAll(".ctx-tab").forEach(t => t.classList.remove("active"));
+    const ccSel = document.getElementById("cc-ctx-select"); if (ccSel) ccSel.value = tab;
     btn.classList.add("active");
     // Update panels
     document.querySelectorAll(".ctx-panel").forEach(p => p.classList.remove("active"));
@@ -2914,6 +2953,15 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   }
 
   // Launch Canton Context fetch on DOM ready
+  function ccCtxSelectChange(sel) {
+    const tab = sel.value;
+    const desktopTabs = document.querySelectorAll("#canton-ctx-section .ctx-tabs-desktop .ctx-tab");
+    desktopTabs.forEach(function(btn) {
+      const m = btn.getAttribute("onclick").match(/'([^']+)'/);
+      if (m && m[1] === tab) ctxSwitch(tab, btn);
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", ctxLoad);
 
 
