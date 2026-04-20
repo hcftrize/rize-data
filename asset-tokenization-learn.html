@@ -137,6 +137,12 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 /* ═══ CHART WRAPPERS ═══ */
 #ey-chart-section, #re-chart-section { border-top: 1px solid #ebebeb; margin-top: 8px; }
 
+/* Module 06 — mobile horizontal scroll for citi chart */
+@media(max-width:700px){
+  #citi-chart-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #citi-chart-wrap svg { min-width: 560px; width: 560px; }
+}
+
 
 /* ═══ ASSET CHART WRAP ═══ */
 .rwa-chart-wrap{padding:20px 32px 0;overflow-x:auto;}
@@ -321,7 +327,7 @@ html,body{overflow-x:hidden;max-width:100%;}
     </div>
 
     <div class="info-box" id="benefits-box">
-      <p class="ib-prompt">Use the arrows to navigate between benefits, or click a label to read the full explanation.</p>
+      <p class="ib-prompt">Use the arrows to navigate between benefits.</p>
       <div class="ib-title" id="benefits-title"></div>
       <div class="ib-text" id="benefits-text"></div>
     </div>
@@ -420,7 +426,7 @@ html,body{overflow-x:hidden;max-width:100%;}
     </div>
 
     <div class="info-box" id="actors-box">
-      <p class="ib-prompt">Use the arrows to navigate between industry actors, then click the monitor button to read the full description.</p>
+      <p class="ib-prompt">Use the arrows to navigate between industry actors.</p>
       <div class="ib-title" id="actors-title"></div>
       <div class="ib-text" id="actors-text"></div>
     </div>
@@ -460,7 +466,7 @@ html,body{overflow-x:hidden;max-width:100%;}
     <!-- EY Parthenon chart - shown for Financial Instruments and Private Equity -->
     <div id="ey-chart-section" style="display:none;padding:20px 32px 0;">
       <div class="chart-title" style="padding:0 0 12px">Investor Interest in Tokenized Alternatives — EY Parthenon, 2023</div>
-      <div id="ey-chart-wrap" style="width:100%;max-width:700px;margin:0 auto;"></div>
+      <div id="ey-chart-wrap" style="width:100%;max-width:900px;margin:0 auto;"></div>
       <div class="chart-source">Data source: EY Parthenon, 2023</div>
     </div>
 
@@ -877,16 +883,16 @@ function renderEYChart() {
   const institutional = [63, 59, 27, 19, 25, 15];
   const hnw = [56, 49, 28, 19, 22, 17];
   const colors = { inst: '#5b8dd9', hnw: '#f4a942' };
-  const W = 680, H = 300, padL = 50, padR = 20, padT = 30, padB = 80;
+  const W = 860, H = 380, padL = 56, padR = 24, padT = 40, padB = 90;
   const chartW = W - padL - padR;
   const chartH = H - padT - padB;
   const maxVal = 75;
   const groupW = chartW / categories.length;
-  const bW = Math.floor(groupW * 0.32);
-  const gap = 4;
+  const bW = Math.floor(groupW * 0.35);
+  const gap = 5;
 
   const bars = categories.map((cat, i) => {
-    const gx = padL + i * groupW + groupW * 0.08;
+    const gx = padL + i * groupW + groupW * 0.07;
     const bh1 = Math.round((institutional[i] / maxVal) * chartH);
     const bh2 = Math.round((hnw[i] / maxVal) * chartH);
     const by1 = padT + chartH - bh1;
@@ -895,11 +901,11 @@ function renderEYChart() {
     const catLines = cat.split(' ');
     return `
       <g>
-        <rect x="${gx}" y="${by1}" width="${bW}" height="${bh1}" fill="${colors.inst}" rx="2" opacity="0.85" style="transition:opacity 0.15s;" onmouseenter="eyTip('${cat} — Institutional: ${institutional[i]}%');this.style.opacity=1" onmouseleave="eyTipHide();this.style.opacity=0.85"/>
-        <text x="${gx+bW/2}" y="${by1-5}" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#333">${institutional[i]}%</text>
-        <rect x="${bx2}" y="${by2}" width="${bW}" height="${bh2}" fill="${colors.hnw}" rx="2" opacity="0.85" style="transition:opacity 0.15s;" onmouseenter="eyTip('${cat} — HNW Investors: ${hnw[i]}%');this.style.opacity=1" onmouseleave="eyTipHide();this.style.opacity=0.85"/>
-        <text x="${bx2+bW/2}" y="${by2-5}" font-family="Rajdhani,sans-serif" font-size="11" font-weight="700" text-anchor="middle" fill="#333">${hnw[i]}%</text>
-        ${catLines.map((ln, li) => `<text x="${gx+bW+gap/2}" y="${H - padB + 16 + li*14}" font-family="DM Mono,monospace" font-size="10" text-anchor="middle" fill="#555">${ln}</text>`).join('')}
+        <rect x="${gx}" y="${by1}" width="${bW}" height="${bh1}" fill="${colors.inst}" rx="3" opacity="0.85" style="transition:opacity 0.15s;" onmouseenter="eyTip('${cat} — Institutional: ${institutional[i]}%');this.style.opacity=1" onmouseleave="eyTipHide();this.style.opacity=0.85"/>
+        <text x="${gx+bW/2}" y="${by1-7}" font-family="Rajdhani,sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#333">${institutional[i]}%</text>
+        <rect x="${bx2}" y="${by2}" width="${bW}" height="${bh2}" fill="${colors.hnw}" rx="3" opacity="0.85" style="transition:opacity 0.15s;" onmouseenter="eyTip('${cat} — HNW Investors: ${hnw[i]}%');this.style.opacity=1" onmouseleave="eyTipHide();this.style.opacity=0.85"/>
+        <text x="${bx2+bW/2}" y="${by2-7}" font-family="Rajdhani,sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="#333">${hnw[i]}%</text>
+        ${catLines.map((ln, li) => `<text x="${gx+bW+gap/2}" y="${H - padB + 18 + li*16}" font-family="DM Mono,monospace" font-size="12" text-anchor="middle" fill="#555">${ln}</text>`).join('')}
       </g>`;
   }).join('');
 
@@ -907,22 +913,22 @@ function renderEYChart() {
   const yLines = ticks.map(v => {
     const ty = padT + chartH - Math.round((v / maxVal) * chartH);
     return `<line x1="${padL}" y1="${ty}" x2="${W-padR}" y2="${ty}" stroke="#f0f0f0" stroke-dasharray="3 3" stroke-width="1"/>
-    <text x="${padL-6}" y="${ty+4}" font-family="DM Mono,monospace" font-size="10" text-anchor="end" fill="#888">${v}%</text>`;
+    <text x="${padL-8}" y="${ty+4}" font-family="DM Mono,monospace" font-size="11" text-anchor="end" fill="#888">${v}%</text>`;
   }).join('');
 
   wrap.innerHTML = `
     <div style="position:relative;">
       <svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:${W}px;display:block;overflow:visible;">
-        <text x="${W/2}" y="18" font-family="Rajdhani,sans-serif" font-size="14" font-weight="700" text-anchor="middle" fill="#0d2d4e">Investor Interest in Tokenized Alternatives</text>
+        <text x="${W/2}" y="20" font-family="Rajdhani,sans-serif" font-size="15" font-weight="700" text-anchor="middle" fill="#0d2d4e">Investor Interest in Tokenized Alternatives</text>
         <line x1="${padL}" y1="${padT+chartH}" x2="${W-padR}" y2="${padT+chartH}" stroke="#333" stroke-width="1.5"/>
         <line x1="${padL}" y1="${padT}" x2="${padL}" y2="${padT+chartH}" stroke="#ccc" stroke-width="1"/>
         ${yLines}
         ${bars}
         <!-- Legend -->
-        <rect x="${W-180}" y="8" width="14" height="10" fill="${colors.inst}" rx="2"/>
-        <text x="${W-161}" y="18" font-family="DM Mono,monospace" font-size="10" fill="#333">Institutional Investors</text>
-        <rect x="${W-180}" y="24" width="14" height="10" fill="${colors.hnw}" rx="2"/>
-        <text x="${W-161}" y="34" font-family="DM Mono,monospace" font-size="10" fill="#333">HNW Investors</text>
+        <rect x="${W-200}" y="8" width="14" height="12" fill="${colors.inst}" rx="2"/>
+        <text x="${W-181}" y="19" font-family="DM Mono,monospace" font-size="11" fill="#333">Institutional Investors</text>
+        <rect x="${W-200}" y="27" width="14" height="12" fill="${colors.hnw}" rx="2"/>
+        <text x="${W-181}" y="38" font-family="DM Mono,monospace" font-size="11" fill="#333">HNW Investors</text>
       </svg>
       <div id="ey-tooltip" style="display:none;position:absolute;background:rgba(13,45,78,0.92);color:#fff;font-family:'DM Mono',monospace;font-size:12px;padding:6px 12px;border-radius:4px;pointer-events:none;white-space:nowrap;top:8px;left:50%;transform:translateX(-50%);"></div>
     </div>`;
@@ -1138,7 +1144,7 @@ const ACTORS = {
     text: `<p>For tokenized assets to deliver on their liquidity promise, there must be functioning secondary markets where tokens can be bought and sold after initial issuance. The Who's Who Guide 2024 lists 62 digital asset exchanges worldwide — but trading volumes remain a fraction of traditional exchange activity.</p>
     <p style="margin-top:12px">The chicken-and-egg problem: without a sufficient number of listed security tokens, there are no investors. Without investors, asset owners won't tokenize. Solving this requires simultaneous growth in issuance quality, investor education, and regulatory clarity — a collective coordination problem.</p>
     <p style="margin-top:12px">Bright spots: SIX Digital Exchange (Switzerland) and Luxembourg Stock Exchange have listed their first security tokens. Luxembourg listed a Société Générale token in January 2022. tZERO has been trading security tokens since 2019. Archax (London) operates as an FCA-regulated exchange and custodian.</p>
-    <div class="ib-highlight">Market snapshot (RWA.xyz / Coinbase, 2024): Tokenized RWAs grew 60%+ from $8.4B (end 2023) to $13.5B (December 1, 2024) — excluding stablecoins. Impressive growth rate, but from a tiny base compared to traditional market volumes.</div>
+    <div class="ib-highlight">Market snapshot (RWA.xyz, April 2026): Tokenized RWAs reached $29.4B on April 19, 2026 — up from $5.8B on January 1, 2025, a +407% increase in 16 months. US Treasury Debt leads at $13.8B, followed by Commodities at $5.4B and Asset-Backed Credit at $2.6B. Impressive growth rate, but still a fraction of traditional market volumes — the runway ahead is vast.</div>
     <p style="margin-top:12px">The most important near-term development: the US Treasury Department's TBAC published an analysis of tokenized US Treasury markets in October 2024, listing nine active projects. When the world's largest bond market starts taking tokenization seriously at the regulatory level, exchanges will follow.</p>`
   },
   lawyers: {
@@ -1320,8 +1326,23 @@ window.pickReg = function(jurisdiction, key) {
   const fullKey = jurisdiction + '_' + key;
   const d = REG_DATA[fullKey];
   if (!d) return;
+  // Clear all tag highlights
   document.querySelectorAll('.reg-tag').forEach(b => b.classList.remove('on'));
-  event.target.classList.add('on');
+  // Clear reg-box highlights
+  document.querySelectorAll('.reg-box').forEach(b => b.classList.remove('on'));
+  // Highlight the matching reg-box
+  const boxEl = document.getElementById('reg-' + jurisdiction + '-box');
+  if (boxEl) boxEl.classList.add('on');
+  // Highlight the matching tag button by finding it within the box
+  if (boxEl) {
+    const allTags = boxEl.querySelectorAll('.reg-tag');
+    allTags.forEach(btn => {
+      if (btn.textContent.trim().toLowerCase().replace(/[^a-z0-9]/g,'') ===
+          key.toLowerCase().replace(/[^a-z0-9]/g,'')) {
+        btn.classList.add('on');
+      }
+    });
+  }
   showInfo('reg-box', 'reg-title', 'reg-text', d.title, d.text, d.tag);
 };
 
