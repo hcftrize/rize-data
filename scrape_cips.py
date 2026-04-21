@@ -4,33 +4,24 @@ scrape_cips.py
 Scrape https://github.com/canton-foundation/cips -> cips.json
 
 Usage:
-    python scrape_cips.py               # normal daily run
-    python scrape_cips.py --bootstrap   # one-time: fetch abstract + approved for ALL entries
+    python scrape_cips.py   # normal daily run
 
-Logic (normal mode):
+Logic:
     - Strictly filters CIP-0[digits] folders — rejects CIP-XXXX drafts
-    - Detects new CIPs not yet in cips.json, adds them with abstract as description
+    - Detects new CIPs not yet in cips.json:
+        * Imports abstract/summary from .md as description
+        * Fallback to title if no abstract found
+    - For existing non-frozen CIPs: updates status and approved date if changed
     - Skips frozen statuses (Final/Replaced/Rejected/Obsolete/Withdrawn)
-    - Updates status and approved date for non-frozen existing CIPs
-    - Writes HANDLE-THIS-BEFORE-PULL/complete-cip-learnbox.txt if new CIPs found
-
-Logic (bootstrap mode):
-    - Fetches abstract + approved date for ALL existing CIPs
-    - Run once after initial deployment to populate all descriptions
 """
 
 import json, os, re, sys, time, urllib.request
-from datetime import date
 from pathlib import Path
 
 FOUNDATION_REPO = "canton-foundation/cips"
 API_BASE        = "https://api.github.com"
 CIPS_JSON       = Path("canton-ecosystem/cips.json")
-HANDLE_DIR      = Path("HANDLE-THIS-BEFORE-PULL")
-NOTICE_FILE     = HANDLE_DIR / "complete-cip-learnbox.txt"
-BOOTSTRAP_MODE  = "--bootstrap" in sys.argv
 
-# Strict: CIP-0 followed by digits only
 CIP_FOLDER_RE   = re.compile(r'^cip-0\d+$', re.IGNORECASE)
 FROZEN_STATUSES = {"Final", "Replaced", "Rejected", "Obsolete", "Withdrawn"}
 GH_TOKEN        = os.environ.get("GH_TOKEN", "")
@@ -82,12 +73,6 @@ def parse_md_header(text):
 
 
 def parse_abstract(text):
-    """
-    Extract the Abstract or Summary section from a CIP .md file.
-    Handles all formats:
-      ## Abstract        ## Abstract:       ## 1. Abstract
-      1. Abstract        ## Summary         ## [1. Abstract](#anchor)
-    """
     lines = text.splitlines()
     in_section = False
     section_lines = []
@@ -102,24 +87,17 @@ def parse_abstract(text):
 
     for line in lines:
         stripped = line.strip()
-        # Strip markdown links from heading before matching
-        # e.g. ## [1. Abstract](#1-abstract) -> ## 1. Abstract
         stripped_nolink = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', stripped)
-
         if not in_section:
             if SECTION_START.match(stripped_nolink):
                 in_section = True
             continue
-
         if stripped and SECTION_END.match(line):
             break
-
         section_lines.append(line)
 
     abstract = "\n".join(section_lines).strip()
-    # Remove markdown links from body text too
     abstract = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', abstract)
-    # Clean excessive blank lines
     abstract = re.sub(r'\n{3,}', '\n\n', abstract)
     return abstract
 
@@ -155,7 +133,6 @@ def list_cip_folders():
 
 
 def main():
-    HANDLE_DIR.mkdir(exist_ok=True)
     CIPS_JSON.parent.mkdir(exist_ok=True)
 
     if CIPS_JSON.exists():
@@ -167,45 +144,6 @@ def main():
 
     existing_by_id = {e["id"]: e for e in existing}
 
-    # ── BOOTSTRAP ─────────────────────────────────────────────────────────────
-    if BOOTSTRAP_MODE:
-        print("\nBootstrap mode — fetching abstract + approved for all CIPs...")
-        updated_desc = updated_approved = 0
-        for entry in existing:
-            cip_id = entry["id"]
-            folder_name = cip_id.lower()  # CIP-0114 -> cip-0114
-            print(f"  [{cip_id}]", end=" ", flush=True)
-            _, text = find_md_file(folder_name)
-            if not text:
-                print("not found")
-                time.sleep(0.3)
-                continue
-            abstract = parse_abstract(text)
-            header   = parse_md_header(text)
-            changed  = False
-            if abstract and entry.get("description", "") != abstract:
-                entry["description"] = abstract
-                updated_desc += 1
-                changed = True
-            elif not abstract and not entry.get("description", ""):
-                # Fallback: use title if no abstract found
-                entry["description"] = entry.get("title", "")
-                updated_desc += 1
-                changed = True
-            approved = header.get("approved", "").strip()
-            if approved and entry.get("approved", "") != approved:
-                entry["approved"] = approved
-                updated_approved += 1
-                changed = True
-            print("updated" if changed else "no change")
-            time.sleep(0.3)
-
-        existing.sort(key=lambda x: x["number"])
-        CIPS_JSON.write_text(json.dumps(existing, indent=2, ensure_ascii=False), encoding="utf-8")
-        print(f"\nBootstrap done — {updated_desc} abstracts, {updated_approved} approved dates updated")
-        return
-
-    # ── NORMAL DAILY RUN ──────────────────────────────────────────────────────
     print("\nListing CIP folders from foundation repo...")
     folders = list_cip_folders()
     print(f"Found {len(folders)} valid CIP-0XXX folders")
@@ -220,7 +158,7 @@ def main():
         entry  = existing_by_id.get(cip_id)
 
         if entry is None:
-            # NEW CIP
+            # ── NEW CIP ────────────────────────────────────────────────────
             print(f"\n  New: {cip_id}")
             _, text = find_md_file(folder)
             if not text:
@@ -241,12 +179,12 @@ def main():
             }
             existing_by_id[cip_id] = new_entry
             new_cips.append(new_entry)
-            print(f"    {new_entry['title'][:70]}")
-            print(f"    Abstract: {len(abstract)} chars")
+            print(f"    Title: {new_entry['title'][:70]}")
+            print(f"    Description: {'abstract (' + str(len(abstract)) + ' chars)' if abstract else 'fallback to title'}")
             time.sleep(0.3)
 
         else:
-            # EXISTING — skip frozen
+            # ── EXISTING — skip frozen ─────────────────────────────────────
             if entry.get("status") in FROZEN_STATUSES:
                 continue
             _, text = find_md_file(folder)
@@ -273,31 +211,12 @@ def main():
     final.sort(key=lambda x: x["number"])
     CIPS_JSON.write_text(json.dumps(final, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"\nDone — {len(final)} CIPs saved")
-    if status_updates:
-        print(f"Updated: {', '.join(status_updates)}")
-
-    # ── Notice ────────────────────────────────────────────────────────────────
     if new_cips:
-        lines = [
-            "Canton CIPs — New entries added to cips.json",
-            f"Generated: {date.today()}",
-            f"Count: {len(new_cips)} new CIP(s)",
-            "",
-            "Abstract imported automatically from the .md file.",
-            "Review description in canton-ecosystem/cips.json before pushing to main.",
-            "",
-        ]
-        for c in new_cips:
-            lines.append(f"- {c['id']}: {c['title']}")
-            lines.append(f"  Status: {c['status']} | Type: {c['type']} | Created: {c['created']}")
-            lines.append(f"  Abstract: {'yes (' + str(len(c['description'])) + ' chars)' if c['description'] else 'MISSING — check .md'}")
-            lines.append("")
-        NOTICE_FILE.write_text("\n".join(lines), encoding="utf-8")
-        print(f"\n  {len(new_cips)} new CIP(s) — see {NOTICE_FILE}")
-    else:
-        if NOTICE_FILE.exists():
-            NOTICE_FILE.unlink()
-        print("No new CIPs")
+        print(f"  {len(new_cips)} new CIP(s) added: {', '.join(c['id'] for c in new_cips)}")
+    if status_updates:
+        print(f"  Updated: {', '.join(status_updates)}")
+    if not new_cips and not status_updates:
+        print("  No changes")
 
 
 if __name__ == "__main__":
