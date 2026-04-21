@@ -25,8 +25,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install playwright
-          playwright install chromium
-          sudo playwright install-deps chromium
+          python -m playwright install chromium
+          python -m playwright install-deps chromium
 
       - name: Run scraper (diff mode — new entities only)
         run: python scrape_canton.py --diff
