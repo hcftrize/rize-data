@@ -31,7 +31,7 @@ NOTICE_FILE     = HANDLE_DIR / "complete-cip-learnbox.txt"
 BOOTSTRAP_MODE  = "--bootstrap" in sys.argv
 
 # Strict: CIP-0 followed by digits only
-CIP_FOLDER_RE   = re.compile(r'^CIP-0\d+$')
+CIP_FOLDER_RE   = re.compile(r'^cip-0\d+$', re.IGNORECASE)
 FROZEN_STATUSES = {"Final", "Replaced", "Rejected", "Obsolete", "Withdrawn"}
 GH_TOKEN        = os.environ.get("GH_TOKEN", "")
 
@@ -146,8 +146,9 @@ def main():
         updated_desc = updated_approved = 0
         for entry in existing:
             cip_id = entry["id"]
+            folder_name = cip_id.lower()  # CIP-0114 -> cip-0114
             print(f"  [{cip_id}]", end=" ", flush=True)
-            _, text = find_md_file(cip_id)
+            _, text = find_md_file(folder_name)
             if not text:
                 print("not found")
                 time.sleep(0.3)
