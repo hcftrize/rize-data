@@ -2834,5 +2834,36 @@
       "0x0D0707963952f2fBA59dD06f2b425ace40b492Fe"
     ],
     "updated": "2026-04-21T14:02:40.755365+00:00"
+  },
+  "address_labels": {
+    "0x5a134098bdbeb05da9eac35439c5624547ed26ee": "Governance Contract",
+    "0x9525df984b7062c7c0fb103bc745467396241e7b": "VestingWallet",
+    "0xad12b1421d14130633700af043445115d16f5f2d": "UnallocatedVesting",
+    "0x0151988326ded907853c7b75641d6a7897959510": "UnallocatedVesting",
+    "0x6d596a1d2c317f39029ee7ccea3fe1d6460811eb": "UnallocatedVesting",
+    "0x1c07bf8dcf081a802e97fbc1b2c3a4317d69c669": "UnallocatedVesting",
+    "0xaafe9d7422e7f0ea1788ccafd0a55f6cf29fb70c": "UnallocatedVesting",
+    "0x02ac4617fe004cf8cd9c988ff9c905b2ec676c2d": "Kraken Hot Wallet 1",
+    "0x7dafba1d69f6c01ae7567ffd7b046ca03b706f83": "Kraken Cold Wallet 1",
+    "0xd2dd7b597fd2435b6db61ddf48544fd931e6869f": "Kraken Cold Wallet 2",
+    "0xcc282e2004428939ee5149a9e7872f0b4d5d5ec7": "Kraken Hot Wallet 2",
+    "0x504ce9e51e508c85a161058c12e970a903d482fc": "Kraken Deposit",
+    "0x4e68e189e4d8d8c0659e0d8a05d0e0ed7071b466": "Kraken Deposit",
+    "0xcf913b48e488c04b9b17fb48e17be2d72687f9f6": "Kraken Deposit (BSC)",
+    "0x9b0c45d46d386cedd98873168c36efd0dcba8d46": "Revolut",
+    "0x4e3ae00e8323558fa5cac04b152238924aa31b60": "MEXC Hot Wallet",
+    "0x0529ea5885702715e83923c59746ae8734c553b7": "Bitpanda Cold Wallet",
+    "0xb7c5f84455c86f9972a80e82939f7ce40b481664": "Bitpanda Hot Wallet",
+    "0x4d59bec2b09052c60c6149c623fb3a461fb1fe74": "Ourbit",
+    "0x0d0707963952f2fba59dd06f2b425ace40b492fe": "Gate",
+    "0xf8191d98ae98d2f7abdfb63a9b0b812b93c873aa": "Wintermute Hot Wallet",
+    "0x51c72848c68a965f66fa7a88855f9f7784502a7f": "Wintermute Market Maker",
+    "0xea5cb64754ad7aa24f7a6bbe3b724f29b4f822b8": "Aerodrome CLPool",
+    "0x0851e36d477577cc0f7ec4f796a89213bd83e2bc": "Arrakis/Aerodrome LP",
+    "0x515190a17f431c91570eb0c81f32f999eb998ebe": "Gnosis Safe",
+    "0x238a358808379702088667322f80ac48bad5e6c4": "PancakeSwap Vault (BSC)",
+    "0x60ec22e3443cdaddcc4cebdf8d34797df29984d4": "Arrakis/PancakeSwap LP (BSC)",
+    "0x000000000004444c5dc75cb358380d2e3de08a90": "Uniswap PoolManager (ETH)",
+    "0xa008b72d39ebb9d9eabdba4012adda4be4c7e938": "tomtom19 (Galxe)"
   }
 }
