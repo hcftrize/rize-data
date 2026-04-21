@@ -3698,28 +3698,37 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   }
 
   // ── Live data: bonded + unbonding + CEX balances ───────────
+  // Safe BigInt parser — returns 0 if result is not a valid hex/decimal number
+  function convSafeBigInt(val) {
+    if (!val || typeof val !== 'string') return 0;
+    const trimmed = val.trim();
+    // Must be numeric (decimal) or hex starting with 0x
+    if (!/^(0x[0-9a-fA-F]+|\d+)$/.test(trimmed)) return 0;
+    try { return Number(BigInt(trimmed)) / CONV.DECIMALS; } catch(e) { return 0; }
+  }
+
   async function convFetchLiveBalances() {
-    // Use Basescan tokenbalance for live balances — avoids RPC rate limits
+    // 1. Governance bonded: single RPC call — lowest risk
+    let bonded = 0;
+    try {
+      const padded = '000000000000000000000000' + CONV.GOV_CONTRACT.slice(2).toLowerCase();
+      const r = await convRpc('eth_call', [
+        { to: CONV.RIZE_TOKEN, data: '0x70a08231' + padded }, 'latest'
+      ]);
+      bonded = convHexToTokens(r?.result);
+    } catch(e) {}
 
-    // 1. Governance contract balance (= total bonded)
-    const bondedRes = await convBasescan({
-      action: 'tokenbalance',
-      contractaddress: CONV.RIZE_TOKEN,
-      address: CONV.GOV_CONTRACT,
-      tag: 'latest',
-    });
-    const bonded = bondedRes?.result ? Number(BigInt(bondedRes.result)) / CONV.DECIMALS : 0;
-
-    // 2. Unbonding: use RPC call to releasableTokens() — single call, low risk of 429
+    // 2. Unbonding: releasableTokens() selector
     let unbonding = 0;
     try {
-      const unbRes = await convRpc('eth_call', [
+      await new Promise(r => setTimeout(r, 300));
+      const r = await convRpc('eth_call', [
         { to: CONV.GOV_CONTRACT, data: '0x1c269043' }, 'latest'
       ]);
-      unbonding = convHexToTokens(unbRes?.result);
-    } catch(e) { unbonding = 0; }
+      unbonding = convHexToTokens(r?.result);
+    } catch(e) {}
 
-    // 3. CEX balances: sequential with small delay to avoid RPC 429
+    // 3. CEX balances via Basescan tokenbalance — sequential, safe
     const cexAddrs = Object.values(CONV.CEX);
     let cexTotal = 0;
     for (const addr of cexAddrs) {
@@ -3730,132 +3739,31 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           address: addr,
           tag: 'latest',
         });
-        if (r?.result) cexTotal += Number(BigInt(r.result)) / CONV.DECIMALS;
-        await new Promise(res => setTimeout(res, 120)); // ~8 req/sec, within free tier
+        cexTotal += convSafeBigInt(r?.result);
+        await new Promise(res => setTimeout(res, 150));
       } catch(e) {}
     }
 
     return { bonded, unbonding, cexTotal };
   }
 
-  // ── Historical data via Basescan ───────────────────────────
+  // ── Historical data from pre-built JSON ──────────────────────
+  // conviction-history.json is updated daily by GitHub Action
+  // No per-visitor API calls needed for historical data
   async function convFetchHistory() {
-    // Fetch all Transfer events for governance contract (bonded history)
-    // and for all CEX addresses (on-exchange history)
-    const govTxRes = await convBasescan({
-      action: 'tokentx',
-      contractaddress: CONV.RIZE_TOKEN,
-      address: CONV.GOV_CONTRACT,
-      startblock: 0,
-      endblock: 99999999,
-      sort: 'asc',
-      offset: 10000,
-      page: 1,
-    });
-
-    const govTxs = (govTxRes?.result && Array.isArray(govTxRes.result)) ? govTxRes.result : [];
-
-    // Fetch CEX txs for all addresses in parallel (batched)
-    const cexAddrs = Object.values(CONV.CEX);
-    const cexTxArrays = await Promise.all(
-      cexAddrs.map(addr => convBasescan({
-        action: 'tokentx',
-        contractaddress: CONV.RIZE_TOKEN,
-        address: addr,
-        startblock: 0,
-        endblock: 99999999,
-        sort: 'asc',
-        offset: 10000,
-        page: 1,
-      }).then(r => (r?.result && Array.isArray(r.result)) ? r.result : []))
-    );
-
-    return { govTxs, cexTxArrays, cexAddrs };
-  }
-
-  // ── Build daily series from Transfer events ────────────────
-  function convBuildDailySeries(txs, targetAddress) {
-    // targetAddress: the address we're tracking balance for
-    const addr = targetAddress.toLowerCase();
-    // Group by day: each tx either adds or subtracts from balance
-    const dayMap = {};
-
-    txs.forEach(tx => {
-      if (!tx.timeStamp) return;
-      const date = new Date(parseInt(tx.timeStamp) * 1000);
-      const dayKey = date.toISOString().slice(0, 10);
-      if (!dayMap[dayKey]) dayMap[dayKey] = 0;
-      const val = parseFloat(tx.value) / CONV.DECIMALS;
-      const from = (tx.from || '').toLowerCase();
-      const to   = (tx.to   || '').toLowerCase();
-      if (to === addr)   dayMap[dayKey] += val;
-      if (from === addr) dayMap[dayKey] -= val;
-    });
-
-    // Build cumulative series from first tx date to today
-    const days = Object.keys(dayMap).sort();
-    if (!days.length) return { labels: [], data: [] };
-
-    const startDate = new Date(days[0]);
-    const endDate   = new Date();
-    const labels = [], data = [];
-    let balance = 0;
-    let cur = new Date(startDate);
-    while (cur <= endDate) {
-      const key = cur.toISOString().slice(0, 10);
-      balance += (dayMap[key] || 0);
-      labels.push(cur.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }));
-      data.push(Math.max(0, balance));
-      cur.setDate(cur.getDate() + 1);
+    const HISTORY_URL = 'https://raw.githubusercontent.com/hcftrize/TOKERIZE/main/rize-data-hub/conviction-history.json';
+    try {
+      const res = await fetch(HISTORY_URL);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      return {
+        bondedSeries: data.bonded || [],  // [{date, value}]
+        cexSeries:    data.cex    || [],  // [{date, value}]
+      };
+    } catch(e) {
+      console.warn('conviction-history.json not found yet — will show live data only:', e.message);
+      return { bondedSeries: [], cexSeries: [] };
     }
-    return { labels, data };
-  }
-
-  function convBuildCexDailySeries(cexTxArrays, cexAddrs) {
-    // Merge all CEX txs into a single per-day balance sum
-    const allAddrs = cexAddrs.map(a => a.toLowerCase());
-    const dayMap = {};
-
-    cexTxArrays.forEach((txs, i) => {
-      const addr = allAddrs[i];
-      txs.forEach(tx => {
-        if (!tx.timeStamp) return;
-        const key = new Date(parseInt(tx.timeStamp) * 1000).toISOString().slice(0, 10);
-        if (!dayMap[key]) dayMap[key] = {};
-        if (!dayMap[key][addr]) dayMap[key][addr] = 0;
-        const val = parseFloat(tx.value) / CONV.DECIMALS;
-        const from = (tx.from || '').toLowerCase();
-        const to   = (tx.to   || '').toLowerCase();
-        if (to === addr)   dayMap[key][addr] += val;
-        if (from === addr) dayMap[key][addr] -= val;
-      });
-    });
-
-    // Build per-address running balances, then sum daily
-    const days = Object.keys(dayMap).sort();
-    if (!days.length) return { labels: [], data: [] };
-
-    const startDate = new Date(days[0]);
-    const endDate   = new Date();
-    const balances  = {}; // addr -> running balance
-    allAddrs.forEach(a => balances[a] = 0);
-
-    const labels = [], data = [], rawDays = [];
-    let cur = new Date(startDate);
-    while (cur <= endDate) {
-      const key = cur.toISOString().slice(0, 10);
-      if (dayMap[key]) {
-        Object.entries(dayMap[key]).forEach(([addr, delta]) => {
-          balances[addr] = Math.max(0, (balances[addr] || 0) + delta);
-        });
-      }
-      const total = Object.values(balances).reduce((s, v) => s + v, 0);
-      labels.push(cur.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }));
-      data.push(Math.max(0, total));
-      rawDays.push(key);
-      cur.setDate(cur.getDate() + 1);
-    }
-    return { labels, data, rawDays };
   }
 
   // ── Delta calculation ──────────────────────────────────────
@@ -3875,47 +3783,43 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
   // ── Whale movements ────────────────────────────────────────
   async function convFetchWhales() {
-    // Get all large transfers involving any CEX or governance contract
-    const allAddrs = [...Object.values(CONV.CEX), CONV.GOV_CONTRACT];
-    const cexSet = new Set(Object.values(CONV.CEX).map(a => a.toLowerCase()));
-
-    // Fetch recent txs for governance contract and all CEX
-    const govWhales = await convBasescan({
+    // Fetch ALL recent RIZE transfers on-chain (not filtered by address)
+    // Basescan: tokentx with contractaddress only = all transfers of this token
+    const res = await convBasescan({
       action: 'tokentx',
       contractaddress: CONV.RIZE_TOKEN,
-      address: CONV.GOV_CONTRACT,
-      startblock: 0, endblock: 99999999, sort: 'desc', offset: 500, page: 1,
+      startblock: 0,
+      endblock: 99999999,
+      sort: 'desc',
+      offset: 1000,
+      page: 1,
     });
 
-    const txs = (govWhales?.result && Array.isArray(govWhales.result)) ? govWhales.result : [];
+    const txs = (res?.result && Array.isArray(res.result)) ? res.result : [];
 
     // Filter > 5M RIZE
     const whales = txs.filter(tx => {
       const val = parseFloat(tx.value) / CONV.DECIMALS;
       return val >= CONV.WHALE_MIN;
-    }).slice(0, 20);
+    }).slice(0, 30);
 
     return whales;
   }
 
-  // ── Unbonding chart data (Transfer events OUT of governance) ──
-  function convBuildUnbondingSeries(govTxs) {
-    // Outflows from governance contract = unbonding events
-    const govAddr = CONV.GOV_CONTRACT.toLowerCase();
-    const dayMap = {};
-    govTxs.forEach(tx => {
-      if ((tx.from || '').toLowerCase() !== govAddr) return;
-      const key = new Date(parseInt(tx.timeStamp) * 1000).toISOString().slice(0, 10);
-      if (!dayMap[key]) dayMap[key] = 0;
-      dayMap[key] += parseFloat(tx.value) / CONV.DECIMALS;
-    });
-    const days = Object.keys(dayMap).sort();
-    if (!days.length) return { labels: [], data: [] };
-    const labels = days.map(d => {
-      const dt = new Date(d);
-      return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
-    });
-    return { labels, data: days.map(d => dayMap[d]) };
+  // ── Unbonding series from daily bonded drops ──────────────
+  // If bonded decreases day-over-day, that delta = unbonding outflow
+  function convBuildUnbondingFromSeries(govSeries) {
+    const { labels, data } = govSeries;
+    if (data.length < 2) return { labels: [], data: [] };
+    const ubLabels = [], ubData = [];
+    for (let i = 1; i < data.length; i++) {
+      const delta = data[i - 1] - data[i]; // positive = decrease = unbonding
+      if (delta > 0) {
+        ubLabels.push(labels[i]);
+        ubData.push(Math.round(delta));
+      }
+    }
+    return { labels: ubLabels, data: ubData };
   }
 
   // ── Render charts ──────────────────────────────────────────
@@ -4104,25 +4008,60 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     }
   };
 
+  // ── Build series from JSON [{date, value}] ─────────────────
+  function convBuildSeriesFromJSON(arr) {
+    if (!arr || !arr.length) return { labels: [], data: [], rawDays: [] };
+    const labels  = arr.map(e => {
+      const d = new Date(e.date + 'T00:00:00Z');
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+    });
+    const data    = arr.map(e => e.value);
+    const rawDays = arr.map(e => e.date);
+    return { labels, data, rawDays };
+  }
+
   // ── Main init ──────────────────────────────────────────────
   async function convInit() {
     if (CONV.initialized) return;
     CONV.initialized = true;
 
     try {
-      // Fetch live + historical in parallel
+      // Fetch live + pre-built history + whales in parallel
       const [live, history, whales] = await Promise.all([
         convFetchLiveBalances(),
         convFetchHistory(),
         convFetchWhales(),
       ]);
 
-      // Build series
-      const govSeries  = convBuildDailySeries(history.govTxs, CONV.GOV_CONTRACT);
-      const cexSeries  = convBuildCexDailySeries(history.cexTxArrays, history.cexAddrs);
-      const unbSeries  = convBuildUnbondingSeries(history.govTxs);
+      // Build chart series from pre-computed JSON
+      const govSeries = convBuildSeriesFromJSON(history.bondedSeries);
+      const cexSeries = convBuildSeriesFromJSON(history.cexSeries);
 
-      // Render everything
+      // Append today's live value if not already in history
+      const today = new Date().toISOString().slice(0, 10);
+      if (live.bonded > 0) {
+        const lastBonded = govSeries.rawDays[govSeries.rawDays.length - 1];
+        if (lastBonded !== today) {
+          const lbl = new Date(today + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+          govSeries.labels.push(lbl);
+          govSeries.data.push(live.bonded);
+          govSeries.rawDays.push(today);
+        }
+      }
+      if (live.cexTotal > 0) {
+        const lastCex = cexSeries.rawDays[cexSeries.rawDays.length - 1];
+        if (lastCex !== today) {
+          const lbl = new Date(today + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+          cexSeries.labels.push(lbl);
+          cexSeries.data.push(live.cexTotal);
+          cexSeries.rawDays.push(today);
+        }
+      }
+
+      // Unbonding: derive from govSeries day-over-day decreases
+      const unbSeries = convBuildUnbondingFromSeries(govSeries);
+
+      // Render
       convRenderMainChart(govSeries, cexSeries);
       convRenderUnbondingChart(unbSeries);
       convRenderLive(live.bonded, live.unbonding, live.cexTotal);
@@ -4132,7 +4071,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     } catch(err) {
       console.error('Conviction module error:', err);
       const loading = document.getElementById('conv-loading-main');
-      if (loading) { loading.textContent = 'Error loading data. Please refresh.'; loading.style.color = 'var(--pink)'; }
+      if (loading) {
+        loading.textContent = 'Error loading data. Please refresh.';
+        loading.style.color = 'var(--pink)';
+      }
     }
   }
 
