@@ -3699,33 +3699,41 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
   // ── Live data: bonded + unbonding + CEX balances ───────────
   async function convFetchLiveBalances() {
-    // 1. Total bonded in governance contract: call bonded() = 0xc9836074
-    const bondedCall = convRpc('eth_call', [
-      { to: CONV.GOV_CONTRACT, data: '0xc9836074' }, 'latest'
-    ]);
+    // Use Basescan tokenbalance for live balances — avoids RPC rate limits
 
-    // 2. Releasable tokens (unbonding queue sum): call releasableTokens() = 0x1c269043
-    //    Also try getBondRelease to get full queue
-    const releasableCall = convRpc('eth_call', [
-      { to: CONV.GOV_CONTRACT, data: '0x1c269043' }, 'latest'
-    ]);
-
-    // 3. CEX balances: balanceOf for each CEX address
-    const cexAddrs = Object.values(CONV.CEX);
-    const cexCalls = cexAddrs.map(addr => {
-      const padded = '000000000000000000000000' + addr.slice(2).toLowerCase();
-      return convRpc('eth_call', [
-        { to: CONV.RIZE_TOKEN, data: '0x70a08231' + padded }, 'latest'
-      ]);
+    // 1. Governance contract balance (= total bonded)
+    const bondedRes = await convBasescan({
+      action: 'tokenbalance',
+      contractaddress: CONV.RIZE_TOKEN,
+      address: CONV.GOV_CONTRACT,
+      tag: 'latest',
     });
+    const bonded = bondedRes?.result ? Number(BigInt(bondedRes.result)) / CONV.DECIMALS : 0;
 
-    const [bondedRes, releasableRes, ...cexRes] = await Promise.all([
-      bondedCall, releasableCall, ...cexCalls
-    ]);
+    // 2. Unbonding: use RPC call to releasableTokens() — single call, low risk of 429
+    let unbonding = 0;
+    try {
+      const unbRes = await convRpc('eth_call', [
+        { to: CONV.GOV_CONTRACT, data: '0x1c269043' }, 'latest'
+      ]);
+      unbonding = convHexToTokens(unbRes?.result);
+    } catch(e) { unbonding = 0; }
 
-    const bonded     = convHexToTokens(bondedRes?.result);
-    const unbonding  = convHexToTokens(releasableRes?.result);
-    const cexTotal   = cexRes.reduce((sum, r) => sum + convHexToTokens(r?.result), 0);
+    // 3. CEX balances: sequential with small delay to avoid RPC 429
+    const cexAddrs = Object.values(CONV.CEX);
+    let cexTotal = 0;
+    for (const addr of cexAddrs) {
+      try {
+        const r = await convBasescan({
+          action: 'tokenbalance',
+          contractaddress: CONV.RIZE_TOKEN,
+          address: addr,
+          tag: 'latest',
+        });
+        if (r?.result) cexTotal += Number(BigInt(r.result)) / CONV.DECIMALS;
+        await new Promise(res => setTimeout(res, 120)); // ~8 req/sec, within free tier
+      } catch(e) {}
+    }
 
     return { bonded, unbonding, cexTotal };
   }
