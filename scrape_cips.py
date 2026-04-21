@@ -93,7 +93,7 @@ def parse_abstract(text):
     section_lines = []
 
     SECTION_START = re.compile(
-        r'^[#\s]*(\d+\.)?\s*(Abstract|Summary)\s*:?\s*$',
+        r'^[#\s*]*(\d+\\?\.)?\s*\**(Abstract|Summary)\**\s*:?\s*$',
         re.IGNORECASE
     )
     SECTION_END = re.compile(
