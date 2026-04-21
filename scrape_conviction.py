@@ -59,8 +59,18 @@ def get_token_balance(address: str) -> float:
         'tag': 'latest',
     })
     time.sleep(0.25)
-    result = res.get('result', '0') if res else '0'
+    if not res:
+        print(f'    [WARN] No response for {address[:10]}...')
+        return 0.0
+    # Log API status for debugging
+    status = res.get('status', '?')
+    message = res.get('message', '?')
+    result = res.get('result', '0')
+    if status != '1':
+        print(f'    [WARN] Basescan status={status} message={message} result={result!r} for {address[:10]}...')
+        return 0.0
     if not result or not result.isdigit():
+        print(f'    [WARN] Non-numeric result: {result!r} for {address[:10]}...')
         return 0.0
     return int(result) / DECIMALS
 
