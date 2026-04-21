@@ -1016,8 +1016,11 @@ html, body { overflow-x: hidden; max-width: 100%; }
     .conv-whale-table td a:hover { text-decoration: underline; }
     .conv-sep { height: 1px; background: rgba(255,255,255,0.07); margin: 20px 0; }
     .conv-section-title {
-      font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 10px;
+      font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 12px;
+    }
+    @media (max-width: 700px) {
+      .conv-section-title { font-size: 14px; letter-spacing: 1.2px; margin-bottom: 8px; }
     }
     @media (max-width: 700px) {
       .conv-delta-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1150,8 +1153,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
         <!-- Governance Flows chart -->
         <div id="conv-wrap-unbonding" style="display:none">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
-            <div style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted)">Governance Flows (Daily)</div>
+          <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:6px">
             <button id="conv-unbond-history-btn" onclick="convToggleUnbondHistory()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.15);padding:5px 14px;cursor:pointer;transition:background 0.15s,color 0.15s;white-space:nowrap">See Full History</button>
           </div>
           <div class="ctx-chart-wrap" style="height:260px">
@@ -1176,6 +1178,33 @@ html, body { overflow-x: hidden; max-width: 100%; }
             <span class="ctx-kpi-label">On Exchanges (Today)</span>
             <span class="ctx-kpi-value" id="conv-live-cex">—</span>
             <span class="conv-delta-sub" id="conv-live-cex-usd">&nbsp;</span>
+          </div>
+        </div>
+
+        <div class="conv-sep"></div>
+
+        <!-- Governance Flows deltas: bonded change 24h/7d/30d/90d -->
+        <div class="conv-section-title">Governance Flows</div>
+        <div class="conv-delta-grid" id="conv-gov-delta-grid">
+          <div class="conv-delta-box">
+            <span class="conv-delta-label">24h Bonded</span>
+            <span class="conv-delta-value conv-neutral" id="conv-gov-1d">—</span>
+            <span class="conv-delta-sub" id="conv-gov-1d-sub">&nbsp;</span>
+          </div>
+          <div class="conv-delta-box">
+            <span class="conv-delta-label">7d Bonded</span>
+            <span class="conv-delta-value conv-neutral" id="conv-gov-7d">—</span>
+            <span class="conv-delta-sub" id="conv-gov-7d-sub">&nbsp;</span>
+          </div>
+          <div class="conv-delta-box">
+            <span class="conv-delta-label">30d Bonded</span>
+            <span class="conv-delta-value conv-neutral" id="conv-gov-30d">—</span>
+            <span class="conv-delta-sub" id="conv-gov-30d-sub">&nbsp;</span>
+          </div>
+          <div class="conv-delta-box">
+            <span class="conv-delta-label">90d Bonded</span>
+            <span class="conv-delta-value conv-neutral" id="conv-gov-90d">—</span>
+            <span class="conv-delta-sub" id="conv-gov-90d-sub">&nbsp;</span>
           </div>
         </div>
 
@@ -3963,13 +3992,18 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
   // ── Render live stats ──────────────────────────────────────
   function convRenderLive(bonded, unbonding, cexTotal) {
-    const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-    setEl('conv-live-bonded',       convFmt(bonded) + ' RIZE');
-    setEl('conv-live-bonded-usd',   convFmtUsd(bonded));
-    setEl('conv-live-unbonding',    convFmt(unbonding) + ' RIZE');
-    setEl('conv-live-unbonding-usd',convFmtUsd(unbonding));
-    setEl('conv-live-cex',          convFmt(cexTotal) + ' RIZE');
-    setEl('conv-live-cex-usd',      convFmtUsd(cexTotal));
+    const setVal = (id, val, color) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = val;
+      if (color) el.style.color = color;
+    };
+    setVal('conv-live-bonded',        convFmt(bonded)    + ' RIZE', 'var(--green)');
+    setVal('conv-live-bonded-usd',    convFmtUsd(bonded));
+    setVal('conv-live-unbonding',     convFmt(unbonding) + ' RIZE', 'var(--gold)');
+    setVal('conv-live-unbonding-usd', convFmtUsd(unbonding));
+    setVal('conv-live-cex',           convFmt(cexTotal)  + ' RIZE', '#fff');
+    setVal('conv-live-cex-usd',       convFmtUsd(cexTotal));
   }
 
   // ── Render deltas ──────────────────────────────────────────
@@ -3994,6 +4028,43 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       el.textContent = sign + convFmt(delta) + ' RIZE';
       el.className   = 'conv-delta-value ' + (isGood ? 'conv-green' : 'conv-red');
       if (sub) sub.innerHTML = usdStr || '&nbsp;';
+    });
+  }
+
+  // ── Render governance flows deltas ───────────────────────────
+  function convRenderGovDeltas(govSeries) {
+    const periods = [
+      { id: '1d',  days: 1  },
+      { id: '7d',  days: 7  },
+      { id: '30d', days: 30 },
+      { id: '90d', days: 90 },
+    ];
+    periods.forEach(p => {
+      const delta = convCalcDelta(govSeries.data, govSeries.rawDays, p.days);
+      const el  = document.getElementById('conv-gov-' + p.id);
+      const sub = document.getElementById('conv-gov-' + p.id + '-sub');
+      if (!el) return;
+      if (delta === null) { el.textContent = '—'; return; }
+      const sign    = delta >= 0 ? '+' : '';
+      const isGood  = delta > 0; // positive bonding = bullish
+      el.textContent = sign + convFmt(delta) + ' RIZE';
+      el.className   = 'conv-delta-value ' + (isGood ? 'conv-green' : 'conv-red');
+      // Percentage change
+      if (sub) {
+        const idx = govSeries.rawDays.length - 1;
+        const pastDate = new Date();
+        pastDate.setDate(pastDate.getDate() - p.days);
+        const pastKey = pastDate.toISOString().slice(0, 10);
+        const pastIdx = govSeries.rawDays.findIndex(d => d >= pastKey);
+        if (pastIdx >= 0 && govSeries.data[pastIdx] > 0) {
+          const pct = (delta / govSeries.data[pastIdx]) * 100;
+          const arrow = pct >= 0 ? '▲' : '▼';
+          sub.innerHTML = arrow + ' ' + Math.abs(pct).toFixed(2) + '%';
+          sub.style.color = pct >= 0 ? 'var(--green)' : 'var(--pink)';
+        } else {
+          sub.innerHTML = '&nbsp;';
+        }
+      }
     });
   }
 
@@ -4070,7 +4141,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     } else {
       if (mainWrap) mainWrap.style.display = 'none';
       if (unbWrap)  unbWrap.style.display  = 'block';
-      if (label)    label.textContent = 'Governance Flows';
+      if (label)    label.textContent = 'Governance Flows (Daily)';
     }
   };
 
@@ -4134,6 +4205,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       convRenderMainChart(govSeries, cexSeries);
       convRenderUnbondingChart(unbSeries);
       convRenderLive(live.bonded, live.unbonding, live.cexTotal);
+      convRenderGovDeltas(govSeries);
       convRenderDeltas(cexSeries);
       convRenderWhales(whalesFromJson, addrLabels);
 
