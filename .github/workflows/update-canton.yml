@@ -50,11 +50,10 @@ jobs:
           # Add missing entities report if present
           git add canton-ecosystem/canton_missing_entities.txt 2>/dev/null || true
           # Add only NEW logo files (untracked), never modify existing ones
-          git add --intent-to-add canton-ecosystem/logos/ 2>/dev/null || true
+          git add canton-ecosystem/logos/
           git diff --cached --name-only canton-ecosystem/logos/ | while read f; do
-            git restore --staged "$f" 2>/dev/null || true
+            git show HEAD:"$f" > /dev/null 2>&1 && git restore --staged "$f" || true
           done
-          git add $(git ls-files --others --exclude-standard canton-ecosystem/logos/) 2>/dev/null || true
           TIMESTAMP=$(date +"%Y-%m-%d")
           COUNT=$(python -c "import json; data=json.load(open('canton-ecosystem/entities.json')); print(len(data))")
           git commit -m "chore: update Canton ecosystem — $COUNT entities ($TIMESTAMP)" || echo "Nothing to commit"
