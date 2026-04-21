@@ -551,8 +551,12 @@ let CIPS = [];
     .then(function(r){ return r.json(); })
     .then(function(data){
       CIPS = data;
-      cipFiltered = CIPS.slice().reverse();
-      cipRender();
+      // Only render if the CIP module is already open
+      var cipLc = document.getElementById('cip-lc');
+      if (cipLc && !cipLc.classList.contains('collapsed')) {
+        cipFiltered = CIPS.slice().reverse();
+        cipRender();
+      }
     })
     .catch(function(err){ console.error('Could not load cips.json:', err); });
 
@@ -565,6 +569,11 @@ document.addEventListener("DOMContentLoaded", function() {
     if (!lc || !body) return;
     const collapsed = lc.classList.toggle('collapsed');
     body.classList.toggle('collapsed', collapsed);
+    // When opening the CIP module and data is already loaded, render immediately
+    if (!collapsed && id === 'cip-lc' && CIPS.length > 0) {
+      cipFiltered = CIPS.slice().reverse();
+      cipRender();
+    }
   };
 
   /* ── NETWORK MAP ── */
@@ -968,7 +977,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
   /* ── CANTON CIPs ── */
-  var cipFiltered = CIPS.slice().reverse();
+  var cipFiltered = [];
   var cipActiveType = 'ALL';
   var cipActiveStatus = 'ALL';
   var cipActiveBubble = null;
@@ -1086,6 +1095,7 @@ document.addEventListener("DOMContentLoaded", function() {
     summaryText.className = 'ib-text';
     summaryText.style.display = 'block';
     summaryText.style.marginBottom = '16px';
+    summaryText.style.whiteSpace = 'pre-wrap';
     summaryText.textContent = c.description;
 
     var metaDiv = document.createElement('div');
@@ -1097,9 +1107,10 @@ document.addEventListener("DOMContentLoaded", function() {
     var sc2 = cipStatusClass(c.status);
     var badge = '<span class="cip-status-badge cip-status-'+sc2+'">'+c.status+'</span>';
     var typeTag = c.type ? ' <span class="cip-type">'+c.type+'</span>' : '';
-    var created = c.created ? '<div>Created: <span style="color:#333">'+c.created+'</span></div>' : '';
+    var created  = c.created  ? '<div>Created: <span style="color:#333">'+c.created+'</span></div>' : '';
+    var approved = c.approved ? '<div>Approved: <span style="color:#333">'+c.approved+'</span></div>' : '';
     var ref = '<div>Source: <span style="color:#333"><a href="https://github.com/canton-foundation/cips/tree/main/'+c.id.toLowerCase()+'" target="_blank" style="color:var(--navy)">github.com/canton-foundation/cips</a></span></div>';
-    metaDiv.innerHTML = created + ref;
+    metaDiv.innerHTML = created + approved + ref;
 
     bodyEl.innerHTML = '<div style="margin-bottom:14px">'+badge+typeTag+'</div>';
     bodyEl.appendChild(summaryText);
