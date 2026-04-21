@@ -304,7 +304,9 @@ async def main():
     if DIFF_MODE and existing:
         scraped_slugs = {e["slug"] for e in entities}
         missing = [e for slug, e in existing.items() if slug not in scraped_slugs]
-        MISSING_PATH = OUT_DIR / "canton_missing_entities.txt"
+        HANDLE_DIR = Path("HANDLE-THIS-BEFORE-PULL")
+        HANDLE_DIR.mkdir(exist_ok=True)
+        MISSING_PATH = HANDLE_DIR / "canton_missing_entities.txt"
 
         if missing:
             lines = [
