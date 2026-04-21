@@ -1186,25 +1186,25 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
         <!-- Governance Flows deltas: bonded change 24h/7d/30d/90d -->
         <div class="conv-section-title">Governance Flows</div>
-        <div class="conv-delta-grid" id="conv-gov-delta-grid">
-          <div class="conv-delta-box">
-            <span class="conv-delta-label">24h Bonded</span>
-            <span class="conv-delta-value conv-neutral" id="conv-gov-1d">—</span>
+        <div class="ctx-kpi-row" id="conv-gov-delta-grid">
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">24h Bonded</span>
+            <span class="ctx-kpi-value" id="conv-gov-1d">—</span>
             <span class="conv-delta-sub" id="conv-gov-1d-sub">&nbsp;</span>
           </div>
-          <div class="conv-delta-box">
-            <span class="conv-delta-label">7d Bonded</span>
-            <span class="conv-delta-value conv-neutral" id="conv-gov-7d">—</span>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">7d Bonded</span>
+            <span class="ctx-kpi-value" id="conv-gov-7d">—</span>
             <span class="conv-delta-sub" id="conv-gov-7d-sub">&nbsp;</span>
           </div>
-          <div class="conv-delta-box">
-            <span class="conv-delta-label">30d Bonded</span>
-            <span class="conv-delta-value conv-neutral" id="conv-gov-30d">—</span>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">30d Bonded</span>
+            <span class="ctx-kpi-value" id="conv-gov-30d">—</span>
             <span class="conv-delta-sub" id="conv-gov-30d-sub">&nbsp;</span>
           </div>
-          <div class="conv-delta-box">
-            <span class="conv-delta-label">90d Bonded</span>
-            <span class="conv-delta-value conv-neutral" id="conv-gov-90d">—</span>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">90d Bonded</span>
+            <span class="ctx-kpi-value" id="conv-gov-90d">—</span>
             <span class="conv-delta-sub" id="conv-gov-90d-sub">&nbsp;</span>
           </div>
         </div>
@@ -1213,25 +1213,25 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
         <!-- Delta boxes: Exchange flow -->
         <div class="conv-section-title">Exchanges Net Flow</div>
-        <div class="conv-delta-grid" id="conv-delta-grid">
-          <div class="conv-delta-box">
-            <span class="conv-delta-label">24h Net Flow</span>
-            <span class="conv-delta-value conv-neutral" id="conv-delta-1d">—</span>
+        <div class="ctx-kpi-row" id="conv-delta-grid">
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">24h Net Flow</span>
+            <span class="ctx-kpi-value" id="conv-delta-1d">—</span>
             <span class="conv-delta-sub" id="conv-delta-1d-sub">&nbsp;</span>
           </div>
-          <div class="conv-delta-box">
-            <span class="conv-delta-label">7d Net Flow</span>
-            <span class="conv-delta-value conv-neutral" id="conv-delta-7d">—</span>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">7d Net Flow</span>
+            <span class="ctx-kpi-value" id="conv-delta-7d">—</span>
             <span class="conv-delta-sub" id="conv-delta-7d-sub">&nbsp;</span>
           </div>
-          <div class="conv-delta-box">
-            <span class="conv-delta-label">30d Net Flow</span>
-            <span class="conv-delta-value conv-neutral" id="conv-delta-30d">—</span>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">30d Net Flow</span>
+            <span class="ctx-kpi-value" id="conv-delta-30d">—</span>
             <span class="conv-delta-sub" id="conv-delta-30d-sub">&nbsp;</span>
           </div>
-          <div class="conv-delta-box">
-            <span class="conv-delta-label">90d Net Flow</span>
-            <span class="conv-delta-value conv-neutral" id="conv-delta-90d">—</span>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">90d Net Flow</span>
+            <span class="ctx-kpi-value" id="conv-delta-90d">—</span>
             <span class="conv-delta-sub" id="conv-delta-90d-sub">&nbsp;</span>
           </div>
         </div>
@@ -4033,7 +4033,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const usd = window.rzLivePrice ? absVal * window.rzLivePrice : 0;
       const usdStr = usd >= 1e6 ? '$' + (usd/1e6).toFixed(2) + 'M' : usd >= 1e3 ? '$' + (usd/1e3).toFixed(0) + 'K' : '';
       el.textContent = sign + convFmt(delta) + ' RIZE';
-      el.className   = 'conv-delta-value ' + (isGood ? 'conv-green' : 'conv-red');
+      el.className   = 'ctx-kpi-value';
+      el.style.color = isGood ? '#98ffb6' : 'var(--pink)';
       if (sub) sub.innerHTML = usdStr || '&nbsp;';
     });
   }
@@ -4055,7 +4056,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const sign    = delta >= 0 ? '+' : '';
       const isGood  = delta > 0; // positive bonding = bullish
       el.textContent = sign + convFmt(delta) + ' RIZE';
-      el.className = 'conv-delta-value';
+      el.className = 'ctx-kpi-value';
       el.style.color = isGood ? '#98ffb6' : 'var(--pink)';
       // Percentage change — bigger font for readability
       if (sub) {
