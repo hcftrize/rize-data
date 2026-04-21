@@ -82,19 +82,38 @@ def parse_md_header(text):
 
 
 def parse_abstract(text):
+    """
+    Extract the Abstract section from a CIP .md file.
+    Handles multiple formats found in the foundation repo:
+      - ## Abstract
+      - ## 1. Abstract  
+      - 1. Abstract
+      - # Abstract
+      - Abstract (plain)
+    """
     lines = text.splitlines()
     in_abstract = False
     abstract_lines = []
+
     for line in lines:
-        if re.match(r'^##\s+Abstract', line, re.IGNORECASE):
+        stripped = line.strip()
+
+        # Detect any Abstract heading variant
+        # Matches: ## Abstract, ## 1. Abstract, 1. Abstract, # Abstract, etc.
+        if re.match(r'^#{0,3}\s*\d*\.?\s*Abstract\s*$', stripped, re.IGNORECASE):
             in_abstract = True
             continue
+
         if in_abstract:
-            if re.match(r'^##\s+', line):
+            # Stop at next section heading (##, #, or numbered like "2." or "## 2.")
+            if re.match(r'^#{1,3}\s+', line) or re.match(r'^\d+\.\s+\w', line):
                 break
             abstract_lines.append(line)
+
     abstract = "\n".join(abstract_lines).strip()
-    return re.sub(r'\n{3,}', '\n\n', abstract)
+    # Clean up excessive blank lines
+    abstract = re.sub(r'\n{3,}', '\n\n', abstract)
+    return abstract
 
 
 def find_md_file(folder):
