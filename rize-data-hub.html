@@ -1138,7 +1138,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div id="conv-chart-label" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;flex:1">RIZE Bonded vs On Exchanges</div>
           <div class="conv-toggle-row" style="margin-bottom:0">
             <button class="conv-toggle active" id="conv-btn-main" onclick="convSwitchChart('main',this)">Bonded / Exchanges</button>
-            <button class="conv-toggle" id="conv-btn-unbonding" onclick="convSwitchChart('unbonding',this)">Unbonding Queue</button>
+            <button class="conv-toggle" id="conv-btn-unbonding" onclick="convSwitchChart('unbonding',this)">Governance Flows</button>
           </div>
         </div>
 
@@ -1157,7 +1157,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <!-- Live stats row: bonded + unbonding + exchanges live -->
         <div class="conv-stat-row" id="conv-live-stats" style="margin-top:16px">
           <div class="ctx-kpi">
-            <span class="ctx-kpi-label">Total Bonded (Live)</span>
+            <span class="ctx-kpi-label">Total Bonded (Today)</span>
             <span class="ctx-kpi-value" id="conv-live-bonded">—</span>
             <span class="conv-delta-sub" id="conv-live-bonded-usd">&nbsp;</span>
           </div>
@@ -1167,7 +1167,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
             <span class="conv-delta-sub" id="conv-live-unbonding-usd">&nbsp;</span>
           </div>
           <div class="ctx-kpi">
-            <span class="ctx-kpi-label">On Exchanges (Live)</span>
+            <span class="ctx-kpi-label">On Exchanges (Today)</span>
             <span class="ctx-kpi-value" id="conv-live-cex">—</span>
             <span class="conv-delta-sub" id="conv-live-cex-usd">&nbsp;</span>
           </div>
@@ -1176,7 +1176,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div class="conv-sep"></div>
 
         <!-- Delta boxes: Exchange flow -->
-        <div class="conv-section-title">Exchange Net Flow &mdash; Negative = Bullish (More Withdrawals)</div>
+        <div class="conv-section-title">Exchanges Net Flow</div>
         <div class="conv-delta-grid" id="conv-delta-grid">
           <div class="conv-delta-box">
             <span class="conv-delta-label">24h Net Flow</span>
@@ -1203,7 +1203,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div class="conv-sep"></div>
 
         <!-- Whale movements -->
-        <div class="conv-section-title">Whale Movements &mdash; Transactions &gt; 5M RIZE</div>
+        <div class="conv-section-title">Whales Movements &mdash; Transactions &gt; 5M RIZE</div>
         <div style="overflow-x:auto" id="conv-whale-wrap">
           <div style="color:var(--muted);font-family:'DM Mono',monospace;font-size:13px;padding:16px 0" id="conv-whale-loading">Loading whale data&hellip;</div>
           <table class="conv-whale-table" id="conv-whale-table" style="display:none">
@@ -3793,17 +3793,18 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   // ── Unbonding series from daily bonded drops ──────────────
   // If bonded decreases day-over-day, that delta = unbonding outflow
   function convBuildUnbondingFromSeries(govSeries) {
+    // Build bidirectional series: positive = net bonding day, negative = net unbonding day
     const { labels, data } = govSeries;
     if (data.length < 2) return { labels: [], data: [] };
-    const ubLabels = [], ubData = [];
+    const flowLabels = [], flowData = [];
     for (let i = 1; i < data.length; i++) {
-      const delta = data[i - 1] - data[i]; // positive = decrease = unbonding
-      if (delta > 0) {
-        ubLabels.push(labels[i]);
-        ubData.push(Math.round(delta));
+      const delta = data[i] - data[i - 1]; // positive = bonding, negative = unbonding
+      if (delta !== 0) {
+        flowLabels.push(labels[i]);
+        flowData.push(Math.round(delta));
       }
     }
-    return { labels: ubLabels, data: ubData };
+    return { labels: flowLabels, data: flowData };
   }
 
   // ── Render charts ──────────────────────────────────────────
@@ -3875,20 +3876,39 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     if (rzCharts.convUnbonding) { rzCharts.convUnbonding.destroy(); rzCharts.convUnbonding = null; }
 
     const opts = rzBaseOpts();
-    opts.scales.y.ticks.callback = v => convFmt(v);
-    opts.plugins.tooltip.callbacks = {
-      label: c => ' Unbonded: ' + convFmt(c.parsed.y) + ' RIZE'
+    // Y axis centered on 0 with + / - labels
+    opts.scales.y.ticks.callback = v => {
+      const sign = v > 0 ? '+' : '';
+      return sign + convFmt(v);
     };
+    opts.scales.y.grid = { color: ctx => ctx.tick.value === 0 ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.05)' };
+    opts.scales.y.beginAtZero = false;
+    opts.plugins.tooltip.callbacks = {
+      label: c => {
+        const v = c.parsed.y;
+        const sign = v > 0 ? '+' : '';
+        const lbl = v > 0 ? ' Net Bonding' : ' Net Unbonding';
+        return lbl + ': ' + sign + convFmt(v) + ' RIZE';
+      }
+    };
+
+    // Color each bar: green if positive (bonding), red if negative (unbonding)
+    const colors = unbondSeries.data.map(v =>
+      v > 0 ? 'rgba(61,190,71,0.70)' : 'rgba(255,138,216,0.65)'
+    );
+    const borderColors = unbondSeries.data.map(v =>
+      v > 0 ? '#3DBE47' : '#ff8ad8'
+    );
 
     rzCharts.convUnbonding = new Chart(cv.getContext('2d'), {
       type: 'bar',
       data: {
         labels: unbondSeries.labels,
         datasets: [{
-          label: 'Daily Unbonding (Outflows from Governance)',
+          label: 'Governance Flows',
           data: unbondSeries.data,
-          backgroundColor: 'rgba(255,211,107,0.55)',
-          borderColor: '#ffd36b',
+          backgroundColor: colors,
+          borderColor: borderColors,
           borderWidth: 1,
         }],
       },
@@ -3923,9 +3943,12 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       if (delta === null) { el.textContent = '—'; return; }
       const sign    = delta >= 0 ? '+' : '';
       const isGood  = delta < 0; // negative = outflow = bullish
+      const absVal = Math.abs(delta);
+      const usd = window.rzLivePrice ? absVal * window.rzLivePrice : 0;
+      const usdStr = usd >= 1e6 ? '$' + (usd/1e6).toFixed(2) + 'M' : usd >= 1e3 ? '$' + (usd/1e3).toFixed(0) + 'K' : '';
       el.textContent = sign + convFmt(delta) + ' RIZE';
       el.className   = 'conv-delta-value ' + (isGood ? 'conv-green' : 'conv-red');
-      if (sub) sub.textContent = isGood ? '▼ Outflow — Bullish' : '▲ Inflow — Bearish';
+      if (sub) sub.textContent = usdStr || '&nbsp;';
     });
   }
 
@@ -3959,8 +3982,16 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const govAddr  = CONV.GOV_CONTRACT.toLowerCase();
       const fromL    = (w.from || '').toLowerCase();
       const toL      = (w.to   || '').toLowerCase();
-      const dir      = toL === govAddr ? '↗ Bond' : fromL === govAddr ? '↙ Unbond' : '→ Transfer';
-      const dirColor = toL === govAddr ? '#98ffb6' : fromL === govAddr ? '#ff8ad8' : '#ffd36b';
+      const isCex = a => Object.values(CONV.CEX).some(ca => ca.toLowerCase() === a);
+      const fromIsCex = isCex(fromL);
+      const toIsCex   = isCex(toL);
+      let dir, dirColor;
+      if (toL === govAddr)              { dir = '↗ Bond';           dirColor = '#98ffb6'; }
+      else if (fromL === govAddr)       { dir = '↙ Release';        dirColor = '#7ee0ff'; }
+      else if (fromIsCex && toIsCex)    { dir = '⇄ CEX Internal';   dirColor = 'var(--muted)'; }
+      else if (!fromIsCex && toIsCex)   { dir = '→ To Exchange';    dirColor = '#ff8ad8'; }
+      else if (fromIsCex && !toIsCex)   { dir = '← From Exchange';  dirColor = '#98ffb6'; }
+      else                              { dir = '→ Transfer';        dirColor = '#ffd36b'; }
       const fromLbl  = w.from_label || convAddrShort(w.from);
       const toLbl    = w.to_label   || convAddrShort(w.to);
       const txUrl    = 'https://basescan.org/tx/' + (w.tx || '');
@@ -3991,7 +4022,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     } else {
       if (mainWrap) mainWrap.style.display = 'none';
       if (unbWrap)  unbWrap.style.display  = 'block';
-      if (label)    label.textContent = 'Daily Unbonding Outflows from Governance';
+      if (label)    label.textContent = 'Governance Flows';
     }
   };
 
