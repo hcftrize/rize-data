@@ -21,7 +21,7 @@ GOV_CONTRACT  = '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE'
 DECIMALS      = 10 ** 18
 OUTPUT_FILE   = Path('rize-data-hub/conviction-history.json')
 BASESCAN_KEY  = os.environ.get('BASESCAN_API_KEY', '')
-BASESCAN_URL  = 'https://api.basescan.org/api'
+BASESCAN_URL  = 'https://api.basescan.org/v2/api'
 
 CEX_ADDRESSES = {
     'Kraken Hot 1'  : '0x02Ac4617Fe004cf8Cd9c988Ff9C905b2Ec676C2d',
@@ -38,7 +38,7 @@ CEX_ADDRESSES = {
 
 
 def basescan(params: dict):
-    p = {**params, 'apikey': BASESCAN_KEY}
+    p = {**params, 'apikey': BASESCAN_KEY, 'chainid': '8453'}
     url = BASESCAN_URL + '?' + urllib.parse.urlencode(p)
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     try:
