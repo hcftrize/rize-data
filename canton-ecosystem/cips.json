@@ -1,300 +1,1042 @@
-"""
-scrape_cips.py
-==============
-Scrape https://github.com/canton-foundation/cips -> cips.json
-
-Usage:
-    python scrape_cips.py               # normal daily run
-    python scrape_cips.py --bootstrap   # one-time: fetch abstract + approved for ALL entries
-
-Logic (normal mode):
-    - Strictly filters CIP-0[digits] folders — rejects CIP-XXXX drafts
-    - Detects new CIPs not yet in cips.json, adds them with abstract as description
-    - Skips frozen statuses (Final/Replaced/Rejected/Obsolete/Withdrawn)
-    - Updates status and approved date for non-frozen existing CIPs
-    - Writes HANDLE-THIS-BEFORE-PULL/complete-cip-learnbox.txt if new CIPs found
-
-Logic (bootstrap mode):
-    - Fetches abstract + approved date for ALL existing CIPs
-    - Run once after initial deployment to populate all descriptions
-"""
-
-import json, os, re, sys, time, urllib.request
-from datetime import date
-from pathlib import Path
-
-FOUNDATION_REPO = "canton-foundation/cips"
-API_BASE        = "https://api.github.com"
-CIPS_JSON       = Path("canton-ecosystem/cips.json")
-HANDLE_DIR      = Path("HANDLE-THIS-BEFORE-PULL")
-NOTICE_FILE     = HANDLE_DIR / "complete-cip-learnbox.txt"
-BOOTSTRAP_MODE  = "--bootstrap" in sys.argv
-
-# Strict: CIP-0 followed by digits only
-CIP_FOLDER_RE   = re.compile(r'^cip-0\d+$', re.IGNORECASE)
-FROZEN_STATUSES = {"Final", "Replaced", "Rejected", "Obsolete", "Withdrawn"}
-GH_TOKEN        = os.environ.get("GH_TOKEN", "")
-
-
-def gh_get(path):
-    url = f"{API_BASE}/{path}"
-    req = urllib.request.Request(url)
-    req.add_header("Accept", "application/vnd.github+json")
-    req.add_header("X-GitHub-Api-Version", "2022-11-28")
-    if GH_TOKEN:
-        req.add_header("Authorization", f"Bearer {GH_TOKEN}")
-    try:
-        with urllib.request.urlopen(req, timeout=15) as r:
-            return json.loads(r.read().decode())
-    except Exception as e:
-        print(f"   API error ({path}): {e}")
-        return None
-
-
-def get_raw(path):
-    url = f"https://raw.githubusercontent.com/{FOUNDATION_REPO}/main/{path}"
-    req = urllib.request.Request(url)
-    if GH_TOKEN:
-        req.add_header("Authorization", f"Bearer {GH_TOKEN}")
-    try:
-        with urllib.request.urlopen(req, timeout=15) as r:
-            return r.read().decode("utf-8", errors="replace")
-    except Exception as e:
-        print(f"   Raw fetch error ({path}): {e}")
-        return None
-
-
-def parse_md_header(text):
-    result = {}
-    for line in text.splitlines()[:30]:
-        s = line.strip()
-        if s == "---" or s.startswith("#") or s.startswith("*"):
-            if result:
-                break
-            continue
-        if ":" in s:
-            key, _, val = s.partition(":")
-            key = key.strip().lower().rstrip("(s)")
-            val = val.strip()
-            if key and val:
-                result[key] = val
-    return result
-
-
-def parse_abstract(text):
-    """
-    Extract the Abstract or Summary section from a CIP .md file.
-    Handles all formats found in the foundation repo:
-      ## Abstract     ## 1. Abstract    1. Abstract
-      # Abstract      ## Summary        Summary
-    """
-    lines = text.splitlines()
-    in_section = False
-    section_lines = []
-
-    # Matches heading lines that introduce Abstract or Summary section
-    SECTION_START = re.compile(
-        r'^[#\s]*(\d+\.)?\s*(Abstract|Summary)\s*:?\s*$',
-        re.IGNORECASE
-    )
-    # Matches the START of any OTHER section (to stop collection)
-    # A new section = line starting with # or a numbered heading like "2. Motivation"
-    SECTION_END = re.compile(
-        r'^(#{1,4}\s+\S|(\d+)\.\s+[A-Z][a-z])'
-    )
-
-    for line in lines:
-        stripped = line.strip()
-
-        if not in_section:
-            if SECTION_START.match(stripped):
-                in_section = True
-            continue
-
-        # We are in the section — check if this line starts a new one
-        if stripped and SECTION_END.match(line):
-            break
-
-        section_lines.append(line)
-
-    abstract = "\n".join(section_lines).strip()
-    # Remove markdown links [text](url) -> text
-    abstract = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', abstract)
-    # Clean excessive blank lines
-    abstract = re.sub(r'\n{3,}', '\n\n', abstract)
-    return abstract
-
-
-def find_md_file(folder):
-    items = gh_get(f"repos/{FOUNDATION_REPO}/contents/{folder}")
-    if not items or not isinstance(items, list):
-        return None, None
-    for item in items:
-        if re.match(r'cip-0\d+\.md$', item["name"].lower()):
-            text = get_raw(f"{folder}/{item['name']}")
-            return item["name"], text
-    return None, None
-
-
-def list_cip_folders():
-    data = gh_get(f"repos/{FOUNDATION_REPO}/contents")
-    if not data or not isinstance(data, list):
-        return []
-    folders, skipped = [], []
-    for item in data:
-        if item["type"] != "dir":
-            continue
-        name = item["name"]
-        if CIP_FOLDER_RE.match(name):
-            folders.append(name)
-        elif re.match(r'^[Cc][Ii][Pp]-', name):
-            skipped.append(name)
-    folders.sort(key=lambda x: int(re.search(r'\d+', x).group()))
-    if skipped:
-        print(f"   Skipped non-standard folders: {skipped}")
-    return folders
-
-
-def main():
-    HANDLE_DIR.mkdir(exist_ok=True)
-    CIPS_JSON.parent.mkdir(exist_ok=True)
-
-    if CIPS_JSON.exists():
-        existing = json.loads(CIPS_JSON.read_text(encoding="utf-8"))
-        print(f"Loaded {len(existing)} existing CIPs")
-    else:
-        existing = []
-        print("No existing cips.json — starting fresh")
-
-    existing_by_id = {e["id"]: e for e in existing}
-
-    # ── BOOTSTRAP ─────────────────────────────────────────────────────────────
-    if BOOTSTRAP_MODE:
-        print("\nBootstrap mode — fetching abstract + approved for all CIPs...")
-        updated_desc = updated_approved = 0
-        for entry in existing:
-            cip_id = entry["id"]
-            folder_name = cip_id.lower()  # CIP-0114 -> cip-0114
-            print(f"  [{cip_id}]", end=" ", flush=True)
-            _, text = find_md_file(folder_name)
-            if not text:
-                print("not found")
-                time.sleep(0.3)
-                continue
-            abstract = parse_abstract(text)
-            header   = parse_md_header(text)
-            changed  = False
-            if abstract and entry.get("description", "") != abstract:
-                entry["description"] = abstract
-                updated_desc += 1
-                changed = True
-            approved = header.get("approved", "").strip()
-            if approved and entry.get("approved", "") != approved:
-                entry["approved"] = approved
-                updated_approved += 1
-                changed = True
-            print("updated" if changed else "no change")
-            time.sleep(0.3)
-
-        existing.sort(key=lambda x: x["number"])
-        CIPS_JSON.write_text(json.dumps(existing, indent=2, ensure_ascii=False), encoding="utf-8")
-        print(f"\nBootstrap done — {updated_desc} abstracts, {updated_approved} approved dates updated")
-        return
-
-    # ── NORMAL DAILY RUN ──────────────────────────────────────────────────────
-    print("\nListing CIP folders from foundation repo...")
-    folders = list_cip_folders()
-    print(f"Found {len(folders)} valid CIP-0XXX folders")
-    if not folders:
-        print("Could not list folders — check API access")
-        return
-
-    new_cips, status_updates = [], []
-
-    for folder in folders:
-        cip_id = folder.upper()
-        entry  = existing_by_id.get(cip_id)
-
-        if entry is None:
-            # NEW CIP
-            print(f"\n  New: {cip_id}")
-            _, text = find_md_file(folder)
-            if not text:
-                print(f"    Could not read .md — skipping")
-                continue
-            header   = parse_md_header(text)
-            abstract = parse_abstract(text)
-            number   = int(re.search(r'\d+', cip_id).group())
-            new_entry = {
-                "id":          cip_id,
-                "number":      number,
-                "title":       header.get("title", ""),
-                "type":        header.get("type", ""),
-                "status":      header.get("status", ""),
-                "created":     header.get("created", ""),
-                "approved":    header.get("approved", ""),
-                "description": abstract or ""
-            }
-            existing_by_id[cip_id] = new_entry
-            new_cips.append(new_entry)
-            print(f"    {new_entry['title'][:70]}")
-            print(f"    Abstract: {len(abstract)} chars")
-            time.sleep(0.3)
-
-        else:
-            # EXISTING — skip frozen
-            if entry.get("status") in FROZEN_STATUSES:
-                continue
-            _, text = find_md_file(folder)
-            if not text:
-                continue
-            header  = parse_md_header(text)
-            changed = False
-            new_status = header.get("status", "").strip()
-            if new_status and new_status != entry.get("status", ""):
-                print(f"  {cip_id}: status {entry['status']} -> {new_status}")
-                entry["status"] = new_status
-                changed = True
-            new_approved = header.get("approved", "").strip()
-            if new_approved and new_approved != entry.get("approved", ""):
-                print(f"  {cip_id}: approved -> {new_approved}")
-                entry["approved"] = new_approved
-                changed = True
-            if changed:
-                status_updates.append(cip_id)
-            time.sleep(0.2)
-
-    # ── Save ──────────────────────────────────────────────────────────────────
-    final = list(existing_by_id.values())
-    final.sort(key=lambda x: x["number"])
-    CIPS_JSON.write_text(json.dumps(final, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(f"\nDone — {len(final)} CIPs saved")
-    if status_updates:
-        print(f"Updated: {', '.join(status_updates)}")
-
-    # ── Notice ────────────────────────────────────────────────────────────────
-    if new_cips:
-        lines = [
-            "Canton CIPs — New entries added to cips.json",
-            f"Generated: {date.today()}",
-            f"Count: {len(new_cips)} new CIP(s)",
-            "",
-            "Abstract imported automatically from the .md file.",
-            "Review description in canton-ecosystem/cips.json before pushing to main.",
-            "",
-        ]
-        for c in new_cips:
-            lines.append(f"- {c['id']}: {c['title']}")
-            lines.append(f"  Status: {c['status']} | Type: {c['type']} | Created: {c['created']}")
-            lines.append(f"  Abstract: {'yes (' + str(len(c['description'])) + ' chars)' if c['description'] else 'MISSING — check .md'}")
-            lines.append("")
-        NOTICE_FILE.write_text("\n".join(lines), encoding="utf-8")
-        print(f"\n  {len(new_cips)} new CIP(s) — see {NOTICE_FILE}")
-    else:
-        if NOTICE_FILE.exists():
-            NOTICE_FILE.unlink()
-        print("No new CIPs")
-
-
-if __name__ == "__main__":
-    main()
+[
+  {
+    "id": "CIP-0000",
+    "number": 0,
+    "title": "Canton Improvement Process for the Global Synchronizer on Canton Network",
+    "type": "Process",
+    "status": "Approved",
+    "created": "2024-01-03",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0001",
+    "number": 1,
+    "title": "Replace the SV tranche time delays with a weighted reward",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2023-12-15",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0002",
+    "number": 2,
+    "title": "Minor adjustments to the Tokenomics variables to fine tune BME tokenomics",
+    "type": "Tokenomics",
+    "status": "Replaced",
+    "created": "2023-12-15",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0003",
+    "number": 3,
+    "title": "Consensus Layer Validator Participation & Rewards",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2023-12-15",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0006",
+    "number": 6,
+    "title": "Define the process of distributing and approving",
+    "type": "Process",
+    "status": "Active",
+    "created": "2024-03-12",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0007",
+    "number": 7,
+    "title": "SVs can earn extra SV reward weight when bringing Validators or apps to the Canton Network",
+    "type": "Tokenomics",
+    "status": "Replaced",
+    "created": "2024-03-12",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0008",
+    "number": 8,
+    "title": "Update and Refinement to CIP-0002",
+    "type": "Tokenomics",
+    "status": "Replaced",
+    "created": "2024-05-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0009",
+    "number": 9,
+    "title": "Add Broadridge as a T1 (weight 10) Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-05-11",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0010",
+    "number": 10,
+    "title": "LCV have met all their requirements to be a T1 Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-05-11",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0011",
+    "number": 11,
+    "title": "IEU have decided to forgo SV minting rights",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-05-11",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0012",
+    "number": 12,
+    "title": "Minor adjustments to Canton Coin processing, and Operational configuration, on the Global Synchronizer",
+    "type": "Standards Track",
+    "status": "Final",
+    "created": "2024-05-22",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0013",
+    "number": 13,
+    "title": "Correct an error in the Daml models controlling the re-onboarding process for Super Validators who have been removed from the quorum. The error allowed Super Validators to mint Canton Coin greater than their agreed share after being removed and returned to the quorum.",
+    "type": "Standards Track",
+    "status": "Final",
+    "created": "2024-05-24",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0014",
+    "number": 14,
+    "title": "Complete additional enhancements to the Scan API to facilitate tax accounting",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-05-29",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0015",
+    "number": 15,
+    "title": "Add Copper as a T3 (weight 1) Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-06-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0016",
+    "number": 16,
+    "title": "Add Dfns as a T3 (weight 1) Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-06-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0017",
+    "number": 17,
+    "title": "Add MPCH as a T3 (weight 1) Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-06-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0018",
+    "number": 18,
+    "title": "Add Tradeweb as a T1 (weight 10) Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-06-03",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0019",
+    "number": 19,
+    "title": "Add 7RIDGE as a T1 (weight 10) Super Validator.",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-06-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0020",
+    "number": 20,
+    "title": "Update and Refinement to CIP-0002",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2024-06-13",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0021",
+    "number": 21,
+    "title": "Create a subgroup of the Super Validators (“SV”) to vet and vote on making the Featured Application designation for network applications. Call this subgroup the Featured Application and Validator Committee (“FAV-C”).",
+    "type": "Governance",
+    "status": "Active",
+    "created": "2024-06-16",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0022",
+    "number": 22,
+    "title": "Status:",
+    "type": "Governance",
+    "status": "Unknown",
+    "created": "Approved:",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0024",
+    "number": 24,
+    "title": "SVs and Validators can earn SV reward weight when bringing Validators or apps to the Canton Network",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2024-09-27",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0025",
+    "number": 25,
+    "title": "CIP-0006 and CIP-0021 called for the formation of Validator and Featured App committees",
+    "type": "Governance",
+    "status": "Obsolete",
+    "created": "2024-09-27",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0032",
+    "number": 32,
+    "title": "Add Lukka as a Tier3 SV (Weight 1)",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0033",
+    "number": 33,
+    "title": "Add Strange Pixels as a Tier4 SV (Weight 0.5)",
+    "type": "Governance",
+    "status": "Rejected",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0034",
+    "number": 34,
+    "title": "Add Proof Group as a Tier3 SV (Weight 1)",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0035",
+    "number": 35,
+    "title": "Add Five North as a Tier2 SV (Weight 3)",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-01-07",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0036",
+    "number": 36,
+    "title": "Add Kiln as a Tier3 SV (Weight 1)",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0037",
+    "number": 37,
+    "title": "Add Obsidian as a Tier3 SV",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-02-13",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0038",
+    "number": 38,
+    "title": "Add Hexagate as a Tier3 SV (Weight 1)",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0039",
+    "number": 39,
+    "title": "Add Copper Clearloop as a Tier3 SV (Weight 1)",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0040",
+    "number": 40,
+    "title": "Add Deribit as a Tier3 SV (Weight 1)",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0041",
+    "number": 41,
+    "title": "Add Circle as a Weight 10 Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-02-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0042",
+    "number": 42,
+    "title": "Stable Price per Canton Coin Transfer via Synchronizer Fees",
+    "type": "Governance",
+    "status": "Active",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0043",
+    "number": 43,
+    "title": "Add TRM as a SV",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-02-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0044",
+    "number": 44,
+    "title": "Add Elliptic as a Tier4 SV",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-02-07",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0045",
+    "number": 45,
+    "title": "SV Operating Requirements",
+    "type": "Governance",
+    "status": "Active",
+    "created": "2025-02-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0046",
+    "number": 46,
+    "title": "Add Coin Metrics as a Weight 1 Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-01-31",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0047",
+    "number": 47,
+    "title": "Featured App Activity Markers",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2025-02-12",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0048",
+    "number": 48,
+    "title": "Raising the Rewards Cap for Validators and Application Providers",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2025-02-19",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0049",
+    "number": 49,
+    "title": "Incentivizing Cold Backups for Super Validators to Enhance Network Resilience",
+    "type": "Governance",
+    "status": "Proposed",
+    "created": "2025-02-28",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0050",
+    "number": 50,
+    "title": "Controlled Validator Growth Through Trusted Operators",
+    "type": "Process",
+    "status": "Withdrawn",
+    "created": "2025-03-11",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0051",
+    "number": 51,
+    "title": "Streamline onchain governance votes",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-03-04",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0052",
+    "number": 52,
+    "title": "Add Monstera as an SV of Weight 5",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-03-14",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0053",
+    "number": 53,
+    "title": "AngelHack as a Weight 2.5 SV",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-03-24",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0054",
+    "number": 54,
+    "title": "Add Figment as a Weight 1 Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-03-14",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0055",
+    "number": 55,
+    "title": "Add Bitwave as a Weight 1 SV",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-03-17",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0056",
+    "number": 56,
+    "title": "Canton Network Token Standard",
+    "type": "Standards Track",
+    "status": "Final",
+    "created": "2025-03-07",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0057",
+    "number": 57,
+    "title": "Add Quantstamp as a Weight 1 Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-03-07",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0058",
+    "number": 58,
+    "title": "Add IntellectEU as Weight 1 SV",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-04-14",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0059",
+    "number": 59,
+    "title": "Add Woodside AI as an SV of Weight 10",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-04-21",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0060",
+    "number": 60,
+    "title": "Add Zero Hash as SV of Weight 7.5",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-04-23",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0061",
+    "number": 61,
+    "title": "Add Chainlink as a Super Validator of Weight 7.5",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-05-09",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0062",
+    "number": 62,
+    "title": "Synchronizer Migration with Downtime to Splice 0.4.0 / Canton 3.3",
+    "type": "Standards Track",
+    "status": "Final",
+    "created": "2025-05-14",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0063",
+    "number": 63,
+    "title": "Add Kaiko as a Super Validator of Weight 6.5",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-05-27",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0064",
+    "number": 64,
+    "title": "Delegateless Automation",
+    "type": "Standards Track",
+    "status": "Final",
+    "created": "2025-04-21",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0065",
+    "number": 65,
+    "title": "Add Layer Zero, Wormhole, and Chainlink as SVs at Weight 3 each",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-06-02",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0066",
+    "number": 66,
+    "title": "Enable escrow mechanisms and governance votes to allow Canton Coin minting from the unminted pool",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2025-06-18",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0067",
+    "number": 67,
+    "title": "One-Time Allocation of Historical Unclaimed Rewards to GSF",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2025-06-13",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0068",
+    "number": 68,
+    "title": "Bootstrap network from non-zero round",
+    "type": "Standards Track",
+    "status": "Final",
+    "created": "2025-07-09",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0069",
+    "number": 69,
+    "title": "Add Ledger as an SV of Weight 5",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-07-11",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0070",
+    "number": 70,
+    "title": "Adjusting Reward Caps for Validators",
+    "type": "Tokenomics",
+    "status": "Withdrawn",
+    "created": "2025-07-22",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0071",
+    "number": 71,
+    "title": "Add Ubyx as an SV of Weight 5",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-06-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0072",
+    "number": 72,
+    "title": "Add Fireblocks as an SV of Weight 5",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-07-30",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0073",
+    "number": 73,
+    "title": "Weighted Validator Liveness Rewards for SV-Chosen Parties",
+    "type": "Tokenomics",
+    "status": "Replaced",
+    "created": "2025-07-23",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0074",
+    "number": 74,
+    "title": "Add BitGo as an SV of Weight 5",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-08-15",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0075",
+    "number": 75,
+    "title": "Add Zodia as a SV with max weight 5",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-09-11",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0076",
+    "number": 76,
+    "title": "Hypernative as a Super Validator with a Weight of 1",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-08-20",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0077",
+    "number": 77,
+    "title": "Add Taurus as an SV of Weight 5",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-08-26",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0078",
+    "number": 78,
+    "title": "Canton Coin Fee Removal",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2025-09-08",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0079",
+    "number": 79,
+    "title": "SV Readiness — Demonstrate Third-Party Price Feed Integration for CC Listing",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-09-15",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0080",
+    "number": 80,
+    "title": "Add Republic as an SV of Weight 6",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-09-18",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0081",
+    "number": 81,
+    "title": "Add YZi Labs as Weight 10 SV",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-09-23",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0082",
+    "number": 82,
+    "title": "Establish a 5% Development Fund (Foundation-Governed)",
+    "type": "Governance",
+    "status": "Active",
+    "created": "2025-09-24",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0083",
+    "number": 83,
+    "title": "DTCC Super Validator Participation",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-10-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0084",
+    "number": 84,
+    "title": "Tokenomics Committee to Recommend $/MB Price Tuning",
+    "type": "Tokenomics",
+    "status": "Approved",
+    "created": "2025-10-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0085",
+    "number": 85,
+    "title": "Add Talos as Weight 6.5 SV",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-09-08",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0086",
+    "number": 86,
+    "title": "ERC-20 Middleware and Distributed Indexer for Canton Network",
+    "type": "Tokenomics",
+    "status": "Approved",
+    "created": "2025-10-14",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0087",
+    "number": 87,
+    "title": "Add Hex Trust as a Super Validator (Weight 3)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-09-26",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0089",
+    "number": 89,
+    "title": "Splice 0.5.0 / Canton 3.4 Upgrade",
+    "type": "Standards Track",
+    "status": "Approved",
+    "created": "2025-08-21",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0090",
+    "number": 90,
+    "title": "** Onboard USDT0 to Canton — Outcome-Linked SV Weight (Max 10)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "** 2025-10-28",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0091",
+    "number": 91,
+    "title": "Add Zenith as an SV of Weight 10",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-10-17",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0092",
+    "number": 92,
+    "title": "Controlled Transition to Dynamic Market Feeds Post-Listing of Canton Coin (CC)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-10-31",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0093",
+    "number": 93,
+    "title": "Add Bosphorus SV (BSV) as a Super Validator Max Weight 6",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-11-07",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0094",
+    "number": 94,
+    "title": "Add Blockdaemon as a Super Validator (weight 5.0)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-12-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0095",
+    "number": 95,
+    "title": "Onboard Mesh to Canton — Outcome-Linked SV Weight (Max 10)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-12-09",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0096",
+    "number": 96,
+    "title": "Removing Liveness Rewards from Validator Rewards Pool",
+    "type": "Tokenomics",
+    "status": "Approved",
+    "created": "2025-12-07",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0097",
+    "number": 97,
+    "title": "Nasdaq Super Validator Participation",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-12-30",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0098",
+    "number": 98,
+    "title": "Cap Per-Transaction Application Rewards at $1.50",
+    "type": "Tokenomics",
+    "status": "Approved",
+    "created": "2025-12-17",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0099",
+    "number": 99,
+    "title": "Zero Hash Modifications to Adoption Incentive",
+    "type": "Tokenomics",
+    "status": "Approved",
+    "created": "2025-01-07",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0100",
+    "number": 100,
+    "title": "Governance of the CIP 0082 Development Fund",
+    "type": "Tokenomics",
+    "status": "Active",
+    "created": "2025-12-22",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0102",
+    "number": 102,
+    "title": "Add Tharimmune as a Super Validator (SV)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2026-01-17",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0103",
+    "number": 103,
+    "title": "dApp Standard",
+    "type": "Standards Track",
+    "status": "Approved",
+    "created": "2025-11-28",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0104",
+    "number": 104,
+    "title": "Traffic-Based App Rewards",
+    "type": "Tokenomics",
+    "status": "Approved",
+    "created": "2026-01-29",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0105",
+    "number": 105,
+    "title": "Super Validator (SV) Locking & Long-Term Commitment Framework",
+    "type": "Tokenomics",
+    "status": "Approved",
+    "created": "2026-02-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0106",
+    "number": 106,
+    "title": "Add QCP Group as a Super Validator (weight 5.0)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2026-02-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0107",
+    "number": 107,
+    "title": "24h Submission Delay for End-User CC Transactions",
+    "type": "Standards Track",
+    "status": "Approved",
+    "created": "2026-01-21",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0108",
+    "number": 108,
+    "title": "Add Merkle Science’s Predictive Analytics as a Weight 1 SV",
+    "type": "Governance",
+    "status": "Proposed",
+    "created": "2020-12-16",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0109",
+    "number": 109,
+    "title": "Visa Super Validator Participation",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2026-03-20",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0110",
+    "number": 110,
+    "title": "Add Apollo as max weight 7 SV",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2026-03-19",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0111",
+    "number": 111,
+    "title": "Process for Reducing Super Validator Weight",
+    "type": "Governance",
+    "status": "Proposed",
+    "created": "2026-03-18",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0112",
+    "number": 112,
+    "title": "Canton Network Token Standard V2 - Improvements for Privacy, Performance and Traditional Accounting",
+    "type": "Standards Track",
+    "status": "Draft",
+    "created": "2026-03-31",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0113",
+    "number": 113,
+    "title": "Add Further Asset Management as a Super Validator (Weight 8.0)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-11-26",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0114",
+    "number": 114,
+    "title": "Digital Asset Treasury (DAT) SV Program",
+    "type": "Tokenomics",
+    "status": "Proposed",
+    "created": "2026-03-19",
+    "approved": "",
+    "description": ""
+  }
+]
