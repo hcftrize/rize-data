@@ -551,8 +551,12 @@ let CIPS = [];
     .then(function(r){ return r.json(); })
     .then(function(data){
       CIPS = data;
-      cipFiltered = CIPS.slice().reverse();
-      cipRender();
+      // Only render if the CIP module is already open
+      var cipLc = document.getElementById('cip-lc');
+      if (cipLc && !cipLc.classList.contains('collapsed')) {
+        cipFiltered = CIPS.slice().reverse();
+        cipRender();
+      }
     })
     .catch(function(err){ console.error('Could not load cips.json:', err); });
 
@@ -565,6 +569,11 @@ document.addEventListener("DOMContentLoaded", function() {
     if (!lc || !body) return;
     const collapsed = lc.classList.toggle('collapsed');
     body.classList.toggle('collapsed', collapsed);
+    // When opening the CIP module and data is already loaded, render immediately
+    if (!collapsed && id === 'cip-lc' && CIPS.length > 0) {
+      cipFiltered = CIPS.slice().reverse();
+      cipRender();
+    }
   };
 
   /* ── NETWORK MAP ── */
