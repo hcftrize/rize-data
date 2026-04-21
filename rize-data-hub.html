@@ -955,6 +955,76 @@ html, body { overflow-x: hidden; max-width: 100%; }
       .ctx-tabs-mobile-wrap { display: block; }
       .ctx-tabs-desktop { display: none !important; }
     }
+
+    /* ═══════════════════════════════════════════════════════════
+       CONVICTION PANEL — RIZE HOLDERS CONVICTION
+    ═══════════════════════════════════════════════════════════ */
+    .conv-toggle-row {
+      display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .conv-toggle {
+      font-family: 'Rajdhani', sans-serif; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px; color: var(--muted);
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12);
+      padding: 5px 14px; cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .conv-toggle:hover { color: #fff; }
+    .conv-toggle.active { color: var(--cyan); border-color: var(--cyan); background: rgba(126,224,255,0.07); }
+    .conv-delta-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px;
+    }
+    .conv-delta-box {
+      padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,0.07);
+      background: linear-gradient(180deg, rgba(126,224,255,0.03), transparent 60%), rgba(255,255,255,0.015);
+    }
+    .conv-delta-label {
+      display: block; font-family: "Trebuchet MS", sans-serif; font-size: 11px;
+      text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 6px;
+    }
+    .conv-delta-value {
+      display: block; font-family: 'Rajdhani', sans-serif; font-size: 22px;
+      font-weight: 700; line-height: 1.1; letter-spacing: 0.5px;
+    }
+    .conv-delta-sub {
+      display: block; font-family: 'DM Mono', monospace; font-size: 10px;
+      color: var(--muted); margin-top: 4px;
+    }
+    .conv-green { color: var(--green); }
+    .conv-red   { color: var(--pink); }
+    .conv-neutral { color: var(--muted); }
+    .conv-stat-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px;
+    }
+    .conv-whale-table {
+      width: 100%; border-collapse: collapse; margin-top: 12px;
+    }
+    .conv-whale-table th {
+      background: rgba(126,224,255,0.06); color: var(--muted); font-size: 13px;
+      text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; text-align: left;
+      font-family: "Trebuchet MS", sans-serif; border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .conv-whale-table td {
+      padding: 8px 12px; font-size: 15px; font-family: 'Rajdhani', sans-serif;
+      font-weight: 600; border-bottom: 1px solid rgba(255,255,255,0.04); color: #fff;
+    }
+    .conv-whale-table td a {
+      color: var(--cyan); text-decoration: none; font-family: 'DM Mono', monospace;
+      font-size: 12px; font-weight: 400;
+    }
+    .conv-whale-table td a:hover { text-decoration: underline; }
+    .conv-sep { height: 1px; background: rgba(255,255,255,0.07); margin: 20px 0; }
+    .conv-section-title {
+      font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 10px;
+    }
+    @media (max-width: 700px) {
+      .conv-delta-grid { grid-template-columns: repeat(2, 1fr); }
+      .conv-stat-row   { grid-template-columns: 1fr 1fr; }
+      .conv-whale-table th, .conv-whale-table td { font-size: 12px; padding: 6px 8px; }
+      #rz-panel-conviction .ctx-chart-wrap { height: 200px !important; }
+    }
     </style>
 </head>
 <body>
@@ -1043,6 +1113,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <!-- Mobile: native select dropdown -->
       <div class="ctx-tabs-mobile-wrap">
         <select class="ctx-tabs-select" id="rz-ctx-select" onchange="rzCtxSelectChange(this)">
+          <option value="conviction">RIZE Holders Conviction</option>
           <option value="rwa">T-RIZE RWA Revenue</option>
           <option value="rewards">T-RIZE Canton Revenue</option>
           <option value="burns">RIZE Burns</option>
@@ -1051,14 +1122,109 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
       <!-- Desktop: tab buttons (hidden on mobile) -->
       <div class="ctx-tabs ctx-tabs-desktop">
-        <button class="ctx-tab active" onclick="rzCtxSwitch('rwa',this)">T-RIZE RWA Revenue</button>
+        <button class="ctx-tab active" onclick="rzCtxSwitch('conviction',this)">RIZE Holders Conviction</button>
+        <button class="ctx-tab" onclick="rzCtxSwitch('rwa',this)">T-RIZE RWA Revenue</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('rewards',this)">T-RIZE Canton Revenue</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('burns',this)">RIZE Burns</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('tokenomics',this)">RIZE Tokenomics</button>
       </div>
 
+
+      <!-- Panel CONVICTION — RIZE Holders Conviction (first) -->
+      <div class="ctx-panel active" id="rz-panel-conviction">
+
+        <!-- Chart toggle buttons -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+          <div id="conv-chart-label" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;flex:1">RIZE Bonded vs On Exchanges</div>
+          <div class="conv-toggle-row" style="margin-bottom:0">
+            <button class="conv-toggle active" id="conv-btn-main" onclick="convSwitchChart('main',this)">Bonded / Exchanges</button>
+            <button class="conv-toggle" id="conv-btn-unbonding" onclick="convSwitchChart('unbonding',this)">Unbonding Queue</button>
+          </div>
+        </div>
+
+        <!-- Main chart: Bonded vs On Exchanges -->
+        <div class="ctx-chart-wrap" id="conv-wrap-main" style="height:260px">
+          <div class="ctx-loading" id="conv-loading-main">Loading on-chain data&hellip;</div>
+          <canvas id="conv-chart-main" style="display:none"></canvas>
+        </div>
+
+        <!-- Unbonding queue chart -->
+        <div class="ctx-chart-wrap" id="conv-wrap-unbonding" style="height:260px;display:none">
+          <div class="ctx-loading" id="conv-loading-unbonding">Loading unbonding data&hellip;</div>
+          <canvas id="conv-chart-unbonding" style="display:none"></canvas>
+        </div>
+
+        <!-- Live stats row: bonded + unbonding + exchanges live -->
+        <div class="conv-stat-row" id="conv-live-stats" style="margin-top:16px">
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">Total Bonded (Live)</span>
+            <span class="ctx-kpi-value" id="conv-live-bonded">—</span>
+            <span class="conv-delta-sub" id="conv-live-bonded-usd">&nbsp;</span>
+          </div>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">Unbonding Queue</span>
+            <span class="ctx-kpi-value" id="conv-live-unbonding">—</span>
+            <span class="conv-delta-sub" id="conv-live-unbonding-usd">&nbsp;</span>
+          </div>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">On Exchanges (Live)</span>
+            <span class="ctx-kpi-value" id="conv-live-cex">—</span>
+            <span class="conv-delta-sub" id="conv-live-cex-usd">&nbsp;</span>
+          </div>
+        </div>
+
+        <div class="conv-sep"></div>
+
+        <!-- Delta boxes: Exchange flow -->
+        <div class="conv-section-title">Exchange Net Flow &mdash; Negative = Bullish (More Withdrawals)</div>
+        <div class="conv-delta-grid" id="conv-delta-grid">
+          <div class="conv-delta-box">
+            <span class="conv-delta-label">24h Net Flow</span>
+            <span class="conv-delta-value conv-neutral" id="conv-delta-1d">—</span>
+            <span class="conv-delta-sub" id="conv-delta-1d-sub">&nbsp;</span>
+          </div>
+          <div class="conv-delta-box">
+            <span class="conv-delta-label">7d Net Flow</span>
+            <span class="conv-delta-value conv-neutral" id="conv-delta-7d">—</span>
+            <span class="conv-delta-sub" id="conv-delta-7d-sub">&nbsp;</span>
+          </div>
+          <div class="conv-delta-box">
+            <span class="conv-delta-label">30d Net Flow</span>
+            <span class="conv-delta-value conv-neutral" id="conv-delta-30d">—</span>
+            <span class="conv-delta-sub" id="conv-delta-30d-sub">&nbsp;</span>
+          </div>
+          <div class="conv-delta-box">
+            <span class="conv-delta-label">90d Net Flow</span>
+            <span class="conv-delta-value conv-neutral" id="conv-delta-90d">—</span>
+            <span class="conv-delta-sub" id="conv-delta-90d-sub">&nbsp;</span>
+          </div>
+        </div>
+
+        <div class="conv-sep"></div>
+
+        <!-- Whale movements -->
+        <div class="conv-section-title">Whale Movements &mdash; Transactions &gt; 5M RIZE</div>
+        <div style="overflow-x:auto" id="conv-whale-wrap">
+          <div style="color:var(--muted);font-family:'DM Mono',monospace;font-size:13px;padding:16px 0" id="conv-whale-loading">Loading whale data&hellip;</div>
+          <table class="conv-whale-table" id="conv-whale-table" style="display:none">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Direction</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Tx</th>
+              </tr>
+            </thead>
+            <tbody id="conv-whale-tbody"></tbody>
+          </table>
+        </div>
+
+      </div><!-- end rz-panel-conviction -->
+
       <!-- Panel 0 — T-RIZE RWA Revenue -->
-      <div class="ctx-panel active" id="rz-panel-rwa">
+      <div class="ctx-panel" id="rz-panel-rwa">
 
         <!-- Chart -->
         <div style="margin-bottom:24px">
@@ -2623,7 +2789,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   const RZ_GENESIS      = "2024-07-31T00:00:00.000Z";
   const RZ_API_BASE     = "https://lighthouse.fivenorth.io/api/parties";
 
-  const rzCharts = { rwa: null, cumul: null, sources: null, weekly: null, alloc: null, vesting: null, cantonomics: null, burns: null };
+  const rzCharts = { rwa: null, cumul: null, sources: null, weekly: null, alloc: null, vesting: null, cantonomics: null, burns: null, convMain: null, convUnbonding: null };
 
   function rzCtxSwitch(tab, btn) {
     const section = document.getElementById("rize-ctx-section");
@@ -2633,7 +2799,9 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     document.getElementById("rz-panel-" + tab).classList.add("active");
     const sel = document.getElementById("rz-ctx-select");
     if (sel) sel.value = tab;
-    if (tab === "rwa") {
+    if (tab === "conviction") {
+      setTimeout(() => convInit(), 50);
+    } else if (tab === "rwa") {
       setTimeout(() => rzRenderRwaChart(), 50);
     } else if (tab === "tokenomics") {
       setTimeout(() => { if (!rzCharts.alloc) rzRenderTokenomics(); else rzRenderCantoChart(); }, 50);
@@ -3459,7 +3627,517 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     if (tabBtns[3]) tabBtns[3].textContent = `Past Unlocks (${doneEvts.length})`;
   }
 
-  document.addEventListener("DOMContentLoaded", rzLoad);
+
+  /* ═══════════════════════════════════════════════════════════
+     RIZE HOLDERS CONVICTION MODULE
+  ═══════════════════════════════════════════════════════════ */
+
+  const CONV = {
+    GOV_CONTRACT  : '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE',
+    RIZE_TOKEN    : '0x9818B6c09f5ECc843060927E8587c427C7C93583',
+    BASE_RPC      : 'https://mainnet.base.org',
+    WHALE_MIN     : 5_000_000,    // 5M RIZE
+    DECIMALS      : 1e18,
+    // CEX addresses to track for "on exchanges" metric
+    CEX: {
+      'Kraken Hot 1'  : '0x02Ac4617Fe004cf8Cd9c988Ff9C905b2Ec676C2d',
+      'Kraken Cold 1' : '0x7DAFbA1d69F6C01AE7567Ffd7b046Ca03B706f83',
+      'Kraken Cold 2' : '0xd2DD7b597Fd2435b6dB61ddf48544fd931e6869F',
+      'Kraken Hot 2'  : '0xcC282E2004428939ee5149A9e7872F0B4d5d5ec7',
+      'Revolut'       : '0x9b0c45d46D386cEdD98873168C36efd0DcBa8d46',
+      'MEXC'          : '0x4e3ae00E8323558fA5Cac04b152238924AA31B60',
+      'Bitpanda Cold' : '0x0529ea5885702715e83923c59746ae8734c553B7',
+      'Bitpanda Hot'  : '0xB7C5F84455c86f9972A80e82939f7CE40b481664',
+      'Ourbit'        : '0x4D59BEC2b09052c60C6149c623fb3a461fB1Fe74',
+      'Gate'          : '0x0D0707963952f2fBA59dD06f2b425ace40b492Fe',
+    },
+    initialized: false,
+    currentChart: 'main',
+  };
+
+  // ── Helpers ────────────────────────────────────────────────
+  function convFmt(n) {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    if (Math.abs(n) >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+    if (Math.abs(n) >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+    if (Math.abs(n) >= 1e3) return (n / 1e3).toFixed(0) + 'K';
+    return n.toLocaleString('en-US', {maximumFractionDigits: 0});
+  }
+
+  function convFmtUsd(rize) {
+    // Use live RIZE price from the hub's global price state (loaded by CoinGecko)
+    const price = window.rzLivePrice || 0;
+    if (!price || !rize) return '';
+    const usd = rize * price;
+    if (usd >= 1e6) return '$' + (usd / 1e6).toFixed(2) + 'M';
+    if (usd >= 1e3) return '$' + (usd / 1e3).toFixed(0) + 'K';
+    return '$' + usd.toFixed(0);
+  }
+
+  function convAddrShort(addr) {
+    if (!addr) return '—';
+    return addr.slice(0, 6) + '…' + addr.slice(-4);
+  }
+
+  function convBasescan(params) {
+    const p = new URLSearchParams(params);
+    return fetch('/api/basescan?' + p.toString()).then(r => r.json());
+  }
+
+  function convRpc(method, params) {
+    return fetch(CONV.BASE_RPC, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', method, params, id: 1 })
+    }).then(r => r.json());
+  }
+
+  function convHexToTokens(hex) {
+    if (!hex || hex === '0x') return 0;
+    try { return Number(BigInt(hex)) / CONV.DECIMALS; } catch(e) { return 0; }
+  }
+
+  // ── Live data: bonded + unbonding + CEX balances ───────────
+  async function convFetchLiveBalances() {
+    // 1. Total bonded in governance contract: call bonded() = 0xc9836074
+    const bondedCall = convRpc('eth_call', [
+      { to: CONV.GOV_CONTRACT, data: '0xc9836074' }, 'latest'
+    ]);
+
+    // 2. Releasable tokens (unbonding queue sum): call releasableTokens() = 0x1c269043
+    //    Also try getBondRelease to get full queue
+    const releasableCall = convRpc('eth_call', [
+      { to: CONV.GOV_CONTRACT, data: '0x1c269043' }, 'latest'
+    ]);
+
+    // 3. CEX balances: balanceOf for each CEX address
+    const cexAddrs = Object.values(CONV.CEX);
+    const cexCalls = cexAddrs.map(addr => {
+      const padded = '000000000000000000000000' + addr.slice(2).toLowerCase();
+      return convRpc('eth_call', [
+        { to: CONV.RIZE_TOKEN, data: '0x70a08231' + padded }, 'latest'
+      ]);
+    });
+
+    const [bondedRes, releasableRes, ...cexRes] = await Promise.all([
+      bondedCall, releasableCall, ...cexCalls
+    ]);
+
+    const bonded     = convHexToTokens(bondedRes?.result);
+    const unbonding  = convHexToTokens(releasableRes?.result);
+    const cexTotal   = cexRes.reduce((sum, r) => sum + convHexToTokens(r?.result), 0);
+
+    return { bonded, unbonding, cexTotal };
+  }
+
+  // ── Historical data via Basescan ───────────────────────────
+  async function convFetchHistory() {
+    // Fetch all Transfer events for governance contract (bonded history)
+    // and for all CEX addresses (on-exchange history)
+    const govTxRes = await convBasescan({
+      action: 'tokentx',
+      contractaddress: CONV.RIZE_TOKEN,
+      address: CONV.GOV_CONTRACT,
+      startblock: 0,
+      endblock: 99999999,
+      sort: 'asc',
+      offset: 10000,
+      page: 1,
+    });
+
+    const govTxs = (govTxRes?.result && Array.isArray(govTxRes.result)) ? govTxRes.result : [];
+
+    // Fetch CEX txs for all addresses in parallel (batched)
+    const cexAddrs = Object.values(CONV.CEX);
+    const cexTxArrays = await Promise.all(
+      cexAddrs.map(addr => convBasescan({
+        action: 'tokentx',
+        contractaddress: CONV.RIZE_TOKEN,
+        address: addr,
+        startblock: 0,
+        endblock: 99999999,
+        sort: 'asc',
+        offset: 10000,
+        page: 1,
+      }).then(r => (r?.result && Array.isArray(r.result)) ? r.result : []))
+    );
+
+    return { govTxs, cexTxArrays, cexAddrs };
+  }
+
+  // ── Build daily series from Transfer events ────────────────
+  function convBuildDailySeries(txs, targetAddress) {
+    // targetAddress: the address we're tracking balance for
+    const addr = targetAddress.toLowerCase();
+    // Group by day: each tx either adds or subtracts from balance
+    const dayMap = {};
+
+    txs.forEach(tx => {
+      if (!tx.timeStamp) return;
+      const date = new Date(parseInt(tx.timeStamp) * 1000);
+      const dayKey = date.toISOString().slice(0, 10);
+      if (!dayMap[dayKey]) dayMap[dayKey] = 0;
+      const val = parseFloat(tx.value) / CONV.DECIMALS;
+      const from = (tx.from || '').toLowerCase();
+      const to   = (tx.to   || '').toLowerCase();
+      if (to === addr)   dayMap[dayKey] += val;
+      if (from === addr) dayMap[dayKey] -= val;
+    });
+
+    // Build cumulative series from first tx date to today
+    const days = Object.keys(dayMap).sort();
+    if (!days.length) return { labels: [], data: [] };
+
+    const startDate = new Date(days[0]);
+    const endDate   = new Date();
+    const labels = [], data = [];
+    let balance = 0;
+    let cur = new Date(startDate);
+    while (cur <= endDate) {
+      const key = cur.toISOString().slice(0, 10);
+      balance += (dayMap[key] || 0);
+      labels.push(cur.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }));
+      data.push(Math.max(0, balance));
+      cur.setDate(cur.getDate() + 1);
+    }
+    return { labels, data };
+  }
+
+  function convBuildCexDailySeries(cexTxArrays, cexAddrs) {
+    // Merge all CEX txs into a single per-day balance sum
+    const allAddrs = cexAddrs.map(a => a.toLowerCase());
+    const dayMap = {};
+
+    cexTxArrays.forEach((txs, i) => {
+      const addr = allAddrs[i];
+      txs.forEach(tx => {
+        if (!tx.timeStamp) return;
+        const key = new Date(parseInt(tx.timeStamp) * 1000).toISOString().slice(0, 10);
+        if (!dayMap[key]) dayMap[key] = {};
+        if (!dayMap[key][addr]) dayMap[key][addr] = 0;
+        const val = parseFloat(tx.value) / CONV.DECIMALS;
+        const from = (tx.from || '').toLowerCase();
+        const to   = (tx.to   || '').toLowerCase();
+        if (to === addr)   dayMap[key][addr] += val;
+        if (from === addr) dayMap[key][addr] -= val;
+      });
+    });
+
+    // Build per-address running balances, then sum daily
+    const days = Object.keys(dayMap).sort();
+    if (!days.length) return { labels: [], data: [] };
+
+    const startDate = new Date(days[0]);
+    const endDate   = new Date();
+    const balances  = {}; // addr -> running balance
+    allAddrs.forEach(a => balances[a] = 0);
+
+    const labels = [], data = [], rawDays = [];
+    let cur = new Date(startDate);
+    while (cur <= endDate) {
+      const key = cur.toISOString().slice(0, 10);
+      if (dayMap[key]) {
+        Object.entries(dayMap[key]).forEach(([addr, delta]) => {
+          balances[addr] = Math.max(0, (balances[addr] || 0) + delta);
+        });
+      }
+      const total = Object.values(balances).reduce((s, v) => s + v, 0);
+      labels.push(cur.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }));
+      data.push(Math.max(0, total));
+      rawDays.push(key);
+      cur.setDate(cur.getDate() + 1);
+    }
+    return { labels, data, rawDays };
+  }
+
+  // ── Delta calculation ──────────────────────────────────────
+  function convCalcDelta(data, rawDays, daysBack) {
+    if (!data.length || !rawDays) return null;
+    const today = new Date().toISOString().slice(0, 10);
+    const pastDate = new Date();
+    pastDate.setDate(pastDate.getDate() - daysBack);
+    const pastKey = pastDate.toISOString().slice(0, 10);
+
+    const todayIdx = rawDays.length - 1;
+    const pastIdx  = rawDays.findIndex(d => d >= pastKey);
+    if (pastIdx < 0) return null;
+
+    return data[todayIdx] - data[pastIdx];
+  }
+
+  // ── Whale movements ────────────────────────────────────────
+  async function convFetchWhales() {
+    // Get all large transfers involving any CEX or governance contract
+    const allAddrs = [...Object.values(CONV.CEX), CONV.GOV_CONTRACT];
+    const cexSet = new Set(Object.values(CONV.CEX).map(a => a.toLowerCase()));
+
+    // Fetch recent txs for governance contract and all CEX
+    const govWhales = await convBasescan({
+      action: 'tokentx',
+      contractaddress: CONV.RIZE_TOKEN,
+      address: CONV.GOV_CONTRACT,
+      startblock: 0, endblock: 99999999, sort: 'desc', offset: 500, page: 1,
+    });
+
+    const txs = (govWhales?.result && Array.isArray(govWhales.result)) ? govWhales.result : [];
+
+    // Filter > 5M RIZE
+    const whales = txs.filter(tx => {
+      const val = parseFloat(tx.value) / CONV.DECIMALS;
+      return val >= CONV.WHALE_MIN;
+    }).slice(0, 20);
+
+    return whales;
+  }
+
+  // ── Unbonding chart data (Transfer events OUT of governance) ──
+  function convBuildUnbondingSeries(govTxs) {
+    // Outflows from governance contract = unbonding events
+    const govAddr = CONV.GOV_CONTRACT.toLowerCase();
+    const dayMap = {};
+    govTxs.forEach(tx => {
+      if ((tx.from || '').toLowerCase() !== govAddr) return;
+      const key = new Date(parseInt(tx.timeStamp) * 1000).toISOString().slice(0, 10);
+      if (!dayMap[key]) dayMap[key] = 0;
+      dayMap[key] += parseFloat(tx.value) / CONV.DECIMALS;
+    });
+    const days = Object.keys(dayMap).sort();
+    if (!days.length) return { labels: [], data: [] };
+    const labels = days.map(d => {
+      const dt = new Date(d);
+      return dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+    });
+    return { labels, data: days.map(d => dayMap[d]) };
+  }
+
+  // ── Render charts ──────────────────────────────────────────
+  function convRenderMainChart(govSeries, cexSeries) {
+    const cv = document.getElementById('conv-chart-main');
+    if (!cv) return;
+    document.getElementById('conv-loading-main').style.display = 'none';
+    cv.style.display = 'block';
+
+    if (rzCharts.convMain) { rzCharts.convMain.destroy(); rzCharts.convMain = null; }
+
+    // Align labels: use government series labels as master (longer history)
+    const opts = rzBaseOpts();
+    opts.scales.y.ticks.callback = v => convFmt(v);
+    opts.plugins.tooltip.callbacks = {
+      label: c => {
+        const v = c.parsed.y;
+        return ' ' + c.dataset.label + ': ' + convFmt(v) + ' RIZE';
+      }
+    };
+    opts.plugins.legend = {
+      labels: { color: '#b6c1d8', font: { family: 'Trebuchet MS, Verdana, sans-serif', size: 12 }, boxWidth: 12, boxHeight: 12, padding: 16 }
+    };
+
+    // Use CEX series labels if longer, else gov labels
+    const useGov = govSeries.labels.length >= cexSeries.labels.length;
+    const masterLabels = useGov ? govSeries.labels : cexSeries.labels;
+
+    // Pad shorter series with nulls at start
+    function padSeries(shorter, master) {
+      const diff = master.length - shorter.length;
+      if (diff <= 0) return shorter;
+      return [...Array(diff).fill(null), ...shorter];
+    }
+
+    rzCharts.convMain = new Chart(cv.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: masterLabels,
+        datasets: [
+          {
+            label: 'RIZE Bonded (Governance)',
+            data: padSeries(govSeries.data, { length: masterLabels.length }),
+            borderColor: '#7ee0ff',
+            backgroundColor: 'rgba(126,224,255,0.10)',
+            fill: true, tension: 0.25, pointRadius: 0, borderWidth: 2.5,
+            spanGaps: true,
+          },
+          {
+            label: 'RIZE On Exchanges',
+            data: padSeries(cexSeries.data, { length: masterLabels.length }),
+            borderColor: '#ff8ad8',
+            backgroundColor: 'rgba(255,138,216,0.10)',
+            fill: true, tension: 0.25, pointRadius: 0, borderWidth: 2,
+            spanGaps: true,
+          },
+        ],
+      },
+      options: opts,
+    });
+  }
+
+  function convRenderUnbondingChart(unbondSeries) {
+    const cv = document.getElementById('conv-chart-unbonding');
+    if (!cv) return;
+    document.getElementById('conv-loading-unbonding').style.display = 'none';
+    cv.style.display = 'block';
+
+    if (rzCharts.convUnbonding) { rzCharts.convUnbonding.destroy(); rzCharts.convUnbonding = null; }
+
+    const opts = rzBaseOpts();
+    opts.scales.y.ticks.callback = v => convFmt(v);
+    opts.plugins.tooltip.callbacks = {
+      label: c => ' Unbonded: ' + convFmt(c.parsed.y) + ' RIZE'
+    };
+
+    rzCharts.convUnbonding = new Chart(cv.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: unbondSeries.labels,
+        datasets: [{
+          label: 'Daily Unbonding (Outflows from Governance)',
+          data: unbondSeries.data,
+          backgroundColor: 'rgba(255,211,107,0.55)',
+          borderColor: '#ffd36b',
+          borderWidth: 1,
+        }],
+      },
+      options: opts,
+    });
+  }
+
+  // ── Render live stats ──────────────────────────────────────
+  function convRenderLive(bonded, unbonding, cexTotal) {
+    const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    setEl('conv-live-bonded',       convFmt(bonded) + ' RIZE');
+    setEl('conv-live-bonded-usd',   convFmtUsd(bonded));
+    setEl('conv-live-unbonding',    convFmt(unbonding) + ' RIZE');
+    setEl('conv-live-unbonding-usd',convFmtUsd(unbonding));
+    setEl('conv-live-cex',          convFmt(cexTotal) + ' RIZE');
+    setEl('conv-live-cex-usd',      convFmtUsd(cexTotal));
+  }
+
+  // ── Render deltas ──────────────────────────────────────────
+  function convRenderDeltas(cexSeries) {
+    const periods = [
+      { id: '1d',  days: 1,  label: '24h' },
+      { id: '7d',  days: 7,  label: '7d'  },
+      { id: '30d', days: 30, label: '30d' },
+      { id: '90d', days: 90, label: '90d' },
+    ];
+    periods.forEach(p => {
+      const delta = convCalcDelta(cexSeries.data, cexSeries.rawDays, p.days);
+      const el    = document.getElementById('conv-delta-' + p.id);
+      const sub   = document.getElementById('conv-delta-' + p.id + '-sub');
+      if (!el) return;
+      if (delta === null) { el.textContent = '—'; return; }
+      const sign    = delta >= 0 ? '+' : '';
+      const isGood  = delta < 0; // negative = outflow = bullish
+      el.textContent = sign + convFmt(delta) + ' RIZE';
+      el.className   = 'conv-delta-value ' + (isGood ? 'conv-green' : 'conv-red');
+      if (sub) sub.textContent = isGood ? '▼ Outflow — Bullish' : '▲ Inflow — Bearish';
+    });
+  }
+
+  // ── Render whale table ─────────────────────────────────────
+  function convRenderWhales(whales) {
+    const loading = document.getElementById('conv-whale-loading');
+    const table   = document.getElementById('conv-whale-table');
+    const tbody   = document.getElementById('conv-whale-tbody');
+    if (!tbody) return;
+    if (loading) loading.style.display = 'none';
+
+    if (!whales.length) {
+      if (loading) { loading.style.display = 'block'; loading.textContent = 'No whale transactions found (>5M RIZE).'; }
+      return;
+    }
+
+    const cexMap = {};
+    Object.entries(CONV.CEX).forEach(([name, addr]) => { cexMap[addr.toLowerCase()] = name; });
+    cexMap[CONV.GOV_CONTRACT.toLowerCase()] = 'Governance';
+
+    function labelAddr(addr) {
+      const lower = (addr || '').toLowerCase();
+      return cexMap[lower] || convAddrShort(addr);
+    }
+
+    tbody.innerHTML = whales.map(tx => {
+      const val    = parseFloat(tx.value) / CONV.DECIMALS;
+      const date   = new Date(parseInt(tx.timeStamp) * 1000);
+      const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+      const govAddr = CONV.GOV_CONTRACT.toLowerCase();
+      const fromL  = (tx.from || '').toLowerCase();
+      const toL    = (tx.to   || '').toLowerCase();
+      const dir    = toL === govAddr ? '↗ Bond' : fromL === govAddr ? '↙ Unbond' : '→ Transfer';
+      const dirColor = toL === govAddr ? '#98ffb6' : fromL === govAddr ? '#ff8ad8' : '#ffd36b';
+      const txUrl  = 'https://basescan.org/tx/' + tx.hash;
+      return `<tr>
+        <td style="color:var(--muted);white-space:nowrap">${dateStr}</td>
+        <td style="color:#fff;font-weight:700">${convFmt(val)} RIZE</td>
+        <td style="color:${dirColor}">${dir}</td>
+        <td style="color:var(--muted)">${labelAddr(tx.from)}</td>
+        <td style="color:var(--muted)">${labelAddr(tx.to)}</td>
+        <td><a href="${txUrl}" target="_blank" rel="noopener">${convAddrShort(tx.hash)}</a></td>
+      </tr>`;
+    }).join('');
+    if (table) table.style.display = 'table';
+  }
+
+  // ── Toggle between main and unbonding chart ────────────────
+  window.convSwitchChart = function(which, btn) {
+    CONV.currentChart = which;
+    document.querySelectorAll('.conv-toggle').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const mainWrap = document.getElementById('conv-wrap-main');
+    const unbWrap  = document.getElementById('conv-wrap-unbonding');
+    const label    = document.getElementById('conv-chart-label');
+    if (which === 'main') {
+      if (mainWrap) mainWrap.style.display = 'block';
+      if (unbWrap)  unbWrap.style.display  = 'none';
+      if (label)    label.textContent = 'RIZE Bonded vs On Exchanges';
+    } else {
+      if (mainWrap) mainWrap.style.display = 'none';
+      if (unbWrap)  unbWrap.style.display  = 'block';
+      if (label)    label.textContent = 'Daily Unbonding Outflows from Governance';
+    }
+  };
+
+  // ── Main init ──────────────────────────────────────────────
+  async function convInit() {
+    if (CONV.initialized) return;
+    CONV.initialized = true;
+
+    try {
+      // Fetch live + historical in parallel
+      const [live, history, whales] = await Promise.all([
+        convFetchLiveBalances(),
+        convFetchHistory(),
+        convFetchWhales(),
+      ]);
+
+      // Build series
+      const govSeries  = convBuildDailySeries(history.govTxs, CONV.GOV_CONTRACT);
+      const cexSeries  = convBuildCexDailySeries(history.cexTxArrays, history.cexAddrs);
+      const unbSeries  = convBuildUnbondingSeries(history.govTxs);
+
+      // Render everything
+      convRenderMainChart(govSeries, cexSeries);
+      convRenderUnbondingChart(unbSeries);
+      convRenderLive(live.bonded, live.unbonding, live.cexTotal);
+      convRenderDeltas(cexSeries);
+      convRenderWhales(whales);
+
+    } catch(err) {
+      console.error('Conviction module error:', err);
+      const loading = document.getElementById('conv-loading-main');
+      if (loading) { loading.textContent = 'Error loading data. Please refresh.'; loading.style.color = 'var(--pink)'; }
+    }
+  }
+
+  // Auto-init if conviction is the active tab on load
+  document.addEventListener('DOMContentLoaded', function() {
+    const panel = document.getElementById('rz-panel-conviction');
+    if (panel && panel.classList.contains('active')) {
+      setTimeout(convInit, 150);
+    }
+  });
+
+
+    document.addEventListener("DOMContentLoaded", rzLoad);
   // RWA is the default active tab — render its chart on load
   document.addEventListener("DOMContentLoaded", function() {
     setTimeout(rzRenderRwaChart, 100);
