@@ -94,7 +94,7 @@ def parse_abstract(text):
 
     # Matches heading lines that introduce Abstract or Summary section
     SECTION_START = re.compile(
-        r'^[#\s]*(\d+\.)?\s*(Abstract|Summary)\s*$',
+        r'^[#\s]*(\d+\.)?\s*(Abstract|Summary)\s*:?\s*$',
         re.IGNORECASE
     )
     # Matches the START of any OTHER section (to stop collection)
