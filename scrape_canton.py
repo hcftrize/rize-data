@@ -300,6 +300,36 @@ async def main():
     print(f"\n✅ Done — {len(final)} entities saved to {JSON_PATH}")
     print(f"   Logos in: {LOGOS_DIR}")
 
+    # ── 4. Detect missing entities (in existing JSON but not on site anymore) ──
+    if DIFF_MODE and existing:
+        scraped_slugs = {e["slug"] for e in entities}
+        missing = [e for slug, e in existing.items() if slug not in scraped_slugs]
+        MISSING_PATH = OUT_DIR / "canton_missing_entities.txt"
+
+        if missing:
+            lines = [
+                "Canton Ecosystem — Entities not found on cantonecosystem.com",
+                f"Checked: {__import__('datetime').date.today()}",
+                f"Count: {len(missing)}",
+                "",
+                "These entities exist in entities.json but were NOT found during scrape.",
+                "Please check manually — remove from entities.json if confirmed gone.",
+                "",
+            ]
+            for e in sorted(missing, key=lambda x: x["name"].lower()):
+                lines.append(f"- {e['name']} (slug: {e['slug']})")
+
+            MISSING_PATH.write_text("\n".join(lines), encoding="utf-8")
+
+            print(f"\n⚠️  {len(missing)} entities not found on site — see {MISSING_PATH.name}:")
+            for e in missing:
+                print(f"   - {e['name']} ({e['slug']})")
+        else:
+            # Clean up file if no missing entities
+            if MISSING_PATH.exists():
+                MISSING_PATH.unlink()
+            print(f"\n✓ No missing entities — all existing entries found on site")
+
 
 if __name__ == "__main__":
     asyncio.run(main())

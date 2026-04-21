@@ -10,12 +10,15 @@ on:
 jobs:
   scrape:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           ref: dev
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -35,6 +38,7 @@ jobs:
         id: changes
         run: |
           git diff --quiet canton-ecosystem/entities.json || echo "changed=true" >> $GITHUB_OUTPUT
+          [ -f canton-ecosystem/canton_missing_entities.txt ] && echo "changed=true" >> $GITHUB_OUTPUT || true
 
       - name: Commit and push if changes
         if: steps.changes.outputs.changed == 'true'
@@ -43,6 +47,8 @@ jobs:
           git config user.email "bot@tokerize.com"
           # Always add entities.json
           git add canton-ecosystem/entities.json
+          # Add missing entities report if present
+          git add canton-ecosystem/canton_missing_entities.txt 2>/dev/null || true
           # Add only NEW logo files (untracked), never modify existing ones
           git add --intent-to-add canton-ecosystem/logos/ 2>/dev/null || true
           git diff --cached --name-only canton-ecosystem/logos/ | while read f; do
