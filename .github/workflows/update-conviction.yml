@@ -2,9 +2,14 @@ name: Update Conviction History
 
 on:
   schedule:
-    # Every day at 08:30 UTC (after canton scraper at 08:00)
-    - cron: '30 8 * * *'
+    - cron: '0 8 * * *'  # Every day at 08:00 UTC
   workflow_dispatch:
+    inputs:
+      bootstrap:
+        description: 'Run bootstrap (first time only — rebuilds full history)'
+        required: false
+        default: 'false'
+        type: boolean
 
 jobs:
   scrape:
@@ -24,10 +29,16 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Run conviction scraper
+      - name: Run scraper
         env:
           ALCHEMY_RPC_URL: ${{ secrets.ALCHEMY_RPC_URL }}
-        run: python scrape_conviction.py
+        run: |
+          if [ "${{ github.event.inputs.bootstrap }}" = "true" ]; then
+            echo "Running bootstrap..."
+            python bootstrap_conviction.py
+          else
+            python scrape_conviction.py
+          fi
 
       - name: Commit and push to dev
         run: |
@@ -37,7 +48,7 @@ jobs:
           git diff --staged --quiet || git commit -m "chore: update conviction history — $(date +%Y-%m-%d)"
           git push origin dev
 
-      - name: Push data to main as well
+      - name: Push data to main
         run: |
           git fetch origin main
           git checkout main
