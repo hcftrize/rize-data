@@ -1,16 +1,16 @@
 // api/basescan.js — Vercel Serverless Function
-// Proxies Basescan API calls server-side, keeping BASESCAN_API_KEY secret.
+// Proxies Basescan API v2 calls server-side, keeping BASESCAN_API_KEY secret.
 
 export default async function handler(req, res) {
-  // Build params from query string
   const params = new URLSearchParams();
-  
+
   for (const [key, val] of Object.entries(req.query || {})) {
     params.set(key, val);
   }
 
-  // Inject API key
+  // Inject API key and chain ID (8453 = Base mainnet)
   params.set('apikey', process.env.BASESCAN_API_KEY || '');
+  params.set('chainid', '8453');
 
   // Infer module from action if not provided
   if (!params.has('module')) {
@@ -24,8 +24,8 @@ export default async function handler(req, res) {
     }
   }
 
-  // Use Basescan Base mainnet API endpoint
-  const basescanUrl = `https://api.basescan.org/api?${params.toString()}`;
+  // Basescan API v2
+  const basescanUrl = `https://api.basescan.org/v2/api?${params.toString()}`;
 
   try {
     const resp = await fetch(basescanUrl, {
