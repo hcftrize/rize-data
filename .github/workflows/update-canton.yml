@@ -24,15 +24,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install playwright cairosvg
+          pip install playwright
           playwright install chromium
-          playwright install-deps chromium
+          sudo playwright install-deps chromium
 
       - name: Run scraper (diff mode — new entities only)
         run: python scrape_canton.py --diff
-
-      - name: Convert any new SVG logos to PNG
-        run: python convert_svgs.py
 
       - name: Check for changes
         id: changes
