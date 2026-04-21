@@ -1371,7 +1371,9 @@ document.addEventListener("DOMContentLoaded", function() {
       var isPriority = cebSlugMatch(e.slug, CEB_PRIORITY);
       // Fixed map for 283 known entities. New entities show initials until manually added.
       var logoFile = CEB_FILES[e.slug];
-      var logoUrl = logoFile ? CEB_LOGO_BASE + logoFile : null;
+      var logoUrl = logoFile
+        ? CEB_LOGO_BASE + logoFile
+        : (e.logo_local ? CEB_LOGO_BASE + e.logo_local.replace(/\\\\/g, '/').replace(/\\/g, '/').replace('logos/', '') : null);
       var initials = e.name.split(' ').map(function(w){return w[0]||'';}).join('').slice(0,2).toUpperCase();
       var logoHtml = logoUrl
         ? '<div class="ceb-logo"><img src="' + logoUrl + '" alt="' + e.name + '" onerror="this.parentElement.className=\'ceb-logo initials\';this.parentElement.textContent=\'' + initials + '\'"/></div>'
