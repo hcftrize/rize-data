@@ -6,8 +6,8 @@
     "type": "Process",
     "status": "Approved",
     "created": "2024-01-03",
-    "approved": "",
-    "description": ""
+    "approved": "2025-03-03",
+    "description": "Summary of the CIP process:\n\n- Draft your CIP `Draft`\n- Send the text of the CIP to the CIP Discuss mailing list\n  - Work with a CIP editor for refinement and finalize as a Pull Request\n  - Iterate until the CIP has a sponsor and endorser on cip-discuss\n- Send contact info for all parties involved in the CIP to operations@sync.global, including at least email addresses and a link to the CIP.\n- Send the CIP to the cip-vote mailing list `Proposed`\n- If `Approved`, the CIP moves to the `Active` status immediately if no other steps are required\n  - If onchain steps are required, the CIP becomes `Final` once a ⅔ majority of Super Validator Node Operators implement the CIP onchain, either through an onchain vote, or by adopting new software versions that implement the CIP. \n\n!img"
   },
   {
     "id": "CIP-0001",
@@ -16,7 +16,7 @@
     "type": "Tokenomics",
     "status": "Final",
     "created": "2023-12-15",
-    "approved": "",
+    "approved": "2024-01-26",
     "description": ""
   },
   {
@@ -26,7 +26,7 @@
     "type": "Tokenomics",
     "status": "Replaced",
     "created": "2023-12-15",
-    "approved": "",
+    "approved": "2024-01-26",
     "description": ""
   },
   {
@@ -36,7 +36,7 @@
     "type": "Tokenomics",
     "status": "Final",
     "created": "2023-12-15",
-    "approved": "",
+    "approved": "2024-01-26",
     "description": ""
   },
   {
@@ -46,7 +46,7 @@
     "type": "Process",
     "status": "Active",
     "created": "2024-03-12",
-    "approved": "",
+    "approved": "2024-03-18",
     "description": ""
   },
   {
@@ -56,7 +56,7 @@
     "type": "Tokenomics",
     "status": "Replaced",
     "created": "2024-03-12",
-    "approved": "",
+    "approved": "2024-03-18",
     "description": ""
   },
   {
@@ -66,7 +66,7 @@
     "type": "Tokenomics",
     "status": "Replaced",
     "created": "2024-05-01",
-    "approved": "",
+    "approved": "2024-05-02",
     "description": ""
   },
   {
@@ -76,7 +76,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2024-05-11",
-    "approved": "",
+    "approved": "2024-05-15",
     "description": ""
   },
   {
@@ -86,7 +86,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2024-05-11",
-    "approved": "",
+    "approved": "2024-05-15",
     "description": ""
   },
   {
@@ -96,7 +96,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2024-05-11",
-    "approved": "",
+    "approved": "2024-05-15",
     "description": ""
   },
   {
@@ -106,7 +106,7 @@
     "type": "Standards Track",
     "status": "Final",
     "created": "2024-05-22",
-    "approved": "",
+    "approved": "2024-05-24",
     "description": ""
   },
   {
@@ -116,7 +116,7 @@
     "type": "Standards Track",
     "status": "Final",
     "created": "2024-05-24",
-    "approved": "",
+    "approved": "2024-05-26",
     "description": ""
   },
   {
@@ -126,7 +126,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2024-05-29",
-    "approved": "",
+    "approved": "2024-05-30",
     "description": ""
   },
   {
@@ -136,7 +136,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2024-06-01",
-    "approved": "",
+    "approved": "2024-06-03",
     "description": ""
   },
   {
@@ -146,7 +146,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2024-06-01",
-    "approved": "",
+    "approved": "2024-06-03",
     "description": ""
   },
   {
@@ -156,7 +156,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2024-06-01",
-    "approved": "",
+    "approved": "2024-06-03",
     "description": ""
   },
   {
@@ -166,7 +166,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2024-06-03",
-    "approved": "",
+    "approved": "2024-06-06",
     "description": ""
   },
   {
@@ -176,7 +176,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2024-06-06",
-    "approved": "",
+    "approved": "2024-06-10",
     "description": ""
   },
   {
@@ -186,7 +186,7 @@
     "type": "Tokenomics",
     "status": "Final",
     "created": "2024-06-13",
-    "approved": "",
+    "approved": "2024-06-14",
     "description": ""
   },
   {
@@ -196,7 +196,7 @@
     "type": "Governance",
     "status": "Active",
     "created": "2024-06-16",
-    "approved": "",
+    "approved": "2024-06-20",
     "description": ""
   },
   {
@@ -216,7 +216,7 @@
     "type": "Tokenomics",
     "status": "Final",
     "created": "2024-09-27",
-    "approved": "",
+    "approved": "2024-10-8",
     "description": ""
   },
   {
@@ -226,7 +226,7 @@
     "type": "Governance",
     "status": "Obsolete",
     "created": "2024-09-27",
-    "approved": "",
+    "approved": "2024-10-8",
     "description": ""
   },
   {
@@ -236,7 +236,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2024-12-06",
-    "approved": "",
+    "approved": "2024-12-14",
     "description": ""
   },
   {
@@ -246,7 +246,7 @@
     "type": "Governance",
     "status": "Rejected",
     "created": "2024-12-06",
-    "approved": "",
+    "approved": "2024-12-14",
     "description": ""
   },
   {
@@ -256,7 +256,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2024-12-06",
-    "approved": "",
+    "approved": "2024-12-14",
     "description": ""
   },
   {
@@ -266,7 +266,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-01-07",
-    "approved": "",
+    "approved": "2025-01-07",
     "description": ""
   },
   {
@@ -276,7 +276,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2024-12-06",
-    "approved": "",
+    "approved": "2024-12-14",
     "description": ""
   },
   {
@@ -287,7 +287,7 @@
     "status": "Final",
     "created": "2025-02-13",
     "approved": "",
-    "description": ""
+    "description": "* Add Obsidian as a Tier3 SV (Weight 1).\n* Obsidian commits to add a Maintainer to the Hyperledger Splice.\n* Obsidian will meaningfully contribute to the repos at least once per month for 2 years, focusing on issues here, but without an obligation to complete all listed tasks."
   },
   {
     "id": "CIP-0038",
@@ -296,7 +296,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2024-12-06",
-    "approved": "",
+    "approved": "2024-12-14",
     "description": ""
   },
   {
@@ -306,7 +306,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2024-12-06",
-    "approved": "",
+    "approved": "2024-12-14",
     "description": ""
   },
   {
@@ -316,7 +316,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2024-12-06",
-    "approved": "",
+    "approved": "2024-12-14",
     "description": ""
   },
   {
@@ -336,7 +336,7 @@
     "type": "Governance",
     "status": "Active",
     "created": "2024-12-06",
-    "approved": "",
+    "approved": "2024-12-14",
     "description": ""
   },
   {
@@ -346,8 +346,8 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-02-06",
-    "approved": "",
-    "description": ""
+    "approved": "2025-02-24",
+    "description": "* Add TRM as a Weight 2.5 SV for providing three services to the Network.\n  * Integrating Cantoin Coin with their on-chain AML product.\n  * Integrating USDC with their on-chain AML product.\n  * Active regulatory engagement and education about Canton and its privacy capabilities.\n* TRM Labs commits to provide on-chain AML monitoring of Canton Coin transactions and USDC by no later than 6 months after the approval of this CIP.\n* TRM Labs commits to join as a General Member of the Global Synchronizer Foundation."
   },
   {
     "id": "CIP-0044",
@@ -356,8 +356,8 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-02-07",
-    "approved": "",
-    "description": ""
+    "approved": "2025-02-14",
+    "description": "* Add Elliptic as a Tier4 SV (Weight 0.5) \n* Elliptic commits to provide on-chain AML monitoring of Canton Coin transactions and USDC by no later than 6 months after the approval of this CIP \n* Elliptic commits to join as a General Member of the Global Synchronizer Foundation"
   },
   {
     "id": "CIP-0045",
@@ -366,8 +366,8 @@
     "type": "Governance",
     "status": "Active",
     "created": "2025-02-06",
-    "approved": "",
-    "description": ""
+    "approved": "2025-02-14",
+    "description": "* A few differently weighted Super Validators are currently camping out on the GSF multitenant Super Validator node instead of running their own Super Validator node..\n* A series of SV CIPs recently passed giving low weighted SVs the right to use the GSF multitenant for 6 months, but many of those parties are not experienced operators, and the network wouldn’t benefit materially from forcing them to contract to run an SV node.\n* This CIP proposes a 2.5 SV weight threshold above which an SV must begin to operate their own SV or their own SV node, or risk forfeiting their SV weight, or their right to be a Super Validator rights owner."
   },
   {
     "id": "CIP-0046",
@@ -376,8 +376,8 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-01-31",
-    "approved": "",
-    "description": ""
+    "approved": "2025-02-14",
+    "description": "* Add Coin Metrics as a Weight 1 Super Validator.\n* Coin Metrics agrees to integrate Canton MainNet data into their analytics products."
   },
   {
     "id": "CIP-0047",
@@ -386,8 +386,8 @@
     "type": "Tokenomics",
     "status": "Final",
     "created": "2025-02-12",
-    "approved": "",
-    "description": ""
+    "approved": "2025-03-24",
+    "description": "Currently, featured applications can only generate activity records\nand mint rewards as part of Canton Coin transfers. However, this\nexcludes a significant amount of applications that do not inherently involve Canton Coin.\nTo address this problem and allow rewarding applications that do not\ninvolve Canton Coin, we propose introducing the ability for featured applications to create\napp activity markers without transfering Canton Coin. An app activity\nmarker is equivalent to the existing app activity records created as\npart of a Canton Coin transfer recording a fixed amount of burned CC. The value of this marker\nwill be determined by a new governance parameter."
   },
   {
     "id": "CIP-0048",
@@ -396,8 +396,8 @@
     "type": "Tokenomics",
     "status": "Final",
     "created": "2025-02-19",
-    "approved": "",
-    "description": ""
+    "approved": "2025-03-03",
+    "description": "I propose that we raise the reward minting caps for Validators and application providers by a factor of 200X, to $570 USD/round for Validators, and 20,000 for application providers. This will have the effect of eliminating minting caps until Canton Coin reaches a conversion rate of $1 USD per Canton Coin. The Super Validators can implement this change via an onchain vote. To make the change persist in both the current configuration, as well as the future steps of the issuance curve, the same value will be set in all \"future values\" fields, as detailed below."
   },
   {
     "id": "CIP-0049",
@@ -406,8 +406,8 @@
     "type": "Governance",
     "status": "Proposed",
     "created": "2025-02-28",
-    "approved": "",
-    "description": ""
+    "approved": "TBD",
+    "description": "This proposal calls for a network-wide adoption of a formal backup and backup verification method of the network. The goal is to incentivise Super Validator nodes to  maintain full, cold backups of the network’s historical state—from the network’s inception to the present. By ensuring these offline backups, the Canton Network will bolster its resilience, uphold decentralization, and guarantee data immutability. In return, nodes that comply will receive enhanced rewards (an extra bonus of approximately 20–30%, or a +1 weight adjustment on their existing reward scheme). Additionally, this proposal highlights the need for a future standardized backup procedure and a formal verification mechanism to ensure that claimed backups are complete and secure."
   },
   {
     "id": "CIP-0050",
@@ -417,7 +417,7 @@
     "status": "Withdrawn",
     "created": "2025-03-11",
     "approved": "",
-    "description": ""
+    "description": "- Allow existing Validator operators to create up to 10 additional Validators for third-party participants.\n- Redirect new individual Validator applicants to approved existing operators."
   },
   {
     "id": "CIP-0051",
@@ -426,8 +426,8 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-03-04",
-    "approved": "",
-    "description": ""
+    "approved": "2025-03-26",
+    "description": "This CIP proposes the following changes to on-chain voting:\n\na) votes on config changes will change individual (or a few) config values, and not the whole set of configurations;\n\nb) vote proposals will have an expiration date, after which if not enough votes have been submitted,\nthey will be auto-rejected;\n\nc) votes on a proposal may be changed until the vote proposal becomes effective;\n\nd) votes will be early-rejected upon 2/3 majority of reject votes;\n\ne) vote requests can be labeled as \"immediate effectivity\",\nmeaning they will automatically get accepted and take effect immediately as soon as 2/3 of the\nSuper Validator nodes vote in favor."
   },
   {
     "id": "CIP-0052",
@@ -436,7 +436,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-03-14",
-    "approved": "",
+    "approved": "2025-05-13",
     "description": ""
   },
   {
@@ -446,7 +446,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-03-24",
-    "approved": "",
+    "approved": "2025-05-19",
     "description": ""
   },
   {
@@ -456,8 +456,8 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-03-14",
-    "approved": "",
-    "description": ""
+    "approved": "2025-03-24",
+    "description": "* Add Figment as a Weight 1 Super Validator\n* Figment commits to support Canton in their Validator as a Service product offering no later than 6 months after the approval of this CIP"
   },
   {
     "id": "CIP-0055",
@@ -466,8 +466,8 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-03-17",
-    "approved": "",
-    "description": ""
+    "approved": "2025-05-08",
+    "description": "* Add Bitwave as a Super Validator with provisional Weight 1.\n* Bitwave commits to operate its own Super Validator (waiving the exemption in CIP 0045), enhancing decentralization and auditability.\n* Associated rewards will remain unminted until defined milestones are met and verified through the Tokenomics Group review process."
   },
   {
     "id": "CIP-0056",
@@ -476,8 +476,8 @@
     "type": "Standards Track",
     "status": "Final",
     "created": "2025-03-07",
-    "approved": "",
-    "description": ""
+    "approved": "2025-03-31",
+    "description": "Define standard APIs for Canton Network tokens so that wallets and apps can use\nthem and build on them in a uniform way."
   },
   {
     "id": "CIP-0057",
@@ -486,8 +486,8 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-03-07",
-    "approved": "",
-    "description": ""
+    "approved": "2025-04-03",
+    "description": "* Add Quantstamp as a Tier 3 (Weight 1) Super Validator rights owner\n* Quantstamp commits to complete an audit to determine whether the Daml smart contracts governing the tokenomics of Canton Coin accurately represent the logic and functions articulated in the Canton Coin Whitepaper **(Canton Coin: A Canton-Network-native payment application, July 2024/Canton%20Coin_%20A%20Canton-Network-native%20payment%20application.pdf?__hstc=169870847.27df3a707cb3b89a07f374d4891d8642.1710256798828.1741110253846.1741612640674.91&__hssc=169870847.2.1741612640674&__hsfp=3850742519&_gl=1*5z4x0k*_gcl_au*MTQ5NzQwNTI2My4xNzM2ODcwMDU0*_ga*Mzg3OTI0NjkxLjE3MTAyNTY3OTg.*_ga_GVK9ZHZSMR*MTc0MTYxMjYzOS43Ny4xLjE3NDE2MTI2NDIuNTcuMC4w))**\n* Quantstamp agrees to complete the audit and provide their analysis no later than 3 months after the approval of this CIP\n* Quantstamp agrees to a 3 year commitment to performing this audit 1x per year, OR for every major upgrade to these Daml models and the Scala automation code they interact with."
   },
   {
     "id": "CIP-0058",
@@ -496,7 +496,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-04-14",
-    "approved": "",
+    "approved": "2025-04-25",
     "description": ""
   },
   {
@@ -506,7 +506,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-04-21",
-    "approved": "",
+    "approved": "2025-05-09 (reset 2025-08-13)",
     "description": ""
   },
   {
@@ -516,7 +516,7 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-04-23",
-    "approved": "",
+    "approved": "2025-05-13",
     "description": ""
   },
   {
@@ -526,7 +526,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-05-09",
-    "approved": "",
+    "approved": "2025-07-21",
     "description": ""
   },
   {
@@ -536,8 +536,8 @@
     "type": "Standards Track",
     "status": "Final",
     "created": "2025-05-14",
-    "approved": "",
-    "description": ""
+    "approved": "2025-05-28",
+    "description": "Splice 0.4.0 introduces new features that rely on upgrading from Canton 3.2 to Canton 3.3. This upgrade require a Canton protocol version upgrade, which will require a Major Upgrade with Downtime action by the Super Validators and Validators."
   },
   {
     "id": "CIP-0063",
@@ -546,8 +546,8 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-05-27",
-    "approved": "",
-    "description": ""
+    "approved": "2025-05-28",
+    "description": "* Add Kaiko as a Super Validator of weight 6.5, as milestones and deliverables are reached over an 18-month period of time, as proposed in the detailed deliverables list below.\n* Kaiko commits to building data solutions on the Canton Network, creating a suite of applications in order to:\n    * Make Canton activity data available to consumers off-chain through the Kaiko API\n    * Make Kaiko’s off-chain and other-chain data available on the Canton Network\n    * Enable third parties to publish bespoke data onto Canton, in a privacy enabled manner\n    * Enhance network value through real-world data integration and use cases\n    * Provide increased visibility to Canton through the inclusion of Canton in Kaiko Research\n    * Support the development of Canton by providing engineering feedback and suggestions on documentation and code base"
   },
   {
     "id": "CIP-0064",
@@ -556,8 +556,8 @@
     "type": "Standards Track",
     "status": "Final",
     "created": "2025-04-21",
-    "approved": "",
-    "description": ""
+    "approved": "2025-06-203",
+    "description": "This CIP proposes to replace the elected SV delegate mechanism, to improve fault tolerance and more fully automate decentralized operations.  \nIn the current approach, the Decentralized Synchronizer Operations (DSO) party, which represents the consensus of the Super Validators, delegates actions to a single Super Validator (SV) party known as the delegate. The delegate then submits those actions to the ledger. \n\nIn the proposed approach, the DSO party authorizes all the SV parties to submit the designated actions.  The automation component of the SV application on each Super Validator node then automatically attempts to submit these delegated actions. Each application applies a random delay, tuned to minimize contention."
   },
   {
     "id": "CIP-0065",
@@ -566,8 +566,8 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-06-02",
-    "approved": "",
-    "description": ""
+    "approved": "2025-07-14",
+    "description": "* Add Layer Zero, Wormhole, and Chainlink as SVs at Weight 3 each\n* Create a bonus pool of Weight 5"
   },
   {
     "id": "CIP-0066",
@@ -576,8 +576,8 @@
     "type": "Tokenomics",
     "status": "Final",
     "created": "2025-06-18",
-    "approved": "",
-    "description": ""
+    "approved": "2025-06-27",
+    "description": "This proposal introduces a new governance mechanism allowing Super Validators (SVs) to initiate a vote to authorize the minting of Canton Coin from an unclaimed (unminted) reward pool, helping to operationalize the milestone-based CIP rewards structure and aligning with the first deliverable of CIP-0058: Enable escrow mechanisms to ensure Super Validators deliver value in return for rewards."
   },
   {
     "id": "CIP-0067",
@@ -586,7 +586,7 @@
     "type": "Tokenomics",
     "status": "Final",
     "created": "2025-06-13",
-    "approved": "",
+    "approved": "2025-07-21",
     "description": ""
   },
   {
@@ -596,8 +596,8 @@
     "type": "Standards Track",
     "status": "Final",
     "created": "2025-07-09",
-    "approved": "",
-    "description": ""
+    "approved": "2025-07-16",
+    "description": "This CIP proposes to modify the network's bootstrapping process allowing SV nodes to start from a pre-configured non-zero round. \nCurrently, on network resets, all SV nodes begin at round zero, which also means they revert to the initial coin issuance curve. \nOur goal is to enable network resets that maintain historical round progression, rather than resetting to zero. \nThis approach aims to better align TestNet with MainNet's ongoing state."
   },
   {
     "id": "CIP-0069",
@@ -606,8 +606,8 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-07-11",
-    "approved": "",
-    "description": ""
+    "approved": "2025-07-21",
+    "description": "Add Ledger as an SV of Weight 5"
   },
   {
     "id": "CIP-0070",
@@ -617,7 +617,7 @@
     "status": "Withdrawn",
     "created": "2025-07-22",
     "approved": "",
-    "description": ""
+    "description": "As the network continues to grow, there is an increasing potential for the free rider problem to emerge with Validators and liveness rewards; Validators can collect liveness rewards significantly in excess of their operating costs without otherwise participating in the network.  \nTo mitigate this and encourage participation among validators operating on the network, we suggest to adjust both the cap for Validator liveness rewards and activity rewards.\nNew values in the Canton Coin DSO configuration would be set as follows given the current Super Validator oracle price of 0.05:\n\nI propose that we raise the reward minting caps for Validators and application providers by a factor of 200X, to $570 USD/round for Validators, and 20,000 for application providers. This will have the effect of eliminating minting caps until Canton Coin reaches a conversion rate of $1 USD per Canton Coin. The Super Validators can implement this change via an onchain vote. To make the change persist in both the current configuration, as well as the future steps of the issuance curve, the same value will be set in all \"future values\" fields, as detailed below.\n\n* Validator Activity Reward Cap = 0.35\n* Validator Liveness Reward Cap = 4.5\n\nThe Liveness Reward cap will be adjusted as the Super Validator oracle price changes to track a per round max liveness reward of approximately 90 CC for each validator."
   },
   {
     "id": "CIP-0071",
@@ -626,8 +626,8 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-06-06",
-    "approved": "",
-    "description": ""
+    "approved": "2025-08-11",
+    "description": "* Add Ubyx as an SV with Weight 5, as milestones and deliverables are reached over an 18-month period, as proposed in the detailed list of deliverables below.\n* Ubyx commits to building solutions on the Canton Network enabling regulated transfers of value on-chain as well integration into the broader Ubyx stablecoin clearing platform.\n  * Make it possible to attach information of regulatory importance to transactions\n  * Integrate the broader Ubyx clearing system with the Canton ecosystem\n* Allow Ubyx ecosystem participants to interact with the stablecoin clearing system through their own Canton Node using the Global Synchronizer."
   },
   {
     "id": "CIP-0072",
@@ -636,7 +636,7 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-07-30",
-    "approved": "",
+    "approved": "2025-08-11",
     "description": ""
   },
   {
@@ -647,7 +647,7 @@
     "status": "Replaced",
     "created": "2025-07-23",
     "approved": "",
-    "description": ""
+    "description": "This CIP proposes extending the concept of validator liveness rewards\nto arbitrary parties--not just validator operators--as well as\nsupporting weights defined through governance.\n\nThis allows hosting multiple parties on a single validator while still providing the same\nrewards to the parties on the same node as if they were running their\nown node. It also allows weighting certain some parties higher, e.g.,\nbecause they have been shown to contribute significantly to the\nsuccess of the network, or have committed to do so.\n\nThis CIP also enables external parties to sign a contract authorizing any party to automatically submit a minting transaction on behalf of the external party."
   },
   {
     "id": "CIP-0074",
@@ -656,7 +656,7 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-08-15",
-    "approved": "",
+    "approved": "2025-08-27",
     "description": ""
   },
   {
@@ -666,7 +666,7 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-09-11",
-    "approved": "",
+    "approved": "2025-09-26",
     "description": ""
   },
   {
@@ -676,7 +676,7 @@
     "type": "Governance",
     "status": "Final",
     "created": "2025-08-20",
-    "approved": "",
+    "approved": "2025-09-09",
     "description": ""
   },
   {
@@ -686,8 +686,8 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-08-26",
-    "approved": "",
-    "description": ""
+    "approved": "2025-09-12",
+    "description": "* Add Taurus as a Super Validator of weight 5 as proposed in the detailed deliverables list below.\n* Taurus commits to contribute to the growth of the Canton Network ecosystem and speed up its adoption within the financial sector by integrating Canton Network within its platform, allowing its banking clients to use and build on Canton Network."
   },
   {
     "id": "CIP-0078",
@@ -696,8 +696,8 @@
     "type": "Tokenomics",
     "status": "Final",
     "created": "2025-09-08",
-    "approved": "",
-    "description": ""
+    "approved": "2025-09-15",
+    "description": "This CIP proposes to remove Canton Coin fees and adjust holding fees so that\nusers do not have to pay fees when transferring Canton Coin and application\ndevelopers can build applications without special code to deal with these fees.\nThis will make Canton Coin, and the Global Synchronizer, more attractive for both users and application\ndevelopers."
   },
   {
     "id": "CIP-0079",
@@ -716,8 +716,8 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-09-18",
-    "approved": "",
-    "description": ""
+    "approved": "2025-10-06",
+    "description": "* Add Republic as an SV of Weight 6."
   },
   {
     "id": "CIP-0081",
@@ -726,8 +726,8 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-09-23",
-    "approved": "",
-    "description": ""
+    "approved": "2025-09-26",
+    "description": "This CIP establishes an umbrella, milestone-based program through which YZi Labs can receive SV Weight\n(up to 10) for initiatives that materially advance the Canton ecosystem.\n\nUnlike single-purpose CIPs, this program is open-ended so YZi can be opportunistic—prioritizing what the\nnetwork needs most at any given time—while preserving accountability via pre-approval and objective\nmilestone verification.\n\n* **Total Earnable Weight:** 10 (max)  \n* **Term:** +365 Days from CIP Approval  \n* **Accrual Destination:** Escrow, consistent with existing SV escrow mechanics.  \n* **Confidentiality:** The Committee may approve confidential initiatives with YZi."
   },
   {
     "id": "CIP-0082",
@@ -736,8 +736,8 @@
     "type": "Governance",
     "status": "Active",
     "created": "2025-09-24",
-    "approved": "",
-    "description": ""
+    "approved": "2025-10-01",
+    "description": "This CIP ratifies the creation of a Development Fund equal to 5% of all future CC mint emissions, allocated to a Foundation-governed Fund. The Fund exists to sustain long-term investment in the Canton protocol (core R&D, dev tools, security, audits, reference implementations, DeFi app(s) liquidity seeding, critical infra). The fund is prospective (no retroactive allocation) and is taken pro-rata from all issuance streams so that every pool contributes, reflecting that everyone benefits from protocol investment.\n\nA subsequent CIP will propose the implementation mechanics (addresses, start epoch/height, accounting hooks, spend process, guardrails)."
   },
   {
     "id": "CIP-0083",
@@ -746,8 +746,8 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-10-01",
-    "approved": "",
-    "description": ""
+    "approved": "TBD",
+    "description": "This CIP proposes granting DTCC participation as a Super Validator (SV) with Weight 10. Given the strategic importance of DTCC to the Canton ecosystem, their inclusion will bring credibility, alignment with traditional financial infrastructure, and meaningful contributions to network governance and adoption.\n\nThis CIP establishes an umbrella, milestone-based program through which the DTCC can receive SV Weight (up to 10) for initiatives that materially advance the Canton ecosystem.\n\nUnlike other CIPs, this program contains confidential commitments to the ecosystem. Those commitments and milestones have been agreed with the Canton Foundation and will be made available to the Tokenomics Committee when appropriate and as needed.\n\n* **Total Earnable Weight:** 10 (max)\n* **Accrual Destination:** Escrow, consistent with existing SV escrow mechanics.\n* **Confidentiality:** The Committee will review the milestones and inform SVs if they have been met."
   },
   {
     "id": "CIP-0084",
@@ -756,8 +756,8 @@
     "type": "Tokenomics",
     "status": "Approved",
     "created": "2025-10-01",
-    "approved": "",
-    "description": ""
+    "approved": "2025-10-17",
+    "description": "This CIP proposes that the Tokenomics Committee has the right to recommend adjustments to the ledger cost parameter ($/MB) to the Super Validators (SVs) without requiring a new CIP each time. This will enable proactive management of accelerated scaling demand while longer-term scaling investments are deployed."
   },
   {
     "id": "CIP-0085",
@@ -766,8 +766,8 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-09-08",
-    "approved": "",
-    "description": ""
+    "approved": "2025-10-09",
+    "description": "This CIP preserves Coin Metrics’ existing Weight 1.0 Super Validator under CIP-0046 and adds an escrowed, outcome-linked maximum earnable Weight of +6.5 for Talos. The incremental weight mints only upon Accountability Subcommittee verification of adoption milestones across:  \n\n* Canton Coin (CC) trading/custody readiness via Talos  \n* pX integration to Canton  \n* Measured production usage through defined trading and settlement volumes"
   },
   {
     "id": "CIP-0086",
@@ -776,8 +776,8 @@
     "type": "Tokenomics",
     "status": "Approved",
     "created": "2025-10-14",
-    "approved": "",
-    "description": ""
+    "approved": "2025-10-20",
+    "description": "This project aims to provide Canton Network operators, token issuers, and ecosystem participants with a robust and extensible ERC-20-compatible middleware and distributed indexer infrastructure that complies with Canton’s privacy-preserving ledger model while aligning with Ethereum’s dominant token interface standard. \n\nThis Statement of Work (SOW) outlines the development of an ERC-20 interface middleware and distributed indexer for the Canton Network. The goal is to enable Ethereum-like token interactions (e.g., stablecoins, tokenized assets) to operate natively on Canton’s distributed ledger using a familiar API surface while maintaining strict privacy, security, and performance guarantees. The middleware will abstract Canton’s UTXO-style smart contract architecture and participant specific data access into standard ERC-20 API semantics. \n\nThe work is structured in three progressive phases: \n\n* Phase 1 – ERC-20 Middleware for a Concrete Canton-Compatible Token (CIP-56): Implement a concrete ERC-20Token Daml template that conforms to the Canton token standard (CIP-56). Develop the middleware and indexer against this implementation to expose ERC-20-compatible API endpoints. This phase focuses on ensuring compatibility with Canton Coin as the initial supported token. \n\n* Phase 2 – Multi-Token Generalization via Interface Abstraction: Refactor the Phase 1 token and middleware to adopt Daml interfaces that formally define ERC-20 compatibility (e.g., an ERC20Compatible interface). Tokens implementing both the Canton token standard and this ERC-20 interface will be supported by the same middleware and indexer infrastructure. The middleware becomes token-agnostic and reusable. \n\n* Phase 3 – Canton Improvement Proposal (CIP): Collaborate with Canton governance (e.g., the Global Synchronizer Foundation) to propose a formal ERC-20 compatibility interface as a CIP. The objective is to enable Canton Coin and other tokens to adopt this interface, allowing Super Validators (who validate all Canton Coin transactions) to run the ERC-20 middleware as public infrastructure. \n\nMiddleware deployment is designed for two operational modes: \n\n* Full Visibility Mode: For tokens like Canton Coin, where Super Validators have full ledger visibility, the middleware can be operated by validator nodes to provide globally accurate ERC-20 API responses. \n\n* Scoped Visibility Mode: For other tokens (e.g., stablecoins or tokenized RWAs), the middleware must be operated by entities with global visibility into the token (e.g., issuers), or by end users for personal visibility. In this mode, functions like balanceOf will only work for addresses the operator is authorized to see, ensuring compliance with Canton’s privacy model. \n\nChainSafe shall provide the Client with monthly invoices that contain all applicable Fees (as defined below) and expenses incurred during the term of this Statement of Work."
   },
   {
     "id": "CIP-0087",
@@ -786,8 +786,8 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-09-26",
-    "approved": "",
-    "description": ""
+    "approved": "2025-11-14",
+    "description": "Add Hex Trust as an SV of Weight 3.\n\nHex Trust commits to:\n-   Bring a comprehensive financial ecosystem to the Canton Network through the integration of regulated custody, on/off-ramp, payments, and yield products for stablecoins.  \n- Support development of Canton by providing practical feedback and suggestions on documentation, requirements, and use cases.\n\n---"
   },
   {
     "id": "CIP-0089",
@@ -796,8 +796,8 @@
     "type": "Standards Track",
     "status": "Approved",
     "created": "2025-08-21",
-    "approved": "",
-    "description": ""
+    "approved": "2025-10-30",
+    "description": "Splice 0.5.0 introduces new features and scaling improvements that rely on Canton 3.4. We recommend adopting Splice 0.5.0, which requires a Major Upgrade with Downtime, for the Super Validators and Validators, to move the network from Canton 3.3 to Canton 3.4. ."
   },
   {
     "id": "CIP-0090",
@@ -807,7 +807,7 @@
     "status": "Approved",
     "created": "** 2025-10-28",
     "approved": "",
-    "description": ""
+    "description": "This CIP proposes awarding up to Weight 10 for onboarding USDT0 (a USD stablecoin issued by the USDT0 issuer) to Canton MainNet, with rewards tied to (i) an MVP go-live, (ii) earlier readiness of MVP (time-based acceleration), (iii) on-chain adoption of MVP, (iv) Native integration go-live, (v) earlier readiness of Native go-live (time-based acceleration), (vi) on-chain adoption of Native USDT0\n+1 for completing a production-ready MVP within 180 days.\nUp to +2 acceleration if MVP readiness occurs as early as Day 60 (linear down to 0 at Day 180).\nUp to +2 adoption bonus at +0.5 per $1.5B notional transacted through MVP on Canton (cap +2).\n+1 for completing a production-ready Native integration within 90 days of, the sooner of, LayerZero go-live on Canton, OR 7/14/2026.\nUp to +2 acceleration if Native integration readiness occurs as early as Day 10 (linear down to 0 at Day 90).\nUp to +2 adoption bonus at +0.5 per $1.5B notional transacted through Native integration on Canton (cap +2)."
   },
   {
     "id": "CIP-0091",
@@ -816,7 +816,7 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-10-17",
-    "approved": "",
+    "approved": "2025-11-04",
     "description": ""
   },
   {
@@ -826,7 +826,7 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-10-31",
-    "approved": "",
+    "approved": "2025-11-07",
     "description": ""
   },
   {
@@ -836,8 +836,8 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-11-07",
-    "approved": "",
-    "description": ""
+    "approved": "2025-11-24",
+    "description": "Bosphorus SV (BSV) will drive user and transaction adoption across Eurasia and the Middle East, focusing on institutional participants transacting in stablecoins, tokenized Treasuries, and other RWAs. BSV’s rewards will be tied to verifiable on-chain burn generated by wallets, apps, and institutions it directly onboards or supports.\n\nBSV will focus on:\n- Regional tokenized U.S. Treasury (UST) distribution to financial institutions and treasuries\n- Stablecoin settlement and rails for cross border trade and institutional transactions\n- Stablecoin wallet, debit, and credit card issuance\n- On-chain lending and borrowing applications built on stablecoins and tokenized collaterals\n- New tokenized sovereign instruments, including government treasuries\n- Cross-border trading between cross-country bonds\n- Strategic investment and collaboration with new technology builders and fintech infrastructure projects."
   },
   {
     "id": "CIP-0094",
@@ -846,8 +846,8 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-12-01",
-    "approved": "",
-    "description": ""
+    "approved": "2025-12-31",
+    "description": "Blockdaemon proposes to join the Canton Network as a Super Validator with Weight 5.0 linked to measurable institutional adoption milestones.\n\nBlockdaemon will:\n\n- Operate geographically distributed, multi-cloud validator clusters with audited 99.9%+ uptime.\n- Act as delegated operator for major banks, exchanges, custodians, CSDs and asset-managers, lowering the barrier to Canton entry.\n- Provide institutional-grade MPC wallets (FIPS-140-2 L3 HSM-seeded, policy-based approvals) that secure client keys while enabling seamless custody and tokenization use cases for CC, Stable Coins and RWAs.\n- Leverage Blockdaemon brand to drive institutional interest into Canton.\n\nThese contributions deliver immediate economic inflows, enhance decentralization, and professionalise Canton's validator and custody landscape, justifying the requested weight."
   },
   {
     "id": "CIP-0095",
@@ -856,8 +856,8 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-12-09",
-    "approved": "",
-    "description": ""
+    "approved": "2026-01-09",
+    "description": "This CIP proposes awarding up to Weight 10 for onboarding Mesh (global payments network for stablecoins and cryptoassets) to Canton MainNet, with rewards tied to (i) successful integration, (ii) earlier readiness (time-based acceleration), and (iii) on-chain adoption.\n\n- **+2** for completing a production-ready Canton Implementation within 180 days.\n- **Up to +2** acceleration if Production readiness occurs as early as Day 60 (linear down to 0 at Day 180).\n- **Up to +3** adoption bonus at **+0.5 per $500M** notional transacted on Canton (cap +3).\n- **Up to +3** adoption bonus at **+0.5 per $1B** notional transacted on Canton (cap +3)."
   },
   {
     "id": "CIP-0096",
@@ -866,8 +866,8 @@
     "type": "Tokenomics",
     "status": "Approved",
     "created": "2025-12-07",
-    "approved": "",
-    "description": ""
+    "approved": "2025-12-31",
+    "description": "As the network continues to grow, there is an increasing potential for the free rider problem to emerge with Validators and liveness rewards; Validators can collect liveness rewards as incentives from the network without otherwise participating in the network and adding utility. \nTo mitigate this and encourage participation among validators operating on the network, we suggest adjusting the Validator liveness rewards cap while leaving other aspects of Validator rewards unchanged.\nThe reduction in liveness rewards would begin no more than 5 business days following CIP approval, along the below schedule:"
   },
   {
     "id": "CIP-0097",
@@ -876,8 +876,8 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-12-30",
-    "approved": "",
-    "description": ""
+    "approved": "2026-01-05",
+    "description": "This CIP proposes granting Nasdaq participation as a Super Validator (SV) with Weight 10. Given the strategic importance of Nasdaq to the Canton ecosystem, their inclusion will bring credibility, alignment with traditional financial infrastructure, and meaningful contributions to network governance and adoption.\n\nThis CIP establishes an umbrella, milestone-based program through which Nasdaq can receive SV Weight (up to 10) for initiatives that materially advance the Canton ecosystem.\n\nUnlike other CIPs, this program contains confidential commitments to the ecosystem. Those commitments and milestones have been agreed with the Tokenomics and Accountability Committees and will be made available to the public when appropriate and as needed.\n\nTotal Earnable Weight: 10 (max)\n\nAccrual Destination: Escrow, consistent with existing SV escrow mechanics.\n\nConfidentiality: The Accountability Committee will review the milestones and inform SVs if they have been met."
   },
   {
     "id": "CIP-0098",
@@ -886,8 +886,8 @@
     "type": "Tokenomics",
     "status": "Approved",
     "created": "2025-12-17",
-    "approved": "",
-    "description": ""
+    "approved": "2026-01-07",
+    "description": "This CIP introduces a maximum per-transaction Application Reward (“App Reward”) of $1.50.\n\nToday, App Rewards are uncapped, which creates outsized and asymmetric incentives during periods of low network activity. This proposal aligns rewards more closely with fee generation by ensuring that each App transaction can produce, at most, a 50% positive expected value relative to the fees it generates when the network is below Validator and Application equilibrium.\n\nThis change is a ledger configuration update—requiring no code changes—and can be activated immediately upon approval."
   },
   {
     "id": "CIP-0099",
@@ -896,7 +896,7 @@
     "type": "Tokenomics",
     "status": "Approved",
     "created": "2025-01-07",
-    "approved": "",
+    "approved": "2026-01-07",
     "description": ""
   },
   {
@@ -906,8 +906,8 @@
     "type": "Tokenomics",
     "status": "Active",
     "created": "2025-12-22",
-    "approved": "",
-    "description": ""
+    "approved": "2026-01-14",
+    "description": "This CIP ratifies how the development fund in CIP-0082 will be managed. Specifically, this document covers the CIP-0082 abstract and specification items S4-S6 where a subsequent CIP is mentioned:\n\n*A subsequent CIP will propose the implementation mechanics (addresses, start epoch/height, accounting hooks, spend process, guardrails).*\n\n| S1 | Establish Development Fund | A Foundation-controlled Development Fund is recognized as the canonical sink for the fund; custody and signers per Foundation bylaws. | One primary on-chain address | Activation contingent on subsequent CIP specifying address, custody, and accounting hooks. |\n| :---- | :---- | :---- | :---- | :---- |\n| S4 | Governance of Spend | Foundation administers and allocates funds. Community participation occurs via Foundation processes. | Foundation governance; processes to be defined and refined by the Foundation. | **Subsequent CIP must detail spend workflows, disclosures, conflicts policy, and appeals.** |\n| S5 | Transparency & Reporting | Foundation publishes quarterly reports (receipts, balances, commitments, disbursements, outcomes) and annual audit/attestation. | Quarterly ops report; annual independent attestation. | First report due ≤90 days after first receipt of funds. |\n| S6 | Sunset / Review | Formal review of fund effectiveness and rate. | Every 12 months. | Review may propose rate change or wind-down via new CIP. |"
   },
   {
     "id": "CIP-0102",
@@ -916,8 +916,8 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2026-01-17",
-    "approved": "",
-    "description": ""
+    "approved": "2026-01-21",
+    "description": "Add Tharimmune, Inc. (“Tharimmune”) as a weight 4 Super Validator (SV) on the Global Synchronizer. Reward weight will be granted via escrow mechanism and released in tranches as milestones are delivered. Tharimmune is a Canton ecosystem–focused digital asset treasury company that has publicly committed capital and participation to the network, including validator operations and ecosystem support. Tharimmune will act as a new, independent operator to strengthen decentralization and provide public-goods contributions to the network."
   },
   {
     "id": "CIP-0103",
@@ -926,8 +926,8 @@
     "type": "Standards Track",
     "status": "Approved",
     "created": "2025-11-28",
-    "approved": "",
-    "description": ""
+    "approved": "2026-01-29",
+    "description": "This proposal introduces a vendor-neutral **dApp API** that decouples network connectivity and key management from decentralized applications, while providing a standardized set of primitives for interacting with the Canton Network.\n\nUsing the dApp API, users can access any application with a validator and signing provider of their choice. In this model, dApp clients operate in conjunction with **Wallets**, which implement the dApp API, are trusted by the user, and enforce authorization to guard against malicious requests from untrusted dApps.\n\nThe design emphasizes a **minimal, interoperable surface** with strict, unambiguous semantics for requests, responses, and errors, while remaining flexible enough to support diverse Wallet architectures and deployment models.\n\nAs a result, any dApp client can seamlessly interoperate with any Wallet."
   },
   {
     "id": "CIP-0104",
@@ -936,8 +936,8 @@
     "type": "Tokenomics",
     "status": "Approved",
     "created": "2026-01-29",
-    "approved": "",
-    "description": ""
+    "approved": "2026-02-12",
+    "description": "This CIP proposes to improve the quality of the app reward incentives by removing featured app markers and instead basing an app’s rewards on the actual traffic spent on (sub-)transactions that change the state managed by the app.\nThis is achieved by measuring traffic spent directly on the Global Synchronizer using only sequencer and mediator data.\nThis removes the need for app builders to create `FeaturedAppActivityMarker`s in all the right places, and instead measures the *actual burn* contributed by *all activity* of an app provider party by default.\n\nTo enable validator operators to manage the traffic costs incurred by validating (as opposed to submitting) transactions and to foster decentralization of apps and wallets, this CIP also proposes to make protocol-conformant confirmation responses free.\nThus validator nodes only pay for the submission of transactions by their users, which is an action that validators can explicitly gate, and charge for, if required.\n\nThis CIP further proposes to implement these changes in a way that improves the throughput of the Global Synchronizer, and reduces the transaction cost of app transactions.\nConcretely it proposes to avoid using the `DSO` party in app transactions for the sole purpose of recording app activity, thereby reducing the size of app transactions, and avoiding the need for the SV nodes to validate and confirm extra sub-transactions concerning the `DSO` party."
   },
   {
     "id": "CIP-0105",
@@ -946,8 +946,8 @@
     "type": "Tokenomics",
     "status": "Approved",
     "created": "2026-02-06",
-    "approved": "",
-    "description": ""
+    "approved": "2026-03-02",
+    "description": "This proposal introduces a long-term locking and commitment framework for Super Validators\n(SVs) on the Canton Network.\nSVs may elect to lock a portion of their aggregate lifetime earned SV rewards in order to\nmaintain forward Super Validator Weight. This lock creates a visible, on-chain commitment to\nthe network and directly ties SV influence to long-term alignment.\nSV Weight is earned based on the percentage of lifetime SV rewards that are actively locked.\nSVs that choose not to participate, or that fall below required lock thresholds, earn proportionally\nreduced SV Weight or none at all.\n\nThis framework is designed to:\n- Align SV incentives with the long-term success of the network\n- Replace reputational assurances with cryptographic proof of alignment\n- Reduce incentives for short-term or opportunistic behavior\n\nParticipation in this framework is voluntary. The consequences of participation or\nnon-participation are transparent, objective, and applied uniformly across all Super Validators."
   },
   {
     "id": "CIP-0106",
@@ -957,7 +957,7 @@
     "status": "Approved",
     "created": "2026-02-01",
     "approved": "",
-    "description": ""
+    "description": "QCP Group proposes to join the Canton Network as a Super Validator (SV) with a maximum potential weight of 5.0, tied to quantifiable institutional adoption, application delivery, and network economic activity milestones."
   },
   {
     "id": "CIP-0107",
@@ -966,8 +966,8 @@
     "type": "Standards Track",
     "status": "Approved",
     "created": "2026-01-21",
-    "approved": "",
-    "description": ""
+    "approved": "2026-03-10",
+    "description": "This CIP supports a 24 hours submission delay between preparing and\nexecution for all CC end-user transactions. Specifically this applies to all\ntoken standard operations making CC fully compliant with the token standard as\nwell as the CC specific public actions of creating, renewing, and\narchiving preapprovals, purchasing traffic, and tapping funds on\nDevNet."
   },
   {
     "id": "CIP-0108",
@@ -976,8 +976,8 @@
     "type": "Governance",
     "status": "Proposed",
     "created": "2020-12-16",
-    "approved": "",
-    "description": ""
+    "approved": "TBD",
+    "description": "This CIP proposes Merkle Science to join the Canton Foundation by adding Merkle Science as a Weight [ ] SV: \n\n1) Natively integrate the Canon Network to protect economic activities from illicit and sanctioned activities.\n\n2) Actively accelerate the institutional adoption via 100+ global customers.\n\n**Ecosystem Protection:** Merkle Science will deploy its industry-leading predictive analytics to enable real-time detection of sanctioned and illicit activity. This serves as a foundational layer of network security required to meet increasing regulatory obligations for financial institutions and stablecoin issuers. Such infrastructure is a prerequisite for institutional adoption of Canton.\n\n**Institutional Adoption:** The initial onboarding of a stablecoin issuer is expected to generate 15M+ transactions annually beginning April 2026. Within 90 days of approval, Merkle Science will make Canton available to 100+ customers, including global exchanges, custodians, stablecoin issuers, and wallets. At least three enterprise customers generating a minimum of 30M in annual transaction volume will go live on Canton within six months, supported by letters of intent."
   },
   {
     "id": "CIP-0109",
@@ -986,8 +986,8 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2026-03-20",
-    "approved": "",
-    "description": ""
+    "approved": "2026-03-23",
+    "description": "This CIP proposes granting Visa participation as a Super Validator (SV) with Weight 10. \n\nGiven the strategic importance of Visa to the Canton ecosystem, its inclusion will bring credibility, alignment with global payment infrastructure, and meaningful contributions to network governance and adoption. \n\nThis CIP establishes an umbrella, milestone-based program through which Visa can receive SV Weight (up to 10) for initiatives that materially advance the Canton ecosystem. \n\nThis program contains confidential commitments to the ecosystem. Those commitments and milestones have been agreed with the Tokenomics and Accountability Committees and will be made available to the public when appropriate. \n\n- **Total Earnable Weight:** 10 (max) \n\n- **Accrual Destination:** Escrow, consistent with existing SV escrow mechanics\n\n- **Confidentiality:** The Accountability Committee will review the milestones and inform SVs if they have been met"
   },
   {
     "id": "CIP-0110",
@@ -996,8 +996,8 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2026-03-19",
-    "approved": "",
-    "description": ""
+    "approved": "2026-03-24",
+    "description": "This CIP proposes granting Apollo participation as a Super Validator (SV) with a maximum Weight of 7. Given Apollo’s scale and strategic role in alternative asset markets, their participation is expected to significantly advance the adoption of tokenized real-world assets and financing use cases on the Canton Network.\nThis CIP establishes a performance-based, milestone-driven program through which Apollo can earn SV Weight (up to 7) by delivering initiatives that unlock alternative markets, enable new collateral types, and drive institutional participation on Canton.\n\nUnlike other CIPs, this program contains confidential commitments to the ecosystem. Those commitments and milestones have been agreed with the Tokenomics and Accountability Committees and will be made available to the public when appropriate and as needed.\n\n- Total Earnable Weight: 7 (max)\n- Accrual Destination: Escrow, consistent with existing SV escrow mechanics.\n- Confidentiality: The Accountability Committee will review the milestones and inform SVs if they have been met."
   },
   {
     "id": "CIP-0111",
@@ -1007,7 +1007,7 @@
     "status": "Proposed",
     "created": "2026-03-18",
     "approved": "",
-    "description": ""
+    "description": "The CIP outlines the process by which the network reduces the weight of a Super Validator (“SV”) under certain circumstances.  The process includes (i) a review of the circumstances associated with the SV, (ii) an off-chain governance procedure, and (iii) a corresponding on-chain vote and configuration change.  \n\nA “Ghost SV” refers to an SV in the process of completing milestones associated with an allocation of weight.  While operating as a Ghost SV, unminted rewards associated with its total potential weight accrue in escrow.  The process introduced in this CIP also addresses how to calculate and \"burn” any unminted rewards associated with Ghost SV weight that have been reduced while preserving unminted rewards in escrow for Ghost SVs in good standing."
   },
   {
     "id": "CIP-0112",
@@ -1026,8 +1026,8 @@
     "type": "Governance",
     "status": "Approved",
     "created": "2025-11-26",
-    "approved": "",
-    "description": ""
+    "approved": "2026-04-01",
+    "description": "This proposal seeks to add Further Asset Management (“Further”) as a Super Validator (SV) on the Canton Network with a maximum reward weight of 8.0, earned through milestone-based delivery and perpetual economic sustainment. Further will act as a regional aggregation layer for the GCC, onboarding sovereign-aligned capital and regulated settlement workflows via its portfolio companies (BridgePort, Pave Bank, Kaio, and Fuze)."
   },
   {
     "id": "CIP-0114",
@@ -1036,7 +1036,7 @@
     "type": "Tokenomics",
     "status": "Proposed",
     "created": "2026-03-19",
-    "approved": "",
-    "description": ""
+    "approved": "2026-04-16",
+    "description": "This proposal establishes a time-bound Super Validator (SV) program to encourage the formation and growth of Digital Asset Treasury companies (DATs) that provide investor access to Canton Coin (CC) and commit to long-term CC ownership.\n\nA DAT is an operating company whose primary purpose is to acquire, accumulate, and hold CC as a treasury asset while offering third parties structured access to CC exposure. DATs that accumulate and hold CC over multi-year periods provide durable ecosystem value and may earn SV rewards based on verifiable, consistent CC holdings."
   }
 ]
