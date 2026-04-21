@@ -968,7 +968,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
   /* ── CANTON CIPs ── */
-  var cipFiltered = CIPS.slice().reverse();
+  var cipFiltered = [];
   var cipActiveType = 'ALL';
   var cipActiveStatus = 'ALL';
   var cipActiveBubble = null;
@@ -1086,6 +1086,7 @@ document.addEventListener("DOMContentLoaded", function() {
     summaryText.className = 'ib-text';
     summaryText.style.display = 'block';
     summaryText.style.marginBottom = '16px';
+    summaryText.style.whiteSpace = 'pre-wrap';
     summaryText.textContent = c.description;
 
     var metaDiv = document.createElement('div');
@@ -1097,9 +1098,10 @@ document.addEventListener("DOMContentLoaded", function() {
     var sc2 = cipStatusClass(c.status);
     var badge = '<span class="cip-status-badge cip-status-'+sc2+'">'+c.status+'</span>';
     var typeTag = c.type ? ' <span class="cip-type">'+c.type+'</span>' : '';
-    var created = c.created ? '<div>Created: <span style="color:#333">'+c.created+'</span></div>' : '';
+    var created  = c.created  ? '<div>Created: <span style="color:#333">'+c.created+'</span></div>' : '';
+    var approved = c.approved ? '<div>Approved: <span style="color:#333">'+c.approved+'</span></div>' : '';
     var ref = '<div>Source: <span style="color:#333"><a href="https://github.com/canton-foundation/cips/tree/main/'+c.id.toLowerCase()+'" target="_blank" style="color:var(--navy)">github.com/canton-foundation/cips</a></span></div>';
-    metaDiv.innerHTML = created + ref;
+    metaDiv.innerHTML = created + approved + ref;
 
     bodyEl.innerHTML = '<div style="margin-bottom:14px">'+badge+typeTag+'</div>';
     bodyEl.appendChild(summaryText);
