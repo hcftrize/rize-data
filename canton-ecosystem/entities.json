@@ -2158,6 +2158,20 @@
     "logo_local": "logos\\haven-digital-partners.svg"
   },
   {
+    "name": "Hex Trust",
+    "slug": "hex-trust",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69bdd5e152ee35233268fd12_hextrust.jpg",
+    "short_desc": "Regulated digital asset custodian supporting institutional-grade custody and staking services",
+    "tags": [
+      "SUPER VALIDATOR",
+      "CANTON FOUNDATION MEMBER",
+      "VALIDATOR",
+      "CUSTODY"
+    ],
+    "detail_text": "Regulated digital asset custodian supporting institutional-grade custody and staking services",
+    "logo_local": "logos/hex-trust.jpg"
+  },
+  {
     "name": "Hextrust",
     "slug": "hextrust",
     "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69bdd5e152ee35233268fd12_hextrust.jpg",
@@ -3800,6 +3814,20 @@
     ],
     "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nThetanuts\nhttps://www.thetanuts.finance/\n\nThetanuts Finance is a decentralised on-chain options protocol focused on altcoin options.\n\nNetwork Utilities\nDEVELOPER TOOLS\nRoles\nVALIDATOR\nVALIDATOR",
     "logo_local": "logos\\thetanuts.png"
+  },
+  {
+    "name": "Tiva",
+    "slug": "tiva",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69e08b78ad3489b870d4c36f_9556a9b0-c562-4be2-92ef-6a7a288e5e59.png",
+    "short_desc": "Deterministic OTC and asset execution layer for Canton Network.",
+    "tags": [
+      "APPS (FEATURED)",
+      "VALIDATOR",
+      "EXCHANGES",
+      "LIQUIDITY"
+    ],
+    "detail_text": "Deterministic OTC and asset execution layer for Canton Network.",
+    "logo_local": "logos/tiva.png"
   },
   {
     "name": "Trade.Fast",
