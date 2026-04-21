@@ -3786,10 +3786,17 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   // conviction-history.json is updated daily by GitHub Action
   // No per-visitor API calls needed for historical data
   async function convFetchHistory() {
-    const HISTORY_URL = 'https://raw.githubusercontent.com/hcftrize/TOKERIZE/main/rize-data-hub/conviction-history.json';
+    // Try main first, fall back to dev for preview/testing
+    const HISTORY_URL_MAIN = 'https://raw.githubusercontent.com/hcftrize/TOKERIZE/main/rize-data-hub/conviction-history.json';
+    const HISTORY_URL_DEV  = 'https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/rize-data-hub/conviction-history.json';
+    let HISTORY_URL = HISTORY_URL_MAIN;
     try {
-      const res = await fetch(HISTORY_URL);
-      if (!res.ok) throw new Error('HTTP ' + res.status);
+      let res = await fetch(HISTORY_URL);
+      if (!res.ok) {
+        // Fallback to dev branch
+        res = await fetch(HISTORY_URL_DEV);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+      }
       const data = await res.json();
       return {
         bondedSeries:  data.bonded         || [],
@@ -3998,7 +4005,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       el.textContent = val;
       if (color) el.style.color = color;
     };
-    setVal('conv-live-bonded',        convFmt(bonded)    + ' RIZE', 'var(--green)');
+    setVal('conv-live-bonded',        convFmt(bonded)    + ' RIZE', '#98ffb6');
     setVal('conv-live-bonded-usd',    convFmtUsd(bonded));
     setVal('conv-live-unbonding',     convFmt(unbonding) + ' RIZE', 'var(--gold)');
     setVal('conv-live-unbonding-usd', convFmtUsd(unbonding));
@@ -4048,10 +4055,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const sign    = delta >= 0 ? '+' : '';
       const isGood  = delta > 0; // positive bonding = bullish
       el.textContent = sign + convFmt(delta) + ' RIZE';
-      el.className   = 'conv-delta-value ' + (isGood ? 'conv-green' : 'conv-red');
-      // Percentage change
+      el.className = 'conv-delta-value';
+      el.style.color = isGood ? '#98ffb6' : 'var(--pink)';
+      // Percentage change — bigger font for readability
       if (sub) {
-        const idx = govSeries.rawDays.length - 1;
         const pastDate = new Date();
         pastDate.setDate(pastDate.getDate() - p.days);
         const pastKey = pastDate.toISOString().slice(0, 10);
@@ -4059,8 +4066,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         if (pastIdx >= 0 && govSeries.data[pastIdx] > 0) {
           const pct = (delta / govSeries.data[pastIdx]) * 100;
           const arrow = pct >= 0 ? '▲' : '▼';
-          sub.innerHTML = arrow + ' ' + Math.abs(pct).toFixed(2) + '%';
-          sub.style.color = pct >= 0 ? 'var(--green)' : 'var(--pink)';
+          sub.innerHTML = `<span style="font-size:13px;font-family:'Rajdhani',sans-serif;font-weight:700">${arrow} ${Math.abs(pct).toFixed(2)}%</span>`;
+          sub.style.color = pct >= 0 ? '#98ffb6' : 'var(--pink)';
         } else {
           sub.innerHTML = '&nbsp;';
         }
