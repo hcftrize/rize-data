@@ -83,35 +83,44 @@ def parse_md_header(text):
 
 def parse_abstract(text):
     """
-    Extract the Abstract section from a CIP .md file.
-    Handles multiple formats found in the foundation repo:
-      - ## Abstract
-      - ## 1. Abstract  
-      - 1. Abstract
-      - # Abstract
-      - Abstract (plain)
+    Extract the Abstract or Summary section from a CIP .md file.
+    Handles all formats found in the foundation repo:
+      ## Abstract     ## 1. Abstract    1. Abstract
+      # Abstract      ## Summary        Summary
     """
     lines = text.splitlines()
-    in_abstract = False
-    abstract_lines = []
+    in_section = False
+    section_lines = []
+
+    # Matches heading lines that introduce Abstract or Summary section
+    SECTION_START = re.compile(
+        r'^[#\s]*(\d+\.)?\s*(Abstract|Summary)\s*$',
+        re.IGNORECASE
+    )
+    # Matches the START of any OTHER section (to stop collection)
+    # A new section = line starting with # or a numbered heading like "2. Motivation"
+    SECTION_END = re.compile(
+        r'^(#{1,4}\s+\S|(\d+)\.\s+[A-Z][a-z])'
+    )
 
     for line in lines:
         stripped = line.strip()
 
-        # Detect any Abstract heading variant
-        # Matches: ## Abstract, ## 1. Abstract, 1. Abstract, # Abstract, etc.
-        if re.match(r'^#{0,3}\s*\d*\.?\s*Abstract\s*$', stripped, re.IGNORECASE):
-            in_abstract = True
+        if not in_section:
+            if SECTION_START.match(stripped):
+                in_section = True
             continue
 
-        if in_abstract:
-            # Stop at next section heading (##, #, or numbered like "2." or "## 2.")
-            if re.match(r'^#{1,3}\s+', line) or re.match(r'^\d+\.\s+\w', line):
-                break
-            abstract_lines.append(line)
+        # We are in the section — check if this line starts a new one
+        if stripped and SECTION_END.match(line):
+            break
 
-    abstract = "\n".join(abstract_lines).strip()
-    # Clean up excessive blank lines
+        section_lines.append(line)
+
+    abstract = "\n".join(section_lines).strip()
+    # Remove markdown links [text](url) -> text
+    abstract = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', abstract)
+    # Clean excessive blank lines
     abstract = re.sub(r'\n{3,}', '\n\n', abstract)
     return abstract
 
