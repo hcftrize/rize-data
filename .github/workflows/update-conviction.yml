@@ -29,10 +29,19 @@ jobs:
           BASESCAN_API_KEY: ${{ secrets.BASESCAN_API_KEY }}
         run: python scrape_conviction.py
 
-      - name: Commit and push if changes
+      - name: Commit and push to dev
         run: |
           git config user.name "canton-bot"
           git config user.email "bot@tokerize.com"
           git add rize-data-hub/conviction-history.json
           git diff --staged --quiet || git commit -m "chore: update conviction history — $(date +%Y-%m-%d)"
           git push origin dev
+
+      - name: Push data to main as well
+        run: |
+          git fetch origin main
+          git checkout main
+          git checkout dev -- rize-data-hub/conviction-history.json
+          git add rize-data-hub/conviction-history.json
+          git diff --staged --quiet || git commit -m "chore: update conviction history — $(date +%Y-%m-%d)"
+          git push origin main
