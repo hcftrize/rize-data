@@ -57,13 +57,13 @@ def download_logo(url: str, slug: str) -> str | None:
         ext = "png"
     dest = LOGOS_DIR / f"{slug}.{ext}"
     if dest.exists():
-        return str(dest.relative_to(OUT_DIR))
+        return str(dest.relative_to(OUT_DIR)).replace("/", "\\")
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
         with urllib.request.urlopen(req, timeout=10) as r:
             dest.write_bytes(r.read())
         print(f"    ↓ logo saved: {dest.name}")
-        return str(dest.relative_to(OUT_DIR))
+        return str(dest.relative_to(OUT_DIR)).replace("/", "\\")
     except Exception as e:
         print(f"    ⚠ logo failed ({slug}): {e}")
         return None
