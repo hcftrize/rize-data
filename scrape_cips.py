@@ -84,41 +84,40 @@ def parse_md_header(text):
 def parse_abstract(text):
     """
     Extract the Abstract or Summary section from a CIP .md file.
-    Handles all formats found in the foundation repo:
-      ## Abstract     ## 1. Abstract    1. Abstract
-      # Abstract      ## Summary        Summary
+    Handles all formats:
+      ## Abstract        ## Abstract:       ## 1. Abstract
+      1. Abstract        ## Summary         ## [1. Abstract](#anchor)
     """
     lines = text.splitlines()
     in_section = False
     section_lines = []
 
-    # Matches heading lines that introduce Abstract or Summary section
     SECTION_START = re.compile(
         r'^[#\s]*(\d+\.)?\s*(Abstract|Summary)\s*:?\s*$',
         re.IGNORECASE
     )
-    # Matches the START of any OTHER section (to stop collection)
-    # A new section = line starting with # or a numbered heading like "2. Motivation"
     SECTION_END = re.compile(
         r'^(#{1,4}\s+\S|(\d+)\.\s+[A-Z][a-z])'
     )
 
     for line in lines:
         stripped = line.strip()
+        # Strip markdown links from heading before matching
+        # e.g. ## [1. Abstract](#1-abstract) -> ## 1. Abstract
+        stripped_nolink = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', stripped)
 
         if not in_section:
-            if SECTION_START.match(stripped):
+            if SECTION_START.match(stripped_nolink):
                 in_section = True
             continue
 
-        # We are in the section — check if this line starts a new one
         if stripped and SECTION_END.match(line):
             break
 
         section_lines.append(line)
 
     abstract = "\n".join(section_lines).strip()
-    # Remove markdown links [text](url) -> text
+    # Remove markdown links from body text too
     abstract = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', abstract)
     # Clean excessive blank lines
     abstract = re.sub(r'\n{3,}', '\n\n', abstract)
@@ -188,6 +187,11 @@ def main():
                 entry["description"] = abstract
                 updated_desc += 1
                 changed = True
+            elif not abstract and not entry.get("description", ""):
+                # Fallback: use title if no abstract found
+                entry["description"] = entry.get("title", "")
+                updated_desc += 1
+                changed = True
             approved = header.get("approved", "").strip()
             if approved and entry.get("approved", "") != approved:
                 entry["approved"] = approved
@@ -233,7 +237,7 @@ def main():
                 "status":      header.get("status", ""),
                 "created":     header.get("created", ""),
                 "approved":    header.get("approved", ""),
-                "description": abstract or ""
+                "description": abstract or header.get("title", "")
             }
             existing_by_id[cip_id] = new_entry
             new_cips.append(new_entry)
