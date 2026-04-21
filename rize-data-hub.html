@@ -3635,7 +3635,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   const CONV = {
     GOV_CONTRACT  : '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE',
     RIZE_TOKEN    : '0x9818B6c09f5ECc843060927E8587c427C7C93583',
-    BASE_RPC      : 'https://mainnet.base.org',
+    BASE_RPC      : 'https://base-mainnet.g.alchemy.com/v2/qS-QZnHMq-cqmoFkw-grY',
     WHALE_MIN     : 5_000_000,    // 5M RIZE
     DECIMALS      : 1e18,
     // CEX addresses to track for "on exchanges" metric
@@ -3708,7 +3708,9 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   }
 
   async function convFetchLiveBalances() {
-    // 1. Governance bonded: single RPC call — lowest risk
+    // All via Alchemy RPC — no Basescan dependency
+
+    // 1. Governance bonded (balanceOf governance contract)
     let bonded = 0;
     try {
       const padded = '000000000000000000000000' + CONV.GOV_CONTRACT.slice(2).toLowerCase();
@@ -3718,29 +3720,27 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       bonded = convHexToTokens(r?.result);
     } catch(e) {}
 
-    // 2. Unbonding: releasableTokens() selector
+    // 2. Unbonding queue: releasableTokens() = 0x1c269043
     let unbonding = 0;
     try {
-      await new Promise(r => setTimeout(r, 300));
+      await new Promise(r => setTimeout(r, 200));
       const r = await convRpc('eth_call', [
         { to: CONV.GOV_CONTRACT, data: '0x1c269043' }, 'latest'
       ]);
       unbonding = convHexToTokens(r?.result);
     } catch(e) {}
 
-    // 3. CEX balances via Basescan tokenbalance — sequential, safe
+    // 3. CEX balances via RPC balanceOf — sequential to avoid 429
     const cexAddrs = Object.values(CONV.CEX);
     let cexTotal = 0;
     for (const addr of cexAddrs) {
       try {
-        const r = await convBasescan({
-          action: 'tokenbalance',
-          contractaddress: CONV.RIZE_TOKEN,
-          address: addr,
-          tag: 'latest',
-        });
-        cexTotal += convSafeBigInt(r?.result);
-        await new Promise(res => setTimeout(res, 150));
+        await new Promise(r => setTimeout(r, 150));
+        const padded = '000000000000000000000000' + addr.slice(2).toLowerCase();
+        const r = await convRpc('eth_call', [
+          { to: CONV.RIZE_TOKEN, data: '0x70a08231' + padded }, 'latest'
+        ]);
+        cexTotal += convHexToTokens(r?.result);
       } catch(e) {}
     }
 
@@ -3757,12 +3757,14 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       return {
-        bondedSeries: data.bonded || [],  // [{date, value}]
-        cexSeries:    data.cex    || [],  // [{date, value}]
+        bondedSeries:    data.bonded    || [],
+        cexSeries:       data.cex       || [],
+        unbondingSeries: data.unbonding || [],
+        whales:          data.whales    || [],
       };
     } catch(e) {
-      console.warn('conviction-history.json not found yet — will show live data only:', e.message);
-      return { bondedSeries: [], cexSeries: [] };
+      console.warn('conviction-history.json not available:', e.message);
+      return { bondedSeries: [], cexSeries: [], unbondingSeries: [], whales: [] };
     }
   }
 
@@ -3781,29 +3783,11 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     return data[todayIdx] - data[pastIdx];
   }
 
-  // ── Whale movements ────────────────────────────────────────
+  // ── Whale movements — read from pre-built JSON ─────────────
+  // Whales are now fetched daily by GitHub Action and stored in conviction-history.json
+  // No live API call needed here — convFetchHistory() already returns them
   async function convFetchWhales() {
-    // Fetch ALL recent RIZE transfers on-chain (not filtered by address)
-    // Basescan: tokentx with contractaddress only = all transfers of this token
-    const res = await convBasescan({
-      action: 'tokentx',
-      contractaddress: CONV.RIZE_TOKEN,
-      startblock: 0,
-      endblock: 99999999,
-      sort: 'desc',
-      offset: 1000,
-      page: 1,
-    });
-
-    const txs = (res?.result && Array.isArray(res.result)) ? res.result : [];
-
-    // Filter > 5M RIZE
-    const whales = txs.filter(tx => {
-      const val = parseFloat(tx.value) / CONV.DECIMALS;
-      return val >= CONV.WHALE_MIN;
-    }).slice(0, 30);
-
-    return whales;
+    return []; // handled by convFetchHistory()
   }
 
   // ── Unbonding series from daily bonded drops ──────────────
@@ -3967,23 +3951,26 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       return cexMap[lower] || convAddrShort(addr);
     }
 
-    tbody.innerHTML = whales.map(tx => {
-      const val    = parseFloat(tx.value) / CONV.DECIMALS;
-      const date   = new Date(parseInt(tx.timeStamp) * 1000);
-      const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
-      const govAddr = CONV.GOV_CONTRACT.toLowerCase();
-      const fromL  = (tx.from || '').toLowerCase();
-      const toL    = (tx.to   || '').toLowerCase();
-      const dir    = toL === govAddr ? '↗ Bond' : fromL === govAddr ? '↙ Unbond' : '→ Transfer';
+    tbody.innerHTML = whales.map(w => {
+      // JSON format from scrape_conviction.py:
+      // {date, amount, from, to, from_label, to_label, tx}
+      const val      = w.amount || 0;
+      const dateStr  = w.date || '—';
+      const govAddr  = CONV.GOV_CONTRACT.toLowerCase();
+      const fromL    = (w.from || '').toLowerCase();
+      const toL      = (w.to   || '').toLowerCase();
+      const dir      = toL === govAddr ? '↗ Bond' : fromL === govAddr ? '↙ Unbond' : '→ Transfer';
       const dirColor = toL === govAddr ? '#98ffb6' : fromL === govAddr ? '#ff8ad8' : '#ffd36b';
-      const txUrl  = 'https://basescan.org/tx/' + tx.hash;
+      const fromLbl  = w.from_label || convAddrShort(w.from);
+      const toLbl    = w.to_label   || convAddrShort(w.to);
+      const txUrl    = 'https://basescan.org/tx/' + (w.tx || '');
       return `<tr>
         <td style="color:var(--muted);white-space:nowrap">${dateStr}</td>
         <td style="color:#fff;font-weight:700">${convFmt(val)} RIZE</td>
         <td style="color:${dirColor}">${dir}</td>
-        <td style="color:var(--muted)">${labelAddr(tx.from)}</td>
-        <td style="color:var(--muted)">${labelAddr(tx.to)}</td>
-        <td><a href="${txUrl}" target="_blank" rel="noopener">${convAddrShort(tx.hash)}</a></td>
+        <td style="color:var(--muted)">${fromLbl}</td>
+        <td style="color:var(--muted)">${toLbl}</td>
+        <td><a href="${txUrl}" target="_blank" rel="noopener">${convAddrShort(w.tx)}</a></td>
       </tr>`;
     }).join('');
     if (table) table.style.display = 'table';
@@ -4026,11 +4013,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     CONV.initialized = true;
 
     try {
-      // Fetch live + pre-built history + whales in parallel
-      const [live, history, whales] = await Promise.all([
+      // Fetch live + pre-built history in parallel
+      const [live, history] = await Promise.all([
         convFetchLiveBalances(),
         convFetchHistory(),
-        convFetchWhales(),
       ]);
 
       // Build chart series from pre-computed JSON
@@ -4058,15 +4044,18 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         }
       }
 
-      // Unbonding: derive from govSeries day-over-day decreases
+      // Unbonding chart: outflows from gov (bonded daily decreases)
       const unbSeries = convBuildUnbondingFromSeries(govSeries);
+
+      // Whales from JSON (updated daily by GitHub Action)
+      const whalesFromJson = history.whales || [];
 
       // Render
       convRenderMainChart(govSeries, cexSeries);
       convRenderUnbondingChart(unbSeries);
       convRenderLive(live.bonded, live.unbonding, live.cexTotal);
       convRenderDeltas(cexSeries);
-      convRenderWhales(whales);
+      convRenderWhales(whalesFromJson);
 
     } catch(err) {
       console.error('Conviction module error:', err);
