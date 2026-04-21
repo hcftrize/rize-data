@@ -1,0 +1,1042 @@
+[
+  {
+    "id": "CIP-0000",
+    "number": 0,
+    "title": "Canton Improvement Process for the Global Synchronizer on Canton Network",
+    "type": "Process",
+    "status": "Approved",
+    "created": "2024-01-03",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0001",
+    "number": 1,
+    "title": "Replace the SV tranche time delays with a weighted reward",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2023-12-15",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0002",
+    "number": 2,
+    "title": "Minor adjustments to the Tokenomics variables to fine tune BME tokenomics",
+    "type": "Tokenomics",
+    "status": "Replaced",
+    "created": "2023-12-15",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0003",
+    "number": 3,
+    "title": "Consensus Layer Validator Participation & Rewards",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2023-12-15",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0006",
+    "number": 6,
+    "title": "Define the process of distributing and approving",
+    "type": "Process",
+    "status": "Active",
+    "created": "2024-03-12",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0007",
+    "number": 7,
+    "title": "SVs can earn extra SV reward weight when bringing Validators or apps to the Canton Network",
+    "type": "Tokenomics",
+    "status": "Replaced",
+    "created": "2024-03-12",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0008",
+    "number": 8,
+    "title": "Update and Refinement to CIP-0002",
+    "type": "Tokenomics",
+    "status": "Replaced",
+    "created": "2024-05-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0009",
+    "number": 9,
+    "title": "Add Broadridge as a T1 (weight 10) Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-05-11",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0010",
+    "number": 10,
+    "title": "LCV have met all their requirements to be a T1 Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-05-11",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0011",
+    "number": 11,
+    "title": "IEU have decided to forgo SV minting rights",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-05-11",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0012",
+    "number": 12,
+    "title": "Minor adjustments to Canton Coin processing, and Operational configuration, on the Global Synchronizer",
+    "type": "Standards Track",
+    "status": "Final",
+    "created": "2024-05-22",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0013",
+    "number": 13,
+    "title": "Correct an error in the Daml models controlling the re-onboarding process for Super Validators who have been removed from the quorum. The error allowed Super Validators to mint Canton Coin greater than their agreed share after being removed and returned to the quorum.",
+    "type": "Standards Track",
+    "status": "Final",
+    "created": "2024-05-24",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0014",
+    "number": 14,
+    "title": "Complete additional enhancements to the Scan API to facilitate tax accounting",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-05-29",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0015",
+    "number": 15,
+    "title": "Add Copper as a T3 (weight 1) Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-06-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0016",
+    "number": 16,
+    "title": "Add Dfns as a T3 (weight 1) Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-06-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0017",
+    "number": 17,
+    "title": "Add MPCH as a T3 (weight 1) Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-06-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0018",
+    "number": 18,
+    "title": "Add Tradeweb as a T1 (weight 10) Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-06-03",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0019",
+    "number": 19,
+    "title": "Add 7RIDGE as a T1 (weight 10) Super Validator.",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-06-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0020",
+    "number": 20,
+    "title": "Update and Refinement to CIP-0002",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2024-06-13",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0021",
+    "number": 21,
+    "title": "Create a subgroup of the Super Validators (“SV”) to vet and vote on making the Featured Application designation for network applications. Call this subgroup the Featured Application and Validator Committee (“FAV-C”).",
+    "type": "Governance",
+    "status": "Active",
+    "created": "2024-06-16",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0022",
+    "number": 22,
+    "title": "Status:",
+    "type": "Governance",
+    "status": "Unknown",
+    "created": "Approved:",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0024",
+    "number": 24,
+    "title": "SVs and Validators can earn SV reward weight when bringing Validators or apps to the Canton Network",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2024-09-27",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0025",
+    "number": 25,
+    "title": "CIP-0006 and CIP-0021 called for the formation of Validator and Featured App committees",
+    "type": "Governance",
+    "status": "Obsolete",
+    "created": "2024-09-27",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0032",
+    "number": 32,
+    "title": "Add Lukka as a Tier3 SV (Weight 1)",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0033",
+    "number": 33,
+    "title": "Add Strange Pixels as a Tier4 SV (Weight 0.5)",
+    "type": "Governance",
+    "status": "Rejected",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0034",
+    "number": 34,
+    "title": "Add Proof Group as a Tier3 SV (Weight 1)",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0035",
+    "number": 35,
+    "title": "Add Five North as a Tier2 SV (Weight 3)",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-01-07",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0036",
+    "number": 36,
+    "title": "Add Kiln as a Tier3 SV (Weight 1)",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0037",
+    "number": 37,
+    "title": "Add Obsidian as a Tier3 SV",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-02-13",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0038",
+    "number": 38,
+    "title": "Add Hexagate as a Tier3 SV (Weight 1)",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0039",
+    "number": 39,
+    "title": "Add Copper Clearloop as a Tier3 SV (Weight 1)",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0040",
+    "number": 40,
+    "title": "Add Deribit as a Tier3 SV (Weight 1)",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0041",
+    "number": 41,
+    "title": "Add Circle as a Weight 10 Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-02-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0042",
+    "number": 42,
+    "title": "Stable Price per Canton Coin Transfer via Synchronizer Fees",
+    "type": "Governance",
+    "status": "Active",
+    "created": "2024-12-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0043",
+    "number": 43,
+    "title": "Add TRM as a SV",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-02-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0044",
+    "number": 44,
+    "title": "Add Elliptic as a Tier4 SV",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-02-07",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0045",
+    "number": 45,
+    "title": "SV Operating Requirements",
+    "type": "Governance",
+    "status": "Active",
+    "created": "2025-02-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0046",
+    "number": 46,
+    "title": "Add Coin Metrics as a Weight 1 Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-01-31",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0047",
+    "number": 47,
+    "title": "Featured App Activity Markers",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2025-02-12",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0048",
+    "number": 48,
+    "title": "Raising the Rewards Cap for Validators and Application Providers",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2025-02-19",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0049",
+    "number": 49,
+    "title": "Incentivizing Cold Backups for Super Validators to Enhance Network Resilience",
+    "type": "Governance",
+    "status": "Proposed",
+    "created": "2025-02-28",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0050",
+    "number": 50,
+    "title": "Controlled Validator Growth Through Trusted Operators",
+    "type": "Process",
+    "status": "Withdrawn",
+    "created": "2025-03-11",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0051",
+    "number": 51,
+    "title": "Streamline onchain governance votes",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-03-04",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0052",
+    "number": 52,
+    "title": "Add Monstera as an SV of Weight 5",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-03-14",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0053",
+    "number": 53,
+    "title": "AngelHack as a Weight 2.5 SV",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-03-24",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0054",
+    "number": 54,
+    "title": "Add Figment as a Weight 1 Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-03-14",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0055",
+    "number": 55,
+    "title": "Add Bitwave as a Weight 1 SV",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-03-17",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0056",
+    "number": 56,
+    "title": "Canton Network Token Standard",
+    "type": "Standards Track",
+    "status": "Final",
+    "created": "2025-03-07",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0057",
+    "number": 57,
+    "title": "Add Quantstamp as a Weight 1 Super Validator",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-03-07",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0058",
+    "number": 58,
+    "title": "Add IntellectEU as Weight 1 SV",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-04-14",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0059",
+    "number": 59,
+    "title": "Add Woodside AI as an SV of Weight 10",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-04-21",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0060",
+    "number": 60,
+    "title": "Add Zero Hash as SV of Weight 7.5",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-04-23",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0061",
+    "number": 61,
+    "title": "Add Chainlink as a Super Validator of Weight 7.5",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-05-09",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0062",
+    "number": 62,
+    "title": "Synchronizer Migration with Downtime to Splice 0.4.0 / Canton 3.3",
+    "type": "Standards Track",
+    "status": "Final",
+    "created": "2025-05-14",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0063",
+    "number": 63,
+    "title": "Add Kaiko as a Super Validator of Weight 6.5",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-05-27",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0064",
+    "number": 64,
+    "title": "Delegateless Automation",
+    "type": "Standards Track",
+    "status": "Final",
+    "created": "2025-04-21",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0065",
+    "number": 65,
+    "title": "Add Layer Zero, Wormhole, and Chainlink as SVs at Weight 3 each",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-06-02",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0066",
+    "number": 66,
+    "title": "Enable escrow mechanisms and governance votes to allow Canton Coin minting from the unminted pool",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2025-06-18",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0067",
+    "number": 67,
+    "title": "One-Time Allocation of Historical Unclaimed Rewards to GSF",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2025-06-13",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0068",
+    "number": 68,
+    "title": "Bootstrap network from non-zero round",
+    "type": "Standards Track",
+    "status": "Final",
+    "created": "2025-07-09",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0069",
+    "number": 69,
+    "title": "Add Ledger as an SV of Weight 5",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-07-11",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0070",
+    "number": 70,
+    "title": "Adjusting Reward Caps for Validators",
+    "type": "Tokenomics",
+    "status": "Withdrawn",
+    "created": "2025-07-22",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0071",
+    "number": 71,
+    "title": "Add Ubyx as an SV of Weight 5",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-06-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0072",
+    "number": 72,
+    "title": "Add Fireblocks as an SV of Weight 5",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-07-30",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0073",
+    "number": 73,
+    "title": "Weighted Validator Liveness Rewards for SV-Chosen Parties",
+    "type": "Tokenomics",
+    "status": "Replaced",
+    "created": "2025-07-23",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0074",
+    "number": 74,
+    "title": "Add BitGo as an SV of Weight 5",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-08-15",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0075",
+    "number": 75,
+    "title": "Add Zodia as a SV with max weight 5",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-09-11",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0076",
+    "number": 76,
+    "title": "Hypernative as a Super Validator with a Weight of 1",
+    "type": "Governance",
+    "status": "Final",
+    "created": "2025-08-20",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0077",
+    "number": 77,
+    "title": "Add Taurus as an SV of Weight 5",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-08-26",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0078",
+    "number": 78,
+    "title": "Canton Coin Fee Removal",
+    "type": "Tokenomics",
+    "status": "Final",
+    "created": "2025-09-08",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0079",
+    "number": 79,
+    "title": "SV Readiness — Demonstrate Third-Party Price Feed Integration for CC Listing",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-09-15",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0080",
+    "number": 80,
+    "title": "Add Republic as an SV of Weight 6",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-09-18",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0081",
+    "number": 81,
+    "title": "Add YZi Labs as Weight 10 SV",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-09-23",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0082",
+    "number": 82,
+    "title": "Establish a 5% Development Fund (Foundation-Governed)",
+    "type": "Governance",
+    "status": "Active",
+    "created": "2025-09-24",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0083",
+    "number": 83,
+    "title": "DTCC Super Validator Participation",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-10-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0084",
+    "number": 84,
+    "title": "Tokenomics Committee to Recommend $/MB Price Tuning",
+    "type": "Tokenomics",
+    "status": "Approved",
+    "created": "2025-10-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0085",
+    "number": 85,
+    "title": "Add Talos as Weight 6.5 SV",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-09-08",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0086",
+    "number": 86,
+    "title": "ERC-20 Middleware and Distributed Indexer for Canton Network",
+    "type": "Tokenomics",
+    "status": "Approved",
+    "created": "2025-10-14",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0087",
+    "number": 87,
+    "title": "Add Hex Trust as a Super Validator (Weight 3)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-09-26",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0089",
+    "number": 89,
+    "title": "Splice 0.5.0 / Canton 3.4 Upgrade",
+    "type": "Standards Track",
+    "status": "Approved",
+    "created": "2025-08-21",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0090",
+    "number": 90,
+    "title": "** Onboard USDT0 to Canton — Outcome-Linked SV Weight (Max 10)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "** 2025-10-28",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0091",
+    "number": 91,
+    "title": "Add Zenith as an SV of Weight 10",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-10-17",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0092",
+    "number": 92,
+    "title": "Controlled Transition to Dynamic Market Feeds Post-Listing of Canton Coin (CC)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-10-31",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0093",
+    "number": 93,
+    "title": "Add Bosphorus SV (BSV) as a Super Validator Max Weight 6",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-11-07",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0094",
+    "number": 94,
+    "title": "Add Blockdaemon as a Super Validator (weight 5.0)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-12-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0095",
+    "number": 95,
+    "title": "Onboard Mesh to Canton — Outcome-Linked SV Weight (Max 10)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-12-09",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0096",
+    "number": 96,
+    "title": "Removing Liveness Rewards from Validator Rewards Pool",
+    "type": "Tokenomics",
+    "status": "Approved",
+    "created": "2025-12-07",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0097",
+    "number": 97,
+    "title": "Nasdaq Super Validator Participation",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-12-30",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0098",
+    "number": 98,
+    "title": "Cap Per-Transaction Application Rewards at $1.50",
+    "type": "Tokenomics",
+    "status": "Approved",
+    "created": "2025-12-17",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0099",
+    "number": 99,
+    "title": "Zero Hash Modifications to Adoption Incentive",
+    "type": "Tokenomics",
+    "status": "Approved",
+    "created": "2025-01-07",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0100",
+    "number": 100,
+    "title": "Governance of the CIP 0082 Development Fund",
+    "type": "Tokenomics",
+    "status": "Active",
+    "created": "2025-12-22",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0102",
+    "number": 102,
+    "title": "Add Tharimmune as a Super Validator (SV)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2026-01-17",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0103",
+    "number": 103,
+    "title": "dApp Standard",
+    "type": "Standards Track",
+    "status": "Approved",
+    "created": "2025-11-28",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0104",
+    "number": 104,
+    "title": "Traffic-Based App Rewards",
+    "type": "Tokenomics",
+    "status": "Approved",
+    "created": "2026-01-29",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0105",
+    "number": 105,
+    "title": "Super Validator (SV) Locking & Long-Term Commitment Framework",
+    "type": "Tokenomics",
+    "status": "Approved",
+    "created": "2026-02-06",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0106",
+    "number": 106,
+    "title": "Add QCP Group as a Super Validator (weight 5.0)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2026-02-01",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0107",
+    "number": 107,
+    "title": "24h Submission Delay for End-User CC Transactions",
+    "type": "Standards Track",
+    "status": "Approved",
+    "created": "2026-01-21",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0108",
+    "number": 108,
+    "title": "Add Merkle Science’s Predictive Analytics as a Weight 1 SV",
+    "type": "Governance",
+    "status": "Proposed",
+    "created": "2020-12-16",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0109",
+    "number": 109,
+    "title": "Visa Super Validator Participation",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2026-03-20",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0110",
+    "number": 110,
+    "title": "Add Apollo as max weight 7 SV",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2026-03-19",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0111",
+    "number": 111,
+    "title": "Process for Reducing Super Validator Weight",
+    "type": "Governance",
+    "status": "Proposed",
+    "created": "2026-03-18",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0112",
+    "number": 112,
+    "title": "Canton Network Token Standard V2 - Improvements for Privacy, Performance and Traditional Accounting",
+    "type": "Standards Track",
+    "status": "Draft",
+    "created": "2026-03-31",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0113",
+    "number": 113,
+    "title": "Add Further Asset Management as a Super Validator (Weight 8.0)",
+    "type": "Governance",
+    "status": "Approved",
+    "created": "2025-11-26",
+    "approved": "",
+    "description": ""
+  },
+  {
+    "id": "CIP-0114",
+    "number": 114,
+    "title": "Digital Asset Treasury (DAT) SV Program",
+    "type": "Tokenomics",
+    "status": "Proposed",
+    "created": "2026-03-19",
+    "approved": "",
+    "description": ""
+  }
+]
