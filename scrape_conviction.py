@@ -1,26 +1,29 @@
 """
 scrape_conviction.py
 ====================
-Builds/updates conviction-history.json with daily on-chain data:
-- RIZE bonded in governance contract (per day)
-- RIZE on exchanges (per day, sum of all CEX wallets)
+Daily script — runs at 08:00 UTC via GitHub Actions.
+Appends one data point per day to conviction-history.json.
 
-Run daily via GitHub Actions. Appends today's snapshot — never
-re-fetches historical data already in the JSON.
-
-Output: rize-data-hub/conviction-history.json
+Fetches:
+  - bonded      : balanceOf(governance contract)
+  - cex         : sum balanceOf(all CEX addresses)
+  - unbonding   : releasableTokens() from governance contract
+  - whales      : new transfers > 5M RIZE in last 24h (keeps 30d rolling window)
 """
 
 import json, os, time, urllib.request
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-# ── Config ─────────────────────────────────────────────────────
-RIZE_TOKEN    = '0x9818B6c09f5ECc843060927E8587c427C7C93583'
-GOV_CONTRACT  = '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE'
-DECIMALS      = 10 ** 18
-OUTPUT_FILE   = Path('rize-data-hub/conviction-history.json')
-ALCHEMY_URL   = os.environ.get('ALCHEMY_RPC_URL', 'https://base-mainnet.g.alchemy.com/v2/qS-QZnHMq-cqmoFkw-grY')
+RIZE_TOKEN   = '0x9818B6c09f5ECc843060927E8587c427C7C93583'
+GOV_CONTRACT = '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE'
+DECIMALS     = 1e18
+WHALE_MIN    = 5_000_000
+OUTPUT_FILE  = Path('rize-data-hub/conviction-history.json')
+ALCHEMY_URL  = os.environ.get(
+    'ALCHEMY_RPC_URL',
+    'https://base-mainnet.g.alchemy.com/v2/qS-QZnHMq-cqmoFkw-grY'
+)
 
 CEX_ADDRESSES = {
     'Kraken Hot 1'  : '0x02Ac4617Fe004cf8Cd9c988Ff9C905b2Ec676C2d',
@@ -36,13 +39,14 @@ CEX_ADDRESSES = {
 }
 
 
-def rpc_call(method: str, params: list):
-    """Make a JSON-RPC call to Alchemy Base mainnet."""
-    payload = json.dumps({'jsonrpc': '2.0', 'method': method, 'params': params, 'id': 1}).encode()
+def rpc(method, params):
+    payload = json.dumps({
+        'jsonrpc': '2.0', 'id': 1,
+        'method': method, 'params': params
+    }).encode()
     req = urllib.request.Request(
-        ALCHEMY_URL,
-        data=payload,
-        headers={'Content-Type': 'application/json', 'Accept': 'application/json'}
+        ALCHEMY_URL, data=payload,
+        headers={'Content-Type': 'application/json'}
     )
     try:
         with urllib.request.urlopen(req, timeout=15) as r:
@@ -52,87 +56,140 @@ def rpc_call(method: str, params: list):
         return None
 
 
-def get_token_balance(address: str) -> float:
-    """Get current RIZE balance for an address via eth_call (balanceOf)."""
-    # ERC20 balanceOf(address) selector = 0x70a08231
+def get_balance(address):
     padded = '000000000000000000000000' + address[2:].lower()
-    data = '0x70a08231' + padded
-    res = rpc_call('eth_call', [{'to': RIZE_TOKEN, 'data': data}, 'latest'])
-    time.sleep(0.15)
-    if not res or 'result' not in res:
-        print(f'    [WARN] No response for {address[:10]}...')
-        return 0.0
-    result = res['result']
-    if not result or result == '0x':
+    res = rpc('eth_call', [{'to': RIZE_TOKEN, 'data': '0x70a08231' + padded}, 'latest'])
+    if not res or not res.get('result') or res['result'] == '0x':
         return 0.0
     try:
-        return int(result, 16) / DECIMALS
-    except Exception as e:
-        print(f'    [WARN] Parse error for {address[:10]}: {e}')
+        return int(res['result'], 16) / DECIMALS
+    except:
         return 0.0
+
+
+def get_releasable():
+    res = rpc('eth_call', [{'to': GOV_CONTRACT, 'data': '0x1c269043'}, 'latest'])
+    if not res or not res.get('result') or res['result'] == '0x':
+        return 0.0
+    try:
+        return int(res['result'], 16) / DECIMALS
+    except:
+        return 0.0
+
+
+def fetch_recent_whales():
+    """Fetch transfers > 5M RIZE from last 24h via alchemy_getAssetTransfers."""
+    yesterday_block = hex(int(rpc('eth_blockNumber', [])['result'], 16) - 43200)  # ~24h of Base blocks
+
+    params = {
+        'fromBlock': yesterday_block,
+        'toBlock'  : 'latest',
+        'contractAddresses': [RIZE_TOKEN],
+        'category' : ['erc20'],
+        'withMetadata': True,
+        'excludeZeroValue': True,
+        'maxCount' : '0x3e8',
+        'order'    : 'desc',
+    }
+    res = rpc('alchemy_getAssetTransfers', [params])
+    if not res or 'result' not in res:
+        return []
+
+    txs = res['result'].get('transfers', [])
+
+    def label(addr):
+        if not addr: return 'Unknown'
+        a = addr.lower()
+        if a == GOV_CONTRACT.lower(): return 'Governance'
+        for name, ca in CEX_ADDRESSES.items():
+            if a == ca.lower(): return name
+        return addr[:6] + '…' + addr[-4:]
+
+    whales = []
+    for tx in txs:
+        v = float(tx.get('value') or 0)
+        if v < WHALE_MIN:
+            continue
+        ts = tx.get('metadata', {}).get('blockTimestamp', '')
+        whales.append({
+            'date'       : ts[:10] if ts else date.today().isoformat(),
+            'amount'     : round(v, 2),
+            'from'       : tx.get('from', ''),
+            'to'         : tx.get('to', ''),
+            'from_label' : label(tx.get('from', '')),
+            'to_label'   : label(tx.get('to', '')),
+            'tx'         : tx.get('hash', ''),
+        })
+    return whales
 
 
 def main():
-    import urllib.parse  # local import for the helper above
-
     OUTPUT_FILE.parent.mkdir(exist_ok=True)
-
-    # Load existing history
-    if OUTPUT_FILE.exists():
-        history = json.loads(OUTPUT_FILE.read_text(encoding='utf-8'))
-        print(f'Loaded {len(history["bonded"])} existing data points')
-    else:
-        history = {
-            'bonded': [],   # [{date, value}]
-            'cex': [],      # [{date, value}]
-            'metadata': {
-                'token': RIZE_TOKEN,
-                'governance': GOV_CONTRACT,
-                'cex_addresses': list(CEX_ADDRESSES.values()),
-                'updated': '',
-            }
-        }
-        print('Starting fresh history')
-
     today = date.today().isoformat()
 
-    # Check if today's entry already exists
-    existing_dates = {e['date'] for e in history['bonded']}
+    # Load existing
+    if OUTPUT_FILE.exists():
+        history = json.loads(OUTPUT_FILE.read_text(encoding='utf-8'))
+        print(f'Loaded existing JSON')
+    else:
+        print('No JSON found — run bootstrap_conviction.py first')
+        history = {'bonded': [], 'cex': [], 'unbonding': [], 'whales': [], 'metadata': {}}
+
+    # Check if today already recorded
+    existing_dates = {e['date'] for e in history.get('bonded', [])}
     if today in existing_dates:
         print(f'Today ({today}) already recorded — nothing to do')
         return
 
-    print(f'Fetching today\'s snapshot: {today}')
+    print(f'Fetching snapshot for {today}...')
 
-    # 1. Governance bonded balance
-    print('  Fetching governance bonded...')
-    bonded = get_token_balance(GOV_CONTRACT)
-    print(f'  Bonded: {bonded:,.0f} RIZE')
+    # 1. Bonded
+    bonded = get_balance(GOV_CONTRACT)
+    print(f'  Bonded    : {bonded:,.0f} RIZE')
 
-    # 2. CEX total balance
-    print('  Fetching CEX balances...')
+    # 2. Unbonding queue
+    time.sleep(0.3)
+    unbonding = get_releasable()
+    print(f'  Unbonding : {unbonding:,.0f} RIZE')
+
+    # 3. CEX total
     cex_total = 0.0
     for name, addr in CEX_ADDRESSES.items():
-        bal = get_token_balance(addr)
+        bal = get_balance(addr)
         cex_total += bal
-        print(f'    {name}: {bal:,.0f}')
-    print(f'  CEX total: {cex_total:,.0f} RIZE')
+        time.sleep(0.15)
+    print(f'  CEX total : {cex_total:,.0f} RIZE')
 
-    # 3. Append today's entry
-    history['bonded'].append({'date': today, 'value': round(bonded, 2)})
-    history['cex'].append({'date': today, 'value': round(cex_total, 2)})
-    history['metadata']['updated'] = datetime.now(timezone.utc).isoformat()
+    # 4. New whale movements (last 24h)
+    print('  Fetching whale movements...')
+    new_whales = fetch_recent_whales()
+    print(f'  Whales    : {len(new_whales)} new movements >5M RIZE')
 
-    # Sort by date
-    history['bonded'].sort(key=lambda x: x['date'])
-    history['cex'].sort(key=lambda x: x['date'])
+    # Append today's points
+    history.setdefault('bonded',    []).append({'date': today, 'value': round(bonded, 2)})
+    history.setdefault('cex',       []).append({'date': today, 'value': round(cex_total, 2)})
+    history.setdefault('unbonding', []).append({'date': today, 'value': round(unbonding, 2)})
+
+    # Merge whales — deduplicate by tx hash, keep last 30 days only
+    cutoff = (date.today() - timedelta(days=30)).isoformat()
+    existing_hashes = {w['tx'] for w in history.get('whales', [])}
+    for w in new_whales:
+        if w['tx'] not in existing_hashes:
+            history.setdefault('whales', []).append(w)
+            existing_hashes.add(w['tx'])
+
+    # Trim whales to 30d rolling window
+    history['whales'] = [w for w in history['whales'] if w.get('date', '') >= cutoff]
+    history['whales'].sort(key=lambda x: x['date'], reverse=True)
+
+    # Update metadata
+    history.setdefault('metadata', {})['updated'] = datetime.now(timezone.utc).isoformat()
 
     OUTPUT_FILE.write_text(
         json.dumps(history, indent=2, ensure_ascii=False),
         encoding='utf-8'
     )
-    print(f'\n✅ Saved {len(history["bonded"])} data points to {OUTPUT_FILE}')
-
+    print(f'\n✅ Saved — {len(history["bonded"])} bonded points, {len(history["whales"])} whale movements')
 
 
 if __name__ == '__main__':
