@@ -20,8 +20,7 @@ RIZE_TOKEN    = '0x9818B6c09f5ECc843060927E8587c427C7C93583'
 GOV_CONTRACT  = '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE'
 DECIMALS      = 10 ** 18
 OUTPUT_FILE   = Path('rize-data-hub/conviction-history.json')
-BASESCAN_KEY  = os.environ.get('BASESCAN_API_KEY', '')
-BASESCAN_URL  = 'https://api.basescan.org/api'
+ALCHEMY_URL   = os.environ.get('ALCHEMY_RPC_URL', 'https://base-mainnet.g.alchemy.com/v2/qS-QZnHMq-cqmoFkw-grY')
 
 CEX_ADDRESSES = {
     'Kraken Hot 1'  : '0x02Ac4617Fe004cf8Cd9c988Ff9C905b2Ec676C2d',
@@ -37,42 +36,40 @@ CEX_ADDRESSES = {
 }
 
 
-def basescan(params: dict):
-    p = {**params, 'apikey': BASESCAN_KEY}
-    url = BASESCAN_URL + '?' + urllib.parse.urlencode(p)
-    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+def rpc_call(method: str, params: list):
+    """Make a JSON-RPC call to Alchemy Base mainnet."""
+    payload = json.dumps({'jsonrpc': '2.0', 'method': method, 'params': params, 'id': 1}).encode()
+    req = urllib.request.Request(
+        ALCHEMY_URL,
+        data=payload,
+        headers={'Content-Type': 'application/json', 'Accept': 'application/json'}
+    )
     try:
         with urllib.request.urlopen(req, timeout=15) as r:
             return json.loads(r.read().decode())
     except Exception as e:
-        print(f'  Basescan error: {e}')
+        print(f'  RPC error: {e}')
         return None
 
 
 def get_token_balance(address: str) -> float:
-    """Get current RIZE balance for an address."""
-    res = basescan({
-        'module': 'account',
-        'action': 'tokenbalance',
-        'contractaddress': RIZE_TOKEN,
-        'address': address,
-        'tag': 'latest',
-    })
-    time.sleep(0.25)
-    if not res:
+    """Get current RIZE balance for an address via eth_call (balanceOf)."""
+    # ERC20 balanceOf(address) selector = 0x70a08231
+    padded = '000000000000000000000000' + address[2:].lower()
+    data = '0x70a08231' + padded
+    res = rpc_call('eth_call', [{'to': RIZE_TOKEN, 'data': data}, 'latest'])
+    time.sleep(0.15)
+    if not res or 'result' not in res:
         print(f'    [WARN] No response for {address[:10]}...')
         return 0.0
-    # Log API status for debugging
-    status = res.get('status', '?')
-    message = res.get('message', '?')
-    result = res.get('result', '0')
-    if status != '1':
-        print(f'    [WARN] Basescan status={status} message={message} result={result!r} for {address[:10]}...')
+    result = res['result']
+    if not result or result == '0x':
         return 0.0
-    if not result or not result.isdigit():
-        print(f'    [WARN] Non-numeric result: {result!r} for {address[:10]}...')
+    try:
+        return int(result, 16) / DECIMALS
+    except Exception as e:
+        print(f'    [WARN] Parse error for {address[:10]}: {e}')
         return 0.0
-    return int(result) / DECIMALS
 
 
 def main():
@@ -137,8 +134,6 @@ def main():
     print(f'\n✅ Saved {len(history["bonded"])} data points to {OUTPUT_FILE}')
 
 
-# Fix: urllib.parse needs to be imported at module level for basescan()
-import urllib.parse
 
 if __name__ == '__main__':
     main()
