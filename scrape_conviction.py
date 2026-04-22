@@ -113,8 +113,15 @@ def fetch_bond_broken_events_24h(current_block):
                 if len(data) >= 66:
                     try:
                         amount = int(data[2:66], 16) / DECIMALS
+                        # Use block number to get approximate date
+                        # (events in the 24h window could be from yesterday)
+                        blk_num = int(log.get('blockNumber', '0x0'), 16)
+                        blocks_ago = current_block - blk_num
+                        secs_ago = blocks_ago / 2.0
+                        event_dt = datetime.now(timezone.utc) - timedelta(seconds=secs_ago)
+                        event_date = event_dt.date().isoformat()
                         events.append({
-                            'date'  : today_str,
+                            'date'  : event_date,
                             'amount': round(amount, 2),
                             'tx'    : log.get('transactionHash', ''),
                         })
