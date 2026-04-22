@@ -1,5 +1,5 @@
-type BondBroken @entity {
-  id: ID!          # transaction hash
+type BondBroken @entity(immutable: true) {
+  id: ID!
   nftId: BigInt!
   amount: BigDecimal!
   date: String!
