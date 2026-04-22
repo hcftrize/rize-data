@@ -35,10 +35,11 @@ ALCHEMY_URL       = os.environ.get(
 # BondBroken(uint256 nftId, uint256 amount) — verified on-chain from Basescan
 BOND_BROKEN_TOPIC  = '0xc23747277531c745e0e6b38cafe2803258edc500eee3dffa3f081b89d9970096'
 BASE_PUBLIC_RPCS = [
-    'https://base.llamarpc.com',
-    'https://base-rpc.publicnode.com',
-    'https://1rpc.io/base',
+    'https://base-rpc.publicnode.com',   # 50,000 block range — primary
+    'https://1rpc.io/base',               # 10,000 block range — fallback
 ]
+
+CHUNK_SIZE = 49_000   # stay safely under publicnode's 50k limit
 
 CEX_ADDRESSES = {
     'Kraken Hot 1'  : '0x02Ac4617Fe004cf8Cd9c988Ff9C905b2Ec676C2d',
@@ -111,25 +112,55 @@ def get_current_block():
     return 0
 
 
+def fetch_logs_chunked(from_block, to_block):
+    """
+    Fetch eth_getLogs in chunks of CHUNK_SIZE blocks.
+    Tries publicnode first (50k limit), falls back to 1rpc (10k limit).
+    Returns the combined list of raw logs.
+    """
+    all_logs = []
+    cursor = from_block
+    while cursor < to_block:
+        chunk_to = min(cursor + CHUNK_SIZE, to_block)
+        fetched = False
+        for endpoint in BASE_PUBLIC_RPCS:
+            payload = json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'eth_getLogs', 'params': [{
+                'fromBlock': hex(cursor),
+                'toBlock':   hex(chunk_to),
+                'address':   GOV_CONTRACT,
+                'topics':    [BOND_BROKEN_TOPIC],
+            }]}).encode()
+            req = urllib.request.Request(
+                endpoint, data=payload,
+                headers={'Content-Type': 'application/json', 'User-Agent': 'python-urllib/3.11'}
+            )
+            try:
+                with urllib.request.urlopen(req, timeout=30) as r:
+                    res = json.loads(r.read().decode())
+                if res and 'result' in res and res['result'] is not None:
+                    all_logs.extend(res['result'])
+                    fetched = True
+                    break
+                elif res and 'error' in res:
+                    print(f'  [WARN] {endpoint} error: {res["error"].get("message", "")}')
+            except Exception as e:
+                print(f'  [WARN] {endpoint} failed: {e}')
+        if not fetched:
+            print(f'  [ERROR] all RPCs failed for chunk {cursor}→{chunk_to}')
+        cursor = chunk_to + 1
+    return all_logs
+
+
 def fetch_bond_broken_events_24h(current_block):
     """
-    Fetch BondBroken events from last 24h using Base public RPC.
-    Single eth_getLogs call — no block range restriction on mainnet.base.org.
+    Fetch BondBroken events from last 24h.
+    Uses chunked eth_getLogs via publicnode (49k blocks/chunk = 4 chunks for 24h).
     """
-    from_block = hex(max(0, current_block - BLOCKS_PER_DAY))
+    from_block = max(0, current_block - BLOCKS_PER_DAY)
+    print(f'  Fetching BondBroken events ({from_block} → {current_block}, ~{BLOCKS_PER_DAY // CHUNK_SIZE + 1} chunks)…')
 
-    res = rpc_public('eth_getLogs', [{
-        'fromBlock': from_block,
-        'toBlock'  : 'latest',
-        'address'  : GOV_CONTRACT,
-        'topics'   : [BOND_BROKEN_TOPIC],
-    }])
+    logs = fetch_logs_chunked(from_block, current_block)
 
-    if not res or 'result' not in res:
-        print(f'  [WARN] eth_getLogs failed: {res}')
-        return []
-
-    logs = res['result']
     events = []
     for log in logs:
         data = log.get('data', '0x')
