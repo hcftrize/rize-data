@@ -20,10 +20,9 @@ jobs:
         run: npm install -g @graphprotocol/graph-cli
 
       - name: Install Goldsky CLI
-        run: curl -fsSL https://cli.goldsky.com/install.sh | sh
-
-      - name: Add Goldsky to PATH
-        run: echo "$HOME/.goldsky/bin" >> $GITHUB_PATH
+        run: |
+          curl -fsSL https://cli.goldsky.com/install.sh | sh
+          echo "$HOME/.goldsky/bin" >> $GITHUB_PATH
 
       - name: Install subgraph dependencies
         working-directory: goldsky
@@ -42,5 +41,5 @@ jobs:
         env:
           GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
         run: |
-          goldsky login --api-key $GOLDSKY_API_KEY
-          goldsky subgraph deploy tokerize-bond-broken/1.0.0 --path .
+          $HOME/.goldsky/bin/goldsky login --api-key $GOLDSKY_API_KEY
+          $HOME/.goldsky/bin/goldsky subgraph deploy tokerize-bond-broken/1.0.0 --path .
