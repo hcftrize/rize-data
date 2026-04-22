@@ -32,7 +32,7 @@ jobs:
           python -m playwright install-deps chromium
 
       - name: Run scraper (diff mode — new entities only)
-        run: python scrape_canton.py --diff
+        run: python scripts/scrape_canton.py --diff
 
       - name: Check for changes
         id: changes

@@ -28,9 +28,9 @@ jobs:
       - name: Run scraper
         run: |
           if [ "${{ github.event.inputs.bootstrap }}" = "true" ]; then
-            python scrape_lighthouse.py --bootstrap
+            python scripts/scrape_lighthouse.py --bootstrap
           else
-            python scrape_lighthouse.py
+            python scripts/scrape_lighthouse.py
           fi
 
       - name: Commit if changed
