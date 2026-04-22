@@ -34,7 +34,7 @@ ALCHEMY_URL       = os.environ.get(
 
 # BondBroken(uint256 nftId, uint256 amount) — verified on-chain from Basescan
 BOND_BROKEN_TOPIC  = '0xc23747277531c745e0e6b38cafe2803258edc500eee3dffa3f081b89d9970096'
-BASE_PUBLIC_RPC    = 'https://mainnet.base.org'
+BASE_PUBLIC_RPC    = 'https://rpc.ankr.com/base'
 
 CEX_ADDRESSES = {
     'Kraken Hot 1'  : '0x02Ac4617Fe004cf8Cd9c988Ff9C905b2Ec676C2d',
