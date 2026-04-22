@@ -49,7 +49,7 @@ CEX_ADDRESSES = {
 }
 
 BLOCKS_PER_DAY  = 24 * 3600 * 2   # ~172,800  (Base ~2 blocks/sec)
-CHUNK_SIZE      = 1500              # safely under Alchemy 2000-block limit
+CHUNK_SIZE      = 500              # safely under Alchemy 2000-block limit
 
 
 def rpc(method, params):
