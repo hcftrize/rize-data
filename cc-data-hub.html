@@ -913,6 +913,9 @@ html, body { overflow-x: hidden; max-width: 100%; }
     }
     /* Mobile ctx-tabs: native select */
     .ctx-tabs-mobile-wrap { display: none; }
+    /* Desktop: use select dropdown instead of tab buttons */
+    #canton-ctx-section .ctx-tabs-desktop { display: none !important; }
+    #canton-ctx-section .ctx-tabs-mobile-wrap { display: block; }
     .ctx-tabs-select {
       width: 100%;
       padding: 12px 16px;
@@ -935,6 +938,13 @@ html, body { overflow-x: hidden; max-width: 100%; }
       padding-right: 40px;
     }
     .ctx-tabs-select option { background: #060818; color: #fff; font-size: 15px; }
+    @media (min-width: 701px) {
+      /* CC hub desktop: bigger charts and select */
+      #canton-ctx-section .ctx-tabs-select { font-size: 18px; padding: 12px 20px; padding-right: 48px; }
+      .ctx-chart-wrap { height: 380px !important; }
+      #ctx-chart-cantonomics-wrap { height: 420px !important; }
+      #ctx-chart-alloc-wrap { height: 380px !important; }
+    }
     @media (max-width: 700px) {
       .ctx-tabs-mobile-wrap { display: block; }
       .ctx-tabs-desktop { display: none !important; }
@@ -2449,7 +2459,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     // Update tabs
     document.querySelectorAll(".ctx-tab").forEach(t => t.classList.remove("active"));
     const ccSel = document.getElementById("cc-ctx-select"); if (ccSel) ccSel.value = tab;
-    btn.classList.add("active");
+    if (btn) btn.classList.add("active");
     // Update panels
     document.querySelectorAll(".ctx-panel").forEach(p => p.classList.remove("active"));
     document.getElementById("ctx-panel-" + tab).classList.add("active");
@@ -2953,12 +2963,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
   // Launch Canton Context fetch on DOM ready
   function ccCtxSelectChange(sel) {
-    const tab = sel.value;
-    const desktopTabs = document.querySelectorAll("#canton-ctx-section .ctx-tabs-desktop .ctx-tab");
-    desktopTabs.forEach(function(btn) {
-      const m = btn.getAttribute("onclick").match(/'([^']+)'/);
-      if (m && m[1] === tab) ctxSwitch(tab, btn);
-    });
+    ctxSwitch(sel.value, null);
   }
 
   document.addEventListener("DOMContentLoaded", ctxLoad);
