@@ -2,7 +2,7 @@ name: Update Lighthouse Revenue
 
 on:
   schedule:
-    - cron: "0 8 * * *"   # 08:00 UTC daily
+    - cron: "0 1 * * *"   # 01:00 UTC daily (API updates at 00:00 UTC)
   workflow_dispatch:
     inputs:
       bootstrap:
@@ -43,4 +43,5 @@ jobs:
           else
             git commit -m "chore(data): canton-revenue $(date -u +%Y-%m-%d)"
             git push origin dev
+            git push origin HEAD:main
           fi
