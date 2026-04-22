@@ -1,7 +1,12 @@
-name: Bootstrap Bond Events (run once)
+name: Bootstrap Bond Events
 
 on:
   workflow_dispatch:
+    inputs:
+      days:
+        description: "Number of days to backfill (1 = today only, max 7)"
+        required: false
+        default: "1"
 
 jobs:
   bootstrap:
@@ -10,35 +15,29 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: dev
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Run bootstrap
         env:
           ALCHEMY_RPC_URL: ${{ secrets.ALCHEMY_RPC_URL }}
-        run: python bootstrap_bond_events.py
+        run: python bootstrap_bond_events.py --days=${{ github.event.inputs.days }}
 
-      - name: Commit and push to dev
+      - name: Commit and push
         run: |
           git config user.name "canton-bot"
           git config user.email "bot@tokerize.com"
           git add rize-data-hub/conviction-history.json
-          git diff --staged --quiet || git commit -m "chore: bootstrap bond events backfill 7d"
+          git diff --staged --quiet || git commit -m "chore: bootstrap bond events —${{ github.event.inputs.days }}d"
           git push origin dev
-
-      - name: Push to main
-        run: |
           git fetch origin main
           git checkout main
           git checkout dev -- rize-data-hub/conviction-history.json
           git add rize-data-hub/conviction-history.json
-          git diff --staged --quiet || git commit -m "chore: bootstrap bond events backfill 7d"
+          git diff --staged --quiet || git commit -m "chore: bootstrap bond events — ${{ github.event.inputs.days }}d"
           git push origin main

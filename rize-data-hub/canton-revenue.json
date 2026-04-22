@@ -1,1 +1,3785 @@
-
+{
+  "updatedAt": "2026-04-22T14:11:03.000Z",
+  "validator_rewards": [
+    {
+      "time": "2024-09-05T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "62930.16"
+    },
+    {
+      "time": "2024-09-06T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-07T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-08T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-09T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79800.0"
+    },
+    {
+      "time": "2024-09-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-11T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-12T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-13T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-14T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-15T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-16T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-17T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-18T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-19T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-20T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-21T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-22T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-23T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-24T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-25T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79800.0"
+    },
+    {
+      "time": "2024-09-26T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-27T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-28T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-29T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-09-30T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-01T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-02T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-03T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "78660.0"
+    },
+    {
+      "time": "2024-10-04T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-05T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-06T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-07T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-08T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-09T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-11T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-12T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-13T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-14T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-15T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-16T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "44460.0"
+    },
+    {
+      "time": "2024-10-18T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "33180.48"
+    },
+    {
+      "time": "2024-10-19T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-20T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-21T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79800.0"
+    },
+    {
+      "time": "2024-10-22T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-23T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-24T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-25T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-26T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-27T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-28T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-29T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-10-30T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "78660.0"
+    },
+    {
+      "time": "2024-10-31T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79800.0"
+    },
+    {
+      "time": "2024-11-01T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "78660.0"
+    },
+    {
+      "time": "2024-11-02T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-03T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79800.0"
+    },
+    {
+      "time": "2024-11-04T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-05T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-06T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-07T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-08T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-09T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-11T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-12T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "78660.0"
+    },
+    {
+      "time": "2024-11-13T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-14T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-15T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-16T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-17T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-18T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-19T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-20T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-21T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-22T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-23T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-24T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-25T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-26T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-27T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-28T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-29T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-11-30T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-01T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-02T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-03T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-04T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-05T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "77520.0"
+    },
+    {
+      "time": "2024-12-06T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-07T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-08T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-09T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "76380.0"
+    },
+    {
+      "time": "2024-12-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-11T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "47880.0"
+    },
+    {
+      "time": "2024-12-16T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "18820.8"
+    },
+    {
+      "time": "2024-12-17T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-18T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-19T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-20T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-21T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-22T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-23T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-24T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-25T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79800.0"
+    },
+    {
+      "time": "2024-12-26T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "78660.0"
+    },
+    {
+      "time": "2024-12-27T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79800.0"
+    },
+    {
+      "time": "2024-12-28T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-29T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2024-12-30T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "78660.0"
+    },
+    {
+      "time": "2024-12-31T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79800.0"
+    },
+    {
+      "time": "2025-01-01T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-02T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "78660.0"
+    },
+    {
+      "time": "2025-01-03T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-04T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-05T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-06T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-07T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-08T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-09T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-11T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-12T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-13T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "77520.0"
+    },
+    {
+      "time": "2025-01-14T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-15T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-16T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-17T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-18T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-19T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-20T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79800.0"
+    },
+    {
+      "time": "2025-01-21T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-22T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-23T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-24T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-25T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-26T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-27T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-28T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "78660.0"
+    },
+    {
+      "time": "2025-01-29T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-30T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-01-31T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79800.0"
+    },
+    {
+      "time": "2025-02-01T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-02T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-03T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79222.2095454577"
+    },
+    {
+      "time": "2025-02-04T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-05T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-06T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79177.7159381442"
+    },
+    {
+      "time": "2025-02-07T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-08T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-09T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-11T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-12T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-13T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-14T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79800.0"
+    },
+    {
+      "time": "2025-02-15T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-16T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-17T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-18T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-19T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79181.8658752851"
+    },
+    {
+      "time": "2025-02-20T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79215.549719559"
+    },
+    {
+      "time": "2025-02-21T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79195.9254810661"
+    },
+    {
+      "time": "2025-02-22T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-02-23T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79205.4861155519"
+    },
+    {
+      "time": "2025-02-24T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79228.2950888482"
+    },
+    {
+      "time": "2025-02-25T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79705.6996231391"
+    },
+    {
+      "time": "2025-02-26T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79161.4636942703"
+    },
+    {
+      "time": "2025-02-27T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79160.0420193786"
+    },
+    {
+      "time": "2025-02-28T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-03-01T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79161.7038443095"
+    },
+    {
+      "time": "2025-03-02T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79140.232055255"
+    },
+    {
+      "time": "2025-03-03T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79230.0"
+    },
+    {
+      "time": "2025-03-04T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "63806.0646662178"
+    },
+    {
+      "time": "2025-03-05T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "14405.4545454596"
+    },
+    {
+      "time": "2025-03-06T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "13099.6363636404"
+    },
+    {
+      "time": "2025-03-07T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7923.0"
+    },
+    {
+      "time": "2025-03-08T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7923.0"
+    },
+    {
+      "time": "2025-03-09T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7923.0"
+    },
+    {
+      "time": "2025-03-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7923.0"
+    },
+    {
+      "time": "2025-03-11T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "11168.0662734821"
+    },
+    {
+      "time": "2025-03-12T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "98962.6298342952"
+    },
+    {
+      "time": "2025-03-13T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "97337.5742921274"
+    },
+    {
+      "time": "2025-03-14T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "96404.9550082472"
+    },
+    {
+      "time": "2025-03-15T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "96406.3286095862"
+    },
+    {
+      "time": "2025-03-16T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "96395.0138816752"
+    },
+    {
+      "time": "2025-03-17T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "96173.2570999637"
+    },
+    {
+      "time": "2025-03-18T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "95722.8245417505"
+    },
+    {
+      "time": "2025-03-19T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "91369.5852607613"
+    },
+    {
+      "time": "2025-03-20T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79260.817241582"
+    },
+    {
+      "time": "2025-03-21T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "79826.1445903694"
+    },
+    {
+      "time": "2025-03-22T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "81295.1648953571"
+    },
+    {
+      "time": "2025-03-23T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "81863.7645002437"
+    },
+    {
+      "time": "2025-03-24T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "80425.6138673225"
+    },
+    {
+      "time": "2025-03-25T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "77267.7988242875"
+    },
+    {
+      "time": "2025-03-26T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "77031.4803979334"
+    },
+    {
+      "time": "2025-03-27T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "76712.6970175218"
+    },
+    {
+      "time": "2025-03-28T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "75328.4455520007"
+    },
+    {
+      "time": "2025-03-29T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "75297.156652782"
+    },
+    {
+      "time": "2025-03-30T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "75317.6093875291"
+    },
+    {
+      "time": "2025-03-31T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "75043.1352146394"
+    },
+    {
+      "time": "2025-04-01T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "73530.919932263"
+    },
+    {
+      "time": "2025-04-02T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "72934.6886309228"
+    },
+    {
+      "time": "2025-04-03T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "73283.3934277481"
+    },
+    {
+      "time": "2025-04-04T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "73598.5534701016"
+    },
+    {
+      "time": "2025-04-05T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "73443.6420971132"
+    },
+    {
+      "time": "2025-04-06T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "73979.8749844501"
+    },
+    {
+      "time": "2025-04-07T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "73452.1843623193"
+    },
+    {
+      "time": "2025-04-08T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "71165.6836772776"
+    },
+    {
+      "time": "2025-04-09T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "65878.2123206224"
+    },
+    {
+      "time": "2025-04-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "63463.9161578833"
+    },
+    {
+      "time": "2025-04-11T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "62879.2955515354"
+    },
+    {
+      "time": "2025-04-12T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "62569.5150877484"
+    },
+    {
+      "time": "2025-04-13T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "62573.5185129648"
+    },
+    {
+      "time": "2025-04-14T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "62444.8512143618"
+    },
+    {
+      "time": "2025-04-15T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "61547.4436091498"
+    },
+    {
+      "time": "2025-04-16T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "60684.2485464584"
+    },
+    {
+      "time": "2025-04-17T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "59951.8021413538"
+    },
+    {
+      "time": "2025-04-18T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "57841.2328083011"
+    },
+    {
+      "time": "2025-04-19T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "57442.7951025762"
+    },
+    {
+      "time": "2025-04-20T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "57950.5644491178"
+    },
+    {
+      "time": "2025-04-21T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "57872.5767334657"
+    },
+    {
+      "time": "2025-04-22T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "57495.8187570232"
+    },
+    {
+      "time": "2025-04-23T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "56863.3259800619"
+    },
+    {
+      "time": "2025-04-24T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "54014.797479841"
+    },
+    {
+      "time": "2025-04-25T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "53999.0903507418"
+    },
+    {
+      "time": "2025-04-26T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "53224.1944702876"
+    },
+    {
+      "time": "2025-04-27T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "53687.7312170484"
+    },
+    {
+      "time": "2025-04-28T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "54156.8525415883"
+    },
+    {
+      "time": "2025-04-29T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "52490.6551395582"
+    },
+    {
+      "time": "2025-04-30T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "51972.4695494109"
+    },
+    {
+      "time": "2025-05-01T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "51032.494699835"
+    },
+    {
+      "time": "2025-05-02T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "50160.3138799639"
+    },
+    {
+      "time": "2025-05-03T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "49126.3818006692"
+    },
+    {
+      "time": "2025-05-04T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "48510.5964596599"
+    },
+    {
+      "time": "2025-05-05T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "48124.8765816388"
+    },
+    {
+      "time": "2025-05-06T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "45755.378263121"
+    },
+    {
+      "time": "2025-05-07T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "45918.9341417472"
+    },
+    {
+      "time": "2025-05-08T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "45455.9089677775"
+    },
+    {
+      "time": "2025-05-09T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "43064.4696550457"
+    },
+    {
+      "time": "2025-05-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "42513.9317090662"
+    },
+    {
+      "time": "2025-05-11T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "41879.7453361055"
+    },
+    {
+      "time": "2025-05-12T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "42734.7704633899"
+    },
+    {
+      "time": "2025-05-13T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "42436.1629588181"
+    },
+    {
+      "time": "2025-05-14T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "42062.393274217"
+    },
+    {
+      "time": "2025-05-15T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "41821.5074087938"
+    },
+    {
+      "time": "2025-05-16T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "41421.824423525"
+    },
+    {
+      "time": "2025-05-17T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "40650.3543595809"
+    },
+    {
+      "time": "2025-05-18T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "40781.5413703965"
+    },
+    {
+      "time": "2025-05-19T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "40091.0333926832"
+    },
+    {
+      "time": "2025-05-20T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "37692.1734348122"
+    },
+    {
+      "time": "2025-05-21T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "36443.1438499377"
+    },
+    {
+      "time": "2025-05-22T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "35385.7374076072"
+    },
+    {
+      "time": "2025-05-23T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "33721.9199048817"
+    },
+    {
+      "time": "2025-05-24T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "32354.7575991165"
+    },
+    {
+      "time": "2025-05-25T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "32578.0054692417"
+    },
+    {
+      "time": "2025-05-26T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "32371.252142792"
+    },
+    {
+      "time": "2025-05-27T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "31945.2755731142"
+    },
+    {
+      "time": "2025-05-28T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "31410.9422063119"
+    },
+    {
+      "time": "2025-05-29T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "30110.1583342422"
+    },
+    {
+      "time": "2025-05-30T00:00:00Z",
+      "app_rewards": "0.42",
+      "validator_rewards": "30578.1078175915"
+    },
+    {
+      "time": "2025-05-31T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "29962.9189528522"
+    },
+    {
+      "time": "2025-06-01T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "29556.5822929055"
+    },
+    {
+      "time": "2025-06-02T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "29443.0681280403"
+    },
+    {
+      "time": "2025-06-03T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "28751.1676705694"
+    },
+    {
+      "time": "2025-06-04T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "28624.9553119589"
+    },
+    {
+      "time": "2025-06-05T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "28557.9962758199"
+    },
+    {
+      "time": "2025-06-06T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "28235.2959414107"
+    },
+    {
+      "time": "2025-06-07T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "27821.8794762189"
+    },
+    {
+      "time": "2025-06-08T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "27885.0324449672"
+    },
+    {
+      "time": "2025-06-09T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "27958.2676964845"
+    },
+    {
+      "time": "2025-06-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "27892.2863465541"
+    },
+    {
+      "time": "2025-06-11T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "27656.2347799839"
+    },
+    {
+      "time": "2025-06-12T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "27185.5935017386"
+    },
+    {
+      "time": "2025-06-13T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "26785.0581088288"
+    },
+    {
+      "time": "2025-06-14T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "26242.109213435"
+    },
+    {
+      "time": "2025-06-15T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "26197.2223302014"
+    },
+    {
+      "time": "2025-06-16T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "26117.7285472768"
+    },
+    {
+      "time": "2025-06-17T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "26066.6706631201"
+    },
+    {
+      "time": "2025-06-18T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "25747.1867428789"
+    },
+    {
+      "time": "2025-06-19T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "25155.2458403221"
+    },
+    {
+      "time": "2025-06-20T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "24976.0167225258"
+    },
+    {
+      "time": "2025-06-21T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "24903.4109870879"
+    },
+    {
+      "time": "2025-06-22T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "25058.0920732135"
+    },
+    {
+      "time": "2025-06-23T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "24996.010502507"
+    },
+    {
+      "time": "2025-06-24T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "25093.6469191662"
+    },
+    {
+      "time": "2025-06-25T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "13972.1703620639"
+    },
+    {
+      "time": "2025-06-26T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "21701.2621251857"
+    },
+    {
+      "time": "2025-06-27T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "24918.5055464792"
+    },
+    {
+      "time": "2025-06-28T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "25510.4109280455"
+    },
+    {
+      "time": "2025-06-29T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "25594.7008013098"
+    },
+    {
+      "time": "2025-06-30T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "25797.0628750441"
+    },
+    {
+      "time": "2025-07-01T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "24621.9458976496"
+    },
+    {
+      "time": "2025-07-02T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "24634.2981680292"
+    },
+    {
+      "time": "2025-07-03T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "24510.7562101518"
+    },
+    {
+      "time": "2025-07-04T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "23989.0618867973"
+    },
+    {
+      "time": "2025-07-05T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "24352.9196774727"
+    },
+    {
+      "time": "2025-07-06T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "24257.556842975"
+    },
+    {
+      "time": "2025-07-07T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "24189.2797687599"
+    },
+    {
+      "time": "2025-07-08T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "23678.9132432964"
+    },
+    {
+      "time": "2025-07-09T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "23383.6073165783"
+    },
+    {
+      "time": "2025-07-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "22829.5021369287"
+    },
+    {
+      "time": "2025-07-11T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "22186.8914421006"
+    },
+    {
+      "time": "2025-07-12T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "23512.7000785443"
+    },
+    {
+      "time": "2025-07-13T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "23539.8789263099"
+    },
+    {
+      "time": "2025-07-14T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "22859.2463272236"
+    },
+    {
+      "time": "2025-07-15T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "21825.9394002383"
+    },
+    {
+      "time": "2025-07-16T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "22356.9552453749"
+    },
+    {
+      "time": "2025-07-17T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "23236.9442746421"
+    },
+    {
+      "time": "2025-07-18T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "22358.385136771"
+    },
+    {
+      "time": "2025-07-19T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "22223.536701298"
+    },
+    {
+      "time": "2025-07-20T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "22163.8933177227"
+    },
+    {
+      "time": "2025-07-21T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "22044.0393412909"
+    },
+    {
+      "time": "2025-07-22T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "20727.8842488968"
+    },
+    {
+      "time": "2025-07-23T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "13064.9204115213"
+    },
+    {
+      "time": "2025-07-24T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "15021.9830547049"
+    },
+    {
+      "time": "2025-07-25T00:00:00Z",
+      "app_rewards": "21.0",
+      "validator_rewards": "12354.1897418566"
+    },
+    {
+      "time": "2025-07-29T00:00:00Z",
+      "app_rewards": "18.06",
+      "validator_rewards": "5300.5483742424"
+    },
+    {
+      "time": "2025-07-30T00:00:00Z",
+      "app_rewards": "55.02",
+      "validator_rewards": "17011.1091155267"
+    },
+    {
+      "time": "2025-08-01T00:00:00Z",
+      "app_rewards": "22.26",
+      "validator_rewards": "6455.3028392675"
+    },
+    {
+      "time": "2025-08-02T00:00:00Z",
+      "app_rewards": "60.9",
+      "validator_rewards": "17862.3001882748"
+    },
+    {
+      "time": "2025-08-03T00:00:00Z",
+      "app_rewards": "60.06",
+      "validator_rewards": "18400.2390697997"
+    },
+    {
+      "time": "2025-08-04T00:00:00Z",
+      "app_rewards": "60.9",
+      "validator_rewards": "18190.0918079968"
+    },
+    {
+      "time": "2025-08-05T00:00:00Z",
+      "app_rewards": "60.48",
+      "validator_rewards": "18068.1939042662"
+    },
+    {
+      "time": "2025-08-06T00:00:00Z",
+      "app_rewards": "57.54",
+      "validator_rewards": "17410.1543131653"
+    },
+    {
+      "time": "2025-08-07T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "17445.1249717577"
+    },
+    {
+      "time": "2025-08-08T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "16717.4717013232"
+    },
+    {
+      "time": "2025-08-09T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "16674.6224910732"
+    },
+    {
+      "time": "2025-08-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "16580.1281810363"
+    },
+    {
+      "time": "2025-08-11T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "16862.8416953462"
+    },
+    {
+      "time": "2025-08-12T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "16922.1105040218"
+    },
+    {
+      "time": "2025-08-13T00:00:00Z",
+      "app_rewards": "17.64",
+      "validator_rewards": "17066.9625978715"
+    },
+    {
+      "time": "2025-08-14T00:00:00Z",
+      "app_rewards": "60.48",
+      "validator_rewards": "16037.50730172"
+    },
+    {
+      "time": "2025-08-15T00:00:00Z",
+      "app_rewards": "60.48",
+      "validator_rewards": "15845.2011292085"
+    },
+    {
+      "time": "2025-08-16T00:00:00Z",
+      "app_rewards": "10.08",
+      "validator_rewards": "15724.853988791"
+    },
+    {
+      "time": "2025-08-17T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "15662.5682291259"
+    },
+    {
+      "time": "2025-08-18T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "15698.3556538853"
+    },
+    {
+      "time": "2025-08-19T00:00:00Z",
+      "app_rewards": "34.44",
+      "validator_rewards": "15628.2540584524"
+    },
+    {
+      "time": "2025-08-20T00:00:00Z",
+      "app_rewards": "60.9",
+      "validator_rewards": "15488.2952975165"
+    },
+    {
+      "time": "2025-08-21T00:00:00Z",
+      "app_rewards": "60.48",
+      "validator_rewards": "15285.9813401628"
+    },
+    {
+      "time": "2025-08-22T00:00:00Z",
+      "app_rewards": "85.50642",
+      "validator_rewards": "14384.6691273493"
+    },
+    {
+      "time": "2025-08-23T00:00:00Z",
+      "app_rewards": "60.9",
+      "validator_rewards": "13328.9596424888"
+    },
+    {
+      "time": "2025-08-24T00:00:00Z",
+      "app_rewards": "60.48",
+      "validator_rewards": "14113.7778937289"
+    },
+    {
+      "time": "2025-08-25T00:00:00Z",
+      "app_rewards": "60.06",
+      "validator_rewards": "14799.6366293324"
+    },
+    {
+      "time": "2025-08-26T00:00:00Z",
+      "app_rewards": "83.1226071142",
+      "validator_rewards": "14376.4125285864"
+    },
+    {
+      "time": "2025-08-27T00:00:00Z",
+      "app_rewards": "58.38",
+      "validator_rewards": "13863.8123533935"
+    },
+    {
+      "time": "2025-08-28T00:00:00Z",
+      "app_rewards": "39.48",
+      "validator_rewards": "13570.7984119517"
+    },
+    {
+      "time": "2025-08-29T00:00:00Z",
+      "app_rewards": "60.9",
+      "validator_rewards": "13491.440240912"
+    },
+    {
+      "time": "2025-08-30T00:00:00Z",
+      "app_rewards": "60.06",
+      "validator_rewards": "13295.9922117411"
+    },
+    {
+      "time": "2025-08-31T00:00:00Z",
+      "app_rewards": "60.9",
+      "validator_rewards": "13472.2005366953"
+    },
+    {
+      "time": "2025-09-01T00:00:00Z",
+      "app_rewards": "60.06",
+      "validator_rewards": "13263.3353214466"
+    },
+    {
+      "time": "2025-09-02T00:00:00Z",
+      "app_rewards": "60.9",
+      "validator_rewards": "13385.8679012447"
+    },
+    {
+      "time": "2025-09-03T00:00:00Z",
+      "app_rewards": "60.06",
+      "validator_rewards": "12832.4995267244"
+    },
+    {
+      "time": "2025-09-04T00:00:00Z",
+      "app_rewards": "60.9",
+      "validator_rewards": "12555.5048893519"
+    },
+    {
+      "time": "2025-09-05T00:00:00Z",
+      "app_rewards": "60.06",
+      "validator_rewards": "12212.0445750751"
+    },
+    {
+      "time": "2025-09-06T00:00:00Z",
+      "app_rewards": "60.9",
+      "validator_rewards": "12228.5308681885"
+    },
+    {
+      "time": "2025-09-07T00:00:00Z",
+      "app_rewards": "60.48",
+      "validator_rewards": "12240.1726022945"
+    },
+    {
+      "time": "2025-09-08T00:00:00Z",
+      "app_rewards": "31.08",
+      "validator_rewards": "12107.2679169882"
+    },
+    {
+      "time": "2025-09-09T00:00:00Z",
+      "app_rewards": "15.96",
+      "validator_rewards": "11857.2838775035"
+    },
+    {
+      "time": "2025-09-10T00:00:00Z",
+      "app_rewards": "60.06",
+      "validator_rewards": "11775.8805571574"
+    },
+    {
+      "time": "2025-09-11T00:00:00Z",
+      "app_rewards": "116.02626",
+      "validator_rewards": "11740.3278524685"
+    },
+    {
+      "time": "2025-09-12T00:00:00Z",
+      "app_rewards": "60.06",
+      "validator_rewards": "11635.5459705531"
+    },
+    {
+      "time": "2025-09-13T00:00:00Z",
+      "app_rewards": "60.9",
+      "validator_rewards": "11566.6193811742"
+    },
+    {
+      "time": "2025-09-14T00:00:00Z",
+      "app_rewards": "60.06",
+      "validator_rewards": "11192.4396398141"
+    },
+    {
+      "time": "2025-09-15T00:00:00Z",
+      "app_rewards": "60.5547388775",
+      "validator_rewards": "11277.6795018763"
+    },
+    {
+      "time": "2025-09-16T00:00:00Z",
+      "app_rewards": "44.2804642163",
+      "validator_rewards": "11765.2646390244"
+    },
+    {
+      "time": "2025-09-17T00:00:00Z",
+      "app_rewards": "43.5",
+      "validator_rewards": "12037.8954098817"
+    },
+    {
+      "time": "2025-09-18T00:00:00Z",
+      "app_rewards": "42.9",
+      "validator_rewards": "12018.4073625439"
+    },
+    {
+      "time": "2025-09-19T00:00:00Z",
+      "app_rewards": "40.1533333319",
+      "validator_rewards": "11504.3922115447"
+    },
+    {
+      "time": "2025-09-20T00:00:00Z",
+      "app_rewards": "33.3666666619",
+      "validator_rewards": "11543.3498429212"
+    },
+    {
+      "time": "2025-09-21T00:00:00Z",
+      "app_rewards": "33.8333333285",
+      "validator_rewards": "11508.8813682546"
+    },
+    {
+      "time": "2025-09-22T00:00:00Z",
+      "app_rewards": "33.5999999952",
+      "validator_rewards": "11484.8122546278"
+    },
+    {
+      "time": "2025-09-23T00:00:00Z",
+      "app_rewards": "33.5999999952",
+      "validator_rewards": "11395.4763943954"
+    },
+    {
+      "time": "2025-09-24T00:00:00Z",
+      "app_rewards": "33.5999999952",
+      "validator_rewards": "11399.3352840336"
+    },
+    {
+      "time": "2025-09-25T00:00:00Z",
+      "app_rewards": "33.3666666619",
+      "validator_rewards": "11044.4086916003"
+    },
+    {
+      "time": "2025-09-26T00:00:00Z",
+      "app_rewards": "33.8333333285",
+      "validator_rewards": "10770.5272633645"
+    },
+    {
+      "time": "2025-09-27T00:00:00Z",
+      "app_rewards": "33.3666666619",
+      "validator_rewards": "10265.0850303682"
+    },
+    {
+      "time": "2025-09-28T00:00:00Z",
+      "app_rewards": "204.1854677346",
+      "validator_rewards": "10183.332874694"
+    },
+    {
+      "time": "2025-09-29T00:00:00Z",
+      "app_rewards": "30.5666666623",
+      "validator_rewards": "10357.0229023004"
+    },
+    {
+      "time": "2025-09-30T00:00:00Z",
+      "app_rewards": "33.3666666619",
+      "validator_rewards": "9867.0008661297"
+    },
+    {
+      "time": "2025-10-01T00:00:00Z",
+      "app_rewards": "33.8333333285",
+      "validator_rewards": "9809.7415285619"
+    },
+    {
+      "time": "2025-10-02T00:00:00Z",
+      "app_rewards": "33.3666666619",
+      "validator_rewards": "9788.7134458616"
+    },
+    {
+      "time": "2025-10-03T00:00:00Z",
+      "app_rewards": "33.8333333285",
+      "validator_rewards": "9750.3897374857"
+    },
+    {
+      "time": "2025-10-04T00:00:00Z",
+      "app_rewards": "33.3666666619",
+      "validator_rewards": "9749.0729661388"
+    },
+    {
+      "time": "2025-10-05T00:00:00Z",
+      "app_rewards": "33.8333333285",
+      "validator_rewards": "9817.6684599101"
+    },
+    {
+      "time": "2025-10-06T00:00:00Z",
+      "app_rewards": "32.0833333304",
+      "validator_rewards": "9903.9514007175"
+    },
+    {
+      "time": "2025-10-07T00:00:00Z",
+      "app_rewards": "30.45",
+      "validator_rewards": "9829.7566221349"
+    },
+    {
+      "time": "2025-10-08T00:00:00Z",
+      "app_rewards": "408.7994457806",
+      "validator_rewards": "9788.7025900787"
+    },
+    {
+      "time": "2025-10-09T00:00:00Z",
+      "app_rewards": "28.602",
+      "validator_rewards": "9849.9295251776"
+    },
+    {
+      "time": "2025-10-10T00:00:00Z",
+      "app_rewards": "24.36",
+      "validator_rewards": "10020.0877833384"
+    },
+    {
+      "time": "2025-10-11T00:00:00Z",
+      "app_rewards": "24.192",
+      "validator_rewards": "9773.0694281424"
+    },
+    {
+      "time": "2025-10-12T00:00:00Z",
+      "app_rewards": "24.024",
+      "validator_rewards": "9738.3199540056"
+    },
+    {
+      "time": "2025-10-13T00:00:00Z",
+      "app_rewards": "24.36",
+      "validator_rewards": "9714.2133572746"
+    },
+    {
+      "time": "2025-10-14T00:00:00Z",
+      "app_rewards": "24.192",
+      "validator_rewards": "9593.6379558808"
+    },
+    {
+      "time": "2025-10-15T00:00:00Z",
+      "app_rewards": "24.024",
+      "validator_rewards": "9457.9365358368"
+    },
+    {
+      "time": "2025-10-16T00:00:00Z",
+      "app_rewards": "19.824",
+      "validator_rewards": "10113.5529065908"
+    },
+    {
+      "time": "2025-10-17T00:00:00Z",
+      "app_rewards": "24.024",
+      "validator_rewards": "9718.6373003246"
+    },
+    {
+      "time": "2025-10-18T00:00:00Z",
+      "app_rewards": "24.192",
+      "validator_rewards": "9536.7534664141"
+    },
+    {
+      "time": "2025-10-19T00:00:00Z",
+      "app_rewards": "24.36",
+      "validator_rewards": "9445.8142431716"
+    },
+    {
+      "time": "2025-10-20T00:00:00Z",
+      "app_rewards": "30.8160000025",
+      "validator_rewards": "8983.7645514333"
+    },
+    {
+      "time": "2025-10-21T00:00:00Z",
+      "app_rewards": "26.6933333381",
+      "validator_rewards": "8850.6741760765"
+    },
+    {
+      "time": "2025-10-22T00:00:00Z",
+      "app_rewards": "26.1146666698",
+      "validator_rewards": "8972.385590102"
+    },
+    {
+      "time": "2025-10-23T00:00:00Z",
+      "app_rewards": "0.84",
+      "validator_rewards": "9376.6409439941"
+    },
+    {
+      "time": "2025-10-24T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "9056.7099159456"
+    },
+    {
+      "time": "2025-10-25T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "9009.4294230791"
+    },
+    {
+      "time": "2025-10-26T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "9166.1280695495"
+    },
+    {
+      "time": "2025-10-27T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "9076.9127823437"
+    },
+    {
+      "time": "2025-10-28T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8668.8652379142"
+    },
+    {
+      "time": "2025-10-29T00:00:00Z",
+      "app_rewards": "11.3104090003",
+      "validator_rewards": "8396.2140596959"
+    },
+    {
+      "time": "2025-10-30T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "3888.8055049188"
+    },
+    {
+      "time": "2025-10-31T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8353.3758464606"
+    },
+    {
+      "time": "2025-11-01T00:00:00Z",
+      "app_rewards": "15.4424537889",
+      "validator_rewards": "8627.2298561226"
+    },
+    {
+      "time": "2025-11-02T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8411.1993443818"
+    },
+    {
+      "time": "2025-11-03T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8538.309482204"
+    },
+    {
+      "time": "2025-11-04T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8620.3326050345"
+    },
+    {
+      "time": "2025-11-05T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8314.2841980178"
+    },
+    {
+      "time": "2025-11-06T00:00:00Z",
+      "app_rewards": "78.0548725764",
+      "validator_rewards": "7839.5624085515"
+    },
+    {
+      "time": "2025-11-07T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7165.0842006792"
+    },
+    {
+      "time": "2025-11-08T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7686.1535564733"
+    },
+    {
+      "time": "2025-11-09T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8024.4066077636"
+    },
+    {
+      "time": "2025-11-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8207.0573100743"
+    },
+    {
+      "time": "2025-11-11T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7875.5880729298"
+    },
+    {
+      "time": "2025-11-12T00:00:00Z",
+      "app_rewards": "21.7249256392",
+      "validator_rewards": "7714.1391533238"
+    },
+    {
+      "time": "2025-11-13T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7806.959537493"
+    },
+    {
+      "time": "2025-11-14T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7848.4168362375"
+    },
+    {
+      "time": "2025-11-15T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7400.838124406"
+    },
+    {
+      "time": "2025-11-16T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7055.0966635056"
+    },
+    {
+      "time": "2025-11-17T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "6530.5954316139"
+    },
+    {
+      "time": "2025-11-18T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "5995.6207545688"
+    },
+    {
+      "time": "2025-11-19T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "6324.8544057995"
+    },
+    {
+      "time": "2025-11-20T00:00:00Z",
+      "app_rewards": "10.116379641",
+      "validator_rewards": "6216.8846014006"
+    },
+    {
+      "time": "2025-11-21T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "5948.7437543051"
+    },
+    {
+      "time": "2025-11-22T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "5212.2395027384"
+    },
+    {
+      "time": "2025-11-23T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "4911.1632062582"
+    },
+    {
+      "time": "2025-11-24T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "4551.5368686576"
+    },
+    {
+      "time": "2025-11-25T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "4877.3845029465"
+    },
+    {
+      "time": "2025-11-26T00:00:00Z",
+      "app_rewards": "15.2036720392",
+      "validator_rewards": "6619.2744234038"
+    },
+    {
+      "time": "2025-11-27T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7674.9124403561"
+    },
+    {
+      "time": "2025-11-28T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7978.4569418827"
+    },
+    {
+      "time": "2025-11-29T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8097.2215397701"
+    },
+    {
+      "time": "2025-11-30T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8217.1358337612"
+    },
+    {
+      "time": "2025-12-01T00:00:00Z",
+      "app_rewards": "23.1583706385",
+      "validator_rewards": "7844.9067352958"
+    },
+    {
+      "time": "2025-12-02T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7475.8317891955"
+    },
+    {
+      "time": "2025-12-03T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8105.6018686233"
+    },
+    {
+      "time": "2025-12-04T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8556.6260019866"
+    },
+    {
+      "time": "2025-12-05T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8517.292951025"
+    },
+    {
+      "time": "2025-12-06T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8018.3682598901"
+    },
+    {
+      "time": "2025-12-07T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "6879.547283174"
+    },
+    {
+      "time": "2025-12-08T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "6898.9839727043"
+    },
+    {
+      "time": "2025-12-09T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "6391.8026231845"
+    },
+    {
+      "time": "2025-12-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8703.8918925859"
+    },
+    {
+      "time": "2025-12-11T00:00:00Z",
+      "app_rewards": "69.4615840908",
+      "validator_rewards": "9221.1710563594"
+    },
+    {
+      "time": "2025-12-12T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8721.9225360339"
+    },
+    {
+      "time": "2025-12-13T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8551.8412441077"
+    },
+    {
+      "time": "2025-12-14T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8607.1395637241"
+    },
+    {
+      "time": "2025-12-15T00:00:00Z",
+      "app_rewards": "71.4016988902",
+      "validator_rewards": "7786.6588440126"
+    },
+    {
+      "time": "2025-12-16T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7220.6298399978"
+    },
+    {
+      "time": "2025-12-17T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8029.0762679709"
+    },
+    {
+      "time": "2025-12-18T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8565.1042041764"
+    },
+    {
+      "time": "2025-12-19T00:00:00Z",
+      "app_rewards": "75.3037508963",
+      "validator_rewards": "7862.6601755092"
+    },
+    {
+      "time": "2025-12-20T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8034.9458281277"
+    },
+    {
+      "time": "2025-12-21T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8198.4487677047"
+    },
+    {
+      "time": "2025-12-22T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8117.4868121726"
+    },
+    {
+      "time": "2025-12-23T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7177.1880844531"
+    },
+    {
+      "time": "2025-12-24T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7695.265881115"
+    },
+    {
+      "time": "2025-12-25T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7705.2598406605"
+    },
+    {
+      "time": "2025-12-26T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7937.2872382598"
+    },
+    {
+      "time": "2025-12-27T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8265.5443503711"
+    },
+    {
+      "time": "2025-12-28T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8127.45442731"
+    },
+    {
+      "time": "2025-12-29T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8394.5085194625"
+    },
+    {
+      "time": "2025-12-30T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8159.9161747222"
+    },
+    {
+      "time": "2025-12-31T00:00:00Z",
+      "app_rewards": "29.6966093424",
+      "validator_rewards": "8833.0974800681"
+    },
+    {
+      "time": "2026-01-01T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "9019.5651903723"
+    },
+    {
+      "time": "2026-01-02T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8874.4063241399"
+    },
+    {
+      "time": "2026-01-03T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8329.7769029918"
+    },
+    {
+      "time": "2026-01-04T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8825.2890925632"
+    },
+    {
+      "time": "2026-01-05T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8417.0162675138"
+    },
+    {
+      "time": "2026-01-06T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7932.6555374409"
+    },
+    {
+      "time": "2026-01-07T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7943.8586283455"
+    },
+    {
+      "time": "2026-01-08T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "8055.8890353114"
+    },
+    {
+      "time": "2026-01-09T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7552.9932500808"
+    },
+    {
+      "time": "2026-01-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "7081.7066719518"
+    },
+    {
+      "time": "2026-01-11T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "6168.0455540355"
+    },
+    {
+      "time": "2026-01-12T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "5493.6089671401"
+    },
+    {
+      "time": "2026-01-13T00:00:00Z",
+      "app_rewards": "37.7817165108",
+      "validator_rewards": "3644.4241105369"
+    },
+    {
+      "time": "2026-01-14T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "2989.8345321102"
+    },
+    {
+      "time": "2026-01-15T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "3232.8596464611"
+    },
+    {
+      "time": "2026-01-16T00:00:00Z",
+      "app_rewards": "39.5003960994",
+      "validator_rewards": "3301.8486811754"
+    },
+    {
+      "time": "2026-01-17T00:00:00Z",
+      "app_rewards": "19.6732556184",
+      "validator_rewards": "2947.361913393"
+    },
+    {
+      "time": "2026-01-18T00:00:00Z",
+      "app_rewards": "21.5291475496",
+      "validator_rewards": "2835.1259026311"
+    },
+    {
+      "time": "2026-01-19T00:00:00Z",
+      "app_rewards": "31.5167003438",
+      "validator_rewards": "3036.5613276946"
+    },
+    {
+      "time": "2026-01-20T00:00:00Z",
+      "app_rewards": "14.0678884213",
+      "validator_rewards": "2933.2113013759"
+    },
+    {
+      "time": "2026-01-21T00:00:00Z",
+      "app_rewards": "36.3256673529",
+      "validator_rewards": "5265.9169814023"
+    },
+    {
+      "time": "2026-01-22T00:00:00Z",
+      "app_rewards": "19.6048748682",
+      "validator_rewards": "6010.8628050752"
+    },
+    {
+      "time": "2026-01-23T00:00:00Z",
+      "app_rewards": "21.7540633583",
+      "validator_rewards": "6201.1409980819"
+    },
+    {
+      "time": "2026-01-24T00:00:00Z",
+      "app_rewards": "25.0901582982",
+      "validator_rewards": "6440.471187572"
+    },
+    {
+      "time": "2026-01-25T00:00:00Z",
+      "app_rewards": "13.5830896025",
+      "validator_rewards": "6654.9319889029"
+    },
+    {
+      "time": "2026-01-26T00:00:00Z",
+      "app_rewards": "19.0021111506",
+      "validator_rewards": "6540.5134407576"
+    },
+    {
+      "time": "2026-01-27T00:00:00Z",
+      "app_rewards": "11.6928359452",
+      "validator_rewards": "6556.1219949516"
+    },
+    {
+      "time": "2026-01-28T00:00:00Z",
+      "app_rewards": "14.4751142394",
+      "validator_rewards": "6524.9440596333"
+    },
+    {
+      "time": "2026-01-29T00:00:00Z",
+      "app_rewards": "15.3879227733",
+      "validator_rewards": "7079.3772613631"
+    },
+    {
+      "time": "2026-01-30T00:00:00Z",
+      "app_rewards": "12.6637320715",
+      "validator_rewards": "9234.322608401"
+    },
+    {
+      "time": "2026-01-31T00:00:00Z",
+      "app_rewards": "14.0623559906",
+      "validator_rewards": "9174.0921866165"
+    },
+    {
+      "time": "2026-02-01T00:00:00Z",
+      "app_rewards": "12.9497820816",
+      "validator_rewards": "11222.8837695573"
+    },
+    {
+      "time": "2026-02-02T00:00:00Z",
+      "app_rewards": "9.800849438",
+      "validator_rewards": "10786.9632985458"
+    },
+    {
+      "time": "2026-02-03T00:00:00Z",
+      "app_rewards": "16.4621822415",
+      "validator_rewards": "11024.4258044517"
+    },
+    {
+      "time": "2026-02-04T00:00:00Z",
+      "app_rewards": "8.1836089727",
+      "validator_rewards": "10381.9201108251"
+    },
+    {
+      "time": "2026-02-05T00:00:00Z",
+      "app_rewards": "15.0747422979",
+      "validator_rewards": "7927.8590549642"
+    },
+    {
+      "time": "2026-02-06T00:00:00Z",
+      "app_rewards": "10.6228352828",
+      "validator_rewards": "7896.7594603169"
+    },
+    {
+      "time": "2026-02-07T00:00:00Z",
+      "app_rewards": "10.2064687035",
+      "validator_rewards": "6819.5404556525"
+    },
+    {
+      "time": "2026-02-08T00:00:00Z",
+      "app_rewards": "15.3135967513",
+      "validator_rewards": "8324.328325083"
+    },
+    {
+      "time": "2026-02-09T00:00:00Z",
+      "app_rewards": "10.5134290679",
+      "validator_rewards": "7336.1468715452"
+    },
+    {
+      "time": "2026-02-10T00:00:00Z",
+      "app_rewards": "15.6820242083",
+      "validator_rewards": "8619.88183678"
+    },
+    {
+      "time": "2026-02-11T00:00:00Z",
+      "app_rewards": "9.5584962368",
+      "validator_rewards": "8590.0760356598"
+    },
+    {
+      "time": "2026-02-12T00:00:00Z",
+      "app_rewards": "10.8796066649",
+      "validator_rewards": "9079.9958349997"
+    },
+    {
+      "time": "2026-02-13T00:00:00Z",
+      "app_rewards": "22.9767045738",
+      "validator_rewards": "7686.5968914507"
+    },
+    {
+      "time": "2026-02-14T00:00:00Z",
+      "app_rewards": "12.233370162",
+      "validator_rewards": "10360.0182041705"
+    },
+    {
+      "time": "2026-02-15T00:00:00Z",
+      "app_rewards": "14.7151604851",
+      "validator_rewards": "9367.5376517404"
+    },
+    {
+      "time": "2026-02-16T00:00:00Z",
+      "app_rewards": "9.9678205613",
+      "validator_rewards": "9486.0289436983"
+    },
+    {
+      "time": "2026-02-17T00:00:00Z",
+      "app_rewards": "7.8728118995",
+      "validator_rewards": "9577.978872539"
+    },
+    {
+      "time": "2026-02-18T00:00:00Z",
+      "app_rewards": "15.7016247556",
+      "validator_rewards": "9634.9245913333"
+    },
+    {
+      "time": "2026-02-19T00:00:00Z",
+      "app_rewards": "9.4090688255",
+      "validator_rewards": "12020.9434291476"
+    },
+    {
+      "time": "2026-02-20T00:00:00Z",
+      "app_rewards": "14.4902325819",
+      "validator_rewards": "15433.8580052191"
+    },
+    {
+      "time": "2026-02-21T00:00:00Z",
+      "app_rewards": "6.9080286144",
+      "validator_rewards": "14175.8536004696"
+    },
+    {
+      "time": "2026-02-22T00:00:00Z",
+      "app_rewards": "6.5607380945",
+      "validator_rewards": "13702.0347480718"
+    },
+    {
+      "time": "2026-02-23T00:00:00Z",
+      "app_rewards": "12.7647173883",
+      "validator_rewards": "11742.8395775267"
+    },
+    {
+      "time": "2026-02-24T00:00:00Z",
+      "app_rewards": "7.500413196",
+      "validator_rewards": "20488.9539357052"
+    },
+    {
+      "time": "2026-02-25T00:00:00Z",
+      "app_rewards": "9.3390005149",
+      "validator_rewards": "18138.7688290624"
+    },
+    {
+      "time": "2026-02-26T00:00:00Z",
+      "app_rewards": "7.4113514953",
+      "validator_rewards": "10412.7859414371"
+    },
+    {
+      "time": "2026-02-27T00:00:00Z",
+      "app_rewards": "6.2212620125",
+      "validator_rewards": "8747.7203568305"
+    },
+    {
+      "time": "2026-02-28T00:00:00Z",
+      "app_rewards": "9.1341431383",
+      "validator_rewards": "5140.1413368776"
+    },
+    {
+      "time": "2026-03-01T00:00:00Z",
+      "app_rewards": "6.0439706579",
+      "validator_rewards": "1036.0576886702"
+    },
+    {
+      "time": "2026-03-02T00:00:00Z",
+      "app_rewards": "10.0148942339",
+      "validator_rewards": "998.4961252472"
+    },
+    {
+      "time": "2026-03-03T00:00:00Z",
+      "app_rewards": "9.7955845741",
+      "validator_rewards": "1930.2076678302"
+    },
+    {
+      "time": "2026-03-04T00:00:00Z",
+      "app_rewards": "9.1206377501",
+      "validator_rewards": "1492.3406531349"
+    },
+    {
+      "time": "2026-03-05T00:00:00Z",
+      "app_rewards": "10.850888819",
+      "validator_rewards": "1419.5973062772"
+    },
+    {
+      "time": "2026-03-06T00:00:00Z",
+      "app_rewards": "5.2341819925",
+      "validator_rewards": "1150.1817520979"
+    },
+    {
+      "time": "2026-03-07T00:00:00Z",
+      "app_rewards": "13.3128931393",
+      "validator_rewards": "1773.8522542715"
+    },
+    {
+      "time": "2026-03-08T00:00:00Z",
+      "app_rewards": "6.7238576541",
+      "validator_rewards": "1007.1759540901"
+    },
+    {
+      "time": "2026-03-09T00:00:00Z",
+      "app_rewards": "6.967983316",
+      "validator_rewards": "1579.7693279522"
+    },
+    {
+      "time": "2026-03-10T00:00:00Z",
+      "app_rewards": "15.4193409315",
+      "validator_rewards": "1456.0415100605"
+    },
+    {
+      "time": "2026-03-11T00:00:00Z",
+      "app_rewards": "6.3124085536",
+      "validator_rewards": "1421.1807794304"
+    },
+    {
+      "time": "2026-03-12T00:00:00Z",
+      "app_rewards": "10.9888531526",
+      "validator_rewards": "1898.7007638121"
+    },
+    {
+      "time": "2026-03-13T00:00:00Z",
+      "app_rewards": "9.8761635338",
+      "validator_rewards": "1794.1700713367"
+    },
+    {
+      "time": "2026-03-14T00:00:00Z",
+      "app_rewards": "8.4292477204",
+      "validator_rewards": "1594.724728624"
+    },
+    {
+      "time": "2026-03-15T00:00:00Z",
+      "app_rewards": "10.8192502683",
+      "validator_rewards": "519.4610864292"
+    },
+    {
+      "time": "2026-03-16T00:00:00Z",
+      "app_rewards": "7.082909793",
+      "validator_rewards": "493.8803479188"
+    },
+    {
+      "time": "2026-03-17T00:00:00Z",
+      "app_rewards": "11.9221150268",
+      "validator_rewards": "490.2823685413"
+    },
+    {
+      "time": "2026-03-18T00:00:00Z",
+      "app_rewards": "10.1413989977",
+      "validator_rewards": "433.7439669123"
+    },
+    {
+      "time": "2026-03-19T00:00:00Z",
+      "app_rewards": "8.2395454401",
+      "validator_rewards": "430.409061513"
+    },
+    {
+      "time": "2026-03-20T00:00:00Z",
+      "app_rewards": "16.7116917692",
+      "validator_rewards": "547.0673037289"
+    },
+    {
+      "time": "2026-03-21T00:00:00Z",
+      "app_rewards": "10.4212871227",
+      "validator_rewards": "491.1193230721"
+    },
+    {
+      "time": "2026-03-22T00:00:00Z",
+      "app_rewards": "12.6291493206",
+      "validator_rewards": "470.4676914292"
+    },
+    {
+      "time": "2026-03-23T00:00:00Z",
+      "app_rewards": "17.0086027395",
+      "validator_rewards": "483.9792282693"
+    },
+    {
+      "time": "2026-03-24T00:00:00Z",
+      "app_rewards": "8.6089236897",
+      "validator_rewards": "450.9821814258"
+    },
+    {
+      "time": "2026-03-25T00:00:00Z",
+      "app_rewards": "13.3975083426",
+      "validator_rewards": "465.8883276385"
+    },
+    {
+      "time": "2026-03-26T00:00:00Z",
+      "app_rewards": "7.721540552",
+      "validator_rewards": "516.4994666554"
+    },
+    {
+      "time": "2026-03-27T00:00:00Z",
+      "app_rewards": "18.9733305627",
+      "validator_rewards": "585.3845681685"
+    },
+    {
+      "time": "2026-03-28T00:00:00Z",
+      "app_rewards": "16.221645376",
+      "validator_rewards": "572.0425614248"
+    },
+    {
+      "time": "2026-03-29T00:00:00Z",
+      "app_rewards": "19.658949568",
+      "validator_rewards": "546.2730945425"
+    },
+    {
+      "time": "2026-03-30T00:00:00Z",
+      "app_rewards": "25.2221622043",
+      "validator_rewards": "551.1472465998"
+    },
+    {
+      "time": "2026-03-31T00:00:00Z",
+      "app_rewards": "9.9194481431",
+      "validator_rewards": "555.6856833536"
+    },
+    {
+      "time": "2026-04-01T00:00:00Z",
+      "app_rewards": "17.6739136071",
+      "validator_rewards": "575.815260892"
+    },
+    {
+      "time": "2026-04-02T00:00:00Z",
+      "app_rewards": "13.3640258759",
+      "validator_rewards": "588.6916831636"
+    },
+    {
+      "time": "2026-04-03T00:00:00Z",
+      "app_rewards": "11.2003666632",
+      "validator_rewards": "583.8249978107"
+    },
+    {
+      "time": "2026-04-04T00:00:00Z",
+      "app_rewards": "15.6248032797",
+      "validator_rewards": "593.4496807865"
+    },
+    {
+      "time": "2026-04-05T00:00:00Z",
+      "app_rewards": "8.6883864331",
+      "validator_rewards": "566.5060631535"
+    },
+    {
+      "time": "2026-04-06T00:00:00Z",
+      "app_rewards": "15.9307489139",
+      "validator_rewards": "475.7913505284"
+    },
+    {
+      "time": "2026-04-07T00:00:00Z",
+      "app_rewards": "8.5400943632",
+      "validator_rewards": "479.7656930824"
+    },
+    {
+      "time": "2026-04-08T00:00:00Z",
+      "app_rewards": "8.3378998373",
+      "validator_rewards": "505.4681162704"
+    },
+    {
+      "time": "2026-04-09T00:00:00Z",
+      "app_rewards": "21.0391453805",
+      "validator_rewards": "519.3987950923"
+    },
+    {
+      "time": "2026-04-10T00:00:00Z",
+      "app_rewards": "43.8925931297",
+      "validator_rewards": "533.2402077121"
+    },
+    {
+      "time": "2026-04-11T00:00:00Z",
+      "app_rewards": "9.7625228597",
+      "validator_rewards": "548.7148704726"
+    },
+    {
+      "time": "2026-04-12T00:00:00Z",
+      "app_rewards": "6.8268439431",
+      "validator_rewards": "552.5601517583"
+    },
+    {
+      "time": "2026-04-13T00:00:00Z",
+      "app_rewards": "13.3226071313",
+      "validator_rewards": "536.9125437794"
+    },
+    {
+      "time": "2026-04-14T00:00:00Z",
+      "app_rewards": "63.2256019668",
+      "validator_rewards": "512.0451316126"
+    },
+    {
+      "time": "2026-04-15T00:00:00Z",
+      "app_rewards": "48.9681791644",
+      "validator_rewards": "496.9355268164"
+    },
+    {
+      "time": "2026-04-16T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "525.3403091115"
+    },
+    {
+      "time": "2026-04-17T00:00:00Z",
+      "app_rewards": "14.4273458229",
+      "validator_rewards": "533.1857970296"
+    },
+    {
+      "time": "2026-04-18T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "509.066663554"
+    },
+    {
+      "time": "2026-04-19T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "513.3464464115"
+    },
+    {
+      "time": "2026-04-20T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "480.7776826433"
+    },
+    {
+      "time": "2026-04-21T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "513.4464951294"
+    },
+    {
+      "time": "2026-04-22T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "303.4297755746"
+    }
+  ],
+  "score_rewards": [
+    {
+      "time": "2026-01-14T00:00:00Z",
+      "app_rewards": "118.7449110141",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-15T00:00:00Z",
+      "app_rewards": "578.8475517079",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-16T00:00:00Z",
+      "app_rewards": "1335.5009542069",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-17T00:00:00Z",
+      "app_rewards": "5887.0886032178",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-18T00:00:00Z",
+      "app_rewards": "5063.1062552593",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-19T00:00:00Z",
+      "app_rewards": "4968.7210971255",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-20T00:00:00Z",
+      "app_rewards": "5777.992247544",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-21T00:00:00Z",
+      "app_rewards": "23864.9885849824",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-22T00:00:00Z",
+      "app_rewards": "34434.3770632841",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-23T00:00:00Z",
+      "app_rewards": "32222.2741784302",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-24T00:00:00Z",
+      "app_rewards": "35030.4102024586",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-25T00:00:00Z",
+      "app_rewards": "37135.1380592248",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-26T00:00:00Z",
+      "app_rewards": "33000.9029379366",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-27T00:00:00Z",
+      "app_rewards": "33700.7472816435",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-28T00:00:00Z",
+      "app_rewards": "31723.0573153905",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-29T00:00:00Z",
+      "app_rewards": "32561.8165263906",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-30T00:00:00Z",
+      "app_rewards": "42349.5576598677",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-01-31T00:00:00Z",
+      "app_rewards": "48140.1863856575",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-01T00:00:00Z",
+      "app_rewards": "71400.2491395615",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-02T00:00:00Z",
+      "app_rewards": "66375.8468514826",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-03T00:00:00Z",
+      "app_rewards": "69351.1535812127",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-04T00:00:00Z",
+      "app_rewards": "54582.9350984837",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-05T00:00:00Z",
+      "app_rewards": "43625.5839067841",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-06T00:00:00Z",
+      "app_rewards": "45188.7318517086",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-07T00:00:00Z",
+      "app_rewards": "36318.539789851",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-08T00:00:00Z",
+      "app_rewards": "44459.6301433971",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-09T00:00:00Z",
+      "app_rewards": "37730.8696116965",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-10T00:00:00Z",
+      "app_rewards": "46068.104493281",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-11T00:00:00Z",
+      "app_rewards": "43922.9982169207",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-12T00:00:00Z",
+      "app_rewards": "48211.3230259951",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-13T00:00:00Z",
+      "app_rewards": "34086.1308382295",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-14T00:00:00Z",
+      "app_rewards": "36792.0364688721",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-15T00:00:00Z",
+      "app_rewards": "33076.6028230356",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-16T00:00:00Z",
+      "app_rewards": "32130.0338246358",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-17T00:00:00Z",
+      "app_rewards": "29819.7058834223",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-18T00:00:00Z",
+      "app_rewards": "27670.7983646375",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-19T00:00:00Z",
+      "app_rewards": "30583.9626451845",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-20T00:00:00Z",
+      "app_rewards": "29265.1269889296",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-21T00:00:00Z",
+      "app_rewards": "32686.1659829371",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-22T00:00:00Z",
+      "app_rewards": "29144.8822894379",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-23T00:00:00Z",
+      "app_rewards": "23468.0876177694",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-24T00:00:00Z",
+      "app_rewards": "33526.8596235706",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-25T00:00:00Z",
+      "app_rewards": "32028.4568938809",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-26T00:00:00Z",
+      "app_rewards": "33735.4815845639",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-27T00:00:00Z",
+      "app_rewards": "24886.4942821965",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-02-28T00:00:00Z",
+      "app_rewards": "12275.6600975384",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-03-18T00:00:00Z",
+      "app_rewards": "1592.2726501794",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-03-19T00:00:00Z",
+      "app_rewards": "13107.8623233131",
+      "validator_rewards": "0.0"
+    },
+    {
+      "time": "2026-03-20T00:00:00Z",
+      "app_rewards": "8131.9734659852",
+      "validator_rewards": "0.0"
+    }
+  ],
+  "validator_burns": [
+    {
+      "time": "2025-06-26T00:00:00Z",
+      "total_burned": "1440.0"
+    },
+    {
+      "time": "2025-07-08T00:00:00Z",
+      "total_burned": "26.416742792"
+    },
+    {
+      "time": "2025-07-09T00:00:00Z",
+      "total_burned": "84.05327252"
+    },
+    {
+      "time": "2025-07-10T00:00:00Z",
+      "total_burned": "84.753653038"
+    },
+    {
+      "time": "2025-07-11T00:00:00Z",
+      "total_burned": "83.452892002"
+    },
+    {
+      "time": "2025-07-12T00:00:00Z",
+      "total_burned": "82.852892002"
+    },
+    {
+      "time": "2025-07-13T00:00:00Z",
+      "total_burned": "84.05327252"
+    },
+    {
+      "time": "2025-07-14T00:00:00Z",
+      "total_burned": "83.452892002"
+    },
+    {
+      "time": "2025-07-15T00:00:00Z",
+      "total_burned": "83.452892002"
+    },
+    {
+      "time": "2025-07-16T00:00:00Z",
+      "total_burned": "219.401497831"
+    },
+    {
+      "time": "2025-07-17T00:00:00Z",
+      "total_burned": "494.3372543862"
+    },
+    {
+      "time": "2025-07-18T00:00:00Z",
+      "total_burned": "459.8870953192"
+    },
+    {
+      "time": "2025-07-19T00:00:00Z",
+      "total_burned": "287.2332550844"
+    },
+    {
+      "time": "2025-07-20T00:00:00Z",
+      "total_burned": "287.2332550844"
+    },
+    {
+      "time": "2025-07-21T00:00:00Z",
+      "total_burned": "434.7806860422"
+    },
+    {
+      "time": "2025-07-22T00:00:00Z",
+      "total_burned": "415.8048380744"
+    },
+    {
+      "time": "2025-07-23T00:00:00Z",
+      "total_burned": "184.2322306776"
+    },
+    {
+      "time": "2025-07-24T00:00:00Z",
+      "total_burned": "241.5420201434"
+    },
+    {
+      "time": "2025-07-25T00:00:00Z",
+      "total_burned": "488.8998169748"
+    },
+    {
+      "time": "2025-07-26T00:00:00Z",
+      "total_burned": "508.3251509915"
+    },
+    {
+      "time": "2025-07-27T00:00:00Z",
+      "total_burned": "503.4046031334"
+    },
+    {
+      "time": "2025-07-28T00:00:00Z",
+      "total_burned": "504.8194341836"
+    },
+    {
+      "time": "2025-07-29T00:00:00Z",
+      "total_burned": "526.2667891278"
+    },
+    {
+      "time": "2025-07-30T00:00:00Z",
+      "total_burned": "578.9776314428"
+    },
+    {
+      "time": "2025-07-31T00:00:00Z",
+      "total_burned": "507.6110771721"
+    },
+    {
+      "time": "2025-08-01T00:00:00Z",
+      "total_burned": "533.4967297715"
+    },
+    {
+      "time": "2025-08-02T00:00:00Z",
+      "total_burned": "591.5647302101"
+    },
+    {
+      "time": "2025-08-03T00:00:00Z",
+      "total_burned": "586.7833354076"
+    },
+    {
+      "time": "2025-08-04T00:00:00Z",
+      "total_burned": "591.5647302101"
+    },
+    {
+      "time": "2025-08-05T00:00:00Z",
+      "total_burned": "590.8894327336"
+    },
+    {
+      "time": "2025-08-06T00:00:00Z",
+      "total_burned": "534.3290530869"
+    },
+    {
+      "time": "2025-08-07T00:00:00Z",
+      "total_burned": "85.354033556"
+    },
+    {
+      "time": "2025-08-08T00:00:00Z",
+      "total_burned": "167.9674073439"
+    },
+    {
+      "time": "2025-08-09T00:00:00Z",
+      "total_burned": "84.053653038"
+    },
+    {
+      "time": "2025-08-10T00:00:00Z",
+      "total_burned": "84.05327252"
+    },
+    {
+      "time": "2025-08-11T00:00:00Z",
+      "total_burned": "84.053653038"
+    },
+    {
+      "time": "2025-08-12T00:00:00Z",
+      "total_burned": "83.45327252"
+    },
+    {
+      "time": "2025-08-13T00:00:00Z",
+      "total_burned": "294.2948002039"
+    },
+    {
+      "time": "2025-08-14T00:00:00Z",
+      "total_burned": "638.3579462615"
+    },
+    {
+      "time": "2025-08-15T00:00:00Z",
+      "total_burned": "587.4132816526"
+    },
+    {
+      "time": "2025-08-16T00:00:00Z",
+      "total_burned": "332.3426761316"
+    },
+    {
+      "time": "2025-08-17T00:00:00Z",
+      "total_burned": "287.8416835408"
+    },
+    {
+      "time": "2025-08-18T00:00:00Z",
+      "total_burned": "288.4424407716"
+    },
+    {
+      "time": "2025-08-19T00:00:00Z",
+      "total_burned": "492.4733117969"
+    },
+    {
+      "time": "2025-08-20T00:00:00Z",
+      "total_burned": "588.7802188099"
+    },
+    {
+      "time": "2025-08-21T00:00:00Z",
+      "total_burned": "590.7740938096"
+    },
+    {
+      "time": "2025-08-22T00:00:00Z",
+      "total_burned": "631.8836560608"
+    },
+    {
+      "time": "2025-08-23T00:00:00Z",
+      "total_burned": "589.4740938096"
+    },
+    {
+      "time": "2025-08-24T00:00:00Z",
+      "total_burned": "588.8729560608"
+    },
+    {
+      "time": "2025-08-25T00:00:00Z",
+      "total_burned": "586.6680000106"
+    },
+    {
+      "time": "2025-08-26T00:00:00Z",
+      "total_burned": "629.8266033835"
+    },
+    {
+      "time": "2025-08-27T00:00:00Z",
+      "total_burned": "560.0127992806"
+    },
+    {
+      "time": "2025-08-28T00:00:00Z",
+      "total_burned": "435.1678000603"
+    },
+    {
+      "time": "2025-08-29T00:00:00Z",
+      "total_burned": "592.9790498598"
+    },
+    {
+      "time": "2025-08-30T00:00:00Z",
+      "total_burned": "585.3680000106"
+    },
+    {
+      "time": "2025-08-31T00:00:00Z",
+      "total_burned": "592.9790498598"
+    },
+    {
+      "time": "2025-09-01T00:00:00Z",
+      "total_burned": "585.3680000106"
+    },
+    {
+      "time": "2025-09-02T00:00:00Z",
+      "total_burned": "592.9790498598"
+    },
+    {
+      "time": "2025-09-03T00:00:00Z",
+      "total_burned": "585.3680000106"
+    },
+    {
+      "time": "2025-09-04T00:00:00Z",
+      "total_burned": "590.8954303779"
+    },
+    {
+      "time": "2025-09-05T00:00:00Z",
+      "total_burned": "585.3680000106"
+    },
+    {
+      "time": "2025-09-06T00:00:00Z",
+      "total_burned": "592.9790498598"
+    },
+    {
+      "time": "2025-09-07T00:00:00Z",
+      "total_burned": "589.4740938096"
+    },
+    {
+      "time": "2025-09-08T00:00:00Z",
+      "total_burned": "398.6828142841"
+    },
+    {
+      "time": "2025-09-09T00:00:00Z",
+      "total_burned": "395.3933230876"
+    },
+    {
+      "time": "2025-09-10T00:00:00Z",
+      "total_burned": "585.3680000106"
+    },
+    {
+      "time": "2025-09-11T00:00:00Z",
+      "total_burned": "687.3572914138"
+    },
+    {
+      "time": "2025-09-12T00:00:00Z",
+      "total_burned": "591.4999999826"
+    },
+    {
+      "time": "2025-09-13T00:00:00Z",
+      "total_burned": "592.9790498598"
+    },
+    {
+      "time": "2025-09-14T00:00:00Z",
+      "total_burned": "585.3680000106"
+    },
+    {
+      "time": "2025-09-15T00:00:00Z",
+      "total_burned": "587.8263884096"
+    },
+    {
+      "time": "2025-09-16T00:00:00Z",
+      "total_burned": "428.5018180132"
+    },
+    {
+      "time": "2025-09-17T00:00:00Z",
+      "total_burned": "422.5621784937"
+    },
+    {
+      "time": "2025-09-18T00:00:00Z",
+      "total_burned": "391.2085714589"
+    },
+    {
+      "time": "2025-09-19T00:00:00Z",
+      "total_burned": "389.0070081264"
+    },
+    {
+      "time": "2025-09-20T00:00:00Z",
+      "total_burned": "325.2044444548"
+    },
+    {
+      "time": "2025-09-21T00:00:00Z",
+      "total_burned": "329.4328054821"
+    },
+    {
+      "time": "2025-09-22T00:00:00Z",
+      "total_burned": "327.4856076765"
+    },
+    {
+      "time": "2025-09-23T00:00:00Z",
+      "total_burned": "327.1516422604"
+    },
+    {
+      "time": "2025-09-24T00:00:00Z",
+      "total_burned": "327.4856076765"
+    },
+    {
+      "time": "2025-09-25T00:00:00Z",
+      "total_burned": "351.5105931998"
+    },
+    {
+      "time": "2025-09-26T00:00:00Z",
+      "total_burned": "425.4487986522"
+    },
+    {
+      "time": "2025-09-27T00:00:00Z",
+      "total_burned": "430.5002283408"
+    },
+    {
+      "time": "2025-09-28T00:00:00Z",
+      "total_burned": "454.9070065619"
+    },
+    {
+      "time": "2025-09-29T00:00:00Z",
+      "total_burned": "407.5353714582"
+    },
+    {
+      "time": "2025-09-30T00:00:00Z",
+      "total_burned": "430.5002283408"
+    },
+    {
+      "time": "2025-10-01T00:00:00Z",
+      "total_burned": "434.728798653"
+    },
+    {
+      "time": "2025-10-02T00:00:00Z",
+      "total_burned": "431.2226619619"
+    },
+    {
+      "time": "2025-10-03T00:00:00Z",
+      "total_burned": "434.728798653"
+    },
+    {
+      "time": "2025-10-04T00:00:00Z",
+      "total_burned": "431.2862455909"
+    },
+    {
+      "time": "2025-10-05T00:00:00Z",
+      "total_burned": "433.9427814029"
+    },
+    {
+      "time": "2025-10-06T00:00:00Z",
+      "total_burned": "469.1244105337"
+    },
+    {
+      "time": "2025-10-07T00:00:00Z",
+      "total_burned": "486.0223126352"
+    },
+    {
+      "time": "2025-10-08T00:00:00Z",
+      "total_burned": "509.4641695415"
+    },
+    {
+      "time": "2025-10-09T00:00:00Z",
+      "total_burned": "415.9129630969"
+    },
+    {
+      "time": "2025-10-10T00:00:00Z",
+      "total_burned": "368.1869670427"
+    },
+    {
+      "time": "2025-10-11T00:00:00Z",
+      "total_burned": "387.4158677099"
+    },
+    {
+      "time": "2025-10-12T00:00:00Z",
+      "total_burned": "383.7043288202"
+    },
+    {
+      "time": "2025-10-13T00:00:00Z",
+      "total_burned": "391.03065013"
+    },
+    {
+      "time": "2025-10-14T00:00:00Z",
+      "total_burned": "386.6183112403"
+    },
+    {
+      "time": "2025-10-15T00:00:00Z",
+      "total_burned": "380.0260639797"
+    },
+    {
+      "time": "2025-10-16T00:00:00Z",
+      "total_burned": "338.5531773592"
+    },
+    {
+      "time": "2025-10-17T00:00:00Z",
+      "total_burned": "385.2346198115"
+    },
+    {
+      "time": "2025-10-18T00:00:00Z",
+      "total_burned": "385.0667373916"
+    },
+    {
+      "time": "2025-10-19T00:00:00Z",
+      "total_burned": "374.3330537558"
+    },
+    {
+      "time": "2025-10-20T00:00:00Z",
+      "total_burned": "369.7155244352"
+    },
+    {
+      "time": "2025-10-21T00:00:00Z",
+      "total_burned": "559.7858936928"
+    },
+    {
+      "time": "2025-10-22T00:00:00Z",
+      "total_burned": "547.0242068784"
+    },
+    {
+      "time": "2025-10-23T00:00:00Z",
+      "total_burned": "199.9135770783"
+    },
+    {
+      "time": "2025-10-24T00:00:00Z",
+      "total_burned": "0.021309008"
+    },
+    {
+      "time": "2025-10-25T00:00:00Z",
+      "total_burned": "0.0214612152"
+    },
+    {
+      "time": "2025-10-26T00:00:00Z",
+      "total_burned": "0.021309008"
+    },
+    {
+      "time": "2025-10-27T00:00:00Z",
+      "total_burned": "0.021309008"
+    },
+    {
+      "time": "2025-10-28T00:00:00Z",
+      "total_burned": "0.0219199512"
+    },
+    {
+      "time": "2025-10-29T00:00:00Z",
+      "total_burned": "0.021309008"
+    },
+    {
+      "time": "2025-10-30T00:00:00Z",
+      "total_burned": "0.0080669816"
+    },
+    {
+      "time": "2025-10-31T00:00:00Z",
+      "total_burned": "0.0343875528"
+    },
+    {
+      "time": "2025-11-01T00:00:00Z",
+      "total_burned": "0.019730564"
+    },
+    {
+      "time": "2025-11-02T00:00:00Z",
+      "total_burned": "0.0198714966"
+    },
+    {
+      "time": "2025-11-03T00:00:00Z",
+      "total_burned": "0.0184480737"
+    },
+    {
+      "time": "2025-11-04T00:00:00Z",
+      "total_burned": "0.0048198934"
+    },
+    {
+      "time": "2025-11-11T00:00:00Z",
+      "total_burned": "1.644"
+    },
+    {
+      "time": "2025-12-10T00:00:00Z",
+      "total_burned": "984.3192475426"
+    },
+    {
+      "time": "2026-01-11T00:00:00Z",
+      "total_burned": "1.7630278896"
+    },
+    {
+      "time": "2026-01-20T00:00:00Z",
+      "total_burned": "1125.287906423"
+    },
+    {
+      "time": "2026-01-21T00:00:00Z",
+      "total_burned": "11206.7366639319"
+    },
+    {
+      "time": "2026-01-22T00:00:00Z",
+      "total_burned": "14599.0562300121"
+    },
+    {
+      "time": "2026-01-23T00:00:00Z",
+      "total_burned": "15267.8677103907"
+    },
+    {
+      "time": "2026-01-24T00:00:00Z",
+      "total_burned": "17991.7925825713"
+    },
+    {
+      "time": "2026-01-25T00:00:00Z",
+      "total_burned": "19079.6232592585"
+    },
+    {
+      "time": "2026-01-26T00:00:00Z",
+      "total_burned": "19655.6745298034"
+    },
+    {
+      "time": "2026-01-27T00:00:00Z",
+      "total_burned": "20214.573720978"
+    },
+    {
+      "time": "2026-01-28T00:00:00Z",
+      "total_burned": "21280.0446017199"
+    },
+    {
+      "time": "2026-01-29T00:00:00Z",
+      "total_burned": "25331.3785396597"
+    },
+    {
+      "time": "2026-01-30T00:00:00Z",
+      "total_burned": "35604.1675296016"
+    },
+    {
+      "time": "2026-01-31T00:00:00Z",
+      "total_burned": "35051.4484880148"
+    },
+    {
+      "time": "2026-02-01T00:00:00Z",
+      "total_burned": "43824.1849064052"
+    },
+    {
+      "time": "2026-02-02T00:00:00Z",
+      "total_burned": "43523.9314183155"
+    },
+    {
+      "time": "2026-02-03T00:00:00Z",
+      "total_burned": "44558.7042491861"
+    },
+    {
+      "time": "2026-02-04T00:00:00Z",
+      "total_burned": "43846.1655142715"
+    },
+    {
+      "time": "2026-02-05T00:00:00Z",
+      "total_burned": "32423.0773233659"
+    },
+    {
+      "time": "2026-02-06T00:00:00Z",
+      "total_burned": "29497.8757752273"
+    },
+    {
+      "time": "2026-02-07T00:00:00Z",
+      "total_burned": "25058.1232922564"
+    },
+    {
+      "time": "2026-02-08T00:00:00Z",
+      "total_burned": "31948.0298210387"
+    },
+    {
+      "time": "2026-02-09T00:00:00Z",
+      "total_burned": "25706.6431393515"
+    },
+    {
+      "time": "2026-02-10T00:00:00Z",
+      "total_burned": "34927.582585556"
+    },
+    {
+      "time": "2026-02-11T00:00:00Z",
+      "total_burned": "35306.5141809232"
+    },
+    {
+      "time": "2026-02-12T00:00:00Z",
+      "total_burned": "34719.9257174746"
+    },
+    {
+      "time": "2026-02-13T00:00:00Z",
+      "total_burned": "21056.2659414055"
+    },
+    {
+      "time": "2026-04-11T00:00:00Z",
+      "total_burned": "1.6920427333"
+    }
+  ],
+  "score_burns": []
+}
