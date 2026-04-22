@@ -6,13 +6,3 @@ type BondBroken @entity(immutable: true) {
   blockNumber: BigInt!
   timestamp: BigInt!
 }
-
-# One entry per day — cumulative unbonding queue value (sum of BondBroken in last 7 days)
-# Keyed by date string "YYYY-MM-DD", updated each time a BondBroken fires that day
-type DailyUnbondingQueue @entity {
-  id: ID!       # "YYYY-MM-DD"
-  date: String!
-  timestamp: BigInt!
-  totalAmount: BigDecimal!
-  eventCount: Int!
-}

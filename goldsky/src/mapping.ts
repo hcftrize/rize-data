@@ -1,8 +1,6 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { BondBroken as BondBrokenEvent } from "../generated/Governance/Governance";
-import { BondBroken, DailyUnbondingQueue } from "../generated/schema";
-
-// ── Date helpers ──────────────────────────────────────────────────────────────
+import { BondBroken } from "../generated/schema";
 
 function isLeapYear(year: i32): bool {
   return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
@@ -30,40 +28,16 @@ function tsToDateStr(ts: i64): string {
   return y.toString() + "-" + mm + "-" + dd;
 }
 
-function dayStartTs(ts: i64): i64 {
-  return (ts / 86400) * 86400;
-}
-
-// ── Handler ───────────────────────────────────────────────────────────────────
-
 export function handleBondBroken(event: BondBrokenEvent): void {
   let DECIMALS = BigDecimal.fromString("1000000000000000000");
   let amount   = event.params.amount.toBigDecimal().div(DECIMALS);
-  let ts       = event.block.timestamp.toI64();
-  let dateStr  = tsToDateStr(ts);
+  let dateStr  = tsToDateStr(event.block.timestamp.toI64());
 
-  // ── BondBroken entity (immutable, one per event) ──────────────────────────
-  let entity      = new BondBroken(event.transaction.hash.toHex());
-  entity.nftId    = event.params.nftId;
-  entity.amount   = amount;
-  entity.date     = dateStr;
+  let entity         = new BondBroken(event.transaction.hash.toHex());
+  entity.nftId       = event.params.nftId;
+  entity.amount      = amount;
+  entity.date        = dateStr;
   entity.blockNumber = event.block.number;
   entity.timestamp   = event.block.timestamp;
   entity.save();
-
-  // ── DailyUnbondingQueue — rolling 7-day sum ───────────────────────────────
-  // We store one entry per day and accumulate all BondBroken that fire that day.
-  // The JS side will do the 7-day rolling window across these daily totals.
-  let dayId  = dateStr;
-  let dayRec = DailyUnbondingQueue.load(dayId);
-  if (dayRec == null) {
-    dayRec             = new DailyUnbondingQueue(dayId);
-    dayRec.date        = dateStr;
-    dayRec.timestamp   = BigInt.fromI64(dayStartTs(ts));
-    dayRec.totalAmount = BigDecimal.fromString("0");
-    dayRec.eventCount  = 0;
-  }
-  dayRec.totalAmount = dayRec.totalAmount.plus(amount);
-  dayRec.eventCount  = dayRec.eventCount + 1;
-  dayRec.save();
 }
