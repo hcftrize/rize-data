@@ -949,6 +949,9 @@ html, body { overflow-x: hidden; max-width: 100%; }
       .ctx-tabs-mobile-wrap { display: block; }
       .ctx-tabs-desktop { display: none !important; }
     }
+    .ctx-iv-btn{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);padding:4px 14px;cursor:pointer;white-space:nowrap;transition:background 0.15s,color 0.15s,border-color 0.15s;margin-right:6px;}
+    .ctx-iv-btn:hover{color:#fff;}
+    .ctx-iv-btn.active{color:var(--cyan);border-color:var(--cyan);background:rgba(126,224,255,0.07);}
     </style>
 </head>
 <body>
@@ -1058,6 +1061,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
       <!-- Panel 1 — Burn/Mint Ratio -->
       <div class="ctx-panel active" id="ctx-panel-ratio">
+        <div style="margin-bottom:10px"><button class="ctx-iv-btn active" data-tab="ratio" data-iv="week" onclick="ctxSetInterval('ratio','week')">Weekly</button><button class="ctx-iv-btn" data-tab="ratio" data-iv="day" onclick="ctxSetInterval('ratio','day')">Daily</button></div>
         <div class="ctx-chart-wrap" id="ctx-chart-ratio-wrap">
           <div class="ctx-loading" id="ctx-loading-ratio">Loading on-chain data&hellip;</div>
           <canvas id="ctx-chart-ratio" style="display:none"></canvas>
@@ -1067,6 +1071,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
       <!-- Panel 2 — Burn Activity -->
       <div class="ctx-panel" id="ctx-panel-burn">
+        <div style="margin-bottom:10px"><button class="ctx-iv-btn active" data-tab="burn" data-iv="week" onclick="ctxSetInterval('burn','week')">Weekly</button><button class="ctx-iv-btn" data-tab="burn" data-iv="day" onclick="ctxSetInterval('burn','day')">Daily</button></div>
         <div class="ctx-chart-wrap" id="ctx-chart-burn-wrap">
           <div class="ctx-loading" id="ctx-loading-burn">Loading on-chain data&hellip;</div>
           <canvas id="ctx-chart-burn" style="display:none"></canvas>
@@ -1076,6 +1081,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
       <!-- Panel 3 — Mint Activity -->
       <div class="ctx-panel" id="ctx-panel-mint">
+        <div style="margin-bottom:10px"><button class="ctx-iv-btn active" data-tab="mint" data-iv="week" onclick="ctxSetInterval('mint','week')">Weekly</button><button class="ctx-iv-btn" data-tab="mint" data-iv="day" onclick="ctxSetInterval('mint','day')">Daily</button></div>
         <div class="ctx-chart-wrap" id="ctx-chart-mint-wrap">
           <div class="ctx-loading" id="ctx-loading-mint">Loading on-chain data&hellip;</div>
           <canvas id="ctx-chart-mint" style="display:none"></canvas>
@@ -2444,7 +2450,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
      CANTON CONTEXT — on-chain burn/mint module
   ═══════════════════════════════════════════════════════════ */
 
-  const CTX_API = "https://fossil-outlook-levitate-gloomy.cantonscan.com/api/mining-rounds/timeseries?interval=week";
+  const CTX_API      = "https://fossil-outlook-levitate-gloomy.cantonscan.com/api/mining-rounds/timeseries?interval=week";
+  const CTX_API_DAY  = "https://fossil-outlook-levitate-gloomy.cantonscan.com/api/mining-rounds/timeseries?interval=day";
+  let   ctxDataDay   = null; // daily dataset fetched alongside weekly
+  const ctxInterval  = { ratio: "week", burn: "week", mint: "week" };
 
   // Chart.js instances — kept so we can destroy before re-render
   const ctxCharts = { ratio: null, mint: null, burn: null, alloc: null, cantonomics: null };
@@ -2470,11 +2479,12 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
   async function ctxLoad() {
     try {
-      const res = await fetch(CTX_API);
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const json = await res.json();
+      const [resW, resD] = await Promise.all([fetch(CTX_API), fetch(CTX_API_DAY)]);
+      if (!resW.ok) throw new Error("HTTP " + resW.status);
+      const [json, jsonD] = await Promise.all([resW.json(), resD.json()]);
       const rows = json.data || [];
       if (!rows.length) throw new Error("No data");
+      ctxDataDay = jsonD.data || [];
       // Keep last 26 weeks for ratio; all history for mint & burn
       ctxData = rows;
       // Hide all loaders
@@ -2495,6 +2505,15 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       });
     }
   }
+
+  // Switch between weekly/daily for a specific chart
+  window.ctxSetInterval = function(tab, iv) {
+    ctxInterval[tab] = iv;
+    document.querySelectorAll(".ctx-iv-btn[data-tab='" + tab + "']").forEach(function(b) {
+      b.classList.toggle("active", b.dataset.iv === iv);
+    });
+    ctxRender(tab);
+  };
 
   function ctxFmt(n) {
     if (!n && n !== 0) return "N/A";
@@ -2562,9 +2581,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
   function ctxRender(tab) {
     if (!ctxData) return;
-
-    // Ratio: full history
-    const src    = ctxData;
+    var isDay = (ctxInterval[tab] === "day");
+    var src   = isDay ? (ctxDataDay && ctxDataDay.length ? ctxDataDay : ctxData) : ctxData;
     const labels = src.map(r => ctxWeekLabel(r.date));
 
     if (tab === "ratio") {
@@ -2590,21 +2608,22 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       function deflClass(v) { return v > 1.05 ? "deflationary" : v >= 0.95 ? "neutral" : "inflationary"; }
       function deflText(v)  { return v > 1.05 ? "DEFLATIONARY 🟢" : v >= 0.95 ? "NEUTRAL 🟡" : "INFLATIONARY 🔴"; }
 
+      var _rL1 = isDay?"Today":"This Week", _rL2 = isDay?"1M Avg (Daily)":"1M Avg (Weekly)", _rL3 = isDay?"3M Avg (Daily)":"3M Avg (Weekly)", _rL4 = isDay?"6M Avg (Daily)":"6M Avg (Weekly)";
       document.getElementById("ctx-kpi-ratio").innerHTML = `
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">This Week</span>
+          <span class="ctx-kpi-label">${_rL1}</span>
           <span class="ctx-kpi-value ${deflClass(latest)}">${latest.toFixed(4)}</span>
         </div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">1M Average</span>
+          <span class="ctx-kpi-label">${_rL2}</span>
           <span class="ctx-kpi-value ${deflClass(avg1m)}">${avg1m.toFixed(4)}</span>
         </div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">3M Average</span>
+          <span class="ctx-kpi-label">${_rL3}</span>
           <span class="ctx-kpi-value ${deflClass(avg3m)}">${avg3m.toFixed(4)}</span>
         </div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">6M Average</span>
+          <span class="ctx-kpi-label">${_rL4}</span>
           <span class="ctx-kpi-value ${deflClass(avg6m)}">${avg6m.toFixed(4)}</span>
         </div>
         <div class="ctx-kpi">
@@ -2687,22 +2706,23 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const mint3m   = mintAvg(13);
       const mint6m   = mintAvg(26);
 
+      var _mL1 = isDay?"Today":"This Week", _mL2 = isDay?"1M Avg (Daily)":"1M Avg (Weekly)", _mL3 = isDay?"3M Avg (Daily)":"3M Avg (Weekly)", _mL4 = isDay?"6M Avg (Daily)":"6M Avg (Weekly)";
       document.getElementById("ctx-kpi-mint").innerHTML = `
         <div style="width:100%;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:4px">Overall Minted</div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">This Week</span>
+          <span class="ctx-kpi-label">${_mL1}</span>
           <span class="ctx-kpi-value" style="color:#ffffff">${ctxFmt(mintThis)} CC</span>
         </div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">1M Average</span>
+          <span class="ctx-kpi-label">${_mL2}</span>
           <span class="ctx-kpi-value" style="color:#ff8ad8">${ctxFmt(mint1m)} CC</span>
         </div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">3M Average</span>
+          <span class="ctx-kpi-label">${_mL3}</span>
           <span class="ctx-kpi-value" style="color:#98ffb6">${ctxFmt(mint3m)} CC</span>
         </div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">6M Average</span>
+          <span class="ctx-kpi-label">${_mL4}</span>
           <span class="ctx-kpi-value" style="color:#ffd36b">${ctxFmt(mint6m)} CC</span>
         </div>`;
 
@@ -2831,21 +2851,22 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const burn3m   = burnAvg(13);
       const burn6m   = burnAvg(26);
 
+      var _bL1 = isDay?"Today":"This Week", _bL2 = isDay?"1M Avg (Daily)":"1M Avg (Weekly)", _bL3 = isDay?"3M Avg (Daily)":"3M Avg (Weekly)", _bL4 = isDay?"6M Avg (Daily)":"6M Avg (Weekly)";
       document.getElementById("ctx-kpi-burn").innerHTML = `
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">This Week</span>
+          <span class="ctx-kpi-label">${_bL1}</span>
           <span class="ctx-kpi-value" style="color:#ffffff">${ctxFmt(burnThis)} CC</span>
         </div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">1M Average</span>
+          <span class="ctx-kpi-label">${_bL2}</span>
           <span class="ctx-kpi-value" style="color:#7ee0ff">${ctxFmt(burn1m)} CC</span>
         </div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">3M Average</span>
+          <span class="ctx-kpi-label">${_bL3}</span>
           <span class="ctx-kpi-value" style="color:#98ffb6">${ctxFmt(burn3m)} CC</span>
         </div>
         <div class="ctx-kpi">
-          <span class="ctx-kpi-label">6M Average</span>
+          <span class="ctx-kpi-label">${_bL4}</span>
           <span class="ctx-kpi-value" style="color:#ffd36b">${ctxFmt(burn6m)} CC</span>
         </div>`;
 
