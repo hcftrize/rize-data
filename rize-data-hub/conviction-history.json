@@ -2719,9 +2719,7 @@
       "value": 348983402.17
     }
   ],
-  "unbonding": [
-
-  ],
+  "unbonding": [],
   "whales": [
     {
       "date": "2026-04-21",
@@ -2829,7 +2827,7 @@
       "0x4D59BEC2b09052c60C6149c623fb3a461fB1Fe74",
       "0x0D0707963952f2fBA59dD06f2b425ace40b492Fe"
     ],
-    "updated": "2026-04-22T08:08:57.397945+00:00"
+    "updated": "2026-04-22T12:58:13.343025+00:00"
   },
   "address_labels": {
     "0x5a134098bdbeb05da9eac35439c5624547ed26ee": "Governance Contract",
@@ -2861,5 +2859,6 @@
     "0x60ec22e3443cdaddcc4cebdf8d34797df29984d4": "Arrakis/PancakeSwap LP (BSC)",
     "0x000000000004444c5dc75cb358380d2e3de08a90": "Uniswap PoolManager (ETH)",
     "0xa008b72d39ebb9d9eabdba4012adda4be4c7e938": "tomtom19 (Galxe)"
-  }
+  },
+  "bond_events": []
 }
