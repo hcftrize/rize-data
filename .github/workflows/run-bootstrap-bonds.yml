@@ -1,0 +1,44 @@
+name: Bootstrap Bond Events (run once)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run bootstrap
+        env:
+          ALCHEMY_RPC_URL: ${{ secrets.ALCHEMY_RPC_URL }}
+        run: python bootstrap_bond_events.py
+
+      - name: Commit and push to dev
+        run: |
+          git config user.name "canton-bot"
+          git config user.email "bot@tokerize.com"
+          git add rize-data-hub/conviction-history.json
+          git diff --staged --quiet || git commit -m "chore: bootstrap bond events backfill 7d"
+          git push origin dev
+
+      - name: Push to main
+        run: |
+          git fetch origin main
+          git checkout main
+          git checkout dev -- rize-data-hub/conviction-history.json
+          git add rize-data-hub/conviction-history.json
+          git diff --staged --quiet || git commit -m "chore: bootstrap bond events backfill 7d"
+          git push origin main
