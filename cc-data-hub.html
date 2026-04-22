@@ -912,18 +912,8 @@ html, body { overflow-x: hidden; max-width: 100%; }
       .ctx-kpi-value { font-size: 22px; }
     }
     /* Mobile ctx-tabs: native select */
-    .ctx-interval-row { display:flex; gap:6px; margin-bottom:10px; }
-    .ctx-interval-btn {
-      font-family:'Rajdhani',sans-serif; font-size:12px; font-weight:700;
-      text-transform:uppercase; letter-spacing:1px; color:var(--muted);
-      background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.12);
-      padding:4px 14px; cursor:pointer; white-space:nowrap;
-      transition:background 0.15s,color 0.15s,border-color 0.15s;
-    }
-    .ctx-interval-btn:hover { color:#fff; }
-    .ctx-interval-btn.active { color:var(--cyan); border-color:var(--cyan); background:rgba(126,224,255,0.07); }
-    @media (min-width:701px) { .ctx-interval-btn { font-size:13px; padding:5px 18px; } }
     .ctx-tabs-mobile-wrap { display: none; }
+    /* Desktop: use select dropdown instead of tab buttons */
     #canton-ctx-section .ctx-tabs-desktop { display: none !important; }
     #canton-ctx-section .ctx-tabs-mobile-wrap { display: block; }
     .ctx-tabs-select {
@@ -949,6 +939,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
     }
     .ctx-tabs-select option { background: #060818; color: #fff; font-size: 17px; }
     @media (min-width: 701px) {
+      /* CC hub desktop: bigger charts and select */
       #canton-ctx-section .ctx-tabs-select { font-size: 18px; padding: 12px 20px; padding-right: 48px; }
       .ctx-chart-wrap { height: 380px !important; }
       #ctx-chart-cantonomics-wrap { height: 420px !important; }
@@ -1067,10 +1058,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
       <!-- Panel 1 — Burn/Mint Ratio -->
       <div class="ctx-panel active" id="ctx-panel-ratio">
-        <div class="ctx-interval-row">
-          <button class="ctx-interval-btn active" data-tab="ratio" data-interval="week" onclick="ctxSetInterval('ratio','week')">Weekly</button>
-          <button class="ctx-interval-btn" data-tab="ratio" data-interval="day" onclick="ctxSetInterval('ratio','day')">Daily</button>
-        </div>
         <div class="ctx-chart-wrap" id="ctx-chart-ratio-wrap">
           <div class="ctx-loading" id="ctx-loading-ratio">Loading on-chain data&hellip;</div>
           <canvas id="ctx-chart-ratio" style="display:none"></canvas>
@@ -1080,10 +1067,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
       <!-- Panel 2 — Burn Activity -->
       <div class="ctx-panel" id="ctx-panel-burn">
-        <div class="ctx-interval-row">
-          <button class="ctx-interval-btn active" data-tab="burn" data-interval="week" onclick="ctxSetInterval('burn','week')">Weekly</button>
-          <button class="ctx-interval-btn" data-tab="burn" data-interval="day" onclick="ctxSetInterval('burn','day')">Daily</button>
-        </div>
         <div class="ctx-chart-wrap" id="ctx-chart-burn-wrap">
           <div class="ctx-loading" id="ctx-loading-burn">Loading on-chain data&hellip;</div>
           <canvas id="ctx-chart-burn" style="display:none"></canvas>
@@ -1093,10 +1076,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
       <!-- Panel 3 — Mint Activity -->
       <div class="ctx-panel" id="ctx-panel-mint">
-        <div class="ctx-interval-row">
-          <button class="ctx-interval-btn active" data-tab="mint" data-interval="week" onclick="ctxSetInterval('mint','week')">Weekly</button>
-          <button class="ctx-interval-btn" data-tab="mint" data-interval="day" onclick="ctxSetInterval('mint','day')">Daily</button>
-        </div>
         <div class="ctx-chart-wrap" id="ctx-chart-mint-wrap">
           <div class="ctx-loading" id="ctx-loading-mint">Loading on-chain data&hellip;</div>
           <canvas id="ctx-chart-mint" style="display:none"></canvas>
@@ -2465,17 +2444,13 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
      CANTON CONTEXT — on-chain burn/mint module
   ═══════════════════════════════════════════════════════════ */
 
-  const CTX_API_WEEK = "https://fossil-outlook-levitate-gloomy.cantonscan.com/api/mining-rounds/timeseries?interval=week";
-  const CTX_API_DAY  = "https://fossil-outlook-levitate-gloomy.cantonscan.com/api/mining-rounds/timeseries?interval=day";
+  const CTX_API = "https://fossil-outlook-levitate-gloomy.cantonscan.com/api/mining-rounds/timeseries?interval=week";
 
   // Chart.js instances — kept so we can destroy before re-render
   const ctxCharts = { ratio: null, mint: null, burn: null, alloc: null, cantonomics: null };
 
   // Shared data once fetched
-  let ctxDataWeek = null;
-  let ctxDataDay  = null;
   let ctxData = null;
-  const ctxInterval = { ratio: "week", burn: "week", mint: "week" };
 
   // Active tab
   let ctxActiveTab = "ratio";
@@ -2495,13 +2470,13 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
   async function ctxLoad() {
     try {
-      const [resW, resD] = await Promise.all([fetch(CTX_API_WEEK), fetch(CTX_API_DAY)]);
-      if (!resW.ok) throw new Error("HTTP " + resW.status);
-      const [jsonW, jsonD] = await Promise.all([resW.json(), resD.json()]);
-      ctxDataWeek = jsonW.data || [];
-      ctxDataDay  = jsonD.data || [];
-      if (!ctxDataWeek.length) throw new Error("No data");
-      ctxData = ctxDataWeek;
+      const res = await fetch(CTX_API);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const json = await res.json();
+      const rows = json.data || [];
+      if (!rows.length) throw new Error("No data");
+      // Keep last 26 weeks for ratio; all history for mint & burn
+      ctxData = rows;
       // Hide all loaders
       ["ratio","mint","burn","alloc"].forEach(t => {
         const el = document.getElementById("ctx-loading-" + t);
@@ -2520,14 +2495,6 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       });
     }
   }
-
-  window.ctxSetInterval = function(tab, interval) {
-    ctxInterval[tab] = interval;
-    document.querySelectorAll('.ctx-interval-btn[data-tab="' + tab + '"]').forEach(function(b) {
-      b.classList.toggle('active', b.dataset.interval === interval);
-    });
-    ctxRender(tab);
-  };
 
   function ctxFmt(n) {
     if (!n && n !== 0) return "N/A";
@@ -2594,9 +2561,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   }
 
   function ctxRender(tab) {
-    if (!ctxDataWeek) return;
-    const isDay  = ctxInterval[tab] === "day";
-    const src    = isDay ? (ctxDataDay || ctxDataWeek) : ctxDataWeek;
+    if (!ctxData) return;
+
+    // Ratio: full history
+    const src    = ctxData;
     const labels = src.map(r => ctxWeekLabel(r.date));
 
     if (tab === "ratio") {
@@ -2622,24 +2590,27 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       function deflClass(v) { return v > 1.05 ? "deflationary" : v >= 0.95 ? "neutral" : "inflationary"; }
       function deflText(v)  { return v > 1.05 ? "DEFLATIONARY 🟢" : v >= 0.95 ? "NEUTRAL 🟡" : "INFLATIONARY 🔴"; }
 
-      // Daily averages from day dataset
-      var dRatioSrc = ctxDataDay || [];
-      var dRatios   = dRatioSrc.map(function(r) { var m=r.mintAmount||0,b=r.burnAmount||0; return m ? parseFloat((b/m).toFixed(4)) : 0; });
-      function dAvgR(n) { var s=dRatios.slice(-n); return s.length ? s.reduce(function(a,b){return a+b;},0)/s.length : 0; }
-      var dAvg30=dAvgR(30), dAvg90=dAvgR(90), dAvg180=dAvgR(180);
-
-      var ratioHtml = "";
-      ratioHtml += "<div class='ctx-kpi'><span class='ctx-kpi-label'>" + (isDay ? "Today" : "This Week") + "</span><span class='ctx-kpi-value " + deflClass(latest) + "'>" + latest.toFixed(4) + "</span></div>";
-      ratioHtml += "<div class='ctx-kpi'><span class='ctx-kpi-label'>" + (isDay ? "1M Avg (Daily)" : "1M Avg (Weekly)") + "</span><span class='ctx-kpi-value " + deflClass(avg1m) + "'>" + avg1m.toFixed(4) + "</span></div>";
-      ratioHtml += "<div class='ctx-kpi'><span class='ctx-kpi-label'>" + (isDay ? "3M Avg (Daily)" : "3M Avg (Weekly)") + "</span><span class='ctx-kpi-value " + deflClass(avg3m) + "'>" + avg3m.toFixed(4) + "</span></div>";
-      ratioHtml += "<div class='ctx-kpi'><span class='ctx-kpi-label'>" + (isDay ? "6M Avg (Daily)" : "6M Avg (Weekly)") + "</span><span class='ctx-kpi-value " + deflClass(avg6m) + "'>" + avg6m.toFixed(4) + "</span></div>";
-      if (!isDay) {
-        ratioHtml += "<div class='ctx-kpi'><span class='ctx-kpi-label'>30D Avg (Daily)</span><span class='ctx-kpi-value " + deflClass(dAvg30) + "'>" + dAvg30.toFixed(4) + "</span></div>";
-        ratioHtml += "<div class='ctx-kpi'><span class='ctx-kpi-label'>90D Avg (Daily)</span><span class='ctx-kpi-value " + deflClass(dAvg90) + "'>" + dAvg90.toFixed(4) + "</span></div>";
-        ratioHtml += "<div class='ctx-kpi'><span class='ctx-kpi-label'>180D Avg (Daily)</span><span class='ctx-kpi-value " + deflClass(dAvg180) + "'>" + dAvg180.toFixed(4) + "</span></div>";
-      }
-      ratioHtml += "<div class='ctx-kpi'><span class='ctx-kpi-label'>Tokenomics Status</span><span class='ctx-kpi-value " + deflClass(latest) + "' style='font-size:20px'>" + deflText(latest) + "</span></div>";
-      document.getElementById("ctx-kpi-ratio").innerHTML = ratioHtml;
+      document.getElementById("ctx-kpi-ratio").innerHTML = `
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">This Week</span>
+          <span class="ctx-kpi-value ${deflClass(latest)}">${latest.toFixed(4)}</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">1M Average</span>
+          <span class="ctx-kpi-value ${deflClass(avg1m)}">${avg1m.toFixed(4)}</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">3M Average</span>
+          <span class="ctx-kpi-value ${deflClass(avg3m)}">${avg3m.toFixed(4)}</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">6M Average</span>
+          <span class="ctx-kpi-value ${deflClass(avg6m)}">${avg6m.toFixed(4)}</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">Tokenomics Status</span>
+          <span class="ctx-kpi-value ${deflClass(latest)}" style="font-size:20px">${deflText(latest)}</span>
+        </div>`;
 
       // Tooltip label also uses updated thresholds
       const tooltipFn = v => v > 1.05 ? " — Deflationary" : v >= 0.95 ? " — Neutral" : " — Inflationary";
@@ -2669,19 +2640,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
             {
               label: "Equilibrium (1.0)",
               data: refLine,
+              // ── 3) Gold same as KPI value color ──
               borderColor: "#ffd36b",
               borderDash: [5, 4],
               borderWidth: 2,
-              pointRadius: 0,
-              fill: false,
-              tension: 0,
-            },
-            {
-              label: isDay ? "30D Avg (Daily)" : "1M Avg (Weekly)",
-              data: labels.map(function(){return isDay ? dAvg30 : avg1m;}),
-              borderColor: "#98ffb6",
-              borderDash: [3,5],
-              borderWidth: 1.5,
               pointRadius: 0,
               fill: false,
               tension: 0,
@@ -2725,21 +2687,24 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const mint3m   = mintAvg(13);
       const mint6m   = mintAvg(26);
 
-      var dMintSrc=ctxDataDay||[];
-      var dMintArr=dMintSrc.map(function(r){return (r.appRewards||0)+(r.validatorRewards||0)+(r.superValidatorRewards||0);});
-      function dMintAvg(n){var s=dMintArr.slice(-n);return s.length?s.reduce(function(a,b){return a+b;},0)/s.length:0;}
-      var dMint30=dMintAvg(30),dMint90=dMintAvg(90),dMint180=dMintAvg(180);
-      var mintHtml="<div style="width:100%;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:4px">Overall Minted</div>";
-      mintHtml+="<div class='ctx-kpi'><span class='ctx-kpi-label'>"+(isDay?"Today":"This Week")+"</span><span class='ctx-kpi-value' style='color:#fff'>"+ctxFmt(mintThis)+" CC</span></div>";
-      mintHtml+="<div class='ctx-kpi'><span class='ctx-kpi-label'>"+(isDay?"1M Avg (Daily)":"1M Avg (Weekly)")+"</span><span class='ctx-kpi-value' style='color:#ff8ad8'>"+ctxFmt(mint1m)+" CC</span></div>";
-      mintHtml+="<div class='ctx-kpi'><span class='ctx-kpi-label'>"+(isDay?"3M Avg (Daily)":"3M Avg (Weekly)")+"</span><span class='ctx-kpi-value' style='color:#98ffb6'>"+ctxFmt(mint3m)+" CC</span></div>";
-      mintHtml+="<div class='ctx-kpi'><span class='ctx-kpi-label'>"+(isDay?"6M Avg (Daily)":"6M Avg (Weekly)")+"</span><span class='ctx-kpi-value' style='color:#ffd36b'>"+ctxFmt(mint6m)+" CC</span></div>";
-      if(!isDay){
-        mintHtml+="<div class='ctx-kpi'><span class='ctx-kpi-label'>30D Avg (Daily)</span><span class='ctx-kpi-value' style='color:#ff8ad8'>"+ctxFmt(dMint30)+" CC</span></div>";
-        mintHtml+="<div class='ctx-kpi'><span class='ctx-kpi-label'>90D Avg (Daily)</span><span class='ctx-kpi-value' style='color:#98ffb6'>"+ctxFmt(dMint90)+" CC</span></div>";
-        mintHtml+="<div class='ctx-kpi'><span class='ctx-kpi-label'>180D Avg (Daily)</span><span class='ctx-kpi-value' style='color:#ffd36b'>"+ctxFmt(dMint180)+" CC</span></div>";
-      }
-      document.getElementById("ctx-kpi-mint").innerHTML = mintHtml;
+      document.getElementById("ctx-kpi-mint").innerHTML = `
+        <div style="width:100%;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:4px">Overall Minted</div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">This Week</span>
+          <span class="ctx-kpi-value" style="color:#ffffff">${ctxFmt(mintThis)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">1M Average</span>
+          <span class="ctx-kpi-value" style="color:#ff8ad8">${ctxFmt(mint1m)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">3M Average</span>
+          <span class="ctx-kpi-value" style="color:#98ffb6">${ctxFmt(mint3m)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">6M Average</span>
+          <span class="ctx-kpi-value" style="color:#ffd36b">${ctxFmt(mint6m)} CC</span>
+        </div>`;
 
       if (ctxCharts.mint) { ctxCharts.mint.destroy(); ctxCharts.mint = null; }
       const cv  = document.getElementById("ctx-chart-mint");
@@ -2866,21 +2831,23 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const burn3m   = burnAvg(13);
       const burn6m   = burnAvg(26);
 
-      var dBurnSrc = ctxDataDay || [];
-      var dBurnArr = dBurnSrc.map(function(r){return r.burnAmount||0;});
-      function dBurnAvg(n){var s=dBurnArr.slice(-n);return s.length?s.reduce(function(a,b){return a+b;},0)/s.length:0;}
-      var dBurn30=dBurnAvg(30),dBurn90=dBurnAvg(90),dBurn180=dBurnAvg(180);
-      var burnHtml="";
-      burnHtml+="<div class='ctx-kpi'><span class='ctx-kpi-label'>"+(isDay?"Today":"This Week")+"</span><span class='ctx-kpi-value' style='color:#fff'>"+ctxFmt(burnThis)+" CC</span></div>";
-      burnHtml+="<div class='ctx-kpi'><span class='ctx-kpi-label'>"+(isDay?"1M Avg (Daily)":"1M Avg (Weekly)")+"</span><span class='ctx-kpi-value' style='color:#7ee0ff'>"+ctxFmt(burn1m)+" CC</span></div>";
-      burnHtml+="<div class='ctx-kpi'><span class='ctx-kpi-label'>"+(isDay?"3M Avg (Daily)":"3M Avg (Weekly)")+"</span><span class='ctx-kpi-value' style='color:#98ffb6'>"+ctxFmt(burn3m)+" CC</span></div>";
-      burnHtml+="<div class='ctx-kpi'><span class='ctx-kpi-label'>"+(isDay?"6M Avg (Daily)":"6M Avg (Weekly)")+"</span><span class='ctx-kpi-value' style='color:#ffd36b'>"+ctxFmt(burn6m)+" CC</span></div>";
-      if(!isDay){
-        burnHtml+="<div class='ctx-kpi'><span class='ctx-kpi-label'>30D Avg (Daily)</span><span class='ctx-kpi-value' style='color:#7ee0ff'>"+ctxFmt(dBurn30)+" CC</span></div>";
-        burnHtml+="<div class='ctx-kpi'><span class='ctx-kpi-label'>90D Avg (Daily)</span><span class='ctx-kpi-value' style='color:#98ffb6'>"+ctxFmt(dBurn90)+" CC</span></div>";
-        burnHtml+="<div class='ctx-kpi'><span class='ctx-kpi-label'>180D Avg (Daily)</span><span class='ctx-kpi-value' style='color:#ffd36b'>"+ctxFmt(dBurn180)+" CC</span></div>";
-      }
-      document.getElementById("ctx-kpi-burn").innerHTML = burnHtml;
+      document.getElementById("ctx-kpi-burn").innerHTML = `
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">This Week</span>
+          <span class="ctx-kpi-value" style="color:#ffffff">${ctxFmt(burnThis)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">1M Average</span>
+          <span class="ctx-kpi-value" style="color:#7ee0ff">${ctxFmt(burn1m)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">3M Average</span>
+          <span class="ctx-kpi-value" style="color:#98ffb6">${ctxFmt(burn3m)} CC</span>
+        </div>
+        <div class="ctx-kpi">
+          <span class="ctx-kpi-label">6M Average</span>
+          <span class="ctx-kpi-value" style="color:#ffd36b">${ctxFmt(burn6m)} CC</span>
+        </div>`;
 
       if (ctxCharts.burn) { ctxCharts.burn.destroy(); ctxCharts.burn = null; }
       const cv  = document.getElementById("ctx-chart-burn");
@@ -2905,15 +2872,6 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
               pointHoverRadius: 5,
               pointBackgroundColor: "#ff8ad8",
               borderWidth: 2,
-            },
-            {
-              label: isDay ? "30D Avg (Daily)" : "1M Avg (Weekly)",
-              data: labels.map(function(){return isDay ? dBurn30 : burn1m;}),
-              borderColor: "#7ee0ff",
-              borderDash: [5,4],
-              borderWidth: 1.5,
-              pointRadius: 0,
-              fill: false,
             },
           ],
         },
