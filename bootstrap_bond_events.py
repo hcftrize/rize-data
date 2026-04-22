@@ -20,7 +20,7 @@ BOND_BROKEN_TOPIC = '0xc23747277531c745e0e6b38cafe2803258edc500eee3dffa3f081b89d
 BLOCKS_PER_DAY    = 24 * 3600 * 2   # ~172,800
 
 
-BASE_PUBLIC_RPC = 'https://mainnet.base.org'
+BASE_PUBLIC_RPC = 'https://rpc.ankr.com/base'
 
 def rpc(method, params, url=None):
     endpoint = url or ALCHEMY_URL
