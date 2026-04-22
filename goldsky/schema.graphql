@@ -1,0 +1,8 @@
+type BondBroken @entity {
+  id: ID!          # transaction hash
+  nftId: BigInt!
+  amount: BigDecimal!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
