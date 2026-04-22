@@ -3200,33 +3200,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     });
   }
 
-  async function rzFetchRewards(partyId) {
-    const end = new Date().toISOString();
-    const url = `${RZ_API_BASE}/${encodeURIComponent(partyId)}/stats/rewards?start_time=${encodeURIComponent(RZ_GENESIS)}&end_time=${encodeURIComponent(end)}`;
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
-    try {
-      const res = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeout);
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      return res.json();
-    } catch(e) {
-      clearTimeout(timeout);
-      throw e;
-    }
-  }
-
-  async function rzFetchBurns(partyId) {
-    const end = new Date().toISOString();
-    const url = `${RZ_API_BASE}/${encodeURIComponent(partyId)}/stats/burns?start_time=${encodeURIComponent(RZ_GENESIS)}&end_time=${encodeURIComponent(end)}`;
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
-    try {
-      const res = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeout);
-      if (!res.ok) return [];
-      return res.json();
-    } catch(e) { clearTimeout(timeout); return []; }
+  async function rzFetchCantonData() {
+    const res = await fetch("/rize-data-hub/canton-revenue.json");
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return res.json();
   }
 
   function rzFmt(n) {
@@ -3276,13 +3253,12 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
   async function rzLoad() {
     try {
-      // Fetch rewards + burns in parallel for both parties
-      const [valData, scoreData, valBurns, scoreBurns] = await Promise.all([
-        rzFetchRewards(RZ_VALIDATOR_ID),
-        rzFetchRewards(RZ_RIZESCORE_ID),
-        rzFetchBurns(RZ_VALIDATOR_ID),
-        rzFetchBurns(RZ_RIZESCORE_ID),
-      ]);
+      // Load pre-fetched data from static JSON (no CORS issue)
+      const cantonData = await rzFetchCantonData();
+      const valData    = cantonData.validator_rewards || [];
+      const scoreData  = cantonData.score_rewards     || [];
+      const valBurns   = cantonData.validator_burns   || [];
+      const scoreBurns = cantonData.score_burns        || [];
 
       // Hide loaders
       ["cumul","weekly"].forEach(k => {
