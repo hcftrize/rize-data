@@ -20,14 +20,17 @@ BOND_BROKEN_TOPIC = '0xc23747277531c745e0e6b38cafe2803258edc500eee3dffa3f081b89d
 BLOCKS_PER_DAY    = 24 * 3600 * 2   # ~172,800
 
 
-def rpc(method, params):
+BASE_PUBLIC_RPC = 'https://mainnet.base.org'
+
+def rpc(method, params, url=None):
+    endpoint = url or ALCHEMY_URL
     payload = json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': method, 'params': params}).encode()
-    req = urllib.request.Request(ALCHEMY_URL, data=payload, headers={'Content-Type': 'application/json'})
+    req = urllib.request.Request(endpoint, data=payload, headers={'Content-Type': 'application/json'})
     try:
-        with urllib.request.urlopen(req, timeout=15) as r:
+        with urllib.request.urlopen(req, timeout=30) as r:
             return json.loads(r.read().decode())
     except Exception as e:
-        print(f'  RPC error: {e}')
+        print(f'  RPC error ({endpoint}): {e}')
         return None
 
 
@@ -56,39 +59,26 @@ def main():
         return
     print(f'Current block: {current_block}')
 
-    # Scan 7 days: one request per day window using alchemy_getAssetTransfers
-    all_hashes = set()
-    for day_offset in range(7):
-        day_start = current_block - (day_offset + 1) * BLOCKS_PER_DAY
-        day_end   = current_block - day_offset * BLOCKS_PER_DAY
-        res = rpc('alchemy_getAssetTransfers', [{
-            'fromBlock'       : hex(max(0, day_start)),
-            'toBlock'         : hex(day_end),
-            'toAddress'       : GOV_CONTRACT,
-            'category'        : ['internal', 'external'],
-            'maxCount'        : '0x3e8',
-            'order'           : 'desc',
-            'withMetadata'    : False,
-            'excludeZeroValue': False,
-        }])
-        if res and 'result' in res:
-            day_hashes = {tx.get('hash','') for tx in res['result'].get('transfers', []) if tx.get('hash')}
-            all_hashes |= day_hashes
-            print(f'  Day -{day_offset+1}: {len(day_hashes)} txs found')
-        time.sleep(0.2)
+    # Scan 7 days using Base public RPC (no block limit on eth_getLogs)
+    start_block = max(0, current_block - 7 * BLOCKS_PER_DAY)
+    print(f'Scanning blocks {start_block} → {current_block} via Base public RPC...')
 
-    print(f'\n{len(all_hashes)} total unique txs, fetching receipts...')
+    res = rpc('eth_getLogs', [{
+        'fromBlock': hex(start_block),
+        'toBlock'  : 'latest',
+        'address'  : GOV_CONTRACT,
+        'topics'   : [BOND_BROKEN_TOPIC],
+    }], url=BASE_PUBLIC_RPC)
+
+    print(f'eth_getLogs response: {str(res)[:200]}')
 
     new_events = []
-    for i, tx_hash in enumerate(all_hashes):
-        if tx_hash in existing_tx:
-            continue
-        receipt = rpc('eth_getTransactionReceipt', [tx_hash])
-        if not receipt or not receipt.get('result'):
-            continue
-        for log in receipt['result'].get('logs', []):
-            topics = log.get('topics', [])
-            if not topics or topics[0].lower() != BOND_BROKEN_TOPIC.lower():
+    if res and 'result' in res:
+        logs = res['result']
+        print(f'{len(logs)} BondBroken events found')
+        for log in logs:
+            tx_hash = log.get('transactionHash', '')
+            if tx_hash in existing_tx:
                 continue
             data = log.get('data', '0x')
             if len(data) >= 66:
@@ -103,9 +93,8 @@ def main():
                     existing_tx.add(tx_hash)
                 except:
                     pass
-        if (i+1) % 20 == 0:
-            print(f'  {i+1}/{len(all_hashes)} receipts checked, {len(new_events)} events so far...')
-        time.sleep(0.1)
+    else:
+        print(f'[WARN] eth_getLogs failed or returned no result')
 
     print(f'\nFound {len(new_events)} new BondBroken events')
 
