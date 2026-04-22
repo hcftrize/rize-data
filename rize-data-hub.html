@@ -1355,7 +1355,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
                   <td style="color:var(--muted)">1</td>
                   <td style="color:#ffd36b;font-weight:700">$50M</td>
                   <td style="color:var(--muted)">NDA</td>
-                  <td style="color:#98ffb6;font-weight:700">~$600,000</td>
+                  <td style="color:#98ffb6;font-weight:700">$600,000</td>
                   <td style="color:var(--muted)">1.20% AVG</td>
                   <td style="color:var(--muted)">Average %</td>
                 </tr>
@@ -2944,14 +2944,15 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           else if (e.estAmount)  { cumSumEst += e.estAmount; }
         }
       });
-      cumData.push(cumSum);
+      // cumData uses cumSumEst so the line always connects to est. milestones
+      cumData.push(cumSumEst);
       cumDataEst.push(cumSumEst);
 
       const namedEntry = rwaEntries.find(e => e.date.slice(0, 7) === iso);
       if (namedEntry) {
         pointLabels.push(namedEntry.label);
         if (namedEntry.amount !== null) {
-          pointData.push(cumSum);
+          pointData.push(cumSumEst);
           pointDataEst.push(null);
         } else {
           pointData.push(null);
