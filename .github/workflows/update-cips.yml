@@ -27,7 +27,7 @@ jobs:
       - name: Run CIP scraper
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
-        run: python scrape_cips.py
+        run: python scripts/scrape_cips.py
 
       - name: Commit and push if changes
         run: |
