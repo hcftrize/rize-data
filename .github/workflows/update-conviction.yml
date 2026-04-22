@@ -4,12 +4,6 @@ on:
   schedule:
     - cron: '0 8 * * *'  # Every day at 08:00 UTC
   workflow_dispatch:
-    inputs:
-      bootstrap:
-        description: 'Run bootstrap (first time only — rebuilds full history)'
-        required: false
-        default: 'false'
-        type: boolean
 
 jobs:
   scrape:
@@ -32,13 +26,7 @@ jobs:
       - name: Run scraper
         env:
           ALCHEMY_RPC_URL: ${{ secrets.ALCHEMY_RPC_URL }}
-        run: |
-          if [ "${{ github.event.inputs.bootstrap }}" = "true" ]; then
-            echo "Running bootstrap..."
-            python bootstrap_conviction.py
-          else
-            python scrape_conviction.py
-          fi
+        run: python scrape_conviction.py
 
       - name: Commit and push to dev
         run: |

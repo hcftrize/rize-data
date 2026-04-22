@@ -926,6 +926,9 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
     /* Mobile ctx-tabs: native select */
     .ctx-tabs-mobile-wrap { display: none; }
+    /* Desktop: also show the dropdown, hide tab buttons for RIZE Context */
+    #rize-ctx-section .ctx-tabs-desktop { display: none !important; }
+    #rize-ctx-section .ctx-tabs-mobile-wrap { display: block; }
     .ctx-tabs-select {
       width: 100%;
       padding: 12px 16px;
@@ -951,6 +954,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
       background: #060818;
       color: #fff;
       font-size: 15px;
+    }
+    @media (min-width: 701px) {
+      /* RIZE Context uses select on desktop too — style it wider */
+      #rize-ctx-section .ctx-tabs-select { font-size: 18px; padding: 12px 20px; padding-right: 48px; }
     }
     @media (max-width: 700px) {
       .ctx-tabs-mobile-wrap { display: block; }
@@ -2830,7 +2837,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   function rzCtxSwitch(tab, btn) {
     const section = document.getElementById("rize-ctx-section");
     section.querySelectorAll(".ctx-tab").forEach(t => t.classList.remove("active"));
-    btn.classList.add("active");
+    if (btn) btn.classList.add("active");
     section.querySelectorAll(".ctx-panel").forEach(p => p.classList.remove("active"));
     document.getElementById("rz-panel-" + tab).classList.add("active");
     const sel = document.getElementById("rz-ctx-select");
@@ -3012,13 +3019,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   }
 
   function rzCtxSelectChange(sel) {
-    const tab = sel.value;
-    // Mirror to desktop tabs
-    const desktopTabs = document.querySelectorAll("#rize-ctx-section .ctx-tabs-desktop .ctx-tab");
-    desktopTabs.forEach(function(btn) {
-      const btnTab = btn.getAttribute("onclick").match(/'([^']+)'/)[1];
-      if (btnTab === tab) rzCtxSwitch(tab, btn);
-    });
+    rzCtxSwitch(sel.value, null);
   }
 
   let rzBurnAdjVisible = false;
@@ -4212,7 +4213,14 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       // Render
       convRenderMainChart(govSeries, cexSeries);
       convRenderUnbondingChart(unbSeries);
-      convRenderLive(live.bonded, live.unbonding, live.cexTotal);
+      // Unbonding queue: use latest from JSON (computed from BondBroken events)
+      const latestUnbonding = history.whales !== undefined
+        ? ((() => {
+            const unbArr = history.unbonding || [];
+            return unbArr.length ? unbArr[unbArr.length - 1].value : live.unbonding;
+          })())
+        : live.unbonding;
+      convRenderLive(live.bonded, latestUnbonding, live.cexTotal);
       convRenderGovDeltas(govSeries);
       convRenderDeltas(cexSeries);
       convRenderWhales(whalesFromJson, addrLabels);
@@ -4237,10 +4245,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
 
     document.addEventListener("DOMContentLoaded", rzLoad);
-  // RWA is the default active tab — render its chart on load
-  document.addEventListener("DOMContentLoaded", function() {
-    setTimeout(rzRenderRwaChart, 100);
-  });
+  // RWA chart renders on first switch to that tab (not on load — conviction is default)
 
   // Dismiss chart tooltips on tap outside canvas (mobile)
   document.addEventListener("click", function(e) {

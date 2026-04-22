@@ -5,10 +5,10 @@ Daily script — runs at 08:00 UTC via GitHub Actions.
 Appends one data point per day to conviction-history.json.
 
 Fetches:
-  - bonded      : balanceOf(governance contract)
-  - cex         : sum balanceOf(all CEX addresses)
-  - unbonding   : releasableTokens() from governance contract
-  - whales      : new transfers > 5M RIZE in last 24h (keeps 30d rolling window)
+  - bonded         : balanceOf(governance contract)
+  - cex            : sum balanceOf(all CEX addresses)
+  - unbonding_queue: sum of BondBroken events in last 7 days (active unbonding)
+  - whales         : new transfers > 5M RIZE in last 24h (keeps 30d rolling window)
 """
 
 import json, os, time, urllib.request
@@ -24,6 +24,9 @@ ALCHEMY_URL  = os.environ.get(
     'ALCHEMY_RPC_URL',
     'https://base-mainnet.g.alchemy.com/v2/qS-QZnHMq-cqmoFkw-grY'
 )
+
+# BondBroken(uint256 nftId, uint256 amount) topic0
+BOND_BROKEN_TOPIC = '0x5c595b69c2b0a43579730e1619c5196ea604fe9a6935300e02d85ee621175cce'
 
 CEX_ADDRESSES = {
     'Kraken Hot 1'  : '0x02Ac4617Fe004cf8Cd9c988Ff9C905b2Ec676C2d',
@@ -67,19 +70,67 @@ def get_balance(address):
         return 0.0
 
 
-def get_releasable():
-    res = rpc('eth_call', [{'to': GOV_CONTRACT, 'data': '0x1c269043'}, 'latest'])
-    if not res or not res.get('result') or res['result'] == '0x':
+def get_current_block():
+    res = rpc('eth_blockNumber', [])
+    if res and res.get('result'):
+        return int(res['result'], 16)
+    return 0
+
+
+def get_unbonding_queue():
+    """
+    Sum all BondBroken events from last 7 days.
+    Base produces ~2 blocks/sec = ~86400 blocks/12h = ~1,209,600 blocks/7d
+    We use ~1,210,000 blocks as 7-day window to be safe.
+    """
+    current_block = get_current_block()
+    if not current_block:
+        print('  [WARN] Could not get current block')
         return 0.0
-    try:
-        return int(res['result'], 16) / DECIMALS
-    except:
+
+    # ~7 days of Base blocks (2 blocks/sec)
+    blocks_7d = 7 * 24 * 3600 * 2  # = 1,209,600
+    from_block = hex(max(0, current_block - blocks_7d))
+
+    res = rpc('eth_getLogs', [{
+        'fromBlock': from_block,
+        'toBlock'  : 'latest',
+        'address'  : GOV_CONTRACT,
+        'topics'   : [BOND_BROKEN_TOPIC],
+    }])
+
+    if not res or 'result' not in res:
+        print('  [WARN] eth_getLogs failed for BondBroken')
         return 0.0
+
+    logs = res['result']
+    if not logs:
+        print('  No BondBroken events in last 7 days')
+        return 0.0
+
+    total = 0.0
+    for log in logs:
+        # data contains: amount (uint256) — 32 bytes
+        # nftId is topics[1], amount is in data
+        data = log.get('data', '0x')
+        if len(data) >= 66:  # 0x + 64 hex chars
+            try:
+                amount = int(data[2:66], 16) / DECIMALS
+                total += amount
+            except:
+                pass
+
+    print(f'  {len(logs)} BondBroken events found in last 7d → {total:,.2f} RIZE in queue')
+    return round(total, 2)
 
 
 def fetch_recent_whales():
     """Fetch transfers > 5M RIZE from last 24h via alchemy_getAssetTransfers."""
-    yesterday_block = hex(int(rpc('eth_blockNumber', [])['result'], 16) - 43200)  # ~24h of Base blocks
+    block_res = rpc('eth_blockNumber', [])
+    if not block_res or not block_res.get('result'):
+        return []
+    current = int(block_res['result'], 16)
+    yesterday_block = hex(current - 43200)  # ~24h of Base blocks
 
     params = {
         'fromBlock': yesterday_block,
@@ -130,7 +181,7 @@ def main():
     # Load existing
     if OUTPUT_FILE.exists():
         history = json.loads(OUTPUT_FILE.read_text(encoding='utf-8'))
-        print(f'Loaded existing JSON')
+        print(f'Loaded existing JSON ({len(history.get("bonded", []))} bonded points)')
     else:
         print('No JSON found — run bootstrap_conviction.py first')
         history = {'bonded': [], 'cex': [], 'unbonding': [], 'whales': [], 'metadata': {}}
@@ -145,12 +196,12 @@ def main():
 
     # 1. Bonded
     bonded = get_balance(GOV_CONTRACT)
-    print(f'  Bonded    : {bonded:,.0f} RIZE')
+    print(f'  Bonded         : {bonded:,.0f} RIZE')
 
-    # 2. Unbonding queue
+    # 2. Unbonding queue — sum of BondBroken events last 7 days
     time.sleep(0.3)
-    unbonding = get_releasable()
-    print(f'  Unbonding : {unbonding:,.0f} RIZE')
+    unbonding = get_unbonding_queue()
+    print(f'  Unbonding queue: {unbonding:,.2f} RIZE')
 
     # 3. CEX total
     cex_total = 0.0
@@ -158,12 +209,12 @@ def main():
         bal = get_balance(addr)
         cex_total += bal
         time.sleep(0.15)
-    print(f'  CEX total : {cex_total:,.0f} RIZE')
+    print(f'  CEX total      : {cex_total:,.0f} RIZE')
 
     # 4. New whale movements (last 24h)
     print('  Fetching whale movements...')
     new_whales = fetch_recent_whales()
-    print(f'  Whales    : {len(new_whales)} new movements >5M RIZE')
+    print(f'  Whales         : {len(new_whales)} new movements >5M RIZE')
 
     # Append today's points
     history.setdefault('bonded',    []).append({'date': today, 'value': round(bonded, 2)})
