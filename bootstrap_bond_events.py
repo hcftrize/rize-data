@@ -1,11 +1,8 @@
 """
 bootstrap_bond_events.py
 ========================
-Run ONCE to backfill the last 7 days of BondBroken events into conviction-history.json.
-After this, scrape_conviction.py takes over scanning only 24h per day.
-
-Usage:
-    python bootstrap_bond_events.py
+Run ONCE to backfill last 7 days of BondBroken events.
+Uses alchemy_getAssetTransfers + eth_getTransactionReceipt — no eth_getLogs.
 """
 
 import json, os, time, urllib.request
@@ -19,21 +16,13 @@ ALCHEMY_URL       = os.environ.get(
     'ALCHEMY_RPC_URL',
     'https://base-mainnet.g.alchemy.com/v2/qS-QZnHMq-cqmoFkw-grY'
 )
-
 BOND_BROKEN_TOPIC = '0xc23747277531c745e0e6b38cafe2803258edc500eee3dffa3f081b89d9970096'
-CHUNK_SIZE        = 500
 BLOCKS_PER_DAY    = 24 * 3600 * 2   # ~172,800
 
 
 def rpc(method, params):
-    payload = json.dumps({
-        'jsonrpc': '2.0', 'id': 1,
-        'method': method, 'params': params
-    }).encode()
-    req = urllib.request.Request(
-        ALCHEMY_URL, data=payload,
-        headers={'Content-Type': 'application/json'}
-    )
+    payload = json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': method, 'params': params}).encode()
+    req = urllib.request.Request(ALCHEMY_URL, data=payload, headers={'Content-Type': 'application/json'})
     try:
         with urllib.request.urlopen(req, timeout=15) as r:
             return json.loads(r.read().decode())
@@ -49,25 +38,6 @@ def get_current_block():
     return 0
 
 
-# Cache block timestamps to avoid redundant RPC calls
-_block_date_cache = {}
-
-def block_to_date(block_num):
-    """Get exact date for a block using its on-chain timestamp."""
-    if block_num in _block_date_cache:
-        return _block_date_cache[block_num]
-    res = rpc('eth_getBlockByNumber', [hex(block_num), False])
-    if res and res.get('result') and res['result'].get('timestamp'):
-        ts = int(res['result']['timestamp'], 16)
-        d  = datetime.fromtimestamp(ts, tz=timezone.utc).date().isoformat()
-    else:
-        # Fallback: today (safe — event is recent by definition)
-        d = date.today().isoformat()
-    _block_date_cache[block_num] = d
-    time.sleep(0.05)
-    return d
-
-
 def main():
     if not OUTPUT_FILE.exists():
         print('ERROR: conviction-history.json not found. Run from repo root.')
@@ -76,7 +46,6 @@ def main():
     history = json.loads(OUTPUT_FILE.read_text(encoding='utf-8'))
     print(f'Loaded JSON ({len(history.get("bonded", []))} bonded points)')
 
-    # Ensure bond_events key exists
     history.setdefault('bond_events', [])
     existing_tx = {e['tx'] for e in history['bond_events']}
     print(f'Existing bond_events: {len(history["bond_events"])}')
@@ -87,82 +56,75 @@ def main():
         return
     print(f'Current block: {current_block}')
 
-    # Scan last 7 days
-    start_block = max(0, current_block - 7 * BLOCKS_PER_DAY)
-    total_chunks = (current_block - start_block) // CHUNK_SIZE + 1
-    print(f'Scanning blocks {start_block} → {current_block} ({total_chunks} chunks)...')
+    # Scan 7 days: one request per day window using alchemy_getAssetTransfers
+    all_hashes = set()
+    for day_offset in range(7):
+        day_start = current_block - (day_offset + 1) * BLOCKS_PER_DAY
+        day_end   = current_block - day_offset * BLOCKS_PER_DAY
+        res = rpc('alchemy_getAssetTransfers', [{
+            'fromBlock'       : hex(max(0, day_start)),
+            'toBlock'         : hex(day_end),
+            'toAddress'       : GOV_CONTRACT,
+            'category'        : ['internal', 'external'],
+            'maxCount'        : '0x3e8',
+            'order'           : 'desc',
+            'withMetadata'    : False,
+            'excludeZeroValue': False,
+        }])
+        if res and 'result' in res:
+            day_hashes = {tx.get('hash','') for tx in res['result'].get('transfers', []) if tx.get('hash')}
+            all_hashes |= day_hashes
+            print(f'  Day -{day_offset+1}: {len(day_hashes)} txs found')
+        time.sleep(0.2)
+
+    print(f'\n{len(all_hashes)} total unique txs, fetching receipts...')
 
     new_events = []
-    chunks_done = 0
-    block = start_block
+    for i, tx_hash in enumerate(all_hashes):
+        if tx_hash in existing_tx:
+            continue
+        receipt = rpc('eth_getTransactionReceipt', [tx_hash])
+        if not receipt or not receipt.get('result'):
+            continue
+        for log in receipt['result'].get('logs', []):
+            topics = log.get('topics', [])
+            if not topics or topics[0].lower() != BOND_BROKEN_TOPIC.lower():
+                continue
+            data = log.get('data', '0x')
+            if len(data) >= 66:
+                try:
+                    amount     = int(data[2:66], 16) / DECIMALS
+                    blk_num    = int(log.get('blockNumber', '0x0'), 16)
+                    blocks_ago = current_block - blk_num
+                    secs_ago   = blocks_ago / 2.0
+                    event_dt   = datetime.now(timezone.utc) - timedelta(seconds=secs_ago)
+                    event_date = event_dt.date().isoformat()
+                    new_events.append({'date': event_date, 'amount': round(amount, 2), 'tx': tx_hash})
+                    existing_tx.add(tx_hash)
+                except:
+                    pass
+        if (i+1) % 20 == 0:
+            print(f'  {i+1}/{len(all_hashes)} receipts checked, {len(new_events)} events so far...')
+        time.sleep(0.1)
 
-    while block <= current_block:
-        to_block = min(block + CHUNK_SIZE - 1, current_block)
-        res = rpc('eth_getLogs', [{
-            'fromBlock': hex(block),
-            'toBlock'  : hex(to_block),
-            'address'  : GOV_CONTRACT,
-            'topics'   : [BOND_BROKEN_TOPIC],
-        }])
+    print(f'\nFound {len(new_events)} new BondBroken events')
 
-        if res and 'result' in res:
-            for log in res['result']:
-                tx_hash = log.get('transactionHash', '')
-                if tx_hash in existing_tx:
-                    continue
-                data = log.get('data', '0x')
-                if len(data) >= 66:
-                    try:
-                        amount     = int(data[2:66], 16) / DECIMALS
-                        block_num  = int(log.get('blockNumber', '0x0'), 16)
-                        event_date = block_to_date(block_num)
-                        new_events.append({
-                            'date'  : event_date,
-                            'amount': round(amount, 2),
-                            'tx'    : tx_hash,
-                        })
-                        existing_tx.add(tx_hash)
-                    except:
-                        pass
-        elif res and 'error' in res:
-            print(f'  [WARN] chunk error: {res["error"]}')
-
-        chunks_done += 1
-        if chunks_done % 100 == 0:
-            print(f'  {chunks_done}/{total_chunks} chunks, {len(new_events)} events so far...')
-
-        block += CHUNK_SIZE
-        time.sleep(0.05)
-
-    print(f'\nFound {len(new_events)} new BondBroken events in last 7 days')
-
-    # Merge into history
     history['bond_events'].extend(new_events)
     history['bond_events'].sort(key=lambda x: x['date'], reverse=True)
 
-    # Compute unbonding queue = sum of all bond_events (all within 7 days)
     queue_total = sum(e['amount'] for e in history['bond_events'])
-    print(f'Unbonding queue total: {queue_total:,.2f} RIZE')
+    print(f'Unbonding queue: {queue_total:,.2f} RIZE')
 
-    # Update today's unbonding value in the series if it exists
     today = date.today().isoformat()
     for entry in history.get('unbonding', []):
         if entry['date'] == today:
             entry['value'] = round(queue_total, 2)
-            print(f'Updated unbonding series for {today}')
             break
 
-    # Update metadata
     history.setdefault('metadata', {})['updated'] = datetime.now(timezone.utc).isoformat()
-
-    OUTPUT_FILE.write_text(
-        json.dumps(history, indent=2, ensure_ascii=False),
-        encoding='utf-8'
-    )
-    print(f'\n✅ Done — {len(history["bond_events"])} bond_events in JSON')
+    OUTPUT_FILE.write_text(json.dumps(history, indent=2, ensure_ascii=False), encoding='utf-8')
+    print(f'\n✅ Done — {len(history["bond_events"])} bond_events saved')
     print(f'   Unbonding queue: {queue_total:,.2f} RIZE')
-    print(f'\nNow commit & push to dev, then main.')
-    print('From tomorrow, scrape_conviction.py handles daily updates automatically.')
 
 
 if __name__ == '__main__':

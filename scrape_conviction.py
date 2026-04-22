@@ -49,7 +49,6 @@ CEX_ADDRESSES = {
 }
 
 BLOCKS_PER_DAY  = 24 * 3600 * 2   # ~172,800  (Base ~2 blocks/sec)
-CHUNK_SIZE      = 500              # safely under Alchemy 2000-block limit
 
 
 def rpc(method, params):
@@ -89,49 +88,62 @@ def get_current_block():
 
 def fetch_bond_broken_events_24h(current_block):
     """
-    Scan only last 24h of blocks for BondBroken events.
-    ~172,800 blocks / 1500 per chunk = ~115 calls = ~10 seconds.
-    Returns list of {date, amount, tx} dicts.
+    Find BondBroken events by:
+    1. alchemy_getAssetTransfers (internal) to find txs touching the gov contract
+    2. eth_getTransactionReceipt on each tx to read BondBroken event logs
+    No eth_getLogs needed — avoids Alchemy block range restrictions.
     """
-    start_block = max(0, current_block - BLOCKS_PER_DAY)
-    today_str   = date.today().isoformat()
-    events      = []
-    chunks      = 0
+    from_block = hex(max(0, current_block - BLOCKS_PER_DAY))
+    today_str  = date.today().isoformat()
 
-    block = start_block
-    while block <= current_block:
-        to_block = min(block + CHUNK_SIZE - 1, current_block)
-        res = rpc('eth_getLogs', [{
-            'fromBlock': hex(block),
-            'toBlock'  : hex(to_block),
-            'address'  : GOV_CONTRACT,
-            'topics'   : [BOND_BROKEN_TOPIC],
-        }])
-        if res and 'result' in res:
-            for log in res['result']:
-                data = log.get('data', '0x')
-                if len(data) >= 66:
-                    try:
-                        amount = int(data[2:66], 16) / DECIMALS
-                        # Use block number to get approximate date
-                        # (events in the 24h window could be from yesterday)
-                        blk_num = int(log.get('blockNumber', '0x0'), 16)
-                        blocks_ago = current_block - blk_num
-                        secs_ago = blocks_ago / 2.0
-                        event_dt = datetime.now(timezone.utc) - timedelta(seconds=secs_ago)
-                        event_date = event_dt.date().isoformat()
-                        events.append({
-                            'date'  : event_date,
-                            'amount': round(amount, 2),
-                            'tx'    : log.get('transactionHash', ''),
-                        })
-                    except:
-                        pass
-        block  += CHUNK_SIZE
-        chunks += 1
-        time.sleep(0.05)
+    # Fetch internal transactions TO governance contract in last 24h
+    res = rpc('alchemy_getAssetTransfers', [{
+        'fromBlock'       : from_block,
+        'toBlock'         : 'latest',
+        'toAddress'       : GOV_CONTRACT,
+        'category'        : ['internal', 'external'],
+        'maxCount'        : '0x3e8',
+        'order'           : 'desc',
+        'withMetadata'    : False,
+        'excludeZeroValue': False,
+    }])
 
-    print(f'  Scanned {chunks} chunks (24h) → {len(events)} new BondBroken events')
+    hashes = []
+    if res and 'result' in res:
+        hashes = list({tx.get('hash','') for tx in res['result'].get('transfers', []) if tx.get('hash')})
+
+    print(f'  {len(hashes)} txs to governance in last 24h, reading receipts...')
+
+    events = []
+    for tx_hash in hashes:
+        receipt = rpc('eth_getTransactionReceipt', [tx_hash])
+        if not receipt or not receipt.get('result'):
+            continue
+        for log in receipt['result'].get('logs', []):
+            topics = log.get('topics', [])
+            if not topics:
+                continue
+            if topics[0].lower() != BOND_BROKEN_TOPIC.lower():
+                continue
+            data = log.get('data', '0x')
+            if len(data) >= 66:
+                try:
+                    amount    = int(data[2:66], 16) / DECIMALS
+                    blk_num   = int(log.get('blockNumber', '0x0'), 16)
+                    blocks_ago = current_block - blk_num
+                    secs_ago   = blocks_ago / 2.0
+                    event_dt   = datetime.now(timezone.utc) - timedelta(seconds=secs_ago)
+                    event_date = event_dt.date().isoformat()
+                    events.append({
+                        'date'  : event_date,
+                        'amount': round(amount, 2),
+                        'tx'    : tx_hash,
+                    })
+                except:
+                    pass
+        time.sleep(0.1)
+
+    print(f'  {len(events)} BondBroken events found in last 24h')
     return events
 
 
