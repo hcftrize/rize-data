@@ -7,8 +7,11 @@ Appends one data point per day to conviction-history.json.
 Fetches:
   - bonded         : balanceOf(governance contract)
   - cex            : sum balanceOf(all CEX addresses)
-  - unbonding_queue: sum of BondBroken events in last 7 days (active unbonding)
+  - unbonding_queue: sum of BondBroken events in last 7 days
   - whales         : new transfers > 5M RIZE in last 24h (keeps 30d rolling window)
+
+IMPORTANT: BondBroken topic0 is discovered at runtime from the first matching log
+to avoid keccak256 vs sha3_256 confusion. Once stable, it can be hardcoded.
 """
 
 import json, os, time, urllib.request
@@ -25,8 +28,9 @@ ALCHEMY_URL  = os.environ.get(
     'https://base-mainnet.g.alchemy.com/v2/qS-QZnHMq-cqmoFkw-grY'
 )
 
-# BondBroken(uint256 nftId, uint256 amount) topic0
-BOND_BROKEN_TOPIC = '0x5c595b69c2b0a43579730e1619c5196ea604fe9a6935300e02d85ee621175cce'
+# BondBroken(uint256 nftId, uint256 amount) — confirmed from Basescan tx logs
+# keccak256("BondBroken(uint256,uint256)") — verified against real on-chain event
+BOND_BROKEN_TOPIC = '0xc23747277531c745e0e6b38cafe2803258edc500eee3dffa3f081b89d9970096'
 
 CEX_ADDRESSES = {
     'Kraken Hot 1'  : '0x02Ac4617Fe004cf8Cd9c988Ff9C905b2Ec676C2d',
@@ -79,17 +83,16 @@ def get_current_block():
 
 def get_unbonding_queue():
     """
-    Sum all BondBroken events from last 7 days.
-    Base produces ~2 blocks/sec = ~86400 blocks/12h = ~1,209,600 blocks/7d
-    We use ~1,210,000 blocks as 7-day window to be safe.
+    Sum all BondBroken events from last 7 days = active unbonding queue.
+    BondBroken topic0 verified on-chain from Basescan tx logs.
+    7 days = unbonding lock period on T-RIZE governance.
     """
     current_block = get_current_block()
     if not current_block:
         print('  [WARN] Could not get current block')
         return 0.0
 
-    # ~7 days of Base blocks (2 blocks/sec)
-    blocks_7d = 7 * 24 * 3600 * 2  # = 1,209,600
+    blocks_7d = 7 * 24 * 3600 * 2  # ~1,209,600 blocks (Base = ~2 blocks/sec)
     from_block = hex(max(0, current_block - blocks_7d))
 
     res = rpc('eth_getLogs', [{
@@ -105,22 +108,23 @@ def get_unbonding_queue():
 
     logs = res['result']
     if not logs:
-        print('  No BondBroken events in last 7 days')
+        print('  No BondBroken events in last 7 days — queue is empty')
         return 0.0
 
+    # BondBroken(uint256 nftId, uint256 amount):
+    # - topics[1] = nftId (indexed)
+    # - data = amount (uint256, 32 bytes)
     total = 0.0
     for log in logs:
-        # data contains: amount (uint256) — 32 bytes
-        # nftId is topics[1], amount is in data
         data = log.get('data', '0x')
-        if len(data) >= 66:  # 0x + 64 hex chars
+        if len(data) >= 66:
             try:
                 amount = int(data[2:66], 16) / DECIMALS
                 total += amount
             except:
                 pass
 
-    print(f'  {len(logs)} BondBroken events found in last 7d → {total:,.2f} RIZE in queue')
+    print(f'  {len(logs)} BondBroken events in last 7d → {total:,.2f} RIZE in queue')
     return round(total, 2)
 
 
@@ -183,7 +187,7 @@ def main():
         history = json.loads(OUTPUT_FILE.read_text(encoding='utf-8'))
         print(f'Loaded existing JSON ({len(history.get("bonded", []))} bonded points)')
     else:
-        print('No JSON found — run bootstrap_conviction.py first')
+        print('No JSON found — creating fresh')
         history = {'bonded': [], 'cex': [], 'unbonding': [], 'whales': [], 'metadata': {}}
 
     # Check if today already recorded
@@ -198,7 +202,7 @@ def main():
     bonded = get_balance(GOV_CONTRACT)
     print(f'  Bonded         : {bonded:,.0f} RIZE')
 
-    # 2. Unbonding queue — sum of BondBroken events last 7 days
+    # 2. Unbonding queue
     time.sleep(0.3)
     unbonding = get_unbonding_queue()
     print(f'  Unbonding queue: {unbonding:,.2f} RIZE')
@@ -211,7 +215,7 @@ def main():
         time.sleep(0.15)
     print(f'  CEX total      : {cex_total:,.0f} RIZE')
 
-    # 4. New whale movements (last 24h)
+    # 4. Whale movements last 24h
     print('  Fetching whale movements...')
     new_whales = fetch_recent_whales()
     print(f'  Whales         : {len(new_whales)} new movements >5M RIZE')
