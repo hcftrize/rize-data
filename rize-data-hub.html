@@ -3769,43 +3769,9 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   }
 
   async function convFetchLiveBalances() {
-    // All via Alchemy RPC — no Basescan dependency
-
-    // 1. Governance bonded (balanceOf governance contract)
-    let bonded = 0;
-    try {
-      const padded = '000000000000000000000000' + CONV.GOV_CONTRACT.slice(2).toLowerCase();
-      const r = await convRpc('eth_call', [
-        { to: CONV.RIZE_TOKEN, data: '0x70a08231' + padded }, 'latest'
-      ]);
-      bonded = convHexToTokens(r?.result);
-    } catch(e) {}
-
-    // 2. Unbonding queue: releasableTokens() = 0x1c269043
-    let unbonding = 0;
-    try {
-      await new Promise(r => setTimeout(r, 200));
-      const r = await convRpc('eth_call', [
-        { to: CONV.GOV_CONTRACT, data: '0x1c269043' }, 'latest'
-      ]);
-      unbonding = convHexToTokens(r?.result);
-    } catch(e) {}
-
-    // 3. CEX balances via RPC balanceOf — sequential to avoid 429
-    const cexAddrs = Object.values(CONV.CEX);
-    let cexTotal = 0;
-    for (const addr of cexAddrs) {
-      try {
-        await new Promise(r => setTimeout(r, 150));
-        const padded = '000000000000000000000000' + addr.slice(2).toLowerCase();
-        const r = await convRpc('eth_call', [
-          { to: CONV.RIZE_TOKEN, data: '0x70a08231' + padded }, 'latest'
-        ]);
-        cexTotal += convHexToTokens(r?.result);
-      } catch(e) {}
-    }
-
-    return { bonded, unbonding, cexTotal };
+    // All values come from JSON (updated daily by GitHub Action)
+    // No live Alchemy calls needed — avoids quota usage per visitor
+    return { bonded: 0, unbonding: 0, cexTotal: 0 };
   }
 
   // ── Historical data from pre-built JSON ──────────────────────
@@ -4196,55 +4162,30 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     CONV.initialized = true;
 
     try {
-      // Fetch live + pre-built history in parallel
-      const [live, history] = await Promise.all([
-        convFetchLiveBalances(),
-        convFetchHistory(),
-      ]);
+      // Fetch JSON history (single source of truth — no live API calls)
+      const history = await convFetchHistory();
 
       // Build chart series from pre-computed JSON
       const govSeries = convBuildSeriesFromJSON(history.bondedSeries);
       const cexSeries = convBuildSeriesFromJSON(history.cexSeries);
 
-      // Append today's live value if not already in history
-      const today = new Date().toISOString().slice(0, 10);
-      if (live.bonded > 0) {
-        const lastBonded = govSeries.rawDays[govSeries.rawDays.length - 1];
-        if (lastBonded !== today) {
-          const lbl = new Date(today + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
-          govSeries.labels.push(lbl);
-          govSeries.data.push(live.bonded);
-          govSeries.rawDays.push(today);
-        }
-      }
-      if (live.cexTotal > 0) {
-        const lastCex = cexSeries.rawDays[cexSeries.rawDays.length - 1];
-        if (lastCex !== today) {
-          const lbl = new Date(today + 'T00:00:00Z').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
-          cexSeries.labels.push(lbl);
-          cexSeries.data.push(live.cexTotal);
-          cexSeries.rawDays.push(today);
-        }
-      }
+      // All KPI values from JSON — last entry = today's value (updated daily at 08:00 UTC)
+      const lastBonded   = govSeries.data.length ? govSeries.data[govSeries.data.length - 1] : 0;
+      const lastCex      = cexSeries.data.length ? cexSeries.data[cexSeries.data.length - 1] : 0;
+      const unbArr       = history.unbonding || [];
+      const lastUnbonding = unbArr.length ? unbArr[unbArr.length - 1].value : 0;
 
-      // Unbonding chart: outflows from gov (bonded daily decreases)
+      // Unbonding chart: governance flows from bonded series
       const unbSeries = convBuildUnbondingFromSeries(govSeries);
 
       // Whales + address labels from JSON
       const whalesFromJson = history.whales        || [];
       const addrLabels     = history.addressLabels || {};
 
-      // Render
+      // Render everything from JSON
       convRenderMainChart(govSeries, cexSeries);
       convRenderUnbondingChart(unbSeries);
-      // Unbonding queue: use latest from JSON (computed from BondBroken events)
-      const latestUnbonding = history.whales !== undefined
-        ? ((() => {
-            const unbArr = history.unbonding || [];
-            return unbArr.length ? unbArr[unbArr.length - 1].value : live.unbonding;
-          })())
-        : live.unbonding;
-      convRenderLive(live.bonded, latestUnbonding, live.cexTotal);
+      convRenderLive(lastBonded, lastUnbonding, lastCex);
       convRenderGovDeltas(govSeries);
       convRenderDeltas(cexSeries);
       convRenderWhales(whalesFromJson, addrLabels);
