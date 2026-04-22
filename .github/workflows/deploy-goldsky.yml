@@ -14,7 +14,7 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Install graph-cli
         run: npm install -g @graphprotocol/graph-cli
@@ -24,6 +24,10 @@ jobs:
 
       - name: Add Goldsky to PATH
         run: echo "$HOME/.goldsky/bin" >> $GITHUB_PATH
+
+      - name: Install subgraph dependencies
+        working-directory: goldsky
+        run: npm install
 
       - name: Generate types
         working-directory: goldsky
