@@ -1,0 +1,32 @@
+name: Bootstrap Lighthouse Revenue (run once)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run bootstrap (full history from genesis)
+        run: python scrape_lighthouse.py --bootstrap
+
+      - name: Commit result
+        run: |
+          git config user.name  "tokerize-bot"
+          git config user.email "bot@tokerize.com"
+          git add rize-data-hub/canton-revenue.json
+          if git diff --cached --quiet; then
+            echo "No changes."
+          else
+            git commit -m "chore(data): bootstrap canton-revenue $(date -u +%Y-%m-%d)"
+            git push
+          fi

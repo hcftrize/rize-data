@@ -1,0 +1,44 @@
+name: Update Lighthouse Revenue
+
+on:
+  schedule:
+    - cron: "0 8 * * *"   # 08:00 UTC daily
+  workflow_dispatch:
+    inputs:
+      bootstrap:
+        description: "Full history from genesis (true = bootstrap, false = incremental)"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run scraper
+        run: |
+          if [ "${{ github.event.inputs.bootstrap }}" = "true" ]; then
+            python scrape_lighthouse.py --bootstrap
+          else
+            python scrape_lighthouse.py
+          fi
+
+      - name: Commit if changed
+        run: |
+          git config user.name  "tokerize-bot"
+          git config user.email "bot@tokerize.com"
+          git add rize-data-hub/canton-revenue.json
+          if git diff --cached --quiet; then
+            echo "No changes."
+          else
+            git commit -m "chore(data): canton-revenue $(date -u +%Y-%m-%d)"
+            git push
+          fi
