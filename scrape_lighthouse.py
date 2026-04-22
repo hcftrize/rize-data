@@ -244,7 +244,7 @@ def main():
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     with open(OUTPUT, "w") as f:
-        json.dump(payload, f, separators=(",", ":"))   # compact — no whitespace
+        json.dump(payload, f, indent=2)
 
     n = len(payload["weeks"])
     print(f"  ✓ {n} weeks written → {OUTPUT}")
