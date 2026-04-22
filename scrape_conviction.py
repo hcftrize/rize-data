@@ -34,12 +34,7 @@ ALCHEMY_URL       = os.environ.get(
 
 # BondBroken(uint256 nftId, uint256 amount) — verified on-chain from Basescan
 BOND_BROKEN_TOPIC  = '0xc23747277531c745e0e6b38cafe2803258edc500eee3dffa3f081b89d9970096'
-BASE_PUBLIC_RPCS = [
-    'https://base-rpc.publicnode.com',   # 50,000 block range — primary
-    'https://1rpc.io/base',               # 10,000 block range — fallback
-]
-
-CHUNK_SIZE = 49_000   # stay safely under publicnode's 50k limit
+GOLDSKY_URL = 'https://api.goldsky.com/api/public/project_cmoa6u5wk3kx201y4g3s52z77/subgraphs/tokerize-bond-broken/1.0.0/gn'
 
 CEX_ADDRESSES = {
     'Kraken Hot 1'  : '0x02Ac4617Fe004cf8Cd9c988Ff9C905b2Ec676C2d',
@@ -56,24 +51,6 @@ CEX_ADDRESSES = {
 
 BLOCKS_PER_DAY  = 24 * 3600 * 2   # ~172,800  (Base ~2 blocks/sec)
 
-
-def rpc_public(method, params):
-    """Try multiple public Base RPCs in order — no key needed."""
-    for endpoint in BASE_PUBLIC_RPCS:
-        payload = json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': method, 'params': params}).encode()
-        req = urllib.request.Request(
-            endpoint, data=payload,
-            headers={'Content-Type': 'application/json', 'User-Agent': 'python-urllib/3.11'}
-        )
-        try:
-            with urllib.request.urlopen(req, timeout=30) as r:
-                result = json.loads(r.read().decode())
-                if result and ('result' in result or 'error' in result):
-                    return result
-        except Exception as e:
-            print(f'  [{endpoint}] failed: {e}')
-            continue
-    return None
 
 
 def rpc(method, params, url=None):
@@ -112,76 +89,40 @@ def get_current_block():
     return 0
 
 
-def fetch_logs_chunked(from_block, to_block):
+def fetch_bond_broken_events_24h(_current_block=None):
     """
-    Fetch eth_getLogs in chunks of CHUNK_SIZE blocks.
-    Tries publicnode first (50k limit), falls back to 1rpc (10k limit).
-    Returns the combined list of raw logs.
+    Fetch BondBroken events from last 24h via Goldsky GraphQL.
+    Single HTTP request — no block range limits, no RPC quota issues.
     """
-    all_logs = []
-    cursor = from_block
-    while cursor < to_block:
-        chunk_to = min(cursor + CHUNK_SIZE, to_block)
-        fetched = False
-        for endpoint in BASE_PUBLIC_RPCS:
-            payload = json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': 'eth_getLogs', 'params': [{
-                'fromBlock': hex(cursor),
-                'toBlock':   hex(chunk_to),
-                'address':   GOV_CONTRACT,
-                'topics':    [BOND_BROKEN_TOPIC],
-            }]}).encode()
-            req = urllib.request.Request(
-                endpoint, data=payload,
-                headers={'Content-Type': 'application/json', 'User-Agent': 'python-urllib/3.11'}
-            )
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=1)).strftime('%Y-%m-%d')
+    query = json.dumps({
+        'query': '''{ bondBrokens(first: 1000, orderBy: timestamp, orderDirection: desc,
+            where: { date_gte: "''' + cutoff + '''" }) {
+            id amount date } }'''
+    }).encode()
+    req = urllib.request.Request(
+        GOLDSKY_URL, data=query,
+        headers={'Content-Type': 'application/json', 'User-Agent': 'Tokerize-Bot/1.0'}
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            res = json.loads(r.read().decode())
+        items = res.get('data', {}).get('bondBrokens', [])
+        events = []
+        for item in items:
             try:
-                with urllib.request.urlopen(req, timeout=30) as r:
-                    res = json.loads(r.read().decode())
-                if res and 'result' in res and res['result'] is not None:
-                    all_logs.extend(res['result'])
-                    fetched = True
-                    break
-                elif res and 'error' in res:
-                    print(f'  [WARN] {endpoint} error: {res["error"].get("message", "")}')
-            except Exception as e:
-                print(f'  [WARN] {endpoint} failed: {e}')
-        if not fetched:
-            print(f'  [ERROR] all RPCs failed for chunk {cursor}→{chunk_to}')
-        cursor = chunk_to + 1
-    return all_logs
-
-
-def fetch_bond_broken_events_24h(current_block):
-    """
-    Fetch BondBroken events from last 24h.
-    Uses chunked eth_getLogs via publicnode (49k blocks/chunk = 4 chunks for 24h).
-    """
-    from_block = max(0, current_block - BLOCKS_PER_DAY)
-    print(f'  Fetching BondBroken events ({from_block} → {current_block}, ~{BLOCKS_PER_DAY // CHUNK_SIZE + 1} chunks)…')
-
-    logs = fetch_logs_chunked(from_block, current_block)
-
-    events = []
-    for log in logs:
-        data = log.get('data', '0x')
-        if len(data) >= 66:
-            try:
-                amount     = int(data[2:66], 16) / DECIMALS
-                blk_num    = int(log.get('blockNumber', '0x0'), 16)
-                blocks_ago = current_block - blk_num
-                secs_ago   = blocks_ago / 2.0
-                event_dt   = datetime.now(timezone.utc) - timedelta(seconds=secs_ago)
-                event_date = event_dt.date().isoformat()
                 events.append({
-                    'date'  : event_date,
-                    'amount': round(amount, 2),
-                    'tx'    : log.get('transactionHash', ''),
+                    'date'  : item['date'],
+                    'amount': round(float(item['amount']), 2),
+                    'tx'    : item['id'],
                 })
             except:
                 pass
-
-    print(f'  {len(events)} BondBroken events in last 24h')
-    return events
+        print(f'  {len(events)} BondBroken events in last 24h (via Goldsky)')
+        return events
+    except Exception as e:
+        print(f'  [WARN] Goldsky fetch failed: {e}')
+        return []
 
 
 def compute_unbonding_queue(bond_events):
