@@ -39,4 +39,4 @@ jobs:
           GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
         run: |
           goldsky login --token $GOLDSKY_API_KEY
-          goldsky subgraph deploy tokerize-bond-broken/1.0.0 --path .
+          goldsky subgraph deploy tokerize-bond-broken/1.1.0 --path .

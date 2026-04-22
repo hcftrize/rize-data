@@ -1,50 +1,69 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { BondBroken as BondBrokenEvent } from "../generated/Governance/Governance";
-import { BondBroken } from "../generated/schema";
+import { BondBroken, DailyUnbondingQueue } from "../generated/schema";
 
-export function handleBondBroken(event: BondBrokenEvent): void {
-  let entity = new BondBroken(event.transaction.hash.toHex());
+// ── Date helpers ──────────────────────────────────────────────────────────────
 
-  entity.nftId       = event.params.nftId;
-  entity.amount      = event.params.amount.toBigDecimal().div(
-                         BigDecimal.fromString("1000000000000000000")
-                       );
-  entity.blockNumber = event.block.number;
-  entity.timestamp   = event.block.timestamp;
+function isLeapYear(year: i32): bool {
+  return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+}
 
-  // ISO date string from unix timestamp
-  let ts      = event.block.timestamp.toI64();
-  let day     = ts / 86400;
-  let year    = 1970;
-  let month   = 1;
-  let dayOfMonth = 1;
-
-  // Simple date calculation from unix days
-  let remaining = day;
+function tsToDateStr(ts: i64): string {
+  let remaining = ts / 86400;
   let y = 1970;
   while (true) {
-    let daysInYear = isLeapYear(y) ? 366 : 365;
-    if (remaining < daysInYear) break;
-    remaining -= daysInYear;
+    let diy: i64 = isLeapYear(y as i32) ? 366 : 365;
+    if (remaining < diy) break;
+    remaining -= diy;
     y++;
   }
-  year = y;
-  let months = [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  let months: i32[] = [31, isLeapYear(y as i32) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   let m = 0;
   while (m < 12 && remaining >= months[m]) {
     remaining -= months[m];
     m++;
   }
-  month      = m + 1;
-  dayOfMonth = remaining as i32 + 1;
-
-  let mm = month < 10   ? "0" + month.toString()      : month.toString();
+  let month      = m + 1;
+  let dayOfMonth = (remaining as i32) + 1;
+  let mm = month      < 10 ? "0" + month.toString()      : month.toString();
   let dd = dayOfMonth < 10 ? "0" + dayOfMonth.toString() : dayOfMonth.toString();
-  entity.date = year.toString() + "-" + mm + "-" + dd;
-
-  entity.save();
+  return y.toString() + "-" + mm + "-" + dd;
 }
 
-function isLeapYear(year: i32): bool {
-  return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+function dayStartTs(ts: i64): i64 {
+  return (ts / 86400) * 86400;
+}
+
+// ── Handler ───────────────────────────────────────────────────────────────────
+
+export function handleBondBroken(event: BondBrokenEvent): void {
+  let DECIMALS = BigDecimal.fromString("1000000000000000000");
+  let amount   = event.params.amount.toBigDecimal().div(DECIMALS);
+  let ts       = event.block.timestamp.toI64();
+  let dateStr  = tsToDateStr(ts);
+
+  // ── BondBroken entity (immutable, one per event) ──────────────────────────
+  let entity      = new BondBroken(event.transaction.hash.toHex());
+  entity.nftId    = event.params.nftId;
+  entity.amount   = amount;
+  entity.date     = dateStr;
+  entity.blockNumber = event.block.number;
+  entity.timestamp   = event.block.timestamp;
+  entity.save();
+
+  // ── DailyUnbondingQueue — rolling 7-day sum ───────────────────────────────
+  // We store one entry per day and accumulate all BondBroken that fire that day.
+  // The JS side will do the 7-day rolling window across these daily totals.
+  let dayId  = dateStr;
+  let dayRec = DailyUnbondingQueue.load(dayId);
+  if (dayRec == null) {
+    dayRec             = new DailyUnbondingQueue(dayId);
+    dayRec.date        = dateStr;
+    dayRec.timestamp   = BigInt.fromI64(dayStartTs(ts));
+    dayRec.totalAmount = BigDecimal.fromString("0");
+    dayRec.eventCount  = 0;
+  }
+  dayRec.totalAmount = dayRec.totalAmount.plus(amount);
+  dayRec.eventCount  = dayRec.eventCount + 1;
+  dayRec.save();
 }
