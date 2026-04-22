@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: dev
 
       - uses: actions/setup-python@v5
         with:
@@ -40,5 +42,5 @@ jobs:
             echo "No changes."
           else
             git commit -m "chore(data): canton-revenue $(date -u +%Y-%m-%d)"
-            git push
+            git push origin dev
           fi
