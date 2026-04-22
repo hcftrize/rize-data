@@ -7,29 +7,32 @@ Appends one data point per day to conviction-history.json.
 Fetches:
   - bonded         : balanceOf(governance contract)
   - cex            : sum balanceOf(all CEX addresses)
-  - unbonding_queue: sum of BondBroken events in last 7 days
+  - unbonding_queue: rolling 7-day window of BondBroken events
   - whales         : new transfers > 5M RIZE in last 24h (keeps 30d rolling window)
 
-IMPORTANT: BondBroken topic0 is discovered at runtime from the first matching log
-to avoid keccak256 vs sha3_256 confusion. Once stable, it can be hardcoded.
+Unbonding strategy:
+  - Scans only the last ~24h of blocks (~172,800 blocks, ~115 chunks of 1500)
+  - New BondBroken events are stored individually in JSON with their date
+  - Events older than 7 days are purged on each run
+  - The sum of remaining events = active unbonding queue
+  This avoids scanning 7 days of blocks (800+ chunks) every day.
 """
 
 import json, os, time, urllib.request
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-RIZE_TOKEN   = '0x9818B6c09f5ECc843060927E8587c427C7C93583'
-GOV_CONTRACT = '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE'
-DECIMALS     = 1e18
-WHALE_MIN    = 5_000_000
-OUTPUT_FILE  = Path('rize-data-hub/conviction-history.json')
-ALCHEMY_URL  = os.environ.get(
+RIZE_TOKEN        = '0x9818B6c09f5ECc843060927E8587c427C7C93583'
+GOV_CONTRACT      = '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE'
+DECIMALS          = 1e18
+WHALE_MIN         = 5_000_000
+OUTPUT_FILE       = Path('rize-data-hub/conviction-history.json')
+ALCHEMY_URL       = os.environ.get(
     'ALCHEMY_RPC_URL',
     'https://base-mainnet.g.alchemy.com/v2/qS-QZnHMq-cqmoFkw-grY'
 )
 
-# BondBroken(uint256 nftId, uint256 amount) — confirmed from Basescan tx logs
-# keccak256("BondBroken(uint256,uint256)") — verified against real on-chain event
+# BondBroken(uint256 nftId, uint256 amount) — verified on-chain from Basescan
 BOND_BROKEN_TOPIC = '0xc23747277531c745e0e6b38cafe2803258edc500eee3dffa3f081b89d9970096'
 
 CEX_ADDRESSES = {
@@ -44,6 +47,9 @@ CEX_ADDRESSES = {
     'Ourbit'        : '0x4D59BEC2b09052c60C6149c623fb3a461fB1Fe74',
     'Gate'          : '0x0D0707963952f2fBA59dD06f2b425ace40b492Fe',
 }
+
+BLOCKS_PER_DAY  = 24 * 3600 * 2   # ~172,800  (Base ~2 blocks/sec)
+CHUNK_SIZE      = 1500              # safely under Alchemy 2000-block limit
 
 
 def rpc(method, params):
@@ -81,51 +87,50 @@ def get_current_block():
     return 0
 
 
-def get_unbonding_queue():
+def fetch_bond_broken_events_24h(current_block):
     """
-    Sum all BondBroken events from last 7 days = active unbonding queue.
-    BondBroken topic0 verified on-chain from Basescan tx logs.
-    7 days = unbonding lock period on T-RIZE governance.
+    Scan only last 24h of blocks for BondBroken events.
+    ~172,800 blocks / 1500 per chunk = ~115 calls = ~10 seconds.
+    Returns list of {date, amount, tx} dicts.
     """
-    current_block = get_current_block()
-    if not current_block:
-        print('  [WARN] Could not get current block')
-        return 0.0
+    start_block = max(0, current_block - BLOCKS_PER_DAY)
+    today_str   = date.today().isoformat()
+    events      = []
+    chunks      = 0
 
-    blocks_7d = 7 * 24 * 3600 * 2  # ~1,209,600 blocks (Base = ~2 blocks/sec)
-    from_block = hex(max(0, current_block - blocks_7d))
+    block = start_block
+    while block <= current_block:
+        to_block = min(block + CHUNK_SIZE - 1, current_block)
+        res = rpc('eth_getLogs', [{
+            'fromBlock': hex(block),
+            'toBlock'  : hex(to_block),
+            'address'  : GOV_CONTRACT,
+            'topics'   : [BOND_BROKEN_TOPIC],
+        }])
+        if res and 'result' in res:
+            for log in res['result']:
+                data = log.get('data', '0x')
+                if len(data) >= 66:
+                    try:
+                        amount = int(data[2:66], 16) / DECIMALS
+                        events.append({
+                            'date'  : today_str,
+                            'amount': round(amount, 2),
+                            'tx'    : log.get('transactionHash', ''),
+                        })
+                    except:
+                        pass
+        block  += CHUNK_SIZE
+        chunks += 1
+        time.sleep(0.05)
 
-    res = rpc('eth_getLogs', [{
-        'fromBlock': from_block,
-        'toBlock'  : 'latest',
-        'address'  : GOV_CONTRACT,
-        'topics'   : [BOND_BROKEN_TOPIC],
-    }])
+    print(f'  Scanned {chunks} chunks (24h) → {len(events)} new BondBroken events')
+    return events
 
-    if not res or 'result' not in res:
-        print('  [WARN] eth_getLogs failed for BondBroken')
-        return 0.0
 
-    logs = res['result']
-    if not logs:
-        print('  No BondBroken events in last 7 days — queue is empty')
-        return 0.0
-
-    # BondBroken(uint256 nftId, uint256 amount):
-    # - topics[1] = nftId (indexed)
-    # - data = amount (uint256, 32 bytes)
-    total = 0.0
-    for log in logs:
-        data = log.get('data', '0x')
-        if len(data) >= 66:
-            try:
-                amount = int(data[2:66], 16) / DECIMALS
-                total += amount
-            except:
-                pass
-
-    print(f'  {len(logs)} BondBroken events in last 7d → {total:,.2f} RIZE in queue')
-    return round(total, 2)
+def compute_unbonding_queue(bond_events):
+    """Sum all BondBroken events — already filtered to last 7 days."""
+    return round(sum(e['amount'] for e in bond_events), 2)
 
 
 def fetch_recent_whales():
@@ -133,24 +138,22 @@ def fetch_recent_whales():
     block_res = rpc('eth_blockNumber', [])
     if not block_res or not block_res.get('result'):
         return []
-    current = int(block_res['result'], 16)
-    yesterday_block = hex(current - 43200)  # ~24h of Base blocks
+    current  = int(block_res['result'], 16)
+    from_blk = hex(current - 43200)  # ~12h Base blocks
 
     params = {
-        'fromBlock': yesterday_block,
-        'toBlock'  : 'latest',
+        'fromBlock'       : from_blk,
+        'toBlock'         : 'latest',
         'contractAddresses': [RIZE_TOKEN],
-        'category' : ['erc20'],
-        'withMetadata': True,
+        'category'        : ['erc20'],
+        'withMetadata'    : True,
         'excludeZeroValue': True,
-        'maxCount' : '0x3e8',
-        'order'    : 'desc',
+        'maxCount'        : '0x3e8',
+        'order'           : 'desc',
     }
     res = rpc('alchemy_getAssetTransfers', [params])
     if not res or 'result' not in res:
         return []
-
-    txs = res['result'].get('transfers', [])
 
     def label(addr):
         if not addr: return 'Unknown'
@@ -161,34 +164,39 @@ def fetch_recent_whales():
         return addr[:6] + '…' + addr[-4:]
 
     whales = []
-    for tx in txs:
+    for tx in res['result'].get('transfers', []):
         v = float(tx.get('value') or 0)
         if v < WHALE_MIN:
             continue
         ts = tx.get('metadata', {}).get('blockTimestamp', '')
         whales.append({
-            'date'       : ts[:10] if ts else date.today().isoformat(),
-            'amount'     : round(v, 2),
-            'from'       : tx.get('from', ''),
-            'to'         : tx.get('to', ''),
-            'from_label' : label(tx.get('from', '')),
-            'to_label'   : label(tx.get('to', '')),
-            'tx'         : tx.get('hash', ''),
+            'date'      : ts[:10] if ts else date.today().isoformat(),
+            'amount'    : round(v, 2),
+            'from'      : tx.get('from', ''),
+            'to'        : tx.get('to', ''),
+            'from_label': label(tx.get('from', '')),
+            'to_label'  : label(tx.get('to', '')),
+            'tx'        : tx.get('hash', ''),
         })
     return whales
 
 
 def main():
     OUTPUT_FILE.parent.mkdir(exist_ok=True)
-    today = date.today().isoformat()
+    today    = date.today().isoformat()
+    cutoff7d = (date.today() - timedelta(days=7)).isoformat()
+    cutoff30d= (date.today() - timedelta(days=30)).isoformat()
 
-    # Load existing
+    # Load existing JSON
     if OUTPUT_FILE.exists():
         history = json.loads(OUTPUT_FILE.read_text(encoding='utf-8'))
         print(f'Loaded existing JSON ({len(history.get("bonded", []))} bonded points)')
     else:
         print('No JSON found — creating fresh')
-        history = {'bonded': [], 'cex': [], 'unbonding': [], 'whales': [], 'metadata': {}}
+        history = {'bonded': [], 'cex': [], 'unbonding': [], 'bond_events': [], 'whales': [], 'metadata': {}}
+
+    # Ensure bond_events key exists (may be absent in older JSON)
+    history.setdefault('bond_events', [])
 
     # Check if today already recorded
     existing_dates = {e['date'] for e in history.get('bonded', [])}
@@ -198,14 +206,29 @@ def main():
 
     print(f'Fetching snapshot for {today}...')
 
+    current_block = get_current_block()
+
     # 1. Bonded
     bonded = get_balance(GOV_CONTRACT)
     print(f'  Bonded         : {bonded:,.0f} RIZE')
 
-    # 2. Unbonding queue
-    time.sleep(0.3)
-    unbonding = get_unbonding_queue()
-    print(f'  Unbonding queue: {unbonding:,.2f} RIZE')
+    # 2. BondBroken events (last 24h only)
+    print('  Scanning last 24h for BondBroken events...')
+    new_events = fetch_bond_broken_events_24h(current_block)
+
+    # Merge new events (deduplicate by tx hash)
+    existing_tx = {e['tx'] for e in history['bond_events']}
+    for ev in new_events:
+        if ev['tx'] not in existing_tx:
+            history['bond_events'].append(ev)
+            existing_tx.add(ev['tx'])
+
+    # Purge events older than 7 days — they are past the unbonding lock period
+    history['bond_events'] = [e for e in history['bond_events'] if e.get('date', '') >= cutoff7d]
+
+    # Unbonding queue = sum of remaining events
+    unbonding = compute_unbonding_queue(history['bond_events'])
+    print(f'  Unbonding queue: {unbonding:,.2f} RIZE ({len(history["bond_events"])} active events)')
 
     # 3. CEX total
     cex_total = 0.0
@@ -215,26 +238,23 @@ def main():
         time.sleep(0.15)
     print(f'  CEX total      : {cex_total:,.0f} RIZE')
 
-    # 4. Whale movements last 24h
+    # 4. Whale movements (last 24h)
     print('  Fetching whale movements...')
     new_whales = fetch_recent_whales()
     print(f'  Whales         : {len(new_whales)} new movements >5M RIZE')
 
-    # Append today's points
+    # Append daily series points
     history.setdefault('bonded',    []).append({'date': today, 'value': round(bonded, 2)})
     history.setdefault('cex',       []).append({'date': today, 'value': round(cex_total, 2)})
-    history.setdefault('unbonding', []).append({'date': today, 'value': round(unbonding, 2)})
+    history.setdefault('unbonding', []).append({'date': today, 'value': unbonding})
 
-    # Merge whales — deduplicate by tx hash, keep last 30 days only
-    cutoff = (date.today() - timedelta(days=30)).isoformat()
+    # Merge whales — deduplicate, keep 30d rolling window
     existing_hashes = {w['tx'] for w in history.get('whales', [])}
     for w in new_whales:
         if w['tx'] not in existing_hashes:
             history.setdefault('whales', []).append(w)
             existing_hashes.add(w['tx'])
-
-    # Trim whales to 30d rolling window
-    history['whales'] = [w for w in history['whales'] if w.get('date', '') >= cutoff]
+    history['whales'] = [w for w in history['whales'] if w.get('date', '') >= cutoff30d]
     history['whales'].sort(key=lambda x: x['date'], reverse=True)
 
     # Update metadata
@@ -244,7 +264,9 @@ def main():
         json.dumps(history, indent=2, ensure_ascii=False),
         encoding='utf-8'
     )
-    print(f'\n✅ Saved — {len(history["bonded"])} bonded points, {len(history["whales"])} whale movements')
+    print(f'\n✅ Saved — {len(history["bonded"])} bonded points, '
+          f'{len(history["bond_events"])} active bond events, '
+          f'{len(history["whales"])} whale movements')
 
 
 if __name__ == '__main__':
