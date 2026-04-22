@@ -20,7 +20,30 @@ BOND_BROKEN_TOPIC = '0xc23747277531c745e0e6b38cafe2803258edc500eee3dffa3f081b89d
 BLOCKS_PER_DAY    = 24 * 3600 * 2   # ~172,800
 
 
-BASE_PUBLIC_RPC = 'https://rpc.ankr.com/base'
+BASE_PUBLIC_RPCS = [
+    'https://base.llamarpc.com',          # LlamaNodes — no key, no IP block
+    'https://base-rpc.publicnode.com',    # PublicNode — no key
+    'https://1rpc.io/base',               # 1RPC — no key
+]
+
+def rpc_public(method, params):
+    """Try multiple public Base RPCs in order — no key needed."""
+    for endpoint in BASE_PUBLIC_RPCS:
+        payload = json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': method, 'params': params}).encode()
+        req = urllib.request.Request(
+            endpoint, data=payload,
+            headers={'Content-Type': 'application/json', 'User-Agent': 'python-urllib/3.11'}
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                result = json.loads(r.read().decode())
+                if result and ('result' in result or 'error' in result):
+                    return result
+        except Exception as e:
+            print(f'  [{endpoint}] failed: {e}')
+            continue
+    return None
+
 
 def rpc(method, params, url=None):
     endpoint = url or ALCHEMY_URL
@@ -63,12 +86,12 @@ def main():
     start_block = max(0, current_block - 7 * BLOCKS_PER_DAY)
     print(f'Scanning blocks {start_block} → {current_block} via Base public RPC...')
 
-    res = rpc('eth_getLogs', [{
+    res = rpc_public('eth_getLogs', [{
         'fromBlock': hex(start_block),
         'toBlock'  : 'latest',
         'address'  : GOV_CONTRACT,
         'topics'   : [BOND_BROKEN_TOPIC],
-    }], url=BASE_PUBLIC_RPC)
+    }])
 
     print(f'eth_getLogs response: {str(res)[:200]}')
 

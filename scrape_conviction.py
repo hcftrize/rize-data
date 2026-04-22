@@ -34,7 +34,11 @@ ALCHEMY_URL       = os.environ.get(
 
 # BondBroken(uint256 nftId, uint256 amount) — verified on-chain from Basescan
 BOND_BROKEN_TOPIC  = '0xc23747277531c745e0e6b38cafe2803258edc500eee3dffa3f081b89d9970096'
-BASE_PUBLIC_RPC    = 'https://rpc.ankr.com/base'
+BASE_PUBLIC_RPCS = [
+    'https://base.llamarpc.com',
+    'https://base-rpc.publicnode.com',
+    'https://1rpc.io/base',
+]
 
 CEX_ADDRESSES = {
     'Kraken Hot 1'  : '0x02Ac4617Fe004cf8Cd9c988Ff9C905b2Ec676C2d',
@@ -50,6 +54,25 @@ CEX_ADDRESSES = {
 }
 
 BLOCKS_PER_DAY  = 24 * 3600 * 2   # ~172,800  (Base ~2 blocks/sec)
+
+
+def rpc_public(method, params):
+    """Try multiple public Base RPCs in order — no key needed."""
+    for endpoint in BASE_PUBLIC_RPCS:
+        payload = json.dumps({'jsonrpc': '2.0', 'id': 1, 'method': method, 'params': params}).encode()
+        req = urllib.request.Request(
+            endpoint, data=payload,
+            headers={'Content-Type': 'application/json', 'User-Agent': 'python-urllib/3.11'}
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                result = json.loads(r.read().decode())
+                if result and ('result' in result or 'error' in result):
+                    return result
+        except Exception as e:
+            print(f'  [{endpoint}] failed: {e}')
+            continue
+    return None
 
 
 def rpc(method, params, url=None):
@@ -95,12 +118,12 @@ def fetch_bond_broken_events_24h(current_block):
     """
     from_block = hex(max(0, current_block - BLOCKS_PER_DAY))
 
-    res = rpc('eth_getLogs', [{
+    res = rpc_public('eth_getLogs', [{
         'fromBlock': from_block,
         'toBlock'  : 'latest',
         'address'  : GOV_CONTRACT,
         'topics'   : [BOND_BROKEN_TOPIC],
-    }], url=BASE_PUBLIC_RPC)
+    }])
 
     if not res or 'result' not in res:
         print(f'  [WARN] eth_getLogs failed: {res}')
