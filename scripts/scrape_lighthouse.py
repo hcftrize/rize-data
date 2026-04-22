@@ -21,7 +21,7 @@ API_BASE     = "https://lighthouse.fivenorth.io/api/parties"
 RZ_GENESIS   = "2024-07-31T00:00:00.000Z"
 VALIDATOR_ID = "TRIZEGroup-cantonMainnetValidator-1::12206ab3bf15b14410220357d6a6375eb1015f2e7fade1deb449463c2f2a25304889"
 RIZESCORE_ID = "TRIZEGroup-RIZEScore::12206ab3bf15b14410220357d6a6375eb1015f2e7fade1deb449463c2f2a25304889"
-OUTPUT       = Path(__file__).parent / "rize-data-hub" / "canton-revenue.json"
+OUTPUT       = Path(__file__).parent.parent / "rize-data-hub" / "canton-revenue.json"
 TIMEOUT      = 30
 WINDOW_DAYS  = 14  # refetch window in incremental mode
 
