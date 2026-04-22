@@ -33,7 +33,8 @@ ALCHEMY_URL       = os.environ.get(
 )
 
 # BondBroken(uint256 nftId, uint256 amount) — verified on-chain from Basescan
-BOND_BROKEN_TOPIC = '0xc23747277531c745e0e6b38cafe2803258edc500eee3dffa3f081b89d9970096'
+BOND_BROKEN_TOPIC  = '0xc23747277531c745e0e6b38cafe2803258edc500eee3dffa3f081b89d9970096'
+BASE_PUBLIC_RPC    = 'https://mainnet.base.org'
 
 CEX_ADDRESSES = {
     'Kraken Hot 1'  : '0x02Ac4617Fe004cf8Cd9c988Ff9C905b2Ec676C2d',
@@ -51,20 +52,21 @@ CEX_ADDRESSES = {
 BLOCKS_PER_DAY  = 24 * 3600 * 2   # ~172,800  (Base ~2 blocks/sec)
 
 
-def rpc(method, params):
+def rpc(method, params, url=None):
+    endpoint = url or ALCHEMY_URL
     payload = json.dumps({
         'jsonrpc': '2.0', 'id': 1,
         'method': method, 'params': params
     }).encode()
     req = urllib.request.Request(
-        ALCHEMY_URL, data=payload,
+        endpoint, data=payload,
         headers={'Content-Type': 'application/json'}
     )
     try:
-        with urllib.request.urlopen(req, timeout=15) as r:
+        with urllib.request.urlopen(req, timeout=30) as r:
             return json.loads(r.read().decode())
     except Exception as e:
-        print(f'  RPC error: {e}')
+        print(f'  RPC error ({endpoint}): {e}')
         return None
 
 
@@ -88,62 +90,43 @@ def get_current_block():
 
 def fetch_bond_broken_events_24h(current_block):
     """
-    Find BondBroken events by:
-    1. alchemy_getAssetTransfers (internal) to find txs touching the gov contract
-    2. eth_getTransactionReceipt on each tx to read BondBroken event logs
-    No eth_getLogs needed — avoids Alchemy block range restrictions.
+    Fetch BondBroken events from last 24h using Base public RPC.
+    Single eth_getLogs call — no block range restriction on mainnet.base.org.
     """
     from_block = hex(max(0, current_block - BLOCKS_PER_DAY))
-    today_str  = date.today().isoformat()
 
-    # Fetch internal transactions TO governance contract in last 24h
-    res = rpc('alchemy_getAssetTransfers', [{
-        'fromBlock'       : from_block,
-        'toBlock'         : 'latest',
-        'toAddress'       : GOV_CONTRACT,
-        'category'        : ['internal', 'external'],
-        'maxCount'        : '0x3e8',
-        'order'           : 'desc',
-        'withMetadata'    : False,
-        'excludeZeroValue': False,
-    }])
+    res = rpc('eth_getLogs', [{
+        'fromBlock': from_block,
+        'toBlock'  : 'latest',
+        'address'  : GOV_CONTRACT,
+        'topics'   : [BOND_BROKEN_TOPIC],
+    }], url=BASE_PUBLIC_RPC)
 
-    hashes = []
-    if res and 'result' in res:
-        hashes = list({tx.get('hash','') for tx in res['result'].get('transfers', []) if tx.get('hash')})
+    if not res or 'result' not in res:
+        print(f'  [WARN] eth_getLogs failed: {res}')
+        return []
 
-    print(f'  {len(hashes)} txs to governance in last 24h, reading receipts...')
-
+    logs = res['result']
     events = []
-    for tx_hash in hashes:
-        receipt = rpc('eth_getTransactionReceipt', [tx_hash])
-        if not receipt or not receipt.get('result'):
-            continue
-        for log in receipt['result'].get('logs', []):
-            topics = log.get('topics', [])
-            if not topics:
-                continue
-            if topics[0].lower() != BOND_BROKEN_TOPIC.lower():
-                continue
-            data = log.get('data', '0x')
-            if len(data) >= 66:
-                try:
-                    amount    = int(data[2:66], 16) / DECIMALS
-                    blk_num   = int(log.get('blockNumber', '0x0'), 16)
-                    blocks_ago = current_block - blk_num
-                    secs_ago   = blocks_ago / 2.0
-                    event_dt   = datetime.now(timezone.utc) - timedelta(seconds=secs_ago)
-                    event_date = event_dt.date().isoformat()
-                    events.append({
-                        'date'  : event_date,
-                        'amount': round(amount, 2),
-                        'tx'    : tx_hash,
-                    })
-                except:
-                    pass
-        time.sleep(0.1)
+    for log in logs:
+        data = log.get('data', '0x')
+        if len(data) >= 66:
+            try:
+                amount     = int(data[2:66], 16) / DECIMALS
+                blk_num    = int(log.get('blockNumber', '0x0'), 16)
+                blocks_ago = current_block - blk_num
+                secs_ago   = blocks_ago / 2.0
+                event_dt   = datetime.now(timezone.utc) - timedelta(seconds=secs_ago)
+                event_date = event_dt.date().isoformat()
+                events.append({
+                    'date'  : event_date,
+                    'amount': round(amount, 2),
+                    'tx'    : log.get('transactionHash', ''),
+                })
+            except:
+                pass
 
-    print(f'  {len(events)} BondBroken events found in last 24h')
+    print(f'  {len(events)} BondBroken events in last 24h')
     return events
 
 
