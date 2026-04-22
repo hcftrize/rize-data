@@ -21,7 +21,7 @@ ALCHEMY_URL       = os.environ.get(
 )
 
 BOND_BROKEN_TOPIC = '0xc23747277531c745e0e6b38cafe2803258edc500eee3dffa3f081b89d9970096'
-CHUNK_SIZE        = 1500
+CHUNK_SIZE        = 500
 BLOCKS_PER_DAY    = 24 * 3600 * 2   # ~172,800
 
 
