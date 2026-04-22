@@ -49,12 +49,23 @@ def get_current_block():
     return 0
 
 
-def block_to_date(block_num, current_block):
-    """Approximate date for a block based on distance from current block."""
-    blocks_ago   = current_block - block_num
-    seconds_ago  = blocks_ago / 2.0  # Base ~2 blocks/sec
-    dt           = datetime.now(timezone.utc) - timedelta(seconds=seconds_ago)
-    return dt.date().isoformat()
+# Cache block timestamps to avoid redundant RPC calls
+_block_date_cache = {}
+
+def block_to_date(block_num):
+    """Get exact date for a block using its on-chain timestamp."""
+    if block_num in _block_date_cache:
+        return _block_date_cache[block_num]
+    res = rpc('eth_getBlockByNumber', [hex(block_num), False])
+    if res and res.get('result') and res['result'].get('timestamp'):
+        ts = int(res['result']['timestamp'], 16)
+        d  = datetime.fromtimestamp(ts, tz=timezone.utc).date().isoformat()
+    else:
+        # Fallback: today (safe — event is recent by definition)
+        d = date.today().isoformat()
+    _block_date_cache[block_num] = d
+    time.sleep(0.05)
+    return d
 
 
 def main():
@@ -104,7 +115,7 @@ def main():
                     try:
                         amount     = int(data[2:66], 16) / DECIMALS
                         block_num  = int(log.get('blockNumber', '0x0'), 16)
-                        event_date = block_to_date(block_num, current_block)
+                        event_date = block_to_date(block_num)
                         new_events.append({
                             'date'  : event_date,
                             'amount': round(amount, 2),
