@@ -15,7 +15,6 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - BondBroken
-        - DailyUnbondingQueue
       abis:
         - name: Governance
           file: ./abis/Governance.json
