@@ -16,15 +16,10 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install graph-cli
-        run: npm install -g @graphprotocol/graph-cli
-
-      - name: Install Goldsky CLI
+      - name: Install graph-cli and goldsky
         run: |
-          curl -fsSL https://cli.goldsky.com/install.sh | sh
-          echo "=== Searching for goldsky binary ==="
-          find / -name "goldsky" -type f 2>/dev/null || echo "not found"
-          which goldsky || echo "not in PATH"
+          npm install -g @graphprotocol/graph-cli
+          npm install -g @goldskycom/cli
 
       - name: Install subgraph dependencies
         working-directory: goldsky
@@ -43,7 +38,5 @@ jobs:
         env:
           GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
         run: |
-          GOLDSKY=$(find / -name "goldsky" -type f 2>/dev/null | head -1)
-          echo "Found goldsky at: $GOLDSKY"
-          $GOLDSKY login --api-key $GOLDSKY_API_KEY
-          $GOLDSKY subgraph deploy tokerize-bond-broken/1.0.0 --path .
+          goldsky login --api-key $GOLDSKY_API_KEY
+          goldsky subgraph deploy tokerize-bond-broken/1.0.0 --path .
