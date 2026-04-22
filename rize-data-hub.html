@@ -3753,6 +3753,24 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   // ── Historical data from pre-built JSON ──────────────────────
   // conviction-history.json is updated daily by GitHub Action
   // No per-visitor API calls needed for historical data
+  async function convFetchUnbondingQueue() {
+    // Fetch BondBroken events from last 7 days directly from Goldsky — live, no quota issues.
+    // Events older than 7 days are excluded (unlocking period passed, tokens released).
+    const GOLDSKY_URL = 'https://api.goldsky.com/api/public/project_cmoa6u5wk3kx201y4g3s52z77/subgraphs/tokerize-bond-broken/1.0.0/gn';
+    const cutoff = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+    const query = JSON.stringify({ query: `{ bondBrokens(first: 1000, orderBy: timestamp, orderDirection: desc, where: { date_gte: "${cutoff}" }) { id amount date } }` });
+    try {
+      const res = await fetch(GOLDSKY_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: query });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const json = await res.json();
+      const items = (json.data || {}).bondBrokens || [];
+      return items.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+    } catch(e) {
+      console.warn('Goldsky unbonding fetch failed:', e.message);
+      return 0;
+    }
+  }
+
   async function convFetchHistory() {
     // Try dev first (has address_labels), fallback to main
     const HISTORY_URL_MAIN = 'https://raw.githubusercontent.com/hcftrize/TOKERIZE/main/rize-data-hub/conviction-history.json';
@@ -4138,18 +4156,19 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     CONV.initialized = true;
 
     try {
-      // Fetch JSON history (single source of truth — no live API calls)
-      const history = await convFetchHistory();
+      // Fetch JSON history + Goldsky unbonding queue in parallel
+      const [history, lastUnbonding] = await Promise.all([
+        convFetchHistory(),
+        convFetchUnbondingQueue(),
+      ]);
 
       // Build chart series from pre-computed JSON
       const govSeries = convBuildSeriesFromJSON(history.bondedSeries);
       const cexSeries = convBuildSeriesFromJSON(history.cexSeries);
 
-      // All KPI values from JSON — last entry = today's value (updated daily at 08:00 UTC)
-      const lastBonded   = govSeries.data.length ? govSeries.data[govSeries.data.length - 1] : 0;
-      const lastCex      = cexSeries.data.length ? cexSeries.data[cexSeries.data.length - 1] : 0;
-      const unbArr       = history.unbonding || [];
-      const lastUnbonding = unbArr.length ? unbArr[unbArr.length - 1].value : 0;
+      // KPI values — bonded + cex from JSON, unbonding live from Goldsky
+      const lastBonded = govSeries.data.length ? govSeries.data[govSeries.data.length - 1] : 0;
+      const lastCex    = cexSeries.data.length ? cexSeries.data[cexSeries.data.length - 1] : 0;
 
       // Unbonding chart: governance flows from bonded series
       const unbSeries = convBuildUnbondingFromSeries(govSeries);
