@@ -3722,8 +3722,11 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
       setKpi("rz-vol-24h",      rzVolFmt(last));
       setStyle("rz-vol-24h",    "#7ee0ff");
-      setKpi("rz-vol-24h-sub",  arrow + " " + Math.abs(pctChg).toFixed(2) + "% vs yesterday");
-      setStyle("rz-vol-24h-sub", pctCol);
+      const subEl24h = document.getElementById("rz-vol-24h-sub");
+      if (subEl24h) {
+        subEl24h.innerHTML = `<span style="font-size:13px;font-family:'Rajdhani',sans-serif;font-weight:700">${arrow} ${Math.abs(pctChg).toFixed(2)}%</span>`;
+        subEl24h.style.color = pctCol;
+      }
       setKpi("rz-vol-1w",  rzVolFmt(avgLast(7)));
       setStyle("rz-vol-1w", "var(--muted)");
       setKpi("rz-vol-1m",  rzVolFmt(avgLast(30)));
@@ -3732,7 +3735,11 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       setStyle("rz-vol-3m", "var(--muted)");
       setKpi("rz-vol-ath",      rzVolFmt(athVal));
       setStyle("rz-vol-ath",    "#ffd36b");
-      setKpi("rz-vol-ath-date", athDate);
+      const subElAth = document.getElementById("rz-vol-ath-date");
+      if (subElAth) {
+        subElAth.innerHTML = `<span style="font-size:13px;font-family:'Rajdhani',sans-serif;font-weight:700">${athDate}</span>`;
+        subElAth.style.color = "var(--muted)";
+      }
 
     } catch(e) {
       console.error("Volume panel error:", e);
