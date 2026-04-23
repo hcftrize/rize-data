@@ -3671,7 +3671,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       // Fetch full history via existing CoinGecko proxy
       const data = await cgFetch("/coins/" + RIZE_ID + "/market_chart", {
         vs_currency: "usd",
-        days:        "max",
+        days:        "365",
       });
 
       const rawVols = data.total_volumes || [];
