@@ -3146,6 +3146,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const burnOpts = rzBaseOpts();
       burnOpts.scales.y.title = { display: true, text: "RIZE burned", color: "#b6c1d8", font: { size: 11 } };
       burnOpts.scales.y.ticks.callback = v => rzFmt(v);
+      burnOpts.plugins.tooltip.callbacks = { label: c => ` ${c.dataset.label}: ${rzFmt(c.parsed.y)} RIZE` };
       burnOpts.plugins.legend.labels.padding = 20;
       burnOpts.plugins.legend.position = "top";
       burnOpts.layout = { padding: { top: 8, bottom: 0 } };
