@@ -197,16 +197,16 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 .bc-card{padding:16px 18px;border:1px solid #e0e0e0;background:#f7f9fc;border-top:3px solid var(--navy);}
 .bc-card-label{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#888;margin-bottom:8px;display:block;}
 .bc-card-value{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--navy);line-height:1.1;}
-.bc-card-sub{font-family:'DM Mono',monospace;font-size:11px;color:#888;margin-top:4px;display:block;}
+.bc-card-sub{font-family:'DM Mono',monospace;font-size:11px;color:#444;margin-top:4px;display:block;}
 .bc-card.bc-highlight .bc-card-value{color:#1a7a4a;}
 .bc-card.bc-gold .bc-card-value{color:#7a5a00;}
 .bc-progress-wrap{margin-bottom:20px;}
-.bc-progress-label{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--navy);margin-bottom:8px;}
+.bc-progress-label{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#111;margin-bottom:8px;}
 .bc-progress-bar{width:100%;height:10px;background:#e0e0e0;border-radius:0;overflow:hidden;}
 .bc-progress-fill{height:100%;background:linear-gradient(90deg,#1a5a9a,#1a7a4a);transition:width 0.6s ease;}
 .bc-progress-sub{font-family:'DM Mono',monospace;font-size:12px;color:#888;margin-top:6px;}
 .bc-sim-inputs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
-.bc-sim-label{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:6px;display:block;}
+.bc-sim-label{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#111;margin-bottom:6px;display:block;}
 .bc-chart-wrap{width:100%;height:260px;position:relative;background:#f7f9fc;border:1px solid #e0e0e0;padding:12px 8px 8px;margin-top:16px;}
 .bc-chart-wrap canvas{width:100%!important;height:100%!important;}
 .bc-error{font-family:'DM Mono',monospace;font-size:13px;color:#a02020;padding:12px 0;}
@@ -323,7 +323,7 @@ html,body{overflow-x:hidden;max-width:100%;}
                 <tr onclick="ripPick('rip-01')">
                   <td>Proposal 01 — Canton Incentives &amp; Ecosystem Alignment</td>
                   <td><span class="gov-status pending">Pending</span></td>
-                  <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:#888">Governance · Tokenomics</span></td>
+                  <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:#111">Governance · Tokenomics</span></td>
                 </tr>
               </tbody>
             </table>
@@ -331,7 +331,7 @@ html,body{overflow-x:hidden;max-width:100%;}
 
           <!-- Learn box -->
           <div class="info-box" id="rip-box">
-            <p class="ib-prompt" id="rip-prompt">Click on any governance proposal to learn more about it.</p>
+            <p class="ib-prompt" id="rip-prompt" style="color:#444">Click on any governance proposal to learn more about it.</p>
             <div class="ib-title" id="rip-detail-title" style="display:none"></div>
             <div class="ib-text" id="rip-detail-body" style="display:none"></div>
           </div>
@@ -349,9 +349,9 @@ html,body{overflow-x:hidden;max-width:100%;}
 
           <!-- ── My Bond panel ── -->
           <div id="bc-panel-lookup">
-            <div style="font-family:'DM Mono',monospace;font-size:12px;color:#888;margin-bottom:12px">Enter your Bond # (e.g. 1317) or a wallet address (0x…)</div>
+            <div style="font-family:'DM Mono',monospace;font-size:12px;color:#111;margin-bottom:12px">Enter your Bond # (e.g. 1317) or a wallet address (0x…)</div>
             <div class="bc-input-row">
-              <input class="bc-input" id="bc-input" placeholder="Bond # or 0x wallet…" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')bcLookup()"/>
+              <input class="bc-input" id="bc-input" placeholder="Bond #7777 or 0x wallet…" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')bcLookup()"/>
               <button class="bc-btn" id="bc-search-btn" onclick="bcLookup()">Search</button>
             </div>
             <div id="bc-lookup-result"></div>
@@ -1275,12 +1275,12 @@ function bcRenderCards(amount, mat, bondDate, bondId) {
       <div class="bc-card bc-highlight">
         <span class="bc-card-label">Voting Power</span>
         <span class="bc-card-value">${bcFmtRize(vp)}</span>
-        <span class="bc-card-sub">votes</span>
+        <span class="bc-card-sub" style="color:#444">votes</span>
       </div>
       <div class="bc-card">
         <span class="bc-card-label">Bonded Amount</span>
         <span class="bc-card-value">${bcFmtRize(amount)}</span>
-        <span class="bc-card-sub">RIZE</span>
+        <span class="bc-card-sub" style="color:#444">RIZE</span>
       </div>
       <div class="bc-card bc-gold">
         <span class="bc-card-label">Maturity Boost</span>
@@ -1289,12 +1289,12 @@ function bcRenderCards(amount, mat, bondDate, bondId) {
       </div>
       <div class="bc-card">
         <span class="bc-card-label">Bond Created</span>
-        <span class="bc-card-value" style="font-size:18px">${bcFmtDate(bondDate)}</span>
+        <span class="bc-card-value">${bcFmtDate(bondDate)}</span>
         <span class="bc-card-sub">${Math.round(mat.months)} months ago</span>
       </div>
       <div class="bc-card">
         <span class="bc-card-label">Max Voting Power Date</span>
-        <span class="bc-card-value" style="font-size:18px">${bcFmtDate(mat.maxDate)}</span>
+        <span class="bc-card-value">${bcFmtDate(mat.maxDate)}</span>
         <span class="bc-card-sub">${mat.pct < 1 ? mat.yearsToMax + ' years remaining' : 'Reached ✓'}</span>
       </div>
       <div class="bc-card">
@@ -1306,7 +1306,7 @@ function bcRenderCards(amount, mat, bondDate, bondId) {
     <div class="bc-progress-wrap">
       <div class="bc-progress-label">Maturity Progress — ${mat.pct < 1 ? (mat.pct*100).toFixed(1)+'%' : '100% — Fully Mature'}</div>
       <div class="bc-progress-bar"><div class="bc-progress-fill" style="width:${(mat.pct*100).toFixed(1)}%"></div></div>
-      <div class="bc-progress-sub">Starts at 1× · reaches 3× at 36 months · linear progression</div>
+      <div class="bc-progress-sub" style="color:#444">Starts at 1× · reaches 3× at 36 months · linear progression</div>
     </div>`;
 }
 
@@ -1355,7 +1355,9 @@ window.bcLookup = async function() {
         resultEl.innerHTML = '<div class="bc-error">Bond #' + raw + ' not found or has zero balance.</div>';
         btn.disabled = false; return;
       }
-      resultEl.innerHTML = `<div style="font-family:'DM Mono',monospace;font-size:11px;color:#888;margin-bottom:12px">Bond #${raw} · Pool ${data.poolId} · on-chain data via Base Mainnet</div>` + bcRenderCards(data.amount, data.mat, data.bondDate, raw);
+      resultEl.innerHTML = `<div style="font-family:'DM Mono',monospace;font-size:11px;color:#111;margin-bottom:12px">Bond #${raw} · Pool ${data.poolId} · on-chain data via Base Mainnet</div>` + bcRenderCards(data.amount, data.mat, data.bondDate, raw)
+        + `<div class="bc-chart-wrap" id="bc-lookup-chart-wrap" style="margin-top:16px"><canvas id="bc-lookup-chart"></canvas></div>`;
+      bcDrawLookupChart(data.amount, data.bondDate);
 
     } else if (/^0x[0-9a-fA-F]{40}$/.test(raw)) {
       // Wallet lookup — bonded(address) = 0xc9836074
@@ -1382,7 +1384,7 @@ window.bcLookup = async function() {
             <span class="bc-card-sub">at 3× full maturity</span>
           </div>
         </div>
-        <div style="font-family:'DM Mono',monospace;font-size:12px;color:#888;padding:12px 0">For per-bond breakdown with maturity details, search by Bond #.</div>`;
+        <div style="font-family:'DM Mono',monospace;font-size:12px;color:#111;padding:12px 0">For per-bond breakdown with maturity details, search by Bond #.</div>`;
 
     } else {
       resultEl.innerHTML = '<div class="bc-error">Enter a Bond # (number) or a wallet address (0x…).</div>';
@@ -1396,6 +1398,47 @@ window.bcLookup = async function() {
 
 /* ── Simulator ── */
 let bcSimChartInst = null;
+
+/* ── Draw chart for My Bond lookup ── */
+let bcLookupChartInst = null;
+function bcDrawLookupChart(amount, bondDate) {
+  const cv = document.getElementById('bc-lookup-chart');
+  if (!cv) return;
+  const timeMarker = bondDate.getTime() / 1000;
+  const mat = bcMaturity(timeMarker);
+  const labels = [], vpData = [], boostData = [];
+  for (let m = 0; m <= 36; m++) {
+    const d = new Date(bondDate);
+    d.setMonth(d.getMonth() + m);
+    labels.push(d.toLocaleDateString('en-US', { month:'short', year:'2-digit' }));
+    const b = Math.min(1 + (m / 36) * 2, 3);
+    vpData.push(+(amount * b).toFixed(0));
+    boostData.push(+b.toFixed(3));
+  }
+  if (bcLookupChartInst) { bcLookupChartInst.destroy(); bcLookupChartInst = null; }
+  bcLookupChartInst = new Chart(cv.getContext('2d'), {
+    type: 'line',
+    data: { labels, datasets: [
+      { label:'Voting Power', data:vpData, borderColor:'#0d2d4e', backgroundColor:'rgba(13,45,78,0.08)', fill:true, tension:0.2, pointRadius:0, borderWidth:2.5, yAxisID:'y' },
+      { label:'Maturity Boost', data:boostData, borderColor:'#c8960a', backgroundColor:'transparent', fill:false, tension:0.2, pointRadius:0, borderWidth:2, borderDash:[5,3], yAxisID:'y2' },
+    ]},
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      interaction:{ mode:'index', intersect:false },
+      plugins:{
+        legend:{ labels:{ color:'#444', font:{family:'Trebuchet MS',size:12}, boxWidth:12, padding:16 } },
+        tooltip:{ backgroundColor:'#0d2d4e', titleColor:'#fff', bodyColor:'#e8f0f7',
+          callbacks:{ label: c => c.datasetIndex===0 ? ' Voting Power: '+bcFmtRize(c.parsed.y)+' votes' : ' Boost: '+c.parsed.y.toFixed(3)+'×' }
+        },
+      },
+      scales:{
+        x:{ ticks:{ color:'#666', font:{size:11}, maxRotation:35, autoSkip:true, maxTicksLimit:12 }, grid:{ color:'rgba(0,0,0,0.05)' } },
+        y:{ ticks:{ color:'#666', font:{size:11}, callback: v=>bcFmtRize(v) }, grid:{ color:'rgba(0,0,0,0.05)' }, title:{ display:true, text:'Voting Power', color:'#666', font:{size:11} } },
+        y2:{ position:'right', ticks:{ color:'#c8960a', font:{size:11}, callback: v=>v.toFixed(1)+'×' }, grid:{display:false}, title:{ display:true, text:'Boost', color:'#c8960a', font:{size:11} }, min:1, max:3 },
+      },
+    },
+  });
+}
 
 window.bcSimCalc = function() {
   const amountRaw = parseFloat(document.getElementById('bc-sim-amount').value);
