@@ -3,7 +3,7 @@ name: Update Canton CIPs
 on:
   schedule:
     # Every day at 08:00 UTC
-    - cron: '0 8 * * *'
+    - cron: '0 4 * * *'
   workflow_dispatch:
 
 jobs:

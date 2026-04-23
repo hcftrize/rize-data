@@ -2,7 +2,7 @@ name: Update Lighthouse Revenue
 
 on:
   schedule:
-    - cron: "0 1 * * *"   # 01:00 UTC daily (API updates at 00:00 UTC)
+    - cron: "0 2 * * *"   # 02:00 UTC daily (API updates at 00:00 UTC)
   workflow_dispatch:
     inputs:
       bootstrap:
@@ -33,7 +33,7 @@ jobs:
             python scripts/scrape_lighthouse.py
           fi
 
-      - name: Commit if changed
+      - name: Commit and push to dev
         run: |
           git config user.name  "tokerize-bot"
           git config user.email "bot@tokerize.com"
@@ -43,5 +43,13 @@ jobs:
           else
             git commit -m "chore(data): canton-revenue $(date -u +%Y-%m-%d)"
             git push origin dev
-            git push origin HEAD:main
           fi
+
+      - name: Push data file to main
+        run: |
+          git fetch origin main
+          git checkout main
+          git checkout dev -- rize-data-hub/canton-revenue.json
+          git add rize-data-hub/canton-revenue.json
+          git diff --staged --quiet || git commit -m "chore(data): canton-revenue $(date -u +%Y-%m-%d)"
+          git push origin main
