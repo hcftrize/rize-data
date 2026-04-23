@@ -2,7 +2,7 @@ name: Update Unbonding Queue
 
 on:
   schedule:
-    - cron: "30 2 * * *"   # 02:30 UTC daily — after Lighthouse (02:00)
+    - cron: "30 23 * * *"   # 23:30 UTC daily — captures full day before writing
   workflow_dispatch:
     inputs:
       bootstrap:
