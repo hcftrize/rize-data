@@ -1,0 +1,55 @@
+name: Update Unbonding Queue
+
+on:
+  schedule:
+    - cron: "30 2 * * *"   # 02:30 UTC daily — after Lighthouse (02:00)
+  workflow_dispatch:
+    inputs:
+      bootstrap:
+        description: "Full history from genesis (true = bootstrap, false = incremental)"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run scraper
+        run: |
+          if [ "${{ github.event.inputs.bootstrap }}" = "true" ]; then
+            python scripts/scrape_unbonding.py --bootstrap
+          else
+            python scripts/scrape_unbonding.py
+          fi
+
+      - name: Commit and push to dev
+        run: |
+          git config user.name  "tokerize-bot"
+          git config user.email "bot@tokerize.com"
+          git add rize-data-hub/unbonding-queue.json
+          if git diff --cached --quiet; then
+            echo "No changes."
+          else
+            git commit -m "chore(data): unbonding-queue $(date -u +%Y-%m-%d)"
+            git push origin dev
+          fi
+
+      - name: Push data file to main
+        run: |
+          git fetch origin main
+          git checkout main
+          git checkout dev -- rize-data-hub/unbonding-queue.json
+          git add rize-data-hub/unbonding-queue.json
+          git diff --staged --quiet || git commit -m "chore(data): unbonding-queue $(date -u +%Y-%m-%d)"
+          git push origin main
