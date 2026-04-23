@@ -1147,6 +1147,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <option value="rwa">T-RIZE RWA Revenue</option>
           <option value="rewards">T-RIZE Canton Revenue</option>
           <option value="burns">RIZE Burns</option>
+          <option value="volume">RIZE Volume</option>
           <option value="tokenomics">RIZE Tokenomics</option>
         </select>
       </div>
@@ -1156,6 +1157,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <button class="ctx-tab" onclick="rzCtxSwitch('rwa',this)">T-RIZE RWA Revenue</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('rewards',this)">T-RIZE Canton Revenue</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('burns',this)">RIZE Burns</button>
+        <button class="ctx-tab" onclick="rzCtxSwitch('volume',this)">RIZE Volume</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('tokenomics',this)">RIZE Tokenomics</button>
       </div>
 
@@ -1406,6 +1408,47 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <div class="ctx-chart-wrap" style="height:260px"><canvas id="rz-chart-burns"></canvas></div>
         <div style="margin-top:20px" id="rz-burn-events-table">
           <span style="color:var(--muted);font-size:13px">Loading burn events&hellip;</span>
+        </div>
+      </div>
+
+      <!-- Panel — RIZE Volume -->
+      <div class="ctx-panel" id="rz-panel-volume">
+        <!-- Chart header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;flex:1">RIZE 24H Volume — All Exchanges (USD)</div>
+          <button id="rz-vol-history-btn" onclick="rzVolumeToggleHistory()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.15);padding:5px 14px;cursor:pointer;transition:background 0.15s,color 0.15s;white-space:nowrap">See Full History</button>
+        </div>
+        <!-- Chart -->
+        <div class="ctx-chart-wrap" style="height:260px">
+          <div class="ctx-loading" id="rz-vol-loading">Loading volume data&hellip;</div>
+          <canvas id="rz-chart-volume" style="display:none"></canvas>
+        </div>
+        <!-- KPI row -->
+        <div class="conv-sep" style="margin-top:16px"></div>
+        <div class="conv-section-title" style="margin-top:12px">Volume Stats</div>
+        <div class="ctx-kpi-row" id="rz-vol-kpi-row">
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">24H Volume</span>
+            <span class="ctx-kpi-value" id="rz-vol-24h">—</span>
+            <span class="conv-delta-sub" id="rz-vol-24h-sub">&nbsp;</span>
+          </div>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">1W Avg (daily)</span>
+            <span class="ctx-kpi-value" id="rz-vol-1w">—</span>
+          </div>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">1M Avg (daily)</span>
+            <span class="ctx-kpi-value" id="rz-vol-1m">—</span>
+          </div>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">3M Avg (daily)</span>
+            <span class="ctx-kpi-value" id="rz-vol-3m">—</span>
+          </div>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">24H Volume ATH</span>
+            <span class="ctx-kpi-value" id="rz-vol-ath">—</span>
+            <span class="conv-delta-sub" id="rz-vol-ath-date">&nbsp;</span>
+          </div>
         </div>
       </div>
 
@@ -2870,7 +2913,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   const RZ_GENESIS      = "2024-07-31T00:00:00.000Z";
   const RZ_API_BASE     = "https://lighthouse.fivenorth.io/api/parties";
 
-  const rzCharts = { rwa: null, cumul: null, sources: null, weekly: null, alloc: null, vesting: null, cantonomics: null, burns: null, convMain: null, convUnbonding: null, convUnbqueue: null };
+  const rzCharts = { rwa: null, cumul: null, sources: null, weekly: null, alloc: null, vesting: null, cantonomics: null, burns: null, volume: null, convMain: null, convUnbonding: null, convUnbqueue: null };
 
   function rzCtxSwitch(tab, btn) {
     const section = document.getElementById("rize-ctx-section");
@@ -2890,6 +2933,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       setTimeout(() => rzRenderCantoChart(), 50);
     } else if (tab === "burns") {
       setTimeout(() => rzRenderBurnsPanel(), 50);
+    } else if (tab === "volume") {
+      setTimeout(() => rzRenderVolumePanel(), 50);
     }
   }
 
@@ -3559,7 +3604,137 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     }
   }
 
-  function rzRenderTokenomics() {
+  /* ─── RIZE Volume Panel ──────────────────────────────────────────────────── */
+  let _rzVolFull      = { labels: [], data: [], rawDays: [] };
+  let _rzVolShowFull  = false;
+
+  function rzVolFmt(v) {
+    if (!v && v !== 0) return "N/A";
+    if (v >= 1e9) return "$" + (v / 1e9).toFixed(2) + "B";
+    if (v >= 1e6) return "$" + (v / 1e6).toFixed(2) + "M";
+    if (v >= 1e3) return "$" + (v / 1e3).toFixed(1) + "K";
+    return "$" + v.toFixed(0);
+  }
+
+  function rzVolumeToggleHistory() {
+    _rzVolShowFull = !_rzVolShowFull;
+    _rzDrawVolumeChart(_rzVolFull, _rzVolShowFull);
+  }
+
+  function _rzDrawVolumeChart(series, isFull) {
+    const cv     = document.getElementById("rz-chart-volume");
+    const loadEl = document.getElementById("rz-vol-loading");
+    if (!cv) return;
+    if (loadEl) loadEl.style.display = "none";
+    cv.style.display = "block";
+    if (rzCharts.volume) { rzCharts.volume.destroy(); rzCharts.volume = null; }
+
+    let labels = series.labels;
+    let data   = series.data;
+    if (!isFull && series.labels.length > 60) {
+      labels = series.labels.slice(-60);
+      data   = series.data.slice(-60);
+    }
+
+    const btn = document.getElementById("rz-vol-history-btn");
+    if (btn) btn.textContent = isFull ? "Last 2 Months" : "See Full History";
+
+    const opts = rzBaseOpts();
+    opts.scales.y.title = { display: true, text: "USD", color: "#b6c1d8", font: { size: 11 } };
+    opts.scales.y.ticks.callback = v => rzVolFmt(v);
+    opts.plugins.legend.display = false;
+    opts.plugins.tooltip.callbacks = {
+      label: c => " Volume: " + rzVolFmt(c.parsed.y)
+    };
+
+    rzCharts.volume = new Chart(cv.getContext("2d"), {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          label: "24H Volume",
+          data,
+          backgroundColor: "rgba(126,224,255,0.45)",
+          borderColor: "#7ee0ff",
+          borderWidth: 1,
+          borderRadius: 2,
+        }],
+      },
+      options: opts,
+    });
+  }
+
+  async function rzRenderVolumePanel() {
+    if (rzCharts.volume) return;
+    const loadEl = document.getElementById("rz-vol-loading");
+    try {
+      // Fetch full history via existing CoinGecko proxy
+      const data = await cgFetch("/coins/" + RIZE_ID + "/market_chart", {
+        vs_currency: "usd",
+        days:        "max",
+        interval:    "daily",
+      });
+
+      const rawVols = data.total_volumes || [];
+      if (!rawVols.length) throw new Error("No volume data");
+
+      // Build series — CoinGecko returns [timestamp_ms, value]
+      const labels  = [];
+      const volumes = [];
+      const rawDays = [];
+      rawVols.forEach(([ts, v]) => {
+        const d = new Date(ts);
+        labels.push(d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" }));
+        volumes.push(v);
+        rawDays.push(d.toISOString().slice(0, 10));
+      });
+
+      _rzVolFull     = { labels, data: volumes, rawDays };
+      _rzVolShowFull = false;
+      _rzDrawVolumeChart(_rzVolFull, false);
+
+      // ── KPIs ──────────────────────────────────────────────────────────────
+      const last    = volumes[volumes.length - 1] || 0;
+      const prev    = volumes[volumes.length - 2] || 0;
+      const pctChg  = prev ? ((last - prev) / prev) * 100 : 0;
+      const arrow   = pctChg >= 0 ? "▲" : "▼";
+      const pctCol  = pctChg >= 0 ? "#98ffb6" : "var(--pink)";
+
+      function avgLast(n) {
+        const slice = volumes.slice(-n);
+        return slice.reduce((s, v) => s + v, 0) / slice.length;
+      }
+
+      // ATH
+      let athVal = 0, athIdx = 0;
+      volumes.forEach((v, i) => { if (v > athVal) { athVal = v; athIdx = i; } });
+      const athDate = new Date(rawDays[athIdx] + "T00:00:00Z")
+        .toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" });
+
+      const setKpi = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      const setStyle = (id, col) => { const el = document.getElementById(id); if (el) el.style.color = col; };
+
+      setKpi("rz-vol-24h",      rzVolFmt(last));
+      setStyle("rz-vol-24h",    "#7ee0ff");
+      setKpi("rz-vol-24h-sub",  arrow + " " + Math.abs(pctChg).toFixed(2) + "% vs yesterday");
+      setStyle("rz-vol-24h-sub", pctCol);
+      setKpi("rz-vol-1w",  rzVolFmt(avgLast(7)));
+      setStyle("rz-vol-1w", "var(--muted)");
+      setKpi("rz-vol-1m",  rzVolFmt(avgLast(30)));
+      setStyle("rz-vol-1m", "var(--muted)");
+      setKpi("rz-vol-3m",  rzVolFmt(avgLast(90)));
+      setStyle("rz-vol-3m", "var(--muted)");
+      setKpi("rz-vol-ath",      rzVolFmt(athVal));
+      setStyle("rz-vol-ath",    "#ffd36b");
+      setKpi("rz-vol-ath-date", athDate);
+
+    } catch(e) {
+      console.error("Volume panel error:", e);
+      if (loadEl) { loadEl.textContent = "⚠ Could not load volume data."; loadEl.style.color = "var(--pink)"; }
+    }
+  }
+
+    function rzRenderTokenomics() {
     const TOTAL = 5_000_000_000;
     const TGE = new Date("2025-05-15T00:00:00Z");
     const today = new Date();
