@@ -117,29 +117,27 @@ def main():
             print("  No existing data — run with --bootstrap first")
             sys.exit(0)
 
-        # Find last date in existing series
         last_date = existing_series[-1]["date"]
         print(f"  Last existing point: {last_date}")
 
-        if last_date == today:
-            print("  Already up to date — nothing to do")
-            sys.exit(0)
+        # Always recompute the last 8 days so that rolling values are corrected
+        # if new BondBroken events arrived since the previous run.
+        RECOMPUTE_DAYS = 8
+        recompute_from = (datetime.fromisoformat(today) - timedelta(days=RECOMPUTE_DAYS)).strftime("%Y-%m-%d")
 
-        # Fetch events for the rolling window (14 days back to cover 7-day window correctly)
-        window_start = (datetime.fromisoformat(last_date) - timedelta(days=7)).strftime("%Y-%m-%d")
+        # Fetch events for the rolling window (recompute window + 7-day lookback)
+        window_start = (datetime.fromisoformat(recompute_from) - timedelta(days=7)).strftime("%Y-%m-%d")
         events = fetch_events(window_start, today)
 
-        # Rebuild from day after last existing point
-        rebuild_from = (datetime.fromisoformat(last_date) + timedelta(days=1)).strftime("%Y-%m-%d")
+        # Rebuild from recompute_from (or day after last_date if we have no history that far)
+        rebuild_from = min(recompute_from, (datetime.fromisoformat(last_date) + timedelta(days=1)).strftime("%Y-%m-%d"))
 
-        # We need all events for the rolling window — combine with what we know
-        # by rebuilding only the new days (series_start = rebuild_from)
-        # but we need events from window_start for correct 7-day rolling
         new_points = build_series(events, rebuild_from, today)
-        print(f"  Adding {len(new_points)} new daily points")
+        print(f"  Recomputing {len(new_points)} daily points from {rebuild_from}")
 
-        # Merge: keep existing up to last_date, append new points
-        new_series = existing_series + new_points
+        # Keep existing points strictly before rebuild_from, then append recomputed points
+        kept = [p for p in existing_series if p["date"] < rebuild_from]
+        new_series = kept + new_points
 
     # Write output
     payload = {
