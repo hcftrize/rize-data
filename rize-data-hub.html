@@ -3836,60 +3836,34 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   // ── Goldsky URL (v1.1.0 — indexes from genesis) ───────────
   const CONV_GOLDSKY_URL = 'https://api.goldsky.com/api/public/project_cmoa6u5wk3kx201y4g3s52z77/subgraphs/tokerize-bond-broken/1.1.0/gn';
 
-  // ── Fetch ALL BondBroken events from Goldsky (paginated) ───
-  async function convFetchAllBondBroken() {
-    const PAGE = 1000;
-    let all = [];
-    let skip = 0;
-    while (true) {
-      const query = JSON.stringify({ query: `{ bondBrokens(first: ${PAGE}, skip: ${skip}, orderBy: timestamp, orderDirection: asc) { id amount date timestamp } }` });
-      const res = await fetch(CONV_GOLDSKY_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: query });
-      if (!res.ok) throw new Error('Goldsky HTTP ' + res.status);
-      const json = await res.json();
-      const items = (json.data || {}).bondBrokens || [];
-      all = all.concat(items);
-      if (items.length < PAGE) break;
-      skip += PAGE;
+  // ── Unbonding Queue — load from pre-built JSON (fast) ────────
+  // JSON is updated daily by GitHub Action (scrape_unbonding.py)
+  // Falls back to Goldsky live fetch if JSON not available
+  async function convFetchUnbqueueJSON() {
+    const URLS = [
+      'https://raw.githubusercontent.com/hcftrize/TOKERIZE/main/rize-data-hub/unbonding-queue.json',
+      'https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/rize-data-hub/unbonding-queue.json',
+    ];
+    for (const url of URLS) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) continue;
+        const data = await res.json();
+        if (data.series && data.series.length) return data.series;
+      } catch(e) { continue; }
     }
-    return all;
+    return null;
   }
 
-  // ── Build rolling 7-day unbonding queue series from raw events ──
-  // For each day from first event to today, sum BondBroken in [day-7d, day]
-  function convBuildUnbqueueSeries(events) {
-    if (!events.length) return { labels: [], data: [], rawDays: [] };
-
-    // Group amounts by date
-    const byDate = {};
-    for (const e of events) {
-      byDate[e.date] = (byDate[e.date] || 0) + parseFloat(e.amount || 0);
-    }
-
-    // Build day range from first event date to today
-    const firstDate = events[0].date;
-    const days = [];
-    let cur = new Date(firstDate + 'T00:00:00Z');
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-    while (cur <= today) {
-      days.push(cur.toISOString().slice(0, 10));
-      cur.setUTCDate(cur.getUTCDate() + 1);
-    }
-
-    // For each day: sum BondBroken in [day-7d, day]
-    const labels = [], data = [], rawDays = [];
-    for (const day of days) {
-      const dayTs  = new Date(day + 'T00:00:00Z').getTime();
-      const cutoff = new Date(dayTs - 7 * 86400000).toISOString().slice(0, 10);
-      let sum = 0;
-      for (const [d, v] of Object.entries(byDate)) {
-        if (d >= cutoff && d <= day) sum += v;
-      }
-      const d = new Date(day + 'T00:00:00Z');
-      labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }));
-      data.push(sum);
-      rawDays.push(day);
-    }
+  // ── Convert [{date, value}] series to chart-ready format ──────
+  function convBuildUnbqueueSeriesFromJSON(arr) {
+    if (!arr || !arr.length) return { labels: [], data: [], rawDays: [] };
+    const labels  = arr.map(e => {
+      const d = new Date(e.date + 'T00:00:00Z');
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+    });
+    const data    = arr.map(e => e.value);
+    const rawDays = arr.map(e => e.date);
     return { labels, data, rawDays };
   }
 
@@ -3948,12 +3922,12 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   async function convRenderUnbqueueChart() {
     const loadEl = document.getElementById('conv-loading-unbqueue');
     try {
-      const events = await convFetchAllBondBroken();
-      if (!events.length) {
-        if (loadEl) { loadEl.textContent = 'Indexing in progress — check back shortly.'; loadEl.style.display = 'block'; }
+      const series = await convFetchUnbqueueJSON();
+      if (!series) {
+        if (loadEl) { loadEl.textContent = 'Data not yet available — check back shortly.'; }
         return;
       }
-      _convUnbqueueFull = convBuildUnbqueueSeries(events);
+      _convUnbqueueFull = convBuildUnbqueueSeriesFromJSON(series);
       _convUnbqueueShowFull = false;
       _convDrawUnbqueueChart(_convUnbqueueFull, false);
     } catch(e) {
