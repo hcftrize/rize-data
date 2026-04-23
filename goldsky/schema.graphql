@@ -1,8 +1,151 @@
-type BondBroken @entity(immutable: true) {
+# ── Pool ──────────────────────────────────────────────────────────────────────
+# Snapshot of pool parameters at a given point in time
+type Pool @entity {
+  id: ID!                        # poolId as string
+  poolId: Int!
+  baseWeight: BigInt!
+  maturedWeightBonus: BigInt!
+  fullMaturity: BigInt!          # in seconds
+  updatedAtBlock: BigInt!
+  updatedAtTimestamp: BigInt!
+  updatedAtDate: String!
+}
+
+# ── Bond ──────────────────────────────────────────────────────────────────────
+# One entity per bond NFT — updated on every event
+type Bond @entity {
+  id: ID!                        # nftId as string
+  nftId: BigInt!
+  owner: Bytes!                  # current owner (from BondCreated)
+  poolId: Int!
+  amount: BigDecimal!            # current bonded amount (RIZE, /1e18)
+  timeMarker: BigInt!            # as stored on-chain (recalculated on increaseBond)
+  createdAtBlock: BigInt!
+  createdAtTimestamp: BigInt!
+  createdAtDate: String!         # YYYY-MM-DD of original creation
+  lastUpdatedBlock: BigInt!
+  lastUpdatedTimestamp: BigInt!
+  isActive: Boolean!             # false if fully released/broken
+  totalDeposited: BigDecimal!    # cumulative amount ever deposited
+  totalBroken: BigDecimal!       # cumulative amount ever broken
+  totalReleased: BigDecimal!     # cumulative amount ever released
+  increaseCount: Int!            # number of increaseBond calls
+  breakCount: Int!               # number of breakBond calls
+}
+
+# ── BondCreatedEvent ──────────────────────────────────────────────────────────
+type BondCreatedEvent @entity(immutable: true) {
+  id: ID!                        # tx hash + log index
+  nftId: BigInt!
+  owner: Bytes!
+  poolId: Int!
+  amount: BigDecimal!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+# ── IncreaseBondEvent ─────────────────────────────────────────────────────────
+type IncreaseBondEvent @entity(immutable: true) {
+  id: ID!                        # tx hash + log index
+  nftId: BigInt!
+  amount: BigDecimal!            # amount added
+  newTotal: BigDecimal!          # total after increase
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+# ── BondBrokenEvent ───────────────────────────────────────────────────────────
+type BondBrokenEvent @entity(immutable: true) {
   id: ID!
   nftId: BigInt!
   amount: BigDecimal!
   date: String!
   blockNumber: BigInt!
   timestamp: BigInt!
+  txHash: Bytes!
+}
+
+# ── TokensReleasedEvent ───────────────────────────────────────────────────────
+type TokensReleasedEvent @entity(immutable: true) {
+  id: ID!
+  nftId: BigInt!
+  to: Bytes!
+  amount: BigDecimal!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+# ── BondMigratedEvent ─────────────────────────────────────────────────────────
+type BondMigratedEvent @entity(immutable: true) {
+  id: ID!
+  nftId: BigInt!
+  fromPool: Int!
+  toPool: Int!
+  migrator: Bytes!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+# ── PoolUpdatedEvent ──────────────────────────────────────────────────────────
+type PoolUpdatedEvent @entity(immutable: true) {
+  id: ID!
+  poolId: Int!
+  baseWeight: BigInt!
+  maturedWeightBonus: BigInt!
+  fullMaturity: BigInt!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+# ── VestedTokenClawedEvent ────────────────────────────────────────────────────
+type VestedTokenClawedEvent @entity(immutable: true) {
+  id: ID!
+  nftId: BigInt!
+  amount: BigDecimal!
+  to: Bytes!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+# ── DailySnapshot ─────────────────────────────────────────────────────────────
+# One record per day — tracks global bonding stats
+type DailySnapshot @entity {
+  id: ID!                        # YYYY-MM-DD
+  date: String!
+  totalBonded: BigDecimal!       # total RIZE bonded across all active bonds
+  totalBroken: BigDecimal!       # cumulative RIZE broken (unbonding queue added)
+  totalReleased: BigDecimal!     # cumulative RIZE released
+  activeBonds: Int!              # number of bonds with amount > 0
+  newBonds: Int!                 # bonds created that day
+  newBreaks: Int!                # breaks that day
+  newReleases: Int!              # releases that day
+  volumeDeposited: BigDecimal!   # RIZE deposited that day (new + increases)
+  volumeBroken: BigDecimal!      # RIZE broken that day
+}
+
+# ── GlobalStats ───────────────────────────────────────────────────────────────
+# Single entity tracking all-time totals
+type GlobalStats @entity {
+  id: ID!                        # "global"
+  totalBonded: BigDecimal!
+  totalBondCount: Int!
+  totalActiveBonds: Int!
+  totalDeposited: BigDecimal!
+  totalBroken: BigDecimal!
+  totalReleased: BigDecimal!
+  uniqueBonders: Int!
+  lastUpdatedBlock: BigInt!
+  lastUpdatedTimestamp: BigInt!
 }
