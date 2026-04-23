@@ -149,6 +149,23 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 .ga-unlock-panel{display:none;}
 .ga-unlock-panel.ga-visible{display:block;}
 
+/* Live dot */
+.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#1a7a4a;margin-right:6px;animation:livepulse 1.8s ease-in-out infinite;}
+@keyframes livepulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+.live-badge{display:inline-flex;align-items:center;font-family:'Rajdhani',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1a7a4a;}
+
+/* Sub-module tabs (light mode — mirrors rize-data-hub ctx-tabs) */
+.ga-mod-tabs{display:flex;gap:0;border-bottom:2px solid #e0e0e0;margin-bottom:0;flex-wrap:wrap;}
+.ga-mod-tab{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;padding:12px 24px;cursor:pointer;border:none;background:#fff;border-bottom:3px solid transparent;margin-bottom:-2px;transition:color 0.18s,border-color 0.18s;white-space:nowrap;}
+.ga-mod-tab:hover{color:var(--navy);}
+.ga-mod-tab.ga-mod-active{color:var(--navy);border-bottom-color:var(--navy);}
+.ga-mod-panel{display:none;padding-top:24px;}
+.ga-mod-panel.ga-mod-visible{display:block;}
+
+/* KPI labels black for readability */
+.ga-kpi-label{color:#111!important;}
+.ga-sub-title{color:#111!important;}
+
 /* Scrollbar */
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:#f0f0f0;}::-webkit-scrollbar-thumb{background:var(--navy);}
 
@@ -278,155 +295,154 @@ html,body{overflow-x:hidden;max-width:100%;}
     <div class="lc-body" id="lc-activity-body">
       <div class="lc-body-inner">
 
-        <!-- Sub-module A: RIZE Holders Conviction -->
-        <div class="ga-section-label">RIZE Holders Conviction</div>
-
-        <!-- Chart toggles -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
-          <div id="ga-conv-label" style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--navy)">RIZE Bonded vs On Exchanges</div>
-          <div class="ga-toggle-row" style="margin-bottom:0">
-            <button class="ga-toggle active" id="ga-btn-main" onclick="gaSwitchChart('main',this)">Bonded / Exchanges</button>
-            <button class="ga-toggle" id="ga-btn-flows" onclick="gaSwitchChart('flows',this)">Governance Flows</button>
-            <button class="ga-toggle" id="ga-btn-unbqueue" onclick="gaSwitchChart('unbqueue',this)">Unbonding Queue</button>
-          </div>
+        <!-- Sub-module tabs -->
+        <div class="ga-mod-tabs" id="ga-mod-tabs">
+          <button class="ga-mod-tab ga-mod-active" onclick="gaModSwitch('conviction',this)">RIZE Holders Conviction</button>
+          <button class="ga-mod-tab" onclick="gaModSwitch('tokenomics',this)">RIZE Tokenomics</button>
         </div>
 
-        <!-- Chart: Main -->
-        <div id="ga-wrap-main" class="ga-chart-wrap">
-          <div class="ga-loading" id="ga-loading-main">Loading on-chain data…</div>
-          <canvas id="ga-chart-main" style="display:none"></canvas>
-        </div>
+        <!-- ── Sub-module: RIZE Holders Conviction ── -->
+        <div class="ga-mod-panel ga-mod-visible" id="ga-mod-conviction">
 
-        <!-- Chart: Governance Flows -->
-        <div id="ga-wrap-flows" style="display:none">
-          <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
-            <button id="ga-flows-hist-btn" onclick="gaToggleFlowHistory()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#666;background:#f0f0f0;border:1px solid #ddd;padding:5px 14px;cursor:pointer;white-space:nowrap">See Full History</button>
-          </div>
-          <div class="ga-chart-wrap">
-            <div class="ga-loading" id="ga-loading-flows">Loading…</div>
-            <canvas id="ga-chart-flows" style="display:none"></canvas>
-          </div>
-        </div>
-
-        <!-- Chart: Unbonding Queue -->
-        <div id="ga-wrap-unbqueue" style="display:none">
-          <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
-            <button id="ga-unbqueue-hist-btn" onclick="gaToggleUnbqueueHistory()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#666;background:#f0f0f0;border:1px solid #ddd;padding:5px 14px;cursor:pointer;white-space:nowrap">See Full History</button>
-          </div>
-          <div class="ga-chart-wrap">
-            <div class="ga-loading" id="ga-loading-unbqueue">Loading Goldsky data…</div>
-            <canvas id="ga-chart-unbqueue" style="display:none"></canvas>
-          </div>
-        </div>
-
-        <!-- Live KPIs -->
-        <div class="ga-stat-row" style="margin-top:16px">
-          <div class="ga-kpi">
-            <span class="ga-kpi-label">Total Bonded (Today)</span>
-            <span class="ga-kpi-value" id="ga-live-bonded" style="color:#1a7a4a">—</span>
-            <span class="ga-kpi-sub" id="ga-live-bonded-sub">&nbsp;</span>
-          </div>
-          <div class="ga-kpi">
-            <span class="ga-kpi-label">Unbonding Queue</span>
-            <span class="ga-kpi-value" id="ga-live-unbonding" style="color:#7a5a00">—</span>
-            <span class="ga-kpi-sub" id="ga-live-unbonding-sub">&nbsp;</span>
-          </div>
-          <div class="ga-kpi">
-            <span class="ga-kpi-label">On Exchanges (Today)</span>
-            <span class="ga-kpi-value" id="ga-live-cex">—</span>
-          </div>
-        </div>
-
-        <div class="ga-sep"></div>
-
-        <!-- Governance Flows deltas -->
-        <div class="ga-sub-title">Governance Flows</div>
-        <div class="ga-kpi-row">
-          <div class="ga-kpi"><span class="ga-kpi-label">24h Bonded</span><span class="ga-kpi-value" id="ga-gov-1d">—</span><span class="ga-kpi-sub" id="ga-gov-1d-sub">&nbsp;</span></div>
-          <div class="ga-kpi"><span class="ga-kpi-label">7d Bonded</span><span class="ga-kpi-value" id="ga-gov-7d">—</span><span class="ga-kpi-sub" id="ga-gov-7d-sub">&nbsp;</span></div>
-          <div class="ga-kpi"><span class="ga-kpi-label">30d Bonded</span><span class="ga-kpi-value" id="ga-gov-30d">—</span><span class="ga-kpi-sub" id="ga-gov-30d-sub">&nbsp;</span></div>
-          <div class="ga-kpi"><span class="ga-kpi-label">90d Bonded</span><span class="ga-kpi-value" id="ga-gov-90d">—</span><span class="ga-kpi-sub" id="ga-gov-90d-sub">&nbsp;</span></div>
-        </div>
-
-        <div class="ga-sep"></div>
-
-        <!-- Exchange Net Flow deltas -->
-        <div class="ga-sub-title">Exchanges Net Flow</div>
-        <div class="ga-kpi-row">
-          <div class="ga-kpi"><span class="ga-kpi-label">24h Net Flow</span><span class="ga-kpi-value" id="ga-cex-1d">—</span><span class="ga-kpi-sub" id="ga-cex-1d-sub">&nbsp;</span></div>
-          <div class="ga-kpi"><span class="ga-kpi-label">7d Net Flow</span><span class="ga-kpi-value" id="ga-cex-7d">—</span><span class="ga-kpi-sub" id="ga-cex-7d-sub">&nbsp;</span></div>
-          <div class="ga-kpi"><span class="ga-kpi-label">30d Net Flow</span><span class="ga-kpi-value" id="ga-cex-30d">—</span><span class="ga-kpi-sub" id="ga-cex-30d-sub">&nbsp;</span></div>
-          <div class="ga-kpi"><span class="ga-kpi-label">90d Net Flow</span><span class="ga-kpi-value" id="ga-cex-90d">—</span><span class="ga-kpi-sub" id="ga-cex-90d-sub">&nbsp;</span></div>
-        </div>
-
-        <div class="ga-sep"></div>
-
-        <!-- Whale movements -->
-        <div class="ga-sub-title">Whale Movements — Transactions &gt; 5M RIZE</div>
-        <div style="overflow-x:auto">
-          <div style="color:#888;font-family:'DM Mono',monospace;font-size:13px;padding:12px 0" id="ga-whale-loading">Loading whale data…</div>
-          <table class="ga-whale-table" id="ga-whale-table" style="display:none">
-            <thead><tr><th>Date</th><th>Amount</th><th>Direction</th><th>From</th><th>To</th><th>Tx</th></tr></thead>
-            <tbody id="ga-whale-tbody"></tbody>
-          </table>
-        </div>
-
-        <div class="ga-sep"></div>
-
-        <!-- Sub-module B: RIZE Tokenomics -->
-        <div class="ga-section-label" style="margin-top:8px">RIZE Tokenomics</div>
-
-        <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:32px;align-items:center" id="ga-tok-grid">
-          <!-- Doughnut -->
-          <div style="display:flex;align-items:center;justify-content:center;">
-            <div style="width:100%;max-width:300px;height:300px"><canvas id="ga-chart-alloc"></canvas></div>
-          </div>
-          <!-- Table -->
-          <div>
-            <div style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--navy);margin-bottom:12px">Allocation &amp; Vesting — 5B RIZE</div>
-            <div style="overflow-x:auto">
-              <table class="ga-tok-table">
-                <thead><tr><th>Category</th><th>%</th><th>Tokens</th><th>Cliff</th><th>Vesting</th></tr></thead>
-                <tbody>
-                  <tr><td class="tok-cat">Seed</td><td style="color:#1a7a4a">5%</td><td>250M</td><td>6m</td><td>12m</td></tr>
-                  <tr><td class="tok-cat">Partnerships &amp; Growth</td><td style="color:#1a7a4a">7%</td><td>350M</td><td>6m</td><td>12m</td></tr>
-                  <tr><td class="tok-cat">Marketing &amp; Incubation</td><td style="color:#1a5a9a">3%</td><td>150M</td><td>3m</td><td>9m</td></tr>
-                  <tr><td class="tok-cat">Private Sale</td><td style="color:#1a5a9a">7%</td><td>350M</td><td>—</td><td>—</td></tr>
-                  <tr><td class="tok-cat">Strategic Reserve</td><td style="color:#7a5a00">10%</td><td>500M</td><td>0m</td><td>12m</td></tr>
-                  <tr><td class="tok-cat">Liquidity</td><td style="color:#7a5a00">10%</td><td>500M</td><td>—</td><td>—</td></tr>
-                  <tr><td class="tok-cat">Airdrop</td><td style="color:#a02020">4%</td><td>200M</td><td>1m</td><td>6m</td></tr>
-                  <tr><td class="tok-cat">Governance</td><td style="color:#a02020">30%</td><td>1.5B</td><td>12m</td><td>36m</td></tr>
-                  <tr><td class="tok-cat">Treasury</td><td style="color:#5a2a8a">10%</td><td>500M</td><td>—</td><td>—</td></tr>
-                  <tr><td class="tok-cat">T-RIZE Team</td><td style="color:#5a2a8a">14%</td><td>700M</td><td>24m</td><td>24m</td></tr>
-                  <tr><td><strong>TOTAL</strong></td><td><strong>100%</strong></td><td><strong>5B</strong></td><td></td><td></td></tr>
-                </tbody>
-              </table>
+          <!-- Chart toggles -->
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+            <div id="ga-conv-label" style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--navy)">RIZE Bonded vs On Exchanges</div>
+            <div class="ga-toggle-row" style="margin-bottom:0">
+              <button class="ga-toggle active" id="ga-btn-main" onclick="gaSwitchChart('main',this)">Bonded / Exchanges</button>
+              <button class="ga-toggle" id="ga-btn-flows" onclick="gaSwitchChart('flows',this)">Governance Flows</button>
+              <button class="ga-toggle" id="ga-btn-unbqueue" onclick="gaSwitchChart('unbqueue',this)">Unbonding Queue</button>
             </div>
           </div>
-        </div>
 
-        <!-- Vesting chart -->
-        <div style="margin-top:24px">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--navy);margin-bottom:10px">Vesting Schedule</div>
-          <div class="ga-chart-wrap" style="height:280px"><canvas id="ga-chart-vesting"></canvas></div>
-        </div>
+          <!-- Chart: Main -->
+          <div id="ga-wrap-main" class="ga-chart-wrap">
+            <div class="ga-loading" id="ga-loading-main">Loading on-chain data…</div>
+            <canvas id="ga-chart-main" style="display:none"></canvas>
+          </div>
 
-        <!-- Unlock events -->
-        <div style="margin-top:24px">
-          <div class="ga-sub-title">Burn &amp; Supply Unlock Events</div>
-          <div class="ga-unlock-tabs" id="ga-unlock-tabs">
-            <button class="ga-unlock-tab ga-active" onclick="gaUnlockSwitch('burn',this)">Burn Events (1)</button>
-            <button class="ga-unlock-tab" onclick="gaUnlockSwitch('pending',this)">Next Unlocks</button>
-            <button class="ga-unlock-tab" onclick="gaUnlockSwitch('ongoing',this)">Ongoing Releases</button>
-            <button class="ga-unlock-tab" onclick="gaUnlockSwitch('done',this)">Past Unlocks</button>
+          <!-- Chart: Governance Flows -->
+          <div id="ga-wrap-flows" style="display:none">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+              <button id="ga-flows-hist-btn" onclick="gaToggleFlowHistory()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#666;background:#f0f0f0;border:1px solid #ddd;padding:5px 14px;cursor:pointer;white-space:nowrap">See Full History</button>
+            </div>
+            <div class="ga-chart-wrap">
+              <div class="ga-loading" id="ga-loading-flows">Loading…</div>
+              <canvas id="ga-chart-flows" style="display:none"></canvas>
+            </div>
           </div>
-          <div id="ga-unlock-burn" class="ga-unlock-panel ga-visible">
-            <span style="color:#888;font-size:13px">Loading…</span>
+
+          <!-- Chart: Unbonding Queue -->
+          <div id="ga-wrap-unbqueue" style="display:none">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+              <button id="ga-unbqueue-hist-btn" onclick="gaToggleUnbqueueHistory()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#666;background:#f0f0f0;border:1px solid #ddd;padding:5px 14px;cursor:pointer;white-space:nowrap">See Full History</button>
+            </div>
+            <div class="ga-chart-wrap">
+              <div class="ga-loading" id="ga-loading-unbqueue">Loading Goldsky data…</div>
+              <canvas id="ga-chart-unbqueue" style="display:none"></canvas>
+            </div>
           </div>
-          <div id="ga-unlock-pending" class="ga-unlock-panel"><span style="color:#888;font-size:13px">Computing…</span></div>
-          <div id="ga-unlock-ongoing" class="ga-unlock-panel"><span style="color:#888;font-size:13px">Computing…</span></div>
-          <div id="ga-unlock-done" class="ga-unlock-panel"><span style="color:#888;font-size:13px">Computing…</span></div>
-        </div>
+
+          <!-- Live KPIs -->
+          <div class="ga-stat-row" style="margin-top:16px">
+            <div class="ga-kpi">
+              <span class="ga-kpi-label"><span class="live-dot"></span>Total Bonded <span class="live-badge">LIVE</span></span>
+              <span class="ga-kpi-value" id="ga-live-bonded" style="color:#1a7a4a">—</span>
+              <span class="ga-kpi-sub" id="ga-live-bonded-sub">&nbsp;</span>
+            </div>
+            <div class="ga-kpi">
+              <span class="ga-kpi-label"><span class="live-dot"></span>Unbonding Queue <span class="live-badge">LIVE</span></span>
+              <span class="ga-kpi-value" id="ga-live-unbonding" style="color:#7a5a00">—</span>
+              <span class="ga-kpi-sub" id="ga-live-unbonding-sub">&nbsp;</span>
+            </div>
+            <div class="ga-kpi">
+              <span class="ga-kpi-label">On Exchanges <span style="font-size:9px;color:#aaa;letter-spacing:0.5px">(last snapshot)</span></span>
+              <span class="ga-kpi-value" id="ga-live-cex">—</span>
+            </div>
+          </div>
+
+          <div class="ga-sep"></div>
+
+          <div class="ga-sub-title">Governance Flows</div>
+          <div class="ga-kpi-row">
+            <div class="ga-kpi"><span class="ga-kpi-label">24h Bonded</span><span class="ga-kpi-value" id="ga-gov-1d">—</span><span class="ga-kpi-sub" id="ga-gov-1d-sub">&nbsp;</span></div>
+            <div class="ga-kpi"><span class="ga-kpi-label">7d Bonded</span><span class="ga-kpi-value" id="ga-gov-7d">—</span><span class="ga-kpi-sub" id="ga-gov-7d-sub">&nbsp;</span></div>
+            <div class="ga-kpi"><span class="ga-kpi-label">30d Bonded</span><span class="ga-kpi-value" id="ga-gov-30d">—</span><span class="ga-kpi-sub" id="ga-gov-30d-sub">&nbsp;</span></div>
+            <div class="ga-kpi"><span class="ga-kpi-label">90d Bonded</span><span class="ga-kpi-value" id="ga-gov-90d">—</span><span class="ga-kpi-sub" id="ga-gov-90d-sub">&nbsp;</span></div>
+          </div>
+
+          <div class="ga-sep"></div>
+
+          <div class="ga-sub-title">Exchanges Net Flow</div>
+          <div class="ga-kpi-row">
+            <div class="ga-kpi"><span class="ga-kpi-label">24h Net Flow</span><span class="ga-kpi-value" id="ga-cex-1d">—</span><span class="ga-kpi-sub" id="ga-cex-1d-sub">&nbsp;</span></div>
+            <div class="ga-kpi"><span class="ga-kpi-label">7d Net Flow</span><span class="ga-kpi-value" id="ga-cex-7d">—</span><span class="ga-kpi-sub" id="ga-cex-7d-sub">&nbsp;</span></div>
+            <div class="ga-kpi"><span class="ga-kpi-label">30d Net Flow</span><span class="ga-kpi-value" id="ga-cex-30d">—</span><span class="ga-kpi-sub" id="ga-cex-30d-sub">&nbsp;</span></div>
+            <div class="ga-kpi"><span class="ga-kpi-label">90d Net Flow</span><span class="ga-kpi-value" id="ga-cex-90d">—</span><span class="ga-kpi-sub" id="ga-cex-90d-sub">&nbsp;</span></div>
+          </div>
+
+          <div class="ga-sep"></div>
+
+          <div class="ga-sub-title">Whale Movements — Transactions &gt; 5M RIZE</div>
+          <div style="overflow-x:auto">
+            <div style="color:#888;font-family:'DM Mono',monospace;font-size:13px;padding:12px 0" id="ga-whale-loading">Loading whale data…</div>
+            <table class="ga-whale-table" id="ga-whale-table" style="display:none">
+              <thead><tr><th>Date</th><th>Amount</th><th>Direction</th><th>From</th><th>To</th><th>Tx</th></tr></thead>
+              <tbody id="ga-whale-tbody"></tbody>
+            </table>
+          </div>
+
+        </div><!-- end ga-mod-conviction -->
+
+        <!-- ── Sub-module: RIZE Tokenomics ── -->
+        <div class="ga-mod-panel" id="ga-mod-tokenomics">
+
+          <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:32px;align-items:center" id="ga-tok-grid">
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <div style="width:100%;max-width:300px;height:300px"><canvas id="ga-chart-alloc"></canvas></div>
+            </div>
+            <div>
+              <div style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--navy);margin-bottom:12px">Allocation &amp; Vesting — 5B RIZE</div>
+              <div style="overflow-x:auto">
+                <table class="ga-tok-table">
+                  <thead><tr><th>Category</th><th>%</th><th>Tokens</th><th>Cliff</th><th>Vesting</th></tr></thead>
+                  <tbody>
+                    <tr><td class="tok-cat">Seed</td><td style="color:#1a7a4a">5%</td><td>250M</td><td>6m</td><td>12m</td></tr>
+                    <tr><td class="tok-cat">Partnerships &amp; Growth</td><td style="color:#1a7a4a">7%</td><td>350M</td><td>6m</td><td>12m</td></tr>
+                    <tr><td class="tok-cat">Marketing &amp; Incubation</td><td style="color:#1a5a9a">3%</td><td>150M</td><td>3m</td><td>9m</td></tr>
+                    <tr><td class="tok-cat">Private Sale</td><td style="color:#1a5a9a">7%</td><td>350M</td><td>—</td><td>—</td></tr>
+                    <tr><td class="tok-cat">Strategic Reserve</td><td style="color:#7a5a00">10%</td><td>500M</td><td>0m</td><td>12m</td></tr>
+                    <tr><td class="tok-cat">Liquidity</td><td style="color:#7a5a00">10%</td><td>500M</td><td>—</td><td>—</td></tr>
+                    <tr><td class="tok-cat">Airdrop</td><td style="color:#a02020">4%</td><td>200M</td><td>1m</td><td>6m</td></tr>
+                    <tr><td class="tok-cat">Governance</td><td style="color:#a02020">30%</td><td>1.5B</td><td>12m</td><td>36m</td></tr>
+                    <tr><td class="tok-cat">Treasury</td><td style="color:#5a2a8a">10%</td><td>500M</td><td>—</td><td>—</td></tr>
+                    <tr><td class="tok-cat">T-RIZE Team</td><td style="color:#5a2a8a">14%</td><td>700M</td><td>24m</td><td>24m</td></tr>
+                    <tr><td><strong>TOTAL</strong></td><td><strong>100%</strong></td><td><strong>5B</strong></td><td></td><td></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:24px">
+            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--navy);margin-bottom:10px">Vesting Schedule</div>
+            <div class="ga-chart-wrap" style="height:280px"><canvas id="ga-chart-vesting"></canvas></div>
+          </div>
+
+          <div style="margin-top:24px">
+            <div class="ga-sub-title">Burn &amp; Supply Unlock Events</div>
+            <div class="ga-unlock-tabs" id="ga-unlock-tabs">
+              <button class="ga-unlock-tab ga-active" onclick="gaUnlockSwitch('burn',this)">Burn Events (1)</button>
+              <button class="ga-unlock-tab" onclick="gaUnlockSwitch('pending',this)">Next Unlocks</button>
+              <button class="ga-unlock-tab" onclick="gaUnlockSwitch('ongoing',this)">Ongoing Releases</button>
+              <button class="ga-unlock-tab" onclick="gaUnlockSwitch('done',this)">Past Unlocks</button>
+            </div>
+            <div id="ga-unlock-burn" class="ga-unlock-panel ga-visible"><span style="color:#888;font-size:13px">Loading…</span></div>
+            <div id="ga-unlock-pending" class="ga-unlock-panel"><span style="color:#888;font-size:13px">Computing…</span></div>
+            <div id="ga-unlock-ongoing" class="ga-unlock-panel"><span style="color:#888;font-size:13px">Computing…</span></div>
+            <div id="ga-unlock-done" class="ga-unlock-panel"><span style="color:#888;font-size:13px">Computing…</span></div>
+          </div>
+
+        </div><!-- end ga-mod-tokenomics -->
 
       </div>
     </div>
@@ -548,6 +564,9 @@ function ripUpdateWidget(tokens, price) {
     }
     updateAgo(); clearInterval(window._ripAgoTimer);
     window._ripAgoTimer = setInterval(updateAgo, 10000);
+    // Sync to Governance Activity KPI — same source, same value
+    const gaEl = document.getElementById('ga-live-bonded');
+    if (gaEl) { gaEl.textContent = tokens.toLocaleString('en-US') + ' RIZE'; gaEl.style.color='#1a7a4a'; }
   } else { tokEl.textContent='—'; usdEl.textContent=''; subEl.textContent='Data failed to load'; }
 }
 function ripLoad() {
@@ -791,7 +810,7 @@ function gaDrawUnbqueueChart(series, isFull) {
 /* ── Render live KPIs ── */
 function gaRenderLive(bonded, unbonding, cexTotal) {
   const s=(id,val,col)=>{const el=document.getElementById(id);if(el){el.textContent=val;if(col)el.style.color=col;}};
-  s('ga-live-bonded', gaFmt(bonded)+' RIZE','#1a7a4a');
+  // ga-live-bonded is set by ripLoad (same Base mainnet source as module 1)
   s('ga-live-unbonding', gaFmt(unbonding)+' RIZE','#7a5a00');
   s('ga-live-cex', gaFmt(cexTotal)+' RIZE','#0d2d4e');
 }
@@ -999,6 +1018,17 @@ window.gaUnlockSwitch = function(tab, btn) {
   });
   const el=document.getElementById('ga-unlock-'+tab);
   if(el){el.classList.add('ga-visible');el.style.display='block';}
+};
+
+/* ── Sub-module tab switch ── */
+window.gaModSwitch = function(tab, btn) {
+  document.querySelectorAll('#ga-mod-tabs .ga-mod-tab').forEach(b=>b.classList.remove('ga-mod-active'));
+  btn.classList.add('ga-mod-active');
+  document.querySelectorAll('.ga-mod-panel').forEach(p=>{p.classList.remove('ga-mod-visible');p.style.display='none';});
+  const el=document.getElementById('ga-mod-'+tab);
+  if(el){el.classList.add('ga-mod-visible');el.style.display='block';}
+  // Lazy-render tokenomics charts on first open
+  if(tab==='tokenomics'&&!gaCharts.alloc) gaRenderTokenomics();
 };
 
 /* ── Main init ── */
