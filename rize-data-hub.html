@@ -1046,6 +1046,9 @@ html, body { overflow-x: hidden; max-width: 100%; }
       font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700;
       text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 12px;
     }
+    .conv-live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#98ffb6;margin-right:5px;animation:convlivepulse 1.8s ease-in-out infinite;}
+    @keyframes convlivepulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.35;transform:scale(0.65);}}
+    .conv-live-badge{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#98ffb6;}
     @media (max-width: 700px) {
       .conv-section-title { font-size: 14px; letter-spacing: 1.2px; margin-bottom: 8px; }
     }
@@ -1206,17 +1209,17 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <!-- Live stats row: bonded + unbonding + exchanges live -->
         <div class="conv-stat-row" id="conv-live-stats" style="margin-top:16px">
           <div class="ctx-kpi">
-            <span class="ctx-kpi-label">Total Bonded (Today)</span>
+            <span class="ctx-kpi-label"><span class="conv-live-dot"></span>Total Bonded <span class="conv-live-badge">LIVE</span></span>
             <span class="ctx-kpi-value" id="conv-live-bonded">—</span>
             <span class="conv-delta-sub" id="conv-live-bonded-usd">&nbsp;</span>
           </div>
           <div class="ctx-kpi">
-            <span class="ctx-kpi-label">Unbonding Queue</span>
+            <span class="ctx-kpi-label"><span class="conv-live-dot"></span>Unbonding Queue <span class="conv-live-badge">LIVE</span></span>
             <span class="ctx-kpi-value" id="conv-live-unbonding">—</span>
             <span class="conv-delta-sub" id="conv-live-unbonding-usd">&nbsp;</span>
           </div>
           <div class="ctx-kpi">
-            <span class="ctx-kpi-label">On Exchanges (Today)</span>
+            <span class="ctx-kpi-label">On Exchanges <span style="font-size:9px;color:var(--muted);letter-spacing:0.5px;font-weight:400">(last snapshot)</span></span>
             <span class="ctx-kpi-value" id="conv-live-cex">—</span>
             <span class="conv-delta-sub" id="conv-live-cex-usd">&nbsp;</span>
           </div>
@@ -3996,9 +3999,27 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   }
 
   async function convFetchLiveBalances() {
-    // All values come from JSON (updated daily by GitHub Action)
-    // No live Alchemy calls needed — avoids quota usage per visitor
-    return { bonded: 0, unbonding: 0, cexTotal: 0 };
+    // Fetch bonded live from Base mainnet — same source as Rizenet Governance widget
+    const RPC      = 'https://mainnet.base.org';
+    const TOKEN    = '0x9818B6c09f5ECc843060927E8587c427C7C93583';
+    const GOV      = '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE';
+    const DECIMALS = 1e18;
+    try {
+      const padded = '000000000000000000000000' + GOV.slice(2).toLowerCase();
+      const res = await fetch(RPC, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({jsonrpc:'2.0',id:1,method:'eth_call',params:[{to:TOKEN,data:'0x70a08231'+padded},'latest']})
+      });
+      const json = await res.json();
+      const hex = json.result;
+      if (!hex || hex === '0x' || /^0x0+$/.test(hex)) return { bonded: 0 };
+      const bonded = Number(BigInt(hex)) / DECIMALS;
+      return { bonded };
+    } catch(e) {
+      console.warn('convFetchLiveBalances error:', e);
+      return { bonded: 0 };
+    }
   }
 
   // ── Historical data from pre-built JSON ──────────────────────
@@ -4526,8 +4547,9 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const govSeries = convBuildSeriesFromJSON(history.bondedSeries);
       const cexSeries = convBuildSeriesFromJSON(history.cexSeries);
 
-      // KPI values — bonded + cex from JSON, unbonding live from Goldsky
-      const lastBonded = govSeries.data.length ? govSeries.data[govSeries.data.length - 1] : 0;
+      // KPI values — bonded live from Base mainnet, cex from JSON, unbonding live from Goldsky
+      const liveBals   = await convFetchLiveBalances();
+      const lastBonded = liveBals.bonded || (govSeries.data.length ? govSeries.data[govSeries.data.length - 1] : 0);
       const lastCex    = cexSeries.data.length ? cexSeries.data[cexSeries.data.length - 1] : 0;
 
       // Unbonding chart: governance flows from bonded series
@@ -4537,7 +4559,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const whalesFromJson = history.whales        || [];
       const addrLabels     = history.addressLabels || {};
 
-      // Render everything from JSON
+      // Render everything
       convRenderMainChart(govSeries, cexSeries);
       convRenderUnbondingChart(unbSeries);
       convRenderLive(lastBonded, lastUnbonding, lastCex);
