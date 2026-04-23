@@ -3668,24 +3668,31 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     if (rzCharts.volume) return;
     const loadEl = document.getElementById("rz-vol-loading");
     try {
-      // Fetch full history via existing CoinGecko proxy
-      const data = await cgFetch("/coins/" + RIZE_ID + "/market_chart", {
-        vs_currency: "usd",
-        days:        "max",
-      });
+      // Load from pre-built JSON (updated daily by GitHub Action)
+      const URLS = [
+        'https://raw.githubusercontent.com/hcftrize/TOKERIZE/main/rize-data-hub/volume-history.json',
+        'https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/rize-data-hub/volume-history.json',
+      ];
+      let series = null;
+      for (const url of URLS) {
+        try {
+          const r = await fetch(url);
+          if (!r.ok) continue;
+          const j = await r.json();
+          if (j.series && j.series.length) { series = j.series; break; }
+        } catch(e) { continue; }
+      }
+      if (!series) throw new Error("No volume data");
 
-      const rawVols = data.total_volumes || [];
-      if (!rawVols.length) throw new Error("No volume data");
-
-      // Build series — CoinGecko returns [timestamp_ms, value]
+      // Build chart arrays from [{date, volume}]
       const labels  = [];
       const volumes = [];
       const rawDays = [];
-      rawVols.forEach(([ts, v]) => {
-        const d = new Date(ts);
+      series.forEach(p => {
+        const d = new Date(p.date + 'T00:00:00Z');
         labels.push(d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" }));
-        volumes.push(v);
-        rawDays.push(d.toISOString().slice(0, 10));
+        volumes.push(p.volume);
+        rawDays.push(p.date);
       });
 
       _rzVolFull     = { labels, data: volumes, rawDays };
