@@ -1268,8 +1268,12 @@ function bcFmtDate(d) {
 }
 
 /* ── Render result cards ── */
-function bcRenderCards(amount, mat, bondDate, bondId) {
-  const vp = amount * mat.boost;
+function bcRenderCards(amount, mat, bondDate, bondId, onChainBoost) {
+  const boost = onChainBoost || mat.boost;
+  const vp = onChainBoost ? amount * onChainBoost : amount * mat.boost;
+  // Use on-chain boost for progress if available
+  const displayBoost = onChainBoost || mat.boost;
+  const displayPct   = onChainBoost ? Math.min((onChainBoost - 1) / 2, 1) : mat.pct;
   return `
     <div class="bc-result-grid">
       <div class="bc-card bc-highlight">
@@ -1284,8 +1288,8 @@ function bcRenderCards(amount, mat, bondDate, bondId) {
       </div>
       <div class="bc-card bc-gold">
         <span class="bc-card-label">Maturity Boost</span>
-        <span class="bc-card-value">${mat.boost.toFixed(3)}×</span>
-        <span class="bc-card-sub">${mat.pct < 1 ? (mat.pct*100).toFixed(1)+'% of max' : 'fully mature'}</span>
+        <span class="bc-card-value">${displayBoost.toFixed(3)}×</span>
+        <span class="bc-card-sub">${displayPct < 1 ? (displayPct*100).toFixed(1)+'% of max' : 'fully mature'}</span>
       </div>
       <div class="bc-card">
         <span class="bc-card-label">Bond Created</span>
@@ -1304,35 +1308,35 @@ function bcRenderCards(amount, mat, bondDate, bondId) {
       </div>
     </div>
     <div class="bc-progress-wrap">
-      <div class="bc-progress-label">Maturity Progress — ${mat.pct < 1 ? (mat.pct*100).toFixed(1)+'%' : '100% — Fully Mature'}</div>
-      <div class="bc-progress-bar"><div class="bc-progress-fill" style="width:${(mat.pct*100).toFixed(1)}%"></div></div>
+      <div class="bc-progress-label">Maturity Progress — ${displayPct < 1 ? (displayPct*100).toFixed(1)+'%' : '100% — Fully Mature'}</div>
+      <div class="bc-progress-bar"><div class="bc-progress-fill" style="width:${(displayPct*100).toFixed(1)}%"></div></div>
       <div class="bc-progress-sub" style="color:#444">Starts at 1× · reaches 3× at 36 months · linear progression</div>
     </div>`;
 }
 
 /* ── Lookup by Bond ID ── */
 async function bcLookupById(bondId) {
-  // getBond(uint256) = 0xd8fe7642
-  const id64   = bondId.toString(16).padStart(64, '0');
+  const id64 = bondId.toString(16).padStart(64, '0');
+
+  // getBond(uint256) = 0xd8fe7642 → {timeMarker, amount, poolId}
   const bondHex = await bcCall('0xd8fe7642' + id64);
-  const bond   = bcDecodeBond(bondHex);
+  const bond    = bcDecodeBond(bondHex);
   if (!bond || bond.amount === 0n) return null;
 
-  // getWeight(uint256) = 0xd851fdfd — returns current voting power (raw)
-  const weightHex = await bcCall('0xd851fdfd' + id64);
-  const weightRaw = bcDecodeUint(weightHex);
+  // getNormalizedWeight(uint256) = 0x8eab59da → VP in fixed-point (/100 = votes)
+  const nwHex = await bcCall('0x8eab59da' + id64);
+  const nwRaw = bcDecodeUint(nwHex);
 
   const amount   = Number(bond.amount) / BC.DECIMALS;
   const bondDate = new Date(Number(bond.timeMarker) * 1000);
   const mat      = bcMaturity(bond.timeMarker);
 
-  // Use on-chain weight if available, else calculate
-  let vp = amount * mat.boost;
-  if (weightRaw && weightRaw > 0n) {
-    vp = Number(weightRaw) / BC.DECIMALS;
-  }
+  // On-chain voting power: getNormalizedWeight / 100
+  const vp = nwRaw && nwRaw > 0n ? Number(nwRaw) / 100 : amount * mat.boost;
+  // On-chain boost: vp / amount
+  const onChainBoost = vp / amount;
 
-  return { amount, bondDate, mat, vp, poolId: Number(bond.poolId), bondId };
+  return { amount, bondDate, mat, vp, onChainBoost, poolId: Number(bond.poolId), bondId };
 }
 
 /* ── Main lookup handler ── */
@@ -1355,7 +1359,7 @@ window.bcLookup = async function() {
         resultEl.innerHTML = '<div class="bc-error">Bond #' + raw + ' not found or has zero balance.</div>';
         btn.disabled = false; return;
       }
-      resultEl.innerHTML = `<div style="font-family:'DM Mono',monospace;font-size:11px;color:#111;margin-bottom:12px">Bond #${raw} · Pool ${data.poolId} · on-chain data via Base Mainnet</div>` + bcRenderCards(data.amount, data.mat, data.bondDate, raw)
+      resultEl.innerHTML = `<div style="font-family:'DM Mono',monospace;font-size:11px;color:#111;margin-bottom:12px">Bond #${raw} · Pool ${data.poolId} · on-chain data via Base Mainnet</div>` + bcRenderCards(data.amount, data.mat, data.bondDate, raw, data.onChainBoost)
         + `<div class="bc-chart-wrap" id="bc-lookup-chart-wrap" style="margin-top:16px"><canvas id="bc-lookup-chart"></canvas></div>`;
       bcDrawLookupChart(data.amount, data.bondDate);
 
