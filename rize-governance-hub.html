@@ -180,6 +180,43 @@ body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text)
 /* Scrollbar */
 ::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:#f0f0f0;}::-webkit-scrollbar-thumb{background:var(--navy);}
 
+/* ── Bond Calculator ── */
+.bc-select-wrap{display:block;margin-bottom:20px;}
+.bc-select{width:100%;padding:12px 16px;background:#fff;border:2px solid var(--navy);color:var(--navy);font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 7 6-7' stroke='%230d2d4e' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px;}
+.bc-select option{background:#fff;color:#111;font-size:16px;}
+.bc-panel{display:none;padding-top:20px;}
+.bc-panel.bc-visible{display:block;}
+.bc-input-row{display:flex;gap:10px;align-items:stretch;margin-bottom:20px;flex-wrap:wrap;}
+.bc-input{flex:1;min-width:180px;padding:12px 16px;border:1px solid #dde4ed;background:#f7f9fc;font-family:'DM Mono',monospace;font-size:15px;color:#111;outline:none;transition:border-color 0.18s;}
+.bc-input:focus{border-color:var(--navy);}
+.bc-input::placeholder{color:#aaa;}
+.bc-btn{padding:12px 28px;background:var(--navy);color:#fff;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;cursor:pointer;transition:background 0.18s;white-space:nowrap;}
+.bc-btn:hover{background:var(--navy2);}
+.bc-btn:disabled{opacity:0.45;cursor:not-allowed;}
+.bc-result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.bc-card{padding:16px 18px;border:1px solid #e0e0e0;background:#f7f9fc;border-top:3px solid var(--navy);}
+.bc-card-label{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#888;margin-bottom:8px;display:block;}
+.bc-card-value{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--navy);line-height:1.1;}
+.bc-card-sub{font-family:'DM Mono',monospace;font-size:11px;color:#888;margin-top:4px;display:block;}
+.bc-card.bc-highlight .bc-card-value{color:#1a7a4a;}
+.bc-card.bc-gold .bc-card-value{color:#7a5a00;}
+.bc-progress-wrap{margin-bottom:20px;}
+.bc-progress-label{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--navy);margin-bottom:8px;}
+.bc-progress-bar{width:100%;height:10px;background:#e0e0e0;border-radius:0;overflow:hidden;}
+.bc-progress-fill{height:100%;background:linear-gradient(90deg,#1a5a9a,#1a7a4a);transition:width 0.6s ease;}
+.bc-progress-sub{font-family:'DM Mono',monospace;font-size:12px;color:#888;margin-top:6px;}
+.bc-sim-inputs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.bc-sim-label{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#888;margin-bottom:6px;display:block;}
+.bc-chart-wrap{width:100%;height:260px;position:relative;background:#f7f9fc;border:1px solid #e0e0e0;padding:12px 8px 8px;margin-top:16px;}
+.bc-chart-wrap canvas{width:100%!important;height:100%!important;}
+.bc-error{font-family:'DM Mono',monospace;font-size:13px;color:#a02020;padding:12px 0;}
+.bc-loading{font-family:'DM Mono',monospace;font-size:13px;color:#888;padding:12px 0;}
+@media(max-width:700px){
+  .bc-result-grid{grid-template-columns:1fr 1fr;}
+  .bc-sim-inputs{grid-template-columns:1fr;}
+  .bc-card-value{font-size:20px;}
+}
+
 /* Mobile */
 html,body{overflow-x:hidden;max-width:100%;}
 .nav-toggle{display:none;}
@@ -250,43 +287,96 @@ html,body{overflow-x:hidden;max-width:100%;}
     <div class="lc-body" id="lc-gov-body">
       <div class="lc-body-inner">
 
-        <!-- Bonded hero -->
-        <div class="rip-bonded-hero">
-          <div class="rip-bonded-hero-label">RIZE bonded by the community so far</div>
-          <div class="rip-bonded-hero-main">
-            <div class="rip-bonded-hero-val" id="rip-bonded-tokens">—</div>
-            <img src="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" alt="RIZE" class="rip-bonded-hero-logo"/>
+        <!-- Sub-module select -->
+        <div class="bc-select-wrap">
+          <select class="bc-select" id="gov-mod-select" onchange="govModSwitch(this.value)">
+            <option value="proposals">Governance Proposals</option>
+            <option value="calculator">Bond Power Calculator</option>
+          </select>
+        </div>
+
+        <!-- ── Panel: Governance Proposals ── -->
+        <div class="bc-panel bc-visible" id="gov-mod-proposals">
+
+          <!-- Bonded hero -->
+          <div class="rip-bonded-hero">
+            <div class="rip-bonded-hero-label">RIZE bonded by the community so far</div>
+            <div class="rip-bonded-hero-main">
+              <div class="rip-bonded-hero-val" id="rip-bonded-tokens">—</div>
+              <img src="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" alt="RIZE" class="rip-bonded-hero-logo"/>
+            </div>
+            <div class="rip-bonded-hero-usd" id="rip-bonded-usd"></div>
+            <div class="rip-bonded-hero-sub" id="rip-bonding-status">Loading live data…</div>
           </div>
-          <div class="rip-bonded-hero-usd" id="rip-bonded-usd"></div>
-          <div class="rip-bonded-hero-sub" id="rip-bonding-status">Loading live data…</div>
-        </div>
 
-        <!-- Proposals table -->
-        <div class="gov-table-wrap">
-          <table class="gov-table">
-            <thead>
-              <tr>
-                <th>Proposal</th>
-                <th style="width:120px">Status</th>
-                <th style="width:200px">Category</th>
-              </tr>
-            </thead>
-            <tbody id="rip-tbody">
-              <tr onclick="ripPick('rip-01')">
-                <td>Proposal 01 — Canton Incentives &amp; Ecosystem Alignment</td>
-                <td><span class="gov-status pending">Pending</span></td>
-                <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:#888">Governance · Tokenomics</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+          <!-- Proposals table -->
+          <div class="gov-table-wrap">
+            <table class="gov-table">
+              <thead>
+                <tr>
+                  <th>Proposal</th>
+                  <th style="width:120px">Status</th>
+                  <th style="width:200px">Category</th>
+                </tr>
+              </thead>
+              <tbody id="rip-tbody">
+                <tr onclick="ripPick('rip-01')">
+                  <td>Proposal 01 — Canton Incentives &amp; Ecosystem Alignment</td>
+                  <td><span class="gov-status pending">Pending</span></td>
+                  <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:#888">Governance · Tokenomics</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-        <!-- Learn box -->
-        <div class="info-box" id="rip-box">
-          <p class="ib-prompt" id="rip-prompt">Click on any governance proposal to learn more about it.</p>
-          <div class="ib-title" id="rip-detail-title" style="display:none"></div>
-          <div class="ib-text" id="rip-detail-body" style="display:none"></div>
-        </div>
+          <!-- Learn box -->
+          <div class="info-box" id="rip-box">
+            <p class="ib-prompt" id="rip-prompt">Click on any governance proposal to learn more about it.</p>
+            <div class="ib-title" id="rip-detail-title" style="display:none"></div>
+            <div class="ib-text" id="rip-detail-body" style="display:none"></div>
+          </div>
+
+        </div><!-- end gov-mod-proposals -->
+
+        <!-- ── Panel: Bond Power Calculator ── -->
+        <div class="bc-panel" id="gov-mod-calculator">
+
+          <!-- Inner toggle: My Bond / Simulator -->
+          <div class="ga-toggle-row" style="margin-bottom:20px">
+            <button class="ga-toggle active" id="bc-btn-lookup" onclick="bcSwitch('lookup',this)">My Bond</button>
+            <button class="ga-toggle" id="bc-btn-sim" onclick="bcSwitch('sim',this)">Simulator</button>
+          </div>
+
+          <!-- ── My Bond panel ── -->
+          <div id="bc-panel-lookup">
+            <div style="font-family:'DM Mono',monospace;font-size:12px;color:#888;margin-bottom:12px">Enter your Bond # (e.g. 1317) or a wallet address (0x…)</div>
+            <div class="bc-input-row">
+              <input class="bc-input" id="bc-input" placeholder="Bond # or 0x wallet…" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')bcLookup()"/>
+              <button class="bc-btn" id="bc-search-btn" onclick="bcLookup()">Search</button>
+            </div>
+            <div id="bc-lookup-result"></div>
+          </div>
+
+          <!-- ── Simulator panel ── -->
+          <div id="bc-panel-sim" style="display:none">
+            <div style="font-family:'DM Mono',monospace;font-size:12px;color:#888;margin-bottom:16px">Simulate the voting power of any bond over time.</div>
+            <div class="bc-sim-inputs">
+              <div>
+                <span class="bc-sim-label">RIZE Amount</span>
+                <input class="bc-input" id="bc-sim-amount" type="number" placeholder="e.g. 500000" min="1" oninput="bcSimCalc()"/>
+              </div>
+              <div>
+                <span class="bc-sim-label">Bond Creation Date</span>
+                <input class="bc-input" id="bc-sim-date" type="date" oninput="bcSimCalc()"/>
+              </div>
+            </div>
+            <div id="bc-sim-result"></div>
+            <div class="bc-chart-wrap" id="bc-sim-chart-wrap" style="display:none">
+              <canvas id="bc-sim-chart"></canvas>
+            </div>
+          </div>
+
+        </div><!-- end gov-mod-calculator -->
 
       </div>
     </div>
@@ -1081,7 +1171,317 @@ document.addEventListener('DOMContentLoaded', function() {
   gaInit();
   fixTokGrid();
   window.addEventListener('resize', fixTokGrid);
+  // Set simulator date default to today
+  const dateInput = document.getElementById('bc-sim-date');
+  if (dateInput) dateInput.value = new Date().toISOString().slice(0,10);
 });
+
+/* ══════════════════════════════════════════════════════════════
+   GOV MODULE SWITCH
+══════════════════════════════════════════════════════════════ */
+window.govModSwitch = function(tab) {
+  ['proposals','calculator'].forEach(k => {
+    const el = document.getElementById('gov-mod-'+k);
+    if (el) { el.classList.remove('bc-visible'); el.style.display='none'; }
+  });
+  const el = document.getElementById('gov-mod-'+tab);
+  if (el) { el.classList.add('bc-visible'); el.style.display='block'; }
+};
+
+/* ══════════════════════════════════════════════════════════════
+   BOND POWER CALCULATOR
+══════════════════════════════════════════════════════════════ */
+const BC = {
+  GOV_CONTRACT : '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE',
+  RPC          : 'https://mainnet.base.org',
+  DECIMALS     : 1e18,
+  MAX_MONTHS   : 36,
+  MAX_BOOST    : 3.0,
+  chart        : null,
+};
+
+/* ── Toggle My Bond / Simulator ── */
+window.bcSwitch = function(which, btn) {
+  document.querySelectorAll('.ga-toggle').forEach(b => {
+    if (b.id === 'bc-btn-lookup' || b.id === 'bc-btn-sim') b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  document.getElementById('bc-panel-lookup').style.display = which === 'lookup' ? 'block' : 'none';
+  document.getElementById('bc-panel-sim').style.display    = which === 'sim'    ? 'block' : 'none';
+};
+
+/* ── RPC call helper ── */
+async function bcRpc(method, params) {
+  const res = await fetch(BC.RPC, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ jsonrpc:'2.0', id:1, method, params })
+  });
+  return res.json();
+}
+
+async function bcCall(data) {
+  const res = await bcRpc('eth_call', [{ to: BC.GOV_CONTRACT, data }, 'latest']);
+  return res.result;
+}
+
+/* ── ABI decode uint256 ── */
+function bcDecodeUint(hex) {
+  if (!hex || hex === '0x') return null;
+  try { return BigInt(hex); } catch(e) { return null; }
+}
+
+/* ── ABI decode getBond tuple: (uint256 timeMarker, uint256 amount, uint16 poolId) ── */
+function bcDecodeBond(hex) {
+  if (!hex || hex === '0x' || hex.length < 194) return null;
+  // Remove 0x, split into 64-char chunks
+  const d = hex.slice(2);
+  const timeMarker = BigInt('0x' + d.slice(0,   64));
+  const amount     = BigInt('0x' + d.slice(64,  128));
+  const poolId     = BigInt('0x' + d.slice(128, 192));
+  return { timeMarker, amount, poolId };
+}
+
+/* ── Maturity calculation ── */
+function bcMaturity(timeMarkerSec) {
+  const now        = Date.now() / 1000;
+  const elapsed    = Math.max(0, now - Number(timeMarkerSec));
+  const months     = elapsed / (365.25 / 12 * 86400);
+  const pct        = Math.min(months / BC.MAX_MONTHS, 1);
+  const boost      = 1 + pct * (BC.MAX_BOOST - 1); // 1x → 3x
+  const maxDate    = new Date(Number(timeMarkerSec) * 1000);
+  maxDate.setMonth(maxDate.getMonth() + BC.MAX_MONTHS);
+  const daysToMax  = Math.max(0, Math.round((maxDate - Date.now()) / 86400000));
+  const yearsToMax = (daysToMax / 365.25).toFixed(1);
+  return { months, pct, boost, maxDate, daysToMax, yearsToMax };
+}
+
+/* ── Format helpers ── */
+function bcFmtRize(n) {
+  if (n >= 1e9) return (n/1e9).toFixed(3) + 'B';
+  if (n >= 1e6) return (n/1e6).toFixed(3) + 'M';
+  if (n >= 1e3) return n.toLocaleString('en-US', {maximumFractionDigits:2});
+  return n.toFixed(2);
+}
+function bcFmtDate(d) {
+  return d.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+}
+
+/* ── Render result cards ── */
+function bcRenderCards(amount, mat, bondDate, bondId) {
+  const vp = amount * mat.boost;
+  return `
+    <div class="bc-result-grid">
+      <div class="bc-card bc-highlight">
+        <span class="bc-card-label">Voting Power</span>
+        <span class="bc-card-value">${bcFmtRize(vp)}</span>
+        <span class="bc-card-sub">votes</span>
+      </div>
+      <div class="bc-card">
+        <span class="bc-card-label">Bonded Amount</span>
+        <span class="bc-card-value">${bcFmtRize(amount)}</span>
+        <span class="bc-card-sub">RIZE</span>
+      </div>
+      <div class="bc-card bc-gold">
+        <span class="bc-card-label">Maturity Boost</span>
+        <span class="bc-card-value">${mat.boost.toFixed(3)}×</span>
+        <span class="bc-card-sub">${mat.pct < 1 ? (mat.pct*100).toFixed(1)+'% of max' : 'fully mature'}</span>
+      </div>
+      <div class="bc-card">
+        <span class="bc-card-label">Bond Created</span>
+        <span class="bc-card-value" style="font-size:18px">${bcFmtDate(bondDate)}</span>
+        <span class="bc-card-sub">${Math.round(mat.months)} months ago</span>
+      </div>
+      <div class="bc-card">
+        <span class="bc-card-label">Max Voting Power Date</span>
+        <span class="bc-card-value" style="font-size:18px">${bcFmtDate(mat.maxDate)}</span>
+        <span class="bc-card-sub">${mat.pct < 1 ? mat.yearsToMax + ' years remaining' : 'Reached ✓'}</span>
+      </div>
+      <div class="bc-card">
+        <span class="bc-card-label">Max Voting Power</span>
+        <span class="bc-card-value">${bcFmtRize(amount * BC.MAX_BOOST)}</span>
+        <span class="bc-card-sub">at 3× boost</span>
+      </div>
+    </div>
+    <div class="bc-progress-wrap">
+      <div class="bc-progress-label">Maturity Progress — ${mat.pct < 1 ? (mat.pct*100).toFixed(1)+'%' : '100% — Fully Mature'}</div>
+      <div class="bc-progress-bar"><div class="bc-progress-fill" style="width:${(mat.pct*100).toFixed(1)}%"></div></div>
+      <div class="bc-progress-sub">Starts at 1× · reaches 3× at 36 months · linear progression</div>
+    </div>`;
+}
+
+/* ── Lookup by Bond ID ── */
+async function bcLookupById(bondId) {
+  // getBond(uint256) = 0xd8fe7642
+  const id64   = bondId.toString(16).padStart(64, '0');
+  const bondHex = await bcCall('0xd8fe7642' + id64);
+  const bond   = bcDecodeBond(bondHex);
+  if (!bond || bond.amount === 0n) return null;
+
+  // getWeight(uint256) = 0xd851fdfd — returns current voting power (raw)
+  const weightHex = await bcCall('0xd851fdfd' + id64);
+  const weightRaw = bcDecodeUint(weightHex);
+
+  const amount   = Number(bond.amount) / BC.DECIMALS;
+  const bondDate = new Date(Number(bond.timeMarker) * 1000);
+  const mat      = bcMaturity(bond.timeMarker);
+
+  // Use on-chain weight if available, else calculate
+  let vp = amount * mat.boost;
+  if (weightRaw && weightRaw > 0n) {
+    vp = Number(weightRaw) / BC.DECIMALS;
+  }
+
+  return { amount, bondDate, mat, vp, poolId: Number(bond.poolId), bondId };
+}
+
+/* ── Main lookup handler ── */
+window.bcLookup = async function() {
+  const raw = (document.getElementById('bc-input').value || '').trim();
+  const resultEl = document.getElementById('bc-lookup-result');
+  const btn = document.getElementById('bc-search-btn');
+  if (!raw) return;
+
+  btn.disabled = true;
+  resultEl.innerHTML = '<div class="bc-loading">Fetching on-chain data…</div>';
+
+  try {
+    let data = null;
+
+    if (/^\d+$/.test(raw)) {
+      // Bond ID lookup
+      data = await bcLookupById(parseInt(raw));
+      if (!data) {
+        resultEl.innerHTML = '<div class="bc-error">Bond #' + raw + ' not found or has zero balance.</div>';
+        btn.disabled = false; return;
+      }
+      resultEl.innerHTML = `<div style="font-family:'DM Mono',monospace;font-size:11px;color:#888;margin-bottom:12px">Bond #${raw} · Pool ${data.poolId} · on-chain data via Base Mainnet</div>` + bcRenderCards(data.amount, data.mat, data.bondDate, raw);
+
+    } else if (/^0x[0-9a-fA-F]{40}$/.test(raw)) {
+      // Wallet lookup — bonded(address) = 0xc9836074
+      const padded = '000000000000000000000000' + raw.slice(2).toLowerCase();
+      const hex = await bcCall('0xc9836074' + padded);
+      const raw2 = bcDecodeUint(hex);
+      if (!raw2 || raw2 === 0n) {
+        resultEl.innerHTML = '<div class="bc-error">No bonded RIZE found for this address.</div>';
+        btn.disabled = false; return;
+      }
+      const amount = Number(raw2) / BC.DECIMALS;
+      // For wallet lookup we only have total bonded — show simplified view
+      resultEl.innerHTML = `
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:#888;margin-bottom:12px">${raw.slice(0,6)}…${raw.slice(-4)} · total bonded across all bonds</div>
+        <div class="bc-result-grid" style="grid-template-columns:1fr 1fr">
+          <div class="bc-card bc-highlight">
+            <span class="bc-card-label">Total Bonded</span>
+            <span class="bc-card-value">${bcFmtRize(amount)}</span>
+            <span class="bc-card-sub">RIZE across all bonds</span>
+          </div>
+          <div class="bc-card">
+            <span class="bc-card-label">Max Potential Voting Power</span>
+            <span class="bc-card-value">${bcFmtRize(amount * BC.MAX_BOOST)}</span>
+            <span class="bc-card-sub">at 3× full maturity</span>
+          </div>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:12px;color:#888;padding:12px 0">For per-bond breakdown with maturity details, search by Bond #.</div>`;
+
+    } else {
+      resultEl.innerHTML = '<div class="bc-error">Enter a Bond # (number) or a wallet address (0x…).</div>';
+    }
+  } catch(e) {
+    console.error(e);
+    resultEl.innerHTML = '<div class="bc-error">RPC error — please try again.</div>';
+  }
+  btn.disabled = false;
+};
+
+/* ── Simulator ── */
+let bcSimChartInst = null;
+
+window.bcSimCalc = function() {
+  const amountRaw = parseFloat(document.getElementById('bc-sim-amount').value);
+  const dateRaw   = document.getElementById('bc-sim-date').value;
+  const resultEl  = document.getElementById('bc-sim-result');
+  const chartWrap = document.getElementById('bc-sim-chart-wrap');
+
+  if (!amountRaw || amountRaw <= 0 || !dateRaw) {
+    resultEl.innerHTML = '';
+    chartWrap.style.display = 'none';
+    return;
+  }
+
+  const bondDate    = new Date(dateRaw + 'T00:00:00Z');
+  const timeMarker  = bondDate.getTime() / 1000;
+  const mat         = bcMaturity(timeMarker);
+  const amount      = amountRaw;
+
+  resultEl.innerHTML = bcRenderCards(amount, mat, bondDate, null);
+  chartWrap.style.display = 'block';
+
+  // Build 36-month curve
+  const labels = [], vpData = [], boostData = [];
+  for (let m = 0; m <= 36; m++) {
+    const d = new Date(bondDate);
+    d.setMonth(d.getMonth() + m);
+    labels.push(d.toLocaleDateString('en-US', { month:'short', year:'2-digit' }));
+    const b  = Math.min(1 + (m / 36) * 2, 3);
+    vpData.push(+(amount * b).toFixed(0));
+    boostData.push(+b.toFixed(3));
+  }
+
+  // Mark current position
+  const nowMonths = Math.min(mat.months, 36);
+
+  const cv = document.getElementById('bc-sim-chart');
+  if (bcSimChartInst) { bcSimChartInst.destroy(); bcSimChartInst = null; }
+
+  bcSimChartInst = new Chart(cv.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Voting Power',
+          data: vpData,
+          borderColor: '#0d2d4e',
+          backgroundColor: 'rgba(13,45,78,0.08)',
+          fill: true, tension: 0.2, pointRadius: 0, borderWidth: 2.5, yAxisID: 'y',
+        },
+        {
+          label: 'Maturity Boost',
+          data: boostData,
+          borderColor: '#c8960a',
+          backgroundColor: 'transparent',
+          fill: false, tension: 0.2, pointRadius: 0, borderWidth: 2, borderDash: [5,3], yAxisID: 'y2',
+        },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color:'#444', font: { family:'Trebuchet MS', size:12 }, boxWidth:12, padding:16 } },
+        tooltip: {
+          backgroundColor: '#0d2d4e', titleColor:'#fff', bodyColor:'#e8f0f7',
+          callbacks: {
+            label: c => c.datasetIndex === 0
+              ? ' Voting Power: ' + bcFmtRize(c.parsed.y) + ' votes'
+              : ' Boost: ' + c.parsed.y.toFixed(3) + '×'
+          }
+        },
+        annotation: nowMonths > 0 ? {
+          annotations: {
+            now: { type:'line', xMin: Math.floor(nowMonths), xMax: Math.floor(nowMonths), borderColor:'#1a7a4a', borderWidth:2, borderDash:[4,3], label:{content:'Today', display:true, position:'start', color:'#1a7a4a', font:{size:11}} }
+          }
+        } : {},
+      },
+      scales: {
+        x:  { ticks:{ color:'#666', font:{size:11}, maxRotation:35, autoSkip:true, maxTicksLimit:12 }, grid:{color:'rgba(0,0,0,0.05)'} },
+        y:  { ticks:{ color:'#666', font:{size:11}, callback: v=>bcFmtRize(v) }, grid:{color:'rgba(0,0,0,0.05)'}, title:{display:true,text:'Voting Power',color:'#666',font:{size:11}} },
+        y2: { position:'right', ticks:{ color:'#c8960a', font:{size:11}, callback: v=>v.toFixed(1)+'×' }, grid:{display:false}, title:{display:true,text:'Boost',color:'#c8960a',font:{size:11}}, min:1, max:3 },
+      },
+    },
+  });
+};
 </script>
 </body>
 </html>
