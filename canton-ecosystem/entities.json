@@ -3187,6 +3187,42 @@
     "logo_local": "logos\\oliver-wyman.svg"
   },
   {
+    "name": "OneSwap",
+    "slug": "oneswap",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69ea21aa8ca9b3831d4c52c0_e4d149d6-0d44-4be4-8bbf-de67b5e2c68a.png",
+    "short_desc": "Permissionless AMM DEX for fast CIP56 token swaps on Canton. Trade, provide liquidity, earn.",
+    "tags": [
+      "APPS (ALL)",
+      "APPS (FEATURED)",
+      "VALIDATOR",
+      "DEVELOPER TOOLS",
+      "EXCHANGES",
+      "FINANCING",
+      "Network Utilities\nDEVELOPER TOOLSEXCHANGESFINANCINGLIQUIDITY",
+      "LIQUIDITY",
+      "Roles\nAPPS (ALL)APPS (FEATURED)VALIDATOR\nAPPS (ALL)APPS (FEATURED)VALIDATOR"
+    ],
+    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nOneSwap\nhttps://oneswap.cc\nOneSwap is a permissionless automated market maker (AMM) DEX natively built on the Canton Network by Sats Terminal. Designed for both retail and institutional users, OneSwap enables seamless, non-custodial swapping of Canton-native assets, including CC/USDCx, CC/cBTC, and other CIP56 pools with transparent on-chain pricing. Liquidity providers can deposit assets into pools and earn fees from every swap.\nNetwork Utilities\nDEVELOPER TOOLSEXCHANGESFINANCINGLIQUIDITY\nRoles\nAPPS (ALL)APPS (FEATURED)VALIDATOR\nAPPS (ALL)APPS (FEATURED)VALIDATOR",
+    "logo_local": "logos\\oneswap.png"
+  },
+  {
+    "name": "onRails",
+    "slug": "onrails",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69ea01c22ef67a8db734377b_0ffd792e-dc9d-45ae-9571-b8dec909fda0.jpeg",
+    "short_desc": "Issuance infrastructure for Canton; providers of cETH, 1:1 backed Ethereum",
+    "tags": [
+      "APPS (ALL)",
+      "APPS (FEATURED)",
+      "CANTON FOUNDATION MEMBER",
+      "TOKENIZED ASSETS",
+      "Network Utilities\nTOKENIZED ASSETS",
+      "Roles\nAPPS (ALL)APPS (FEATURED)CANTON FOUNDATION MEMBERVALIDATOR\nAPPS (ALL)APPS (FEATURED)CANTON FOUNDATION MEMBERVALIDATOR",
+      "VALIDATOR"
+    ],
+    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nonRails\nhttps://www.onrails.finance\nonRails builds issuance infrastructure for Canton Network. Its full asset pipeline gives institutions explicit finality and policy enforcement at every step. cETH is its first product: Ethereum on Canton, 1:1 backed by ETH in custody with reserves verifiable on-chain. No rehypothecation. CIP-56 compliant, enabling atomic composability with other Canton assets, including USDCx. Built for trading, lending, and settlement across institutional markets.\nNetwork Utilities\nTOKENIZED ASSETS\nRoles\nAPPS (ALL)APPS (FEATURED)CANTON FOUNDATION MEMBERVALIDATOR\nAPPS (ALL)APPS (FEATURED)CANTON FOUNDATION MEMBERVALIDATOR",
+    "logo_local": "logos\\onrails.jpeg"
+  },
+  {
     "name": "Ownera",
     "slug": "ownera",
     "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69a515c743e74bf4b80f3668_logo_ownera.png",
