@@ -1,9 +1,25 @@
-type BondBrokenEvent @entity(immutable: true) {
+# ── NFT Transfer Event ────────────────────────────────────────────────────────
+type NftTransferEvent @entity(immutable: true) {
   id: ID!
-  nftId: BigInt!
-  amount: BigDecimal!
+  tokenId: BigInt!       # Bond NFT ID
+  from: Bytes!           # 0x000...000 = mint
+  to: Bytes!
+  isMint: Boolean!       # true if from == 0x000...000
   date: String!
   blockNumber: BigInt!
   timestamp: BigInt!
   txHash: Bytes!
+}
+
+# ── Bond Owner ────────────────────────────────────────────────────────────────
+# Current owner of each Bond NFT — updated on every Transfer
+type BondOwner @entity(immutable: false) {
+  id: ID!          # tokenId as string
+  tokenId: BigInt!
+  owner: Bytes!
+  mintDate: String!
+  mintTimestamp: BigInt!
+  lastTransferDate: String!
+  lastTransferTimestamp: BigInt!
+  transferCount: Int!
 }
