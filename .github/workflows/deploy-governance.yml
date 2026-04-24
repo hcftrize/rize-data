@@ -1,12 +1,15 @@
-name: Deploy Governance Subgraph (run once)
+name: Deploy Bond Created Subgraph (run once)
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Subgraph version to deploy (e.g. 1.0.0)"
+        description: "Subgraph version (e.g. 1.0.0)"
         required: true
         default: "1.0.0"
+
+permissions:
+  contents: write
 
 jobs:
   deploy:
@@ -16,8 +19,7 @@ jobs:
         with:
           ref: dev
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
@@ -26,7 +28,7 @@ jobs:
           npm install -g @graphprotocol/graph-cli
           npm install -g @goldskycom/cli
 
-      - name: Install subgraph dependencies
+      - name: Install dependencies
         working-directory: goldsky-governance
         run: npm install
 
@@ -44,4 +46,4 @@ jobs:
           GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
         run: |
           goldsky login --token $GOLDSKY_API_KEY
-          goldsky subgraph deploy tokerize-governance/${{ github.event.inputs.version }} --path .
+          goldsky subgraph deploy tokerize-bond-created/${{ github.event.inputs.version }} --path .
