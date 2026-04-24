@@ -1,39 +1,49 @@
-# ── BondCreatedEvent ──────────────────────────────────────────────────────────
-type BondCreatedEvent @entity(immutable: true) {
-  id: ID!                  # tx hash + log index
+# ── TokensReleasedEvent ───────────────────────────────────────────────────────
+type TokensReleasedEvent @entity(immutable: true) {
+  id: ID!
   nftId: BigInt!
-  owner: Bytes!
-  poolId: Int!
-  amount: BigDecimal!      # RIZE /1e18
-  date: String!            # YYYY-MM-DD
-  blockNumber: BigInt!
-  timestamp: BigInt!
-  txHash: Bytes!
-}
-
-# ── IncreaseBondEvent ─────────────────────────────────────────────────────────
-type IncreaseBondEvent @entity(immutable: true) {
-  id: ID!                  # tx hash
-  nftId: BigInt!
-  amount: BigDecimal!      # amount added
+  to: Bytes!
+  amount: BigDecimal!
   date: String!
   blockNumber: BigInt!
   timestamp: BigInt!
   txHash: Bytes!
 }
 
-# ── Bond ──────────────────────────────────────────────────────────────────────
-# Mutable — updated on BondCreated and each increaseBond
-type Bond @entity(immutable: false) {
-  id: ID!                  # nftId as string
+# ── BondMigratedEvent ─────────────────────────────────────────────────────────
+type BondMigratedEvent @entity(immutable: true) {
+  id: ID!
   nftId: BigInt!
-  owner: Bytes!
-  poolId: Int!
-  createdAtDate: String!   # true creation date — never changes
-  createdAtTimestamp: BigInt!
-  createdAtBlock: BigInt!
-  totalDeposited: BigDecimal!   # cumulative all deposits
-  increaseCount: Int!           # number of increaseBond calls
-  lastDepositDate: String!
-  lastDepositTimestamp: BigInt!
+  toPool: Int!
+  migrator: Bytes!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+# ── VestingUpdatedEvent ───────────────────────────────────────────────────────
+type VestingUpdatedEvent @entity(immutable: true) {
+  id: ID!
+  nftId: BigInt!
+  amount: BigDecimal!
+  cliff: BigInt!
+  vesting: BigInt!
+  start: BigInt!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+# ── VestedTokenClawedEvent ────────────────────────────────────────────────────
+type VestedTokenClawedEvent @entity(immutable: true) {
+  id: ID!
+  nftId: BigInt!
+  amount: BigDecimal!
+  to: Bytes!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
 }
