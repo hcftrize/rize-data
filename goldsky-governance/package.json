@@ -1,6 +1,6 @@
 {
-  "name": "tokerize-bond-timemarker",
-  "version": "1.0.0",
+  "name": "tokerize-bond-created",
+  "version": "1.0.1",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build"
