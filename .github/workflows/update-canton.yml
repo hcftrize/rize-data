@@ -1,10 +1,6 @@
 name: Update Canton Ecosystem
 
 on:
-  schedule:
-    # Every Monday at 08:00 UTC
-    - cron: '0 3 * * 1'
-  # Allow manual trigger from GitHub UI
   workflow_dispatch:
 
 jobs:
