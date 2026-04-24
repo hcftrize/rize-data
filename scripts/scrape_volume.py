@@ -5,8 +5,8 @@ Fetches RIZE daily volume from CoinGecko and builds
 rize-data-hub/volume-history.json.
 
 Usage:
-  python scripts/scrape_volume.py             # incremental (last 30 days)
-  python scripts/scrape_volume.py --bootstrap # full history (365 days max)
+  python scripts/scrape_volume.py             # incremental (last 365 days, true daily granularity)
+  python scripts/scrape_volume.py --bootstrap # same — 365 days is already the full CoinGecko free tier
 """
 
 import json
@@ -54,8 +54,9 @@ def main():
     existing        = load_existing()
     existing_series = existing.get("series", [])
 
-    # Days to fetch — bootstrap = 365 (free tier max), incremental = 30
-    days = 365 if bootstrap else 30
+    # Always fetch 365 days — above 90 days CoinGecko returns true daily granularity (00:00 UTC)
+    # This overwrites the last 365 points in the JSON, older history is preserved
+    days = 365
 
     print(f"=== {'BOOTSTRAP' if bootstrap else 'INCREMENTAL'} — fetching {days} days ===")
     print(f"  Calling CoinGecko market_chart for {RIZE_ID}…")
