@@ -1,1 +1,74 @@
-
+[
+  {
+    "type": "event",
+    "name": "BondCreated",
+    "inputs": [
+      { "name": "account", "type": "address", "indexed": true },
+      { "name": "nftId",   "type": "uint256", "indexed": true },
+      { "name": "poolId",  "type": "uint16",  "indexed": true },
+      { "name": "amount",  "type": "uint256", "indexed": false }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "BondBroken",
+    "inputs": [
+      { "name": "nftId",  "type": "uint256", "indexed": true },
+      { "name": "amount", "type": "uint256", "indexed": false }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "TokensReleased",
+    "inputs": [
+      { "name": "nftId",  "type": "uint256", "indexed": true },
+      { "name": "to",     "type": "address", "indexed": true },
+      { "name": "amount", "type": "uint256", "indexed": false }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "BondMigrated",
+    "inputs": [
+      { "name": "nftId",    "type": "uint256", "indexed": true },
+      { "name": "toPool",   "type": "uint16",  "indexed": true },
+      { "name": "migrator", "type": "address", "indexed": true }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "PoolUpdated",
+    "inputs": [
+      { "name": "poolId",             "type": "uint16",  "indexed": true },
+      { "name": "baseWeight",         "type": "uint32",  "indexed": false },
+      { "name": "maturedWeightBonus", "type": "uint32",  "indexed": false },
+      { "name": "fullMaturity",       "type": "uint128", "indexed": false }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "ReleaseWarmupUpdated",
+    "inputs": [
+      { "name": "value", "type": "uint256", "indexed": false }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "VestedTokenClawed",
+    "inputs": [
+      { "name": "nftId",  "type": "uint256", "indexed": true },
+      { "name": "amount", "type": "uint256", "indexed": false },
+      { "name": "to",     "type": "address", "indexed": false }
+    ]
+  },
+  {
+    "type": "function",
+    "name": "increaseBond",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "tokenId", "type": "uint256" },
+      { "name": "amount",  "type": "uint256" }
+    ],
+    "outputs": []
+  }
+]
