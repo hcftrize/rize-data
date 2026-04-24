@@ -6,8 +6,6 @@ import {
   BondMigrated as BondMigratedEvent,
   PoolUpdated as PoolUpdatedEvent,
   VestedTokenClawed as VestedTokenClawedEvent,
-  GovernanceBonding,
-  GovernanceBonding__getBondResult,
 } from "../generated/GovernanceBonding/GovernanceBonding";
 import {
   Bond,
@@ -22,7 +20,7 @@ import {
   DailySnapshot,
   GlobalStats,
 } from "../generated/schema";
-import { increaseBond as IncreaseBondCall } from "../generated/GovernanceBonding/GovernanceBonding";
+import { ethereum } from "@graphprotocol/graph-ts";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 let DECIMALS = BigDecimal.fromString("1000000000000000000"); // 1e18
@@ -170,9 +168,9 @@ export function handleBondCreated(event: BondCreatedEvent): void {
 }
 
 // ── Call: increaseBond ────────────────────────────────────────────────────────
-export function handleIncreaseBond(call: IncreaseBondCall): void {
-  let nftId   = call.inputs.tokenId;
-  let amount  = call.inputs.amount.toBigDecimal().div(DECIMALS);
+export function handleIncreaseBond(call: ethereum.Call): void {
+  let nftId   = ethereum.decode("uint256", call.inputValues[0].value.toBytes())!.toBigInt();
+  let amount  = ethereum.decode("uint256", call.inputValues[1].value.toBytes())!.toBigInt().toBigDecimal().div(DECIMALS);
   let dateStr = tsToDateStr(call.block.timestamp.toI64());
 
   // Update bond
@@ -344,8 +342,8 @@ export function handlePoolUpdated(event: PoolUpdatedEvent): void {
     pool = new Pool(id);
     pool.poolId = poolId;
   }
-  pool.baseWeight         = BigInt.fromI32(event.params.baseWeight as i32);
-  pool.maturedWeightBonus = BigInt.fromI32(event.params.maturedWeightBonus as i32);
+  pool.baseWeight         = BigInt.fromI32(event.params.baseWeight);
+  pool.maturedWeightBonus = BigInt.fromI32(event.params.maturedWeightBonus);
   pool.fullMaturity       = event.params.fullMaturity;
   pool.updatedAtBlock     = event.block.number;
   pool.updatedAtTimestamp = event.block.timestamp;
@@ -355,8 +353,8 @@ export function handlePoolUpdated(event: PoolUpdatedEvent): void {
   // Immutable event
   let ev                  = new PoolUpdatedEntity(event.transaction.hash.toHex() + "-" + event.logIndex.toString());
   ev.poolId               = poolId;
-  ev.baseWeight           = BigInt.fromI32(event.params.baseWeight as i32);
-  ev.maturedWeightBonus   = BigInt.fromI32(event.params.maturedWeightBonus as i32);
+  ev.baseWeight           = BigInt.fromI32(event.params.baseWeight);
+  ev.maturedWeightBonus   = BigInt.fromI32(event.params.maturedWeightBonus);
   ev.fullMaturity         = event.params.fullMaturity;
   ev.date                 = dateStr;
   ev.blockNumber          = event.block.number;
