@@ -1,12 +1,12 @@
-name: Deploy Bond TimeMarker Subgraph (run once)
+name: Deploy Bond Created Subgraph v1.0.1
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Subgraph version (e.g. 1.0.0)"
+        description: "Subgraph version (e.g. 1.0.1)"
         required: true
-        default: "1.0.0"
+        default: "1.0.1"
 
 permissions:
   contents: write
@@ -43,7 +43,7 @@ jobs:
       - name: Deploy to Goldsky
         working-directory: goldsky-governance
         env:
-          GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY_6 }}
+          GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
         run: |
           goldsky login --token $GOLDSKY_API_KEY
-          goldsky subgraph deploy tokerize-bond-timemarker/${{ github.event.inputs.version }} --path .
+          goldsky subgraph deploy tokerize-bond-created/${{ github.event.inputs.version }} --path .
