@@ -1,4 +1,4 @@
-name: Deploy Bond Lifecycle Subgraph (run once)
+name: Deploy Pool Config Subgraph (run once)
 
 on:
   workflow_dispatch:
@@ -43,7 +43,7 @@ jobs:
       - name: Deploy to Goldsky
         working-directory: goldsky-governance
         env:
-          GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY_2 }}
+          GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY_3 }}
         run: |
           goldsky login --token $GOLDSKY_API_KEY
-          goldsky subgraph deploy tokerize-bond-lifecycle/${{ github.event.inputs.version }} --path .
+          goldsky subgraph deploy tokerize-pool-config/${{ github.event.inputs.version }} --path .
