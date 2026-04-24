@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts";
 import { BondCreated as BondCreatedEvent } from "../generated/GovernanceBonding/GovernanceBonding";
 import { Bond, BondCreatedEvent as BondCreatedEntity, IncreaseBondEvent } from "../generated/schema";
@@ -60,19 +60,8 @@ export function handleBondCreated(event: BondCreatedEvent): void {
 }
 
 export function handleIncreaseBond(call: ethereum.Call): void {
-  // Decode directly from raw input bytes — skip 4 byte selector
-  // increaseBond(uint256 tokenId, uint256 amount)
-  // Input: 4 bytes selector + 32 bytes tokenId + 32 bytes amount
-  let inputData = call.transaction.input;
-  if (inputData.length < 68) return; // 4 + 32 + 32
-
-  // Skip 4-byte function selector
-  let tokenIdBytes = inputData.slice(4, 36);
-  let amountBytes  = inputData.slice(36, 68);
-
-  let nftId       = BigInt.fromUnsignedBytes(Bytes.fromUint8Array(tokenIdBytes.reverse()));
-  let amountRaw   = BigInt.fromUnsignedBytes(Bytes.fromUint8Array(amountBytes.reverse()));
-  let amountAdded = amountRaw.toBigDecimal().div(DECIMALS);
+  let nftId       = call.inputValues[0].value.toBigInt();
+  let amountAdded = call.inputValues[1].value.toBigInt().toBigDecimal().div(DECIMALS);
   let dateStr     = tsToDateStr(call.block.timestamp.toI64());
   let id          = nftId.toString();
 
