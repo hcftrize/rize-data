@@ -1,20 +1,36 @@
-# ── TokensReleasedEvent ───────────────────────────────────────────────────────
-type TokensReleasedEvent @entity(immutable: true) {
+type PoolUpdatedEvent @entity(immutable: true) {
   id: ID!
-  nftId: BigInt!
-  to: Bytes!
-  amount: BigDecimal!
+  poolId: Int!
+  baseWeight: BigInt!
+  maturedWeightBonus: BigInt!
+  fullMaturity: BigInt!
   date: String!
   blockNumber: BigInt!
   timestamp: BigInt!
   txHash: Bytes!
 }
 
-# ── BondMigratedEvent ─────────────────────────────────────────────────────────
-type BondMigratedEvent @entity(immutable: true) {
+type Pool @entity(immutable: false) {
   id: ID!
-  nftId: BigInt!
-  toPool: Int!
+  poolId: Int!
+  baseWeight: BigInt!
+  maturedWeightBonus: BigInt!
+  fullMaturity: BigInt!
+  updatedAtDate: String!
+  updatedAtTimestamp: BigInt!
+}
+
+type ReleaseWarmupUpdatedEvent @entity(immutable: true) {
+  id: ID!
+  value: BigInt!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type MigratorAddedEvent @entity(immutable: true) {
+  id: ID!
   migrator: Bytes!
   date: String!
   blockNumber: BigInt!
@@ -22,26 +38,9 @@ type BondMigratedEvent @entity(immutable: true) {
   txHash: Bytes!
 }
 
-# ── VestingUpdatedEvent ───────────────────────────────────────────────────────
-type VestingUpdatedEvent @entity(immutable: true) {
+type MigratorRemovedEvent @entity(immutable: true) {
   id: ID!
-  nftId: BigInt!
-  amount: BigDecimal!
-  cliff: BigInt!
-  vesting: BigInt!
-  start: BigInt!
-  date: String!
-  blockNumber: BigInt!
-  timestamp: BigInt!
-  txHash: Bytes!
-}
-
-# ── VestedTokenClawedEvent ────────────────────────────────────────────────────
-type VestedTokenClawedEvent @entity(immutable: true) {
-  id: ID!
-  nftId: BigInt!
-  amount: BigDecimal!
-  to: Bytes!
+  migrator: Bytes!
   date: String!
   blockNumber: BigInt!
   timestamp: BigInt!
