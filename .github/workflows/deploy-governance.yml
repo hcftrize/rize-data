@@ -1,12 +1,12 @@
-name: Deploy Bond Created Subgraph v1.0.1
+name: Deploy Bond Created Subgraph v2
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Subgraph version (e.g. 1.0.1)"
+        description: "Subgraph version (e.g. 1.0.0)"
         required: true
-        default: "1.0.1"
+        default: "1.0.0"
 
 permissions:
   contents: write
@@ -46,4 +46,4 @@ jobs:
           GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
         run: |
           goldsky login --token $GOLDSKY_API_KEY
-          goldsky subgraph deploy tokerize-bond-created/${{ github.event.inputs.version }} --path .
+          goldsky subgraph deploy tokerize-bond-created-v2/${{ github.event.inputs.version }} --path .
