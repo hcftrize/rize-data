@@ -14,16 +14,20 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Bond
-        - BondCreatedEvent
-        - IncreaseBondEvent
+        - TokensReleasedEvent
+        - BondMigratedEvent
+        - VestingUpdatedEvent
+        - VestedTokenClawedEvent
       abis:
         - name: GovernanceBonding
           file: ./abis/GovernanceBonding.json
       eventHandlers:
-        - event: BondCreated(indexed address,indexed uint256,indexed uint16,uint256)
-          handler: handleBondCreated
-      callHandlers:
-        - function: increaseBond(uint256,uint256)
-          handler: handleIncreaseBond
+        - event: TokensReleased(indexed uint256,indexed address,uint256)
+          handler: handleTokensReleased
+        - event: BondMigrated(indexed uint256,indexed uint16,indexed address)
+          handler: handleBondMigrated
+        - event: VestingUpdated(indexed uint256,uint256,uint64,uint64,uint64)
+          handler: handleVestingUpdated
+        - event: VestedTokenClawed(indexed uint256,uint256,address)
+          handler: handleVestedTokenClawed
       file: ./src/mapping.ts
