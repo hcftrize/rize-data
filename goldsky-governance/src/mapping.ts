@@ -342,8 +342,8 @@ export function handlePoolUpdated(event: PoolUpdatedEvent): void {
     pool = new Pool(id);
     pool.poolId = poolId;
   }
-  pool.baseWeight         = BigInt.fromI32(event.params.baseWeight);
-  pool.maturedWeightBonus = BigInt.fromI32(event.params.maturedWeightBonus);
+  pool.baseWeight         = BigInt.fromString(event.params.baseWeight.toString());
+  pool.maturedWeightBonus = BigInt.fromString(event.params.maturedWeightBonus.toString());
   pool.fullMaturity       = event.params.fullMaturity;
   pool.updatedAtBlock     = event.block.number;
   pool.updatedAtTimestamp = event.block.timestamp;
@@ -353,8 +353,8 @@ export function handlePoolUpdated(event: PoolUpdatedEvent): void {
   // Immutable event
   let ev                  = new PoolUpdatedEntity(event.transaction.hash.toHex() + "-" + event.logIndex.toString());
   ev.poolId               = poolId;
-  ev.baseWeight           = BigInt.fromI32(event.params.baseWeight);
-  ev.maturedWeightBonus   = BigInt.fromI32(event.params.maturedWeightBonus);
+  ev.baseWeight           = BigInt.fromString(event.params.baseWeight.toString());
+  ev.maturedWeightBonus   = BigInt.fromString(event.params.maturedWeightBonus.toString());
   ev.fullMaturity         = event.params.fullMaturity;
   ev.date                 = dateStr;
   ev.blockNumber          = event.block.number;
