@@ -1,5 +1,5 @@
 {
-  "name": "tokerize-bond-created",
+  "name": "tokerize-bond-lifecycle",
   "version": "1.0.0",
   "scripts": {
     "codegen": "graph codegen",
