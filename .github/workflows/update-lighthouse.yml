@@ -1,8 +1,6 @@
 name: Update Lighthouse Revenue
 
 on:
-  schedule:
-    - cron: "0 2 * * *"   # 02:00 UTC daily (API updates at 00:00 UTC)
   workflow_dispatch:
     inputs:
       bootstrap:
