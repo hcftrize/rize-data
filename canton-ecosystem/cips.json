@@ -1006,7 +1006,7 @@
     "type": "Governance",
     "status": "Proposed",
     "created": "2026-03-18",
-    "approved": "",
+    "approved": "2026-04-23",
     "description": "The CIP outlines the process by which the network reduces the weight of a Super Validator (“SV”) under certain circumstances.  The process includes (i) a review of the circumstances associated with the SV, (ii) an off-chain governance procedure, and (iii) a corresponding on-chain vote and configuration change.  \n\nA “Ghost SV” refers to an SV in the process of completing milestones associated with an allocation of weight.  While operating as a Ghost SV, unminted rewards associated with its total potential weight accrue in escrow.  The process introduced in this CIP also addresses how to calculate and \"burn” any unminted rewards associated with Ghost SV weight that have been reduced while preserving unminted rewards in escrow for Ghost SVs in good standing."
   },
   {
