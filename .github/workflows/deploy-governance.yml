@@ -1,4 +1,4 @@
-name: Deploy Bond Broken Subgraph (run once)
+name: Deploy NFT Transfers Subgraph (run once)
 
 on:
   workflow_dispatch:
@@ -43,7 +43,7 @@ jobs:
       - name: Deploy to Goldsky
         working-directory: goldsky-governance
         env:
-          GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY_4 }}
+          GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY_5 }}
         run: |
           goldsky login --token $GOLDSKY_API_KEY
-          goldsky subgraph deploy tokerize-bond-broken/${{ github.event.inputs.version }} --path .
+          goldsky subgraph deploy tokerize-nft-transfers/${{ github.event.inputs.version }} --path .
