@@ -1,0 +1,47 @@
+name: Deploy Governance Subgraph (run once)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Subgraph version to deploy (e.g. 1.0.0)"
+        required: true
+        default: "1.0.0"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install graph-cli and goldsky
+        run: |
+          npm install -g @graphprotocol/graph-cli
+          npm install -g @goldskycom/cli
+
+      - name: Install subgraph dependencies
+        working-directory: goldsky-governance
+        run: npm install
+
+      - name: Generate types
+        working-directory: goldsky-governance
+        run: graph codegen
+
+      - name: Build subgraph
+        working-directory: goldsky-governance
+        run: graph build
+
+      - name: Deploy to Goldsky
+        working-directory: goldsky-governance
+        env:
+          GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
+        run: |
+          goldsky login --token $GOLDSKY_API_KEY
+          goldsky subgraph deploy tokerize-governance/${{ github.event.inputs.version }} --path .
