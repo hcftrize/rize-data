@@ -1,11 +1,12 @@
 [
   {
     "type": "event",
-    "name": "BondBroken",
+    "name": "Transfer",
     "anonymous": false,
     "inputs": [
-      { "name": "nftId",  "type": "uint256", "indexed": true  },
-      { "name": "amount", "type": "uint256", "indexed": false }
+      { "name": "from",    "type": "address", "indexed": true },
+      { "name": "to",      "type": "address", "indexed": true },
+      { "name": "tokenId", "type": "uint256", "indexed": true }
     ]
   }
 ]
