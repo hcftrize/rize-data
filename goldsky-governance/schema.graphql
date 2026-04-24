@@ -1,6 +1,6 @@
 # ── Pool ──────────────────────────────────────────────────────────────────────
 # Snapshot of pool parameters at a given point in time
-type Pool @entity {
+type Pool @entity(immutable: false) {
   id: ID!                        # poolId as string
   poolId: Int!
   baseWeight: BigInt!
@@ -13,7 +13,7 @@ type Pool @entity {
 
 # ── Bond ──────────────────────────────────────────────────────────────────────
 # One entity per bond NFT — updated on every event
-type Bond @entity {
+type Bond @entity(immutable: false) {
   id: ID!                        # nftId as string
   nftId: BigInt!
   owner: Bytes!                  # current owner (from BondCreated)
@@ -121,7 +121,7 @@ type VestedTokenClawedEvent @entity(immutable: true) {
 
 # ── DailySnapshot ─────────────────────────────────────────────────────────────
 # One record per day — tracks global bonding stats
-type DailySnapshot @entity {
+type DailySnapshot @entity(immutable: false) {
   id: ID!                        # YYYY-MM-DD
   date: String!
   totalBonded: BigDecimal!       # total RIZE bonded across all active bonds
@@ -137,7 +137,7 @@ type DailySnapshot @entity {
 
 # ── GlobalStats ───────────────────────────────────────────────────────────────
 # Single entity tracking all-time totals
-type GlobalStats @entity {
+type GlobalStats @entity(immutable: false) {
   id: ID!                        # "global"
   totalBonded: BigDecimal!
   totalBondCount: Int!
