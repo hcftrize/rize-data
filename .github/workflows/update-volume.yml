@@ -1,8 +1,6 @@
 name: Update Volume History
 
 on:
-  schedule:
-    - cron: "0 23 * * *"   # 23:00 UTC daily — captures full day
   workflow_dispatch:
     inputs:
       bootstrap:
