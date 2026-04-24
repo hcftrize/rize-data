@@ -3,22 +3,23 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: GovernanceBonding
+    name: RizeGovernanceNFT
     network: base
     source:
-      address: "0x5a134098bDBEb05Da9eAc35439c5624547ed26eE"
-      abi: GovernanceBonding
+      address: "0xf33f231b769ccc1c7f74190de14340fbd51879ff"
+      abi: RizeGovernanceNFT
       startBlock: 28890000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - BondBrokenEvent
+        - NftTransferEvent
+        - BondOwner
       abis:
-        - name: GovernanceBonding
+        - name: RizeGovernanceNFT
           file: ./abis/GovernanceBonding.json
       eventHandlers:
-        - event: BondBroken(indexed uint256,uint256)
-          handler: handleBondBroken
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
       file: ./src/mapping.ts
