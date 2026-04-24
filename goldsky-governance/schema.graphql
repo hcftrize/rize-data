@@ -1,14 +1,35 @@
-# Snapshot du timeMarker après chaque increaseBond
-# C'est la seule donnée qu'on ne peut pas reconstituer autrement
-type BondTimeMarkerSnapshot @entity(immutable: true) {
-  id: ID!                  # tx hash
+type BondCreatedEvent @entity(immutable: true) {
+  id: ID!
   nftId: BigInt!
-  timeMarker: BigInt!      # nouveau timeMarker post-recalcul
-  amount: BigDecimal!      # nouveau montant total bondé
+  owner: Bytes!
   poolId: Int!
-  amountAdded: BigDecimal! # montant ajouté dans cet increaseBond
+  amount: BigDecimal!
   date: String!
   blockNumber: BigInt!
   timestamp: BigInt!
   txHash: Bytes!
+}
+
+type IncreaseBondEvent @entity(immutable: true) {
+  id: ID!
+  nftId: BigInt!
+  amount: BigDecimal!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type Bond @entity(immutable: false) {
+  id: ID!
+  nftId: BigInt!
+  owner: Bytes!
+  poolId: Int!
+  createdAtDate: String!
+  createdAtTimestamp: BigInt!
+  createdAtBlock: BigInt!
+  totalDeposited: BigDecimal!
+  increaseCount: Int!
+  lastDepositDate: String!
+  lastDepositTimestamp: BigInt!
 }
