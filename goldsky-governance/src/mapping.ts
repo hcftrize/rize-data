@@ -1,8 +1,8 @@
-import { BigDecimal } from "@graphprotocol/graph-ts";
-import { BondBroken as BondBrokenEvent } from "../generated/GovernanceBonding/GovernanceBonding";
-import { BondBrokenEvent as BondBrokenEntity } from "../generated/schema";
+import { BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { Transfer as TransferEvent } from "../generated/RizeGovernanceNFT/RizeGovernanceNFT";
+import { NftTransferEvent, BondOwner } from "../generated/schema";
 
-let DECIMALS = BigDecimal.fromString("1000000000000000000");
+let ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 function isLeapYear(year: i32): bool {
   return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
@@ -27,13 +27,38 @@ function tsToDateStr(ts: i64): string {
   return y.toString() + "-" + mm + "-" + dd;
 }
 
-export function handleBondBroken(event: BondBrokenEvent): void {
-  let ev      = new BondBrokenEntity(event.transaction.hash.toHex() + "-" + event.logIndex.toString());
-  ev.nftId    = event.params.nftId;
-  ev.amount   = event.params.amount.toBigDecimal().div(DECIMALS);
-  ev.date     = tsToDateStr(event.block.timestamp.toI64());
-  ev.blockNumber = event.block.number;
-  ev.timestamp   = event.block.timestamp;
-  ev.txHash      = event.transaction.hash;
+export function handleTransfer(event: TransferEvent): void {
+  let tokenId = event.params.tokenId;
+  let from    = event.params.from;
+  let to      = event.params.to;
+  let dateStr = tsToDateStr(event.block.timestamp.toI64());
+  let isMint  = from.toHexString() == ZERO_ADDRESS;
+
+  // Immutable transfer event
+  let ev        = new NftTransferEvent(event.transaction.hash.toHex() + "-" + event.logIndex.toString());
+  ev.tokenId    = tokenId;
+  ev.from       = from;
+  ev.to         = to;
+  ev.isMint     = isMint;
+  ev.date       = dateStr;
+  ev.blockNumber   = event.block.number;
+  ev.timestamp     = event.block.timestamp;
+  ev.txHash        = event.transaction.hash;
   ev.save();
+
+  // Upsert BondOwner
+  let id    = tokenId.toString();
+  let owner = BondOwner.load(id);
+  if (owner == null) {
+    owner = new BondOwner(id);
+    owner.tokenId          = tokenId;
+    owner.mintDate         = dateStr;
+    owner.mintTimestamp    = event.block.timestamp;
+    owner.transferCount    = 0;
+  }
+  owner.owner                  = to;
+  owner.lastTransferDate       = dateStr;
+  owner.lastTransferTimestamp  = event.block.timestamp;
+  owner.transferCount          = owner.transferCount + 1;
+  owner.save();
 }
