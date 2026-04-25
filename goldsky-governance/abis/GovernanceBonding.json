@@ -1,23 +1,12 @@
 [
   {
-    "type": "function",
-    "name": "increaseBond",
-    "stateMutability": "nonpayable",
+    "type": "event",
+    "name": "Transfer",
+    "anonymous": false,
     "inputs": [
-      { "name": "tokenId", "type": "uint256" },
-      { "name": "amount",  "type": "uint256" }
-    ],
-    "outputs": []
-  },
-  {
-    "type": "function",
-    "name": "getBond",
-    "stateMutability": "view",
-    "inputs":  [{ "name": "bondId", "type": "uint256" }],
-    "outputs": [
-      { "name": "timeMarker", "type": "uint256" },
-      { "name": "amount",     "type": "uint256" },
-      { "name": "poolId",     "type": "uint16"  }
+      { "name": "from",    "type": "address", "indexed": true },
+      { "name": "to",      "type": "address", "indexed": true },
+      { "name": "tokenId", "type": "uint256", "indexed": true }
     ]
   }
 ]
