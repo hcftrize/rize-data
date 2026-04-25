@@ -1,12 +1,15 @@
-name: Deploy Governance Subgraph (run once)
+name: Deploy Bond Created Subgraph (Ormi)
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Subgraph version to deploy (e.g. 1.0.0)"
+        description: "Subgraph version (e.g. 1.0.1)"
         required: true
-        default: "1.0.0"
+        default: "1.0.1"
+
+permissions:
+  contents: write
 
 jobs:
   deploy:
@@ -16,17 +19,14 @@ jobs:
         with:
           ref: dev
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Install graph-cli and goldsky
-        run: |
-          npm install -g @graphprotocol/graph-cli
-          npm install -g @goldskycom/cli
+      - name: Install graph-cli
+        run: npm install -g @graphprotocol/graph-cli
 
-      - name: Install subgraph dependencies
+      - name: Install dependencies
         working-directory: goldsky-governance
         run: npm install
 
@@ -38,10 +38,13 @@ jobs:
         working-directory: goldsky-governance
         run: graph build
 
-      - name: Deploy to Goldsky
+      - name: Deploy to Ormi
         working-directory: goldsky-governance
         env:
-          GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
+          ORMI_API_KEY: ${{ secrets.ORMI_API_KEY }}
         run: |
-          goldsky login --token $GOLDSKY_API_KEY
-          goldsky subgraph deploy tokerize-governance/${{ github.event.inputs.version }} --path .
+          graph deploy tokerize-bond-created \
+            --node https://subgraph.api.ormilabs.com/deploy \
+            --ipfs https://subgraph.api.ormilabs.com/ipfs \
+            --deploy-key $ORMI_API_KEY \
+            --version-label 1.0.1
