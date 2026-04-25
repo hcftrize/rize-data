@@ -1,46 +1,7 @@
-type PoolUpdatedEvent @entity(immutable: true) {
+type BondBrokenEvent @entity(immutable: true) {
   id: ID!
-  poolId: Int!
-  baseWeight: BigInt!
-  maturedWeightBonus: BigInt!
-  fullMaturity: BigInt!
-  date: String!
-  blockNumber: BigInt!
-  timestamp: BigInt!
-  txHash: Bytes!
-}
-
-type Pool @entity(immutable: false) {
-  id: ID!
-  poolId: Int!
-  baseWeight: BigInt!
-  maturedWeightBonus: BigInt!
-  fullMaturity: BigInt!
-  updatedAtDate: String!
-  updatedAtTimestamp: BigInt!
-}
-
-type ReleaseWarmupUpdatedEvent @entity(immutable: true) {
-  id: ID!
-  value: BigInt!
-  date: String!
-  blockNumber: BigInt!
-  timestamp: BigInt!
-  txHash: Bytes!
-}
-
-type MigratorAddedEvent @entity(immutable: true) {
-  id: ID!
-  migrator: Bytes!
-  date: String!
-  blockNumber: BigInt!
-  timestamp: BigInt!
-  txHash: Bytes!
-}
-
-type MigratorRemovedEvent @entity(immutable: true) {
-  id: ID!
-  migrator: Bytes!
+  nftId: BigInt!
+  amount: BigDecimal!
   date: String!
   blockNumber: BigInt!
   timestamp: BigInt!
