@@ -1,7 +1,7 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts";
-import { BondCreated as BondCreatedEvent } from "../generated/GovernanceBonding/GovernanceBonding";
-import { Bond, BondCreatedEvent as BondCreatedEntity, IncreaseBondEvent } from "../generated/schema";
+import { GovernanceBonding } from "../generated/GovernanceBonding/GovernanceBonding";
+import { BondTimeMarkerSnapshot } from "../generated/schema";
 
 let DECIMALS = BigDecimal.fromString("1000000000000000000");
 
@@ -28,56 +28,25 @@ function tsToDateStr(ts: i64): string {
   return y.toString() + "-" + mm + "-" + dd;
 }
 
-export function handleBondCreated(event: BondCreatedEvent): void {
-  let amount  = event.params.amount.toBigDecimal().div(DECIMALS);
-  let dateStr = tsToDateStr(event.block.timestamp.toI64());
-  let nftId   = event.params.nftId;
-  let id      = nftId.toString();
-
-  let bond = new Bond(id);
-  bond.nftId                = nftId;
-  bond.owner                = event.params.account;
-  bond.poolId               = event.params.poolId as i32;
-  bond.createdAtDate        = dateStr;
-  bond.createdAtTimestamp   = event.block.timestamp;
-  bond.createdAtBlock       = event.block.number;
-  bond.totalDeposited       = amount;
-  bond.increaseCount        = 0;
-  bond.lastDepositDate      = dateStr;
-  bond.lastDepositTimestamp = event.block.timestamp;
-  bond.save();
-
-  let ev         = new BondCreatedEntity(event.transaction.hash.toHex() + "-" + event.logIndex.toString());
-  ev.nftId       = nftId;
-  ev.owner       = event.params.account;
-  ev.poolId      = event.params.poolId as i32;
-  ev.amount      = amount;
-  ev.date        = dateStr;
-  ev.blockNumber = event.block.number;
-  ev.timestamp   = event.block.timestamp;
-  ev.txHash      = event.transaction.hash;
-  ev.save();
-}
-
 export function handleIncreaseBond(call: ethereum.Call): void {
   let nftId       = call.inputValues[0].value.toBigInt();
   let amountAdded = call.inputValues[1].value.toBigInt().toBigDecimal().div(DECIMALS);
-  let dateStr     = tsToDateStr(call.block.timestamp.toI64());
-  let id          = nftId.toString();
 
-  let bond = Bond.load(id);
-  if (bond != null) {
-    bond.totalDeposited        = bond.totalDeposited.plus(amountAdded);
-    bond.increaseCount         = bond.increaseCount + 1;
-    bond.lastDepositDate       = dateStr;
-    bond.lastDepositTimestamp  = call.block.timestamp;
-    bond.save();
-  }
+  let contract   = GovernanceBonding.bind(call.to);
+  let bondResult = contract.try_getBond(nftId);
+  if (bondResult.reverted) return;
 
-  let ev         = new IncreaseBondEvent(call.transaction.hash.toHex() + "-inc-" + call.block.number.toString());
+  let timeMarker = bondResult.value.getTimeMarker();
+  let amount     = bondResult.value.getAmount().toBigDecimal().div(DECIMALS);
+  let poolId     = bondResult.value.getPoolId() as i32;
+
+  let ev         = new BondTimeMarkerSnapshot(call.transaction.hash.toHex() + "-" + call.block.number.toString());
   ev.nftId       = nftId;
-  ev.amount      = amountAdded;
-  ev.date        = dateStr;
+  ev.timeMarker  = timeMarker;
+  ev.amount      = amount;
+  ev.poolId      = poolId;
+  ev.amountAdded = amountAdded;
+  ev.date        = tsToDateStr(call.block.timestamp.toI64());
   ev.blockNumber = call.block.number;
   ev.timestamp   = call.block.timestamp;
   ev.txHash      = call.transaction.hash;
