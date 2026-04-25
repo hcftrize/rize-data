@@ -1,8 +1,9 @@
-import { BigInt, Bytes } from "@graphprotocol/graph-ts";
-import { Transfer as TransferEvent } from "../generated/RizeGovernanceNFT/RizeGovernanceNFT";
-import { NftTransferEvent, BondOwner } from "../generated/schema";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { ethereum } from "@graphprotocol/graph-ts";
+import { BondCreated as BondCreatedEvent } from "../generated/GovernanceBonding/GovernanceBonding";
+import { Bond, BondCreatedEvent as BondCreatedEntity, IncreaseBondEvent } from "../generated/schema";
 
-let ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+let DECIMALS = BigDecimal.fromString("1000000000000000000");
 
 function isLeapYear(year: i32): bool {
   return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
@@ -27,36 +28,58 @@ function tsToDateStr(ts: i64): string {
   return y.toString() + "-" + mm + "-" + dd;
 }
 
-export function handleTransfer(event: TransferEvent): void {
-  let tokenId = event.params.tokenId;
-  let from    = event.params.from;
-  let to      = event.params.to;
+export function handleBondCreated(event: BondCreatedEvent): void {
+  let amount  = event.params.amount.toBigDecimal().div(DECIMALS);
   let dateStr = tsToDateStr(event.block.timestamp.toI64());
-  let isMint  = from.toHexString() == ZERO_ADDRESS;
+  let nftId   = event.params.nftId;
+  let id      = nftId.toString();
 
-  let ev        = new NftTransferEvent(event.transaction.hash.toHex() + "-" + event.logIndex.toString());
-  ev.tokenId    = tokenId;
-  ev.from       = from;
-  ev.to         = to;
-  ev.isMint     = isMint;
-  ev.date       = dateStr;
-  ev.blockNumber   = event.block.number;
-  ev.timestamp     = event.block.timestamp;
-  ev.txHash        = event.transaction.hash;
+  let bond = new Bond(id);
+  bond.nftId                = nftId;
+  bond.owner                = event.params.account;
+  bond.poolId               = event.params.poolId as i32;
+  bond.createdAtDate        = dateStr;
+  bond.createdAtTimestamp   = event.block.timestamp;
+  bond.createdAtBlock       = event.block.number;
+  bond.totalDeposited       = amount;
+  bond.increaseCount        = 0;
+  bond.lastDepositDate      = dateStr;
+  bond.lastDepositTimestamp = event.block.timestamp;
+  bond.save();
+
+  let ev         = new BondCreatedEntity(event.transaction.hash.toHex() + "-" + event.logIndex.toString());
+  ev.nftId       = nftId;
+  ev.owner       = event.params.account;
+  ev.poolId      = event.params.poolId as i32;
+  ev.amount      = amount;
+  ev.date        = dateStr;
+  ev.blockNumber = event.block.number;
+  ev.timestamp   = event.block.timestamp;
+  ev.txHash      = event.transaction.hash;
   ev.save();
+}
 
-  let id    = tokenId.toString();
-  let owner = BondOwner.load(id);
-  if (owner == null) {
-    owner = new BondOwner(id);
-    owner.tokenId       = tokenId;
-    owner.mintDate      = dateStr;
-    owner.mintTimestamp = event.block.timestamp;
-    owner.transferCount = 0;
+export function handleIncreaseBond(call: ethereum.Call): void {
+  let nftId       = call.inputValues[0].value.toBigInt();
+  let amountAdded = call.inputValues[1].value.toBigInt().toBigDecimal().div(DECIMALS);
+  let dateStr     = tsToDateStr(call.block.timestamp.toI64());
+  let id          = nftId.toString();
+
+  let bond = Bond.load(id);
+  if (bond != null) {
+    bond.totalDeposited        = bond.totalDeposited.plus(amountAdded);
+    bond.increaseCount         = bond.increaseCount + 1;
+    bond.lastDepositDate       = dateStr;
+    bond.lastDepositTimestamp  = call.block.timestamp;
+    bond.save();
   }
-  owner.owner                 = to;
-  owner.lastTransferDate      = dateStr;
-  owner.lastTransferTimestamp = event.block.timestamp;
-  owner.transferCount         = owner.transferCount + 1;
-  owner.save();
+
+  let ev         = new IncreaseBondEvent(call.transaction.hash.toHex() + "-inc-" + call.block.number.toString());
+  ev.nftId       = nftId;
+  ev.amount      = amountAdded;
+  ev.date        = dateStr;
+  ev.blockNumber = call.block.number;
+  ev.timestamp   = call.block.timestamp;
+  ev.txHash      = call.transaction.hash;
+  ev.save();
 }
