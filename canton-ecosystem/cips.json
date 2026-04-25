@@ -1006,7 +1006,7 @@
     "type": "Governance",
     "status": "Proposed",
     "created": "2026-03-18",
-    "approved": "",
+    "approved": "2026-04-23",
     "description": "The CIP outlines the process by which the network reduces the weight of a Super Validator (“SV”) under certain circumstances.  The process includes (i) a review of the circumstances associated with the SV, (ii) an off-chain governance procedure, and (iii) a corresponding on-chain vote and configuration change.  \n\nA “Ghost SV” refers to an SV in the process of completing milestones associated with an allocation of weight.  While operating as a Ghost SV, unminted rewards associated with its total potential weight accrue in escrow.  The process introduced in this CIP also addresses how to calculate and \"burn” any unminted rewards associated with Ghost SV weight that have been reduced while preserving unminted rewards in escrow for Ghost SVs in good standing."
   },
   {
@@ -1038,5 +1038,15 @@
     "created": "2026-03-19",
     "approved": "2026-04-16",
     "description": "This proposal establishes a time-bound Super Validator (SV) program to encourage the formation and growth of Digital Asset Treasury companies (DATs) that provide investor access to Canton Coin (CC) and commit to long-term CC ownership.\n\nA DAT is an operating company whose primary purpose is to acquire, accumulate, and hold CC as a treasury asset while offering third parties structured access to CC exposure. DATs that accumulate and hold CC over multi-year periods provide durable ecosystem value and may earn SV rewards based on verifiable, consistent CC holdings."
+  },
+  {
+    "id": "CIP-0115",
+    "number": 115,
+    "title": "Add Societe Generale as a Super Validator (max weight 8)",
+    "type": "Governance",
+    "status": "",
+    "created": "2026-04-24",
+    "approved": "",
+    "description": "This CIP establishes a milestone-based Super Validator commitment framework for Societe Generale on the Canton Network.\n\nSociete Generale already runs Canton validators, has issued a tokenized bond on Canton, and actively participates in the on-chain U.S. Treasury financing working group. This proposal focuses on Societe Generale Prime Services and Clearing accepting tokenized assets on Canton as eligible collateral, as well as SG Forge deploying EURCV/USDCV on Canton.\n\nSV Weight is earned incrementally as milestones are completed and verified. Rewards accrue to escrow, consistent with existing Super Validator mechanics.\n\nThe total maximum earnable SV Weight under this CIP is 8"
   }
 ]
