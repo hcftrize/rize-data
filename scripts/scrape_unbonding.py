@@ -16,7 +16,7 @@ from datetime import datetime, timezone, timedelta, date
 from pathlib import Path
 
 # ── Config ─────────────────────────────────────────────────────────────────────
-GOLDSKY_URL = "https://api.goldsky.com/api/public/project_cmoa6u5wk3kx201y4g3s52z77/subgraphs/tokerize-bond-broken/1.1.0/gn"
+GOLDSKY_URL = "https://api.goldsky.com/api/public/project_cmoa6u5wk3kx201y4g3s52z77/subgraphs/tokerize-bond-broken/1.0.0/gn"
 OUTPUT      = Path(__file__).parent.parent / "rize-data-hub" / "unbonding-queue.json"
 TIMEOUT     = 30
 PAGE_SIZE   = 1000
