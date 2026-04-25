@@ -1,44 +1,37 @@
 [
   {
     "type": "event",
-    "name": "TokensReleased",
+    "name": "PoolUpdated",
     "anonymous": false,
     "inputs": [
-      { "name": "nftId",  "type": "uint256", "indexed": true },
-      { "name": "to",     "type": "address", "indexed": true },
-      { "name": "amount", "type": "uint256", "indexed": false }
+      { "name": "poolId",             "type": "uint16",  "indexed": true  },
+      { "name": "baseWeight",         "type": "uint32",  "indexed": false },
+      { "name": "maturedWeightBonus", "type": "uint32",  "indexed": false },
+      { "name": "fullMaturity",       "type": "uint128", "indexed": false }
     ]
   },
   {
     "type": "event",
-    "name": "BondMigrated",
+    "name": "ReleaseWarmupUpdated",
     "anonymous": false,
     "inputs": [
-      { "name": "nftId",    "type": "uint256", "indexed": true },
-      { "name": "toPool",   "type": "uint16",  "indexed": true },
+      { "name": "value", "type": "uint256", "indexed": false }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "MigratorAdded",
+    "anonymous": false,
+    "inputs": [
       { "name": "migrator", "type": "address", "indexed": true }
     ]
   },
   {
     "type": "event",
-    "name": "VestingUpdated",
+    "name": "MigratorRemoved",
     "anonymous": false,
     "inputs": [
-      { "name": "nftId",   "type": "uint256", "indexed": true },
-      { "name": "amount",  "type": "uint256", "indexed": false },
-      { "name": "cliff",   "type": "uint64",  "indexed": false },
-      { "name": "vesting", "type": "uint64",  "indexed": false },
-      { "name": "start",   "type": "uint64",  "indexed": false }
-    ]
-  },
-  {
-    "type": "event",
-    "name": "VestedTokenClawed",
-    "anonymous": false,
-    "inputs": [
-      { "name": "nftId",  "type": "uint256", "indexed": true },
-      { "name": "amount", "type": "uint256", "indexed": false },
-      { "name": "to",     "type": "address", "indexed": false }
+      { "name": "migrator", "type": "address", "indexed": true }
     ]
   }
 ]
