@@ -1,8 +1,7 @@
-type BondCreatedEvent @entity(immutable: true) {
+type TokensReleasedEvent @entity(immutable: true) {
   id: ID!
   nftId: BigInt!
-  owner: Bytes!
-  poolId: Int!
+  to: Bytes!
   amount: BigDecimal!
   date: String!
   blockNumber: BigInt!
@@ -10,26 +9,37 @@ type BondCreatedEvent @entity(immutable: true) {
   txHash: Bytes!
 }
 
-type IncreaseBondEvent @entity(immutable: true) {
+type BondMigratedEvent @entity(immutable: true) {
   id: ID!
   nftId: BigInt!
-  amount: BigDecimal!
+  toPool: Int!
+  migrator: Bytes!
   date: String!
   blockNumber: BigInt!
   timestamp: BigInt!
   txHash: Bytes!
 }
 
-type Bond @entity(immutable: false) {
+type VestingUpdatedEvent @entity(immutable: true) {
   id: ID!
   nftId: BigInt!
-  owner: Bytes!
-  poolId: Int!
-  createdAtDate: String!
-  createdAtTimestamp: BigInt!
-  createdAtBlock: BigInt!
-  totalDeposited: BigDecimal!
-  increaseCount: Int!
-  lastDepositDate: String!
-  lastDepositTimestamp: BigInt!
+  amount: BigDecimal!
+  cliff: BigInt!
+  vesting: BigInt!
+  start: BigInt!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type VestedTokenClawedEvent @entity(immutable: true) {
+  id: ID!
+  nftId: BigInt!
+  amount: BigDecimal!
+  to: Bytes!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
 }
