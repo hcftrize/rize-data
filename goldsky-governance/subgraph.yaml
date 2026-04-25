@@ -14,15 +14,10 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Bond
-        - BondCreatedEvent
-        - IncreaseBondEvent
+        - BondTimeMarkerSnapshot
       abis:
         - name: GovernanceBonding
           file: ./abis/GovernanceBonding.json
-      eventHandlers:
-        - event: BondCreated(indexed address,indexed uint256,indexed uint16,uint256)
-          handler: handleBondCreated
       callHandlers:
         - function: increaseBond(uint256,uint256)
           handler: handleIncreaseBond
