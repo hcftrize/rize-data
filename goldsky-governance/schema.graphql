@@ -1,35 +1,12 @@
-type BondCreatedEvent @entity(immutable: true) {
+type BondTimeMarkerSnapshot @entity(immutable: true) {
   id: ID!
   nftId: BigInt!
-  owner: Bytes!
-  poolId: Int!
+  timeMarker: BigInt!
   amount: BigDecimal!
+  poolId: Int!
+  amountAdded: BigDecimal!
   date: String!
   blockNumber: BigInt!
   timestamp: BigInt!
   txHash: Bytes!
-}
-
-type IncreaseBondEvent @entity(immutable: true) {
-  id: ID!
-  nftId: BigInt!
-  amount: BigDecimal!
-  date: String!
-  blockNumber: BigInt!
-  timestamp: BigInt!
-  txHash: Bytes!
-}
-
-type Bond @entity(immutable: false) {
-  id: ID!
-  nftId: BigInt!
-  owner: Bytes!
-  poolId: Int!
-  createdAtDate: String!
-  createdAtTimestamp: BigInt!
-  createdAtBlock: BigInt!
-  totalDeposited: BigDecimal!
-  increaseCount: Int!
-  lastDepositDate: String!
-  lastDepositTimestamp: BigInt!
 }
