@@ -1,12 +1,23 @@
 [
   {
     "type": "event",
-    "name": "Transfer",
+    "name": "BondCreated",
     "anonymous": false,
     "inputs": [
-      { "name": "from",    "type": "address", "indexed": true },
-      { "name": "to",      "type": "address", "indexed": true },
-      { "name": "tokenId", "type": "uint256", "indexed": true }
+      { "name": "account", "type": "address", "indexed": true },
+      { "name": "nftId",   "type": "uint256", "indexed": true },
+      { "name": "poolId",  "type": "uint16",  "indexed": true },
+      { "name": "amount",  "type": "uint256", "indexed": false }
     ]
+  },
+  {
+    "type": "function",
+    "name": "increaseBond",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "name": "tokenId", "type": "uint256" },
+      { "name": "amount",  "type": "uint256" }
+    ],
+    "outputs": []
   }
 ]
