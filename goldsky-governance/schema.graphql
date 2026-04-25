@@ -1,12 +1,22 @@
-type BondTimeMarkerSnapshot @entity(immutable: true) {
+type NftTransferEvent @entity(immutable: true) {
   id: ID!
-  nftId: BigInt!
-  timeMarker: BigInt!
-  amount: BigDecimal!
-  poolId: Int!
-  amountAdded: BigDecimal!
+  tokenId: BigInt!
+  from: Bytes!
+  to: Bytes!
+  isMint: Boolean!
   date: String!
   blockNumber: BigInt!
   timestamp: BigInt!
   txHash: Bytes!
+}
+
+type BondOwner @entity(immutable: false) {
+  id: ID!
+  tokenId: BigInt!
+  owner: Bytes!
+  mintDate: String!
+  mintTimestamp: BigInt!
+  lastTransferDate: String!
+  lastTransferTimestamp: BigInt!
+  transferCount: Int!
 }
