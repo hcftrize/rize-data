@@ -1,7 +1,10 @@
-type BondBrokenEvent @entity(immutable: true) {
+type BondTimeMarkerSnapshot @entity(immutable: true) {
   id: ID!
   nftId: BigInt!
+  timeMarker: BigInt!
   amount: BigDecimal!
+  poolId: Int!
+  amountAdded: BigDecimal!
   date: String!
   blockNumber: BigInt!
   timestamp: BigInt!
