@@ -65,7 +65,7 @@ def parse_md_header(text):
             continue
         if ":" in s:
             key, _, val = s.partition(":")
-            key = key.strip().lower().rstrip("(s)")
+            key = key.strip().lower()
             val = val.strip()
             if key and val:
                 result[key] = val
