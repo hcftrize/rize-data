@@ -843,6 +843,22 @@
     "logo_local": "logos\\cc-view.svg"
   },
   {
+    "name": "CCTools",
+    "slug": "cctools",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69ea880d24a5b98c30a4605a_6b854ef3-6b35-4fca-8101-b559079a96c0.png",
+    "short_desc": "The all-in-one hub for Canton Networt - ecosystem, portfolio, earn, governance, analytics and more.",
+    "tags": [
+      "APPS (ALL)",
+      "SERVICE PROVIDER",
+      "DATA & ANALYTICS",
+      "DEVELOPER TOOLS",
+      "Network Utilities\nDATA & ANALYTICSDEVELOPER TOOLS",
+      "Roles\nAPPS (ALL)SERVICE PROVIDER\nAPPS (ALL)SERVICE PROVIDER"
+    ],
+    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nCCTools\nhttps://cctools.network\nCCTools is the leading community platform for the Canton Network. It brings together everything Canton users and builders need in one place. Core features: Ecosystem Directory (450+ projects, apps and validators), Portfolio Tracker (live wallet data, P&L, transfers), Earn Hub (partner campaigns with XP and badge rewards), Governance (on-chain proposals, Super Validator votes, price consensus rounds), Network Stats (throughput, burn/mint, halving countdown), Calculator (modeled returns for app builders, validators, and CC holders), Academy (learning paths, guides, educational content), News (live Canton ecosystem updates), DevTools & GitHub Hub, and a Leaderboard system with reputation. With 23,000+ registered users, a 53% return rate, and a Canton Protocol Development Fund grant approved in April 2026, CCTools is the reference point for the Canton ecosystem community. Partners include Send, Temple Digital, CantonScan, Cancore, RootsFi, and Nuxaris.\nNetwork Utilities\nDATA & ANALYTICSDEVELOPER TOOLS\nRoles\nAPPS (ALL)SERVICE PROVIDER\nAPPS (ALL)SERVICE PROVIDER",
+    "logo_local": "logos\\cctools.png"
+  },
+  {
     "name": "Chain Experts",
     "slug": "chain-experts",
     "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69a515d5d122a24fb97b608d_chain-expters-icon.png",
