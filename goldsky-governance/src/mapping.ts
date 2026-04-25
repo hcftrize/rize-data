@@ -1,17 +1,8 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import {
-  PoolUpdated as PoolUpdatedEvent,
-  ReleaseWarmupUpdated as ReleaseWarmupUpdatedEvent,
-  MigratorAdded as MigratorAddedEvent,
-  MigratorRemoved as MigratorRemovedEvent,
-} from "../generated/GovernanceBonding/GovernanceBonding";
-import {
-  Pool,
-  PoolUpdatedEvent as PoolUpdatedEntity,
-  ReleaseWarmupUpdatedEvent as ReleaseWarmupUpdatedEntity,
-  MigratorAddedEvent as MigratorAddedEntity,
-  MigratorRemovedEvent as MigratorRemovedEntity,
-} from "../generated/schema";
+import { BigDecimal } from "@graphprotocol/graph-ts";
+import { BondBroken as BondBrokenEvent } from "../generated/GovernanceBonding/GovernanceBonding";
+import { BondBrokenEvent as BondBrokenEntity } from "../generated/schema";
+
+let DECIMALS = BigDecimal.fromString("1000000000000000000");
 
 function isLeapYear(year: i32): bool {
   return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
@@ -36,60 +27,13 @@ function tsToDateStr(ts: i64): string {
   return y.toString() + "-" + mm + "-" + dd;
 }
 
-export function handlePoolUpdated(event: PoolUpdatedEvent): void {
-  let dateStr = tsToDateStr(event.block.timestamp.toI64());
-  let poolId  = event.params.poolId as i32;
-
-  let pool = Pool.load(poolId.toString());
-  if (pool == null) {
-    pool = new Pool(poolId.toString());
-    pool.poolId = poolId;
-  }
-  pool.baseWeight         = BigInt.fromString(event.params.baseWeight.toString());
-  pool.maturedWeightBonus = BigInt.fromString(event.params.maturedWeightBonus.toString());
-  pool.fullMaturity       = event.params.fullMaturity;
-  pool.updatedAtDate      = dateStr;
-  pool.updatedAtTimestamp = event.block.timestamp;
-  pool.save();
-
-  let ev                  = new PoolUpdatedEntity(event.transaction.hash.toHex() + "-" + event.logIndex.toString());
-  ev.poolId               = poolId;
-  ev.baseWeight           = BigInt.fromString(event.params.baseWeight.toString());
-  ev.maturedWeightBonus   = BigInt.fromString(event.params.maturedWeightBonus.toString());
-  ev.fullMaturity         = event.params.fullMaturity;
-  ev.date                 = dateStr;
-  ev.blockNumber          = event.block.number;
-  ev.timestamp            = event.block.timestamp;
-  ev.txHash               = event.transaction.hash;
-  ev.save();
-}
-
-export function handleReleaseWarmupUpdated(event: ReleaseWarmupUpdatedEvent): void {
-  let ev      = new ReleaseWarmupUpdatedEntity(event.transaction.hash.toHex() + "-" + event.logIndex.toString());
-  ev.value    = event.params.value;
-  ev.date     = tsToDateStr(event.block.timestamp.toI64());
+export function handleBondBroken(event: BondBrokenEvent): void {
+  let ev         = new BondBrokenEntity(event.transaction.hash.toHex() + "-" + event.logIndex.toString());
+  ev.nftId       = event.params.nftId;
+  ev.amount      = event.params.amount.toBigDecimal().div(DECIMALS);
+  ev.date        = tsToDateStr(event.block.timestamp.toI64());
   ev.blockNumber = event.block.number;
   ev.timestamp   = event.block.timestamp;
   ev.txHash      = event.transaction.hash;
-  ev.save();
-}
-
-export function handleMigratorAdded(event: MigratorAddedEvent): void {
-  let ev        = new MigratorAddedEntity(event.transaction.hash.toHex() + "-" + event.logIndex.toString());
-  ev.migrator   = event.params.migrator;
-  ev.date       = tsToDateStr(event.block.timestamp.toI64());
-  ev.blockNumber   = event.block.number;
-  ev.timestamp     = event.block.timestamp;
-  ev.txHash        = event.transaction.hash;
-  ev.save();
-}
-
-export function handleMigratorRemoved(event: MigratorRemovedEvent): void {
-  let ev        = new MigratorRemovedEntity(event.transaction.hash.toHex() + "-" + event.logIndex.toString());
-  ev.migrator   = event.params.migrator;
-  ev.date       = tsToDateStr(event.block.timestamp.toI64());
-  ev.blockNumber   = event.block.number;
-  ev.timestamp     = event.block.timestamp;
-  ev.txHash        = event.transaction.hash;
   ev.save();
 }
