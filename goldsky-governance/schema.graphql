@@ -1,22 +1,35 @@
-type NftTransferEvent @entity(immutable: true) {
+type BondCreatedEvent @entity(immutable: true) {
   id: ID!
-  tokenId: BigInt!
-  from: Bytes!
-  to: Bytes!
-  isMint: Boolean!
+  nftId: BigInt!
+  owner: Bytes!
+  poolId: Int!
+  amount: BigDecimal!
   date: String!
   blockNumber: BigInt!
   timestamp: BigInt!
   txHash: Bytes!
 }
 
-type BondOwner @entity(immutable: false) {
+type IncreaseBondEvent @entity(immutable: true) {
   id: ID!
-  tokenId: BigInt!
+  nftId: BigInt!
+  amount: BigDecimal!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type Bond @entity(immutable: false) {
+  id: ID!
+  nftId: BigInt!
   owner: Bytes!
-  mintDate: String!
-  mintTimestamp: BigInt!
-  lastTransferDate: String!
-  lastTransferTimestamp: BigInt!
-  transferCount: Int!
+  poolId: Int!
+  createdAtDate: String!
+  createdAtTimestamp: BigInt!
+  createdAtBlock: BigInt!
+  totalDeposited: BigDecimal!
+  increaseCount: Int!
+  lastDepositDate: String!
+  lastDepositTimestamp: BigInt!
 }
