@@ -65,9 +65,9 @@ export function handleVestingUpdated(event: VestingUpdatedEvent): void {
   let ev      = new VestingUpdatedEntity(event.transaction.hash.toHex() + "-" + event.logIndex.toString());
   ev.nftId    = event.params.nftId;
   ev.amount   = event.params.amount.toBigDecimal().div(DECIMALS);
-  ev.cliff    = BigInt.fromI32(event.params.cliff as i32);
-  ev.vesting  = BigInt.fromI32(event.params.vesting as i32);
-  ev.start    = BigInt.fromI32(event.params.start as i32);
+  ev.cliff    = BigInt.fromString(event.params.cliff.toString());
+  ev.vesting  = BigInt.fromString(event.params.vesting.toString());
+  ev.start    = BigInt.fromString(event.params.start.toString());
   ev.date     = tsToDateStr(event.block.timestamp.toI64());
   ev.blockNumber = event.block.number;
   ev.timestamp   = event.block.timestamp;
