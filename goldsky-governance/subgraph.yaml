@@ -14,11 +14,11 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - BondBrokenEvent
+        - BondTimeMarkerSnapshot
       abis:
         - name: GovernanceBonding
           file: ./abis/GovernanceBonding.json
-      eventHandlers:
-        - event: BondBroken(indexed uint256,uint256)
-          handler: handleBondBroken
+      callHandlers:
+        - function: increaseBond(uint256,uint256)
+          handler: handleIncreaseBond
       file: ./src/mapping.ts
