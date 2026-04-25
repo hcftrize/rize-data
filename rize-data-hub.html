@@ -4028,7 +4028,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   async function convFetchUnbondingQueue() {
     // Fetch BondBroken events from last 7 days directly from Goldsky — live, no quota issues.
     // Events older than 7 days are excluded (unlocking period passed, tokens released).
-    const GOLDSKY_URL = 'https://api.goldsky.com/api/public/project_cmoa6u5wk3kx201y4g3s52z77/subgraphs/tokerize-bond-broken/1.1.0/gn';
+    const GOLDSKY_URL = 'https://api.goldsky.com/api/public/project_cmoa6u5wk3kx201y4g3s52z77/subgraphs/tokerize-bond-broken/1.0.0/gn';
     const cutoff = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
     const query = JSON.stringify({ query: `{ bondBrokens(first: 1000, orderBy: timestamp, orderDirection: desc, where: { date_gte: "${cutoff}" }) { id amount date } }` });
     try {
@@ -4044,7 +4044,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   }
 
   // ── Goldsky URL (v1.1.0 — indexes from genesis) ───────────
-  const CONV_GOLDSKY_URL = 'https://api.goldsky.com/api/public/project_cmoa6u5wk3kx201y4g3s52z77/subgraphs/tokerize-bond-broken/1.1.0/gn';
+  const CONV_GOLDSKY_URL = 'https://api.goldsky.com/api/public/project_cmoa6u5wk3kx201y4g3s52z77/subgraphs/tokerize-bond-broken/1.0.0/gn';
 
   // ── Unbonding Queue — load from pre-built JSON (fast) ────────
   // JSON is updated daily by GitHub Action (scrape_unbonding.py)
