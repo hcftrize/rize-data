@@ -1,11 +1,23 @@
 [
   {
-    "type": "event",
-    "name": "BondBroken",
-    "anonymous": false,
+    "type": "function",
+    "name": "increaseBond",
+    "stateMutability": "nonpayable",
     "inputs": [
-      { "name": "nftId",  "type": "uint256", "indexed": true  },
-      { "name": "amount", "type": "uint256", "indexed": false }
+      { "name": "tokenId", "type": "uint256" },
+      { "name": "amount",  "type": "uint256" }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "getBond",
+    "stateMutability": "view",
+    "inputs":  [{ "name": "bondId", "type": "uint256" }],
+    "outputs": [
+      { "name": "timeMarker", "type": "uint256" },
+      { "name": "amount",     "type": "uint256" },
+      { "name": "poolId",     "type": "uint16"  }
     ]
   }
 ]
