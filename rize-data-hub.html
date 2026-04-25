@@ -2657,9 +2657,12 @@ html, body { overflow-x: hidden; max-width: 100%; }
         fully_diluted_valuation: fdv,
         circulating_supply:     supply,
         price_change_percentage_24h: pct24h,
+        total_volume:           liveVolume24h,
         ath, ath_date,
         market_cap_rank: rank,
       } = main;
+      // Store live 24h volume globally for volume panel
+      window._rzLiveVolume24h = liveVolume24h || null;
 
       const daysSinceAth = ath_date
         ? Math.floor((Date.now() - new Date(ath_date)) / (1000 * 60 * 60 * 24))
@@ -3691,7 +3694,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const labels  = [];
       const volumes = [];
       const rawDays = [];
-      series.forEach(p => {
+      // Exclude today's point — volume is only complete at 00:15 UTC next day
+      const todayUTC = new Date().toISOString().slice(0, 10);
+      const filteredSeries = series.filter(p => p.date < todayUTC);
+      filteredSeries.forEach(p => {
         const d = new Date(p.date + 'T00:00:00Z');
         labels.push(d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" }));
         volumes.push(p.volume);
@@ -3723,12 +3729,18 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const setKpi = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
       const setStyle = (id, col) => { const el = document.getElementById(id); if (el) el.style.color = col; };
 
-      setKpi("rz-vol-24h",      rzVolFmt(last));
+      // 24H Volume: use live CoinGecko value if available
+      const live24h = window._rzLiveVolume24h || last;
+      setKpi("rz-vol-24h",      rzVolFmt(live24h));
       setStyle("rz-vol-24h",    "#7ee0ff");
       const subEl24h = document.getElementById("rz-vol-24h-sub");
       if (subEl24h) {
-        subEl24h.innerHTML = `<span style="font-size:13px;font-family:'Rajdhani',sans-serif;font-weight:700">${arrow} ${Math.abs(pctChg).toFixed(2)}%</span>`;
-        subEl24h.style.color = pctCol;
+        // pctChg vs yesterday from JSON
+        const pctChgLive = prev ? ((live24h - prev) / prev) * 100 : 0;
+        const arrowLive  = pctChgLive >= 0 ? "▲" : "▼";
+        const pctColLive = pctChgLive >= 0 ? "#98ffb6" : "var(--pink)";
+        subEl24h.innerHTML = `<span style="font-size:13px;font-family:'Rajdhani',sans-serif;font-weight:700">${arrowLive} ${Math.abs(pctChgLive).toFixed(2)}%</span>`;
+        subEl24h.style.color = pctColLive;
       }
       setKpi("rz-vol-1w",  rzVolFmt(avgLast(7)));
       setStyle("rz-vol-1w", "var(--muted)");
@@ -4028,7 +4040,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   async function convFetchUnbondingQueue() {
     // Fetch BondBroken events from last 7 days directly from Goldsky — live, no quota issues.
     // Events older than 7 days are excluded (unlocking period passed, tokens released).
-    const GOLDSKY_URL = 'https://api.goldsky.com/api/public/project_cmoa6u5wk3kx201y4g3s52z77/subgraphs/tokerize-bond-broken/1.0.0/gn';
+    const GOLDSKY_URL = 'https://api.goldsky.com/api/public/project_cmoa6u5wk3kx201y4g3s52z77/subgraphs/tokerize-bond-broken/1.1.0/gn';
     const cutoff = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
     const query = JSON.stringify({ query: `{ bondBrokens(first: 1000, orderBy: timestamp, orderDirection: desc, where: { date_gte: "${cutoff}" }) { id amount date } }` });
     try {
@@ -4044,7 +4056,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   }
 
   // ── Goldsky URL (v1.1.0 — indexes from genesis) ───────────
-  const CONV_GOLDSKY_URL = 'https://api.goldsky.com/api/public/project_cmoa6u5wk3kx201y4g3s52z77/subgraphs/tokerize-bond-broken/1.0.0/gn';
+  const CONV_GOLDSKY_URL = 'https://api.goldsky.com/api/public/project_cmoa6u5wk3kx201y4g3s52z77/subgraphs/tokerize-bond-broken/1.1.0/gn';
 
   // ── Unbonding Queue — load from pre-built JSON (fast) ────────
   // JSON is updated daily by GitHub Action (scrape_unbonding.py)
