@@ -14,21 +14,11 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Pool
-        - PoolUpdatedEvent
-        - ReleaseWarmupUpdatedEvent
-        - MigratorAddedEvent
-        - MigratorRemovedEvent
+        - BondBrokenEvent
       abis:
         - name: GovernanceBonding
           file: ./abis/GovernanceBonding.json
       eventHandlers:
-        - event: PoolUpdated(indexed uint16,uint32,uint32,uint128)
-          handler: handlePoolUpdated
-        - event: ReleaseWarmupUpdated(uint256)
-          handler: handleReleaseWarmupUpdated
-        - event: MigratorAdded(indexed address)
-          handler: handleMigratorAdded
-        - event: MigratorRemoved(indexed address)
-          handler: handleMigratorRemoved
+        - event: BondBroken(indexed uint256,uint256)
+          handler: handleBondBroken
       file: ./src/mapping.ts
