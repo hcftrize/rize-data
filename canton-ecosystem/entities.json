@@ -843,6 +843,22 @@
     "logo_local": "logos\\cc-view.svg"
   },
   {
+    "name": "CCTools",
+    "slug": "cctools",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69ea880d24a5b98c30a4605a_6b854ef3-6b35-4fca-8101-b559079a96c0.png",
+    "short_desc": "The all-in-one hub for Canton Networt - ecosystem, portfolio, earn, governance, analytics and more.",
+    "tags": [
+      "APPS (ALL)",
+      "SERVICE PROVIDER",
+      "DATA & ANALYTICS",
+      "DEVELOPER TOOLS",
+      "Network Utilities\nDATA & ANALYTICSDEVELOPER TOOLS",
+      "Roles\nAPPS (ALL)SERVICE PROVIDER\nAPPS (ALL)SERVICE PROVIDER"
+    ],
+    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nCCTools\nhttps://cctools.network\nCCTools is the leading community platform for the Canton Network. It brings together everything Canton users and builders need in one place. Core features: Ecosystem Directory (450+ projects, apps and validators), Portfolio Tracker (live wallet data, P&L, transfers), Earn Hub (partner campaigns with XP and badge rewards), Governance (on-chain proposals, Super Validator votes, price consensus rounds), Network Stats (throughput, burn/mint, halving countdown), Calculator (modeled returns for app builders, validators, and CC holders), Academy (learning paths, guides, educational content), News (live Canton ecosystem updates), DevTools & GitHub Hub, and a Leaderboard system with reputation. With 23,000+ registered users, a 53% return rate, and a Canton Protocol Development Fund grant approved in April 2026, CCTools is the reference point for the Canton ecosystem community. Partners include Send, Temple Digital, CantonScan, Cancore, RootsFi, and Nuxaris.\nNetwork Utilities\nDATA & ANALYTICSDEVELOPER TOOLS\nRoles\nAPPS (ALL)SERVICE PROVIDER\nAPPS (ALL)SERVICE PROVIDER",
+    "logo_local": "logos\\cctools.png"
+  },
+  {
     "name": "Chain Experts",
     "slug": "chain-experts",
     "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69a515d5d122a24fb97b608d_chain-expters-icon.png",
@@ -3185,6 +3201,42 @@
     ],
     "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nOliver Wyman\nhttps://www.oliverwyman.com\n\nIndustry-leading consultancy Oliver Wyman has supported a number of organizations in their creation of solutions for Canton Network and is a founding organization. Oliver Wyman supports the Canton Network with consultancy, application design and validation.\n\nNetwork Utilities\nDEVELOPER TOOLSTOKENIZED ASSETS\nRoles\nSERVICE PROVIDER\nSERVICE PROVIDER",
     "logo_local": "logos\\oliver-wyman.svg"
+  },
+  {
+    "name": "OneSwap",
+    "slug": "oneswap",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69ea21aa8ca9b3831d4c52c0_e4d149d6-0d44-4be4-8bbf-de67b5e2c68a.png",
+    "short_desc": "Permissionless AMM DEX for fast CIP56 token swaps on Canton. Trade, provide liquidity, earn.",
+    "tags": [
+      "APPS (ALL)",
+      "APPS (FEATURED)",
+      "VALIDATOR",
+      "DEVELOPER TOOLS",
+      "EXCHANGES",
+      "FINANCING",
+      "Network Utilities\nDEVELOPER TOOLSEXCHANGESFINANCINGLIQUIDITY",
+      "LIQUIDITY",
+      "Roles\nAPPS (ALL)APPS (FEATURED)VALIDATOR\nAPPS (ALL)APPS (FEATURED)VALIDATOR"
+    ],
+    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nOneSwap\nhttps://oneswap.cc\nOneSwap is a permissionless automated market maker (AMM) DEX natively built on the Canton Network by Sats Terminal. Designed for both retail and institutional users, OneSwap enables seamless, non-custodial swapping of Canton-native assets, including CC/USDCx, CC/cBTC, and other CIP56 pools with transparent on-chain pricing. Liquidity providers can deposit assets into pools and earn fees from every swap.\nNetwork Utilities\nDEVELOPER TOOLSEXCHANGESFINANCINGLIQUIDITY\nRoles\nAPPS (ALL)APPS (FEATURED)VALIDATOR\nAPPS (ALL)APPS (FEATURED)VALIDATOR",
+    "logo_local": "logos\\oneswap.png"
+  },
+  {
+    "name": "onRails",
+    "slug": "onrails",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69ea01c22ef67a8db734377b_0ffd792e-dc9d-45ae-9571-b8dec909fda0.jpeg",
+    "short_desc": "Issuance infrastructure for Canton; providers of cETH, 1:1 backed Ethereum",
+    "tags": [
+      "APPS (ALL)",
+      "APPS (FEATURED)",
+      "CANTON FOUNDATION MEMBER",
+      "TOKENIZED ASSETS",
+      "Network Utilities\nTOKENIZED ASSETS",
+      "Roles\nAPPS (ALL)APPS (FEATURED)CANTON FOUNDATION MEMBERVALIDATOR\nAPPS (ALL)APPS (FEATURED)CANTON FOUNDATION MEMBERVALIDATOR",
+      "VALIDATOR"
+    ],
+    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nonRails\nhttps://www.onrails.finance\nonRails builds issuance infrastructure for Canton Network. Its full asset pipeline gives institutions explicit finality and policy enforcement at every step. cETH is its first product: Ethereum on Canton, 1:1 backed by ETH in custody with reserves verifiable on-chain. No rehypothecation. CIP-56 compliant, enabling atomic composability with other Canton assets, including USDCx. Built for trading, lending, and settlement across institutional markets.\nNetwork Utilities\nTOKENIZED ASSETS\nRoles\nAPPS (ALL)APPS (FEATURED)CANTON FOUNDATION MEMBERVALIDATOR\nAPPS (ALL)APPS (FEATURED)CANTON FOUNDATION MEMBERVALIDATOR",
+    "logo_local": "logos\\onrails.jpeg"
   },
   {
     "name": "Ownera",
