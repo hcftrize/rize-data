@@ -1152,6 +1152,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <option value="burns">RIZE Burns</option>
           <option value="mcap">RIZE MCap &amp; TVL</option>
           <option value="volume">RIZE Volume</option>
+          <option value="depth">RIZE Market Depth</option>
           <option value="tokenomics">RIZE Tokenomics</option>
         </select>
       </div>
@@ -1163,6 +1164,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <button class="ctx-tab" onclick="rzCtxSwitch('burns',this)">RIZE Burns</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('mcap',this)">RIZE MCap &amp; TVL</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('volume',this)">RIZE Volume</button>
+        <button class="ctx-tab" onclick="rzCtxSwitch('depth',this)">RIZE Market Depth</button>
         <button class="ctx-tab" onclick="rzCtxSwitch('tokenomics',this)">RIZE Tokenomics</button>
       </div>
 
@@ -1420,31 +1422,41 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <!-- Panel — RIZE MCap & TVL -->
       <div class="ctx-panel" id="rz-panel-mcap">
 
-        <!-- Chart header: label left, buttons+subbtn in column on right -->
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
-          <div id="rz-mcap-chart-label" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;flex:1;padding-top:4px">Market Cap</div>
-          <div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px">
-            <div class="conv-toggle-row" style="margin-bottom:0">
-              <button class="conv-toggle active" id="rz-mcap-btn-mcap" onclick="rzMcapSwitch('mcap',this)">Display MCap</button>
-              <button class="conv-toggle" id="rz-mcap-btn-fdv" onclick="rzMcapSwitch('fdv',this)">Display FDV</button>
-              <button class="conv-toggle" id="rz-mcap-btn-tvl" onclick="rzMcapSwitch('tvl',this)">Display TVL</button>
-              <button class="conv-toggle" id="rz-mcap-btn-both" onclick="rzMcapSwitch('both',this)">MCap + FDV</button>
-            </div>
-            <!-- Sub-btn appears below first button, left-aligned in same column -->
-            <div id="rz-ratio-row" style="display:none">
-              <button class="conv-toggle" id="rz-tvl-btn-mcap" onclick="rzTvlSwitch('mcap',this)" style="display:none">MCap / TVL</button>
-              <button class="conv-toggle" id="rz-tvl-btn-fdv" onclick="rzTvlSwitch('fdv',this)" style="display:none">FDV / TVL</button>
-            </div>
+        <!-- Chart header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+          <div id="rz-mcap-chart-label" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;flex:1">Market Cap</div>
+          <div class="conv-toggle-row" style="margin-bottom:0" id="rz-mcap-main-btns">
+            <button class="conv-toggle active" id="rz-mcap-btn-mcap" onclick="rzMcapSwitch('mcap',this)">Display MCap</button>
+            <button class="conv-toggle" id="rz-mcap-btn-fdv" onclick="rzMcapSwitch('fdv',this)">Display FDV</button>
+            <button class="conv-toggle" id="rz-mcap-btn-tvl" onclick="rzMcapSwitch('tvl',this)">Display TVL</button>
+            <button class="conv-toggle" id="rz-mcap-btn-both" onclick="rzMcapSwitch('both',this)">MCap + FDV</button>
           </div>
         </div>
 
-        <!-- Single chart area -->
-        <div class="ctx-chart-wrap" style="height:280px">
+        <!-- Main chart -->
+        <div class="ctx-chart-wrap" style="height:260px">
           <div class="ctx-loading" id="rz-mcap-loading-1">Loading market data&hellip;</div>
           <canvas id="rz-chart-mcap" style="display:none"></canvas>
         </div>
 
-        <!-- KPI rows -->
+        <!-- Sub-ratio toggle — shown conditionally -->
+        <div id="rz-ratio-row" style="display:none;justify-content:flex-end;margin-top:10px;margin-bottom:6px">
+          <div class="conv-toggle-row" style="margin-bottom:0">
+            <button class="conv-toggle active" id="rz-tvl-btn-mcap" onclick="rzTvlSwitch('mcap',this)" style="font-size:11px;padding:4px 10px">MCap / TVL</button>
+            <button class="conv-toggle" id="rz-tvl-btn-fdv" onclick="rzTvlSwitch('fdv',this)" style="font-size:11px;padding:4px 10px">FDV / TVL</button>
+          </div>
+        </div>
+
+        <!-- Ratio chart — hidden by default -->
+        <div id="rz-tvl-wrap" style="display:none">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;margin-bottom:6px" id="rz-tvl-chart-label">MCap / TVL Ratio</div>
+          <div class="ctx-chart-wrap" style="height:200px">
+            <div class="ctx-loading" id="rz-mcap-loading-2" style="display:none"></div>
+            <canvas id="rz-chart-tvl" style="display:none"></canvas>
+          </div>
+        </div>
+
+        <!-- KPI row -->
         <div class="conv-sep" style="margin-top:16px"></div>
         <div class="conv-section-title" style="margin-top:12px">Market Stats</div>
         <div class="ctx-kpi-row">
@@ -1466,12 +1478,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div class="ctx-kpi">
             <span class="ctx-kpi-label">MCap / TVL</span>
             <span class="ctx-kpi-value" id="rz-mcap-tvl-now" style="color:#c77dff">—</span>
-            <span class="conv-delta-sub" id="rz-mcap-tvl-status">&nbsp;</span>
           </div>
           <div class="ctx-kpi">
             <span class="ctx-kpi-label">FDV / TVL</span>
             <span class="ctx-kpi-value" id="rz-fdv-tvl-now" style="color:#ff8ad8">—</span>
-            <span class="conv-delta-sub" id="rz-fdv-tvl-status">&nbsp;</span>
           </div>
         </div>
         <div class="ctx-kpi-row" style="margin-top:8px">
@@ -1545,6 +1555,90 @@ html, body { overflow-x: hidden; max-width: 100%; }
             <span class="ctx-kpi-label">24H Volume ATH</span>
             <span class="ctx-kpi-value" id="rz-vol-ath">—</span>
             <span class="conv-delta-sub" id="rz-vol-ath-date">&nbsp;</span>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Panel — RIZE Market Depth -->
+      <div class="ctx-panel" id="rz-panel-depth">
+
+        <!-- Header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+          <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);flex:1">Order Book Depth — Kraken</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="conv-toggle-row" style="margin-bottom:0">
+              <button class="conv-toggle active" id="rz-depth-btn-usd" onclick="rzDepthSwitch('usd',this)">RIZE / USD</button>
+              <button class="conv-toggle" id="rz-depth-btn-eur" onclick="rzDepthSwitch('eur',this)">RIZE / EUR</button>
+              <button class="conv-toggle" id="rz-depth-btn-both" onclick="rzDepthSwitch('both',this)">USD + EUR</button>
+            </div>
+            <button id="rz-depth-refresh" onclick="rzDepthRefresh()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.15);padding:5px 14px;cursor:pointer;white-space:nowrap;transition:background 0.15s">&#8635; Refresh</button>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="ctx-chart-wrap" style="height:280px">
+          <div class="ctx-loading" id="rz-depth-loading">Loading order book&hellip;</div>
+          <canvas id="rz-chart-depth" style="display:none"></canvas>
+        </div>
+
+        <!-- Last updated -->
+        <div style="text-align:right;font-family:'Rajdhani',sans-serif;font-size:11px;color:rgba(255,255,255,0.25);margin-top:4px" id="rz-depth-ts"></div>
+
+        <!-- KPIs -->
+        <div class="conv-sep" style="margin-top:12px"></div>
+        <div class="conv-section-title" style="margin-top:12px">Market Depth Stats</div>
+        <div class="ctx-kpi-row">
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">Mid Price</span>
+            <span class="ctx-kpi-value" id="rz-depth-mid" style="color:#7ee0ff">—</span>
+          </div>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">Spread</span>
+            <span class="ctx-kpi-value" id="rz-depth-spread" style="color:var(--muted)">—</span>
+            <span class="conv-delta-sub" id="rz-depth-spread-pct">&nbsp;</span>
+          </div>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">Bid Wall (top)</span>
+            <span class="ctx-kpi-value" id="rz-depth-bid-wall" style="color:#98ffb6">—</span>
+            <span class="conv-delta-sub" id="rz-depth-bid-wall-price">&nbsp;</span>
+          </div>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">Ask Wall (top)</span>
+            <span class="ctx-kpi-value" id="rz-depth-ask-wall" style="color:var(--pink)">—</span>
+            <span class="conv-delta-sub" id="rz-depth-ask-wall-price">&nbsp;</span>
+          </div>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">Bid/Ask Ratio</span>
+            <span class="ctx-kpi-value" id="rz-depth-ratio" style="color:#ffd36b">—</span>
+            <span class="conv-delta-sub" id="rz-depth-ratio-sub">&nbsp;</span>
+          </div>
+        </div>
+        <div class="ctx-kpi-row" style="margin-top:8px">
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">Total Bids ±2%</span>
+            <span class="ctx-kpi-value" id="rz-depth-bids-rize" style="color:#98ffb6">—</span>
+            <span class="conv-delta-sub" id="rz-depth-bids-usd">&nbsp;</span>
+          </div>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">Total Asks ±2%</span>
+            <span class="ctx-kpi-value" id="rz-depth-asks-rize" style="color:var(--pink)">—</span>
+            <span class="conv-delta-sub" id="rz-depth-asks-usd">&nbsp;</span>
+          </div>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">$10k Market Buy → Price</span>
+            <span class="ctx-kpi-value" id="rz-depth-impact-10k" style="color:#c77dff">—</span>
+            <span class="conv-delta-sub" id="rz-depth-impact-10k-sub">&nbsp;</span>
+          </div>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">$50k Market Buy → Price</span>
+            <span class="ctx-kpi-value" id="rz-depth-impact-50k" style="color:#ff8ad8">—</span>
+            <span class="conv-delta-sub" id="rz-depth-impact-50k-sub">&nbsp;</span>
+          </div>
+          <div class="ctx-kpi">
+            <span class="ctx-kpi-label">$100k Market Buy → Price</span>
+            <span class="ctx-kpi-value" id="rz-depth-impact-100k" style="color:#ffd36b">—</span>
+            <span class="conv-delta-sub" id="rz-depth-impact-100k-sub">&nbsp;</span>
           </div>
         </div>
       </div>
@@ -4712,9 +4806,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     (function() {
       const MCAP_URL = 'https://raw.githubusercontent.com/hcftrize/TOKERIZE/main/rize-data-hub/mcap-history.json';
       let _series    = [];
-      let _chart     = null;  // single chart instance
-      let _mcapMode  = 'mcap';   // mcap | fdv | tvl | both
-      let _subMode   = null;     // null = show main metric, 'ratio' = show ratio
+      let _mcapChart = null;
+      let _tvlChart  = null;
+      let _mcapMode  = 'mcap';
+      let _tvlMode   = 'mcap';
       let _loaded    = false;
 
       function fmtM(v) {
@@ -4730,19 +4825,12 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         const col = p >= 0 ? '#98ffb6' : 'var(--pink)';
         return `<span style="color:${col};font-size:13px;font-family:'Rajdhani',sans-serif;font-weight:700">${p>=0?'▲':'▼'} ${Math.abs(p).toFixed(2)}%</span>`;
       }
-      function valuationBadge(ratio) {
-        if (!ratio || ratio === 0) return '';
-        if (ratio < 0.95)  return '<span style="color:#98ffb6;font-weight:700">▼ UNDERVALUED</span>';
-        if (ratio <= 1.05) return '<span style="color:#ffd36b;font-weight:700">● FAIR VALUE</span>';
-        return '<span style="color:var(--pink);font-weight:700">▲ OVERVALUED</span>';
-      }
 
-      // Trim leading points with no data — start chart at first real data point
+      // Only use series points that have data — trim leading nulls
       function getActiveSeries() {
-        // Start at first point that has mcap — avoids TVL-only points before genesis
         let start = 0;
         for (let i = 0; i < _series.length; i++) {
-          if (_series[i].mcap && _series[i].mcap > 0) { start = i; break; }
+          if (_series[i].mcap || _series[i].tvl) { start = i; break; }
         }
         return _series.slice(start);
       }
@@ -4754,81 +4842,77 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         });
       }
 
-      function buildChart() {
-        const series = getActiveSeries();
-        const labels = mkLabels(series);
+      function buildMcapChart() {
+        const series   = getActiveSeries();
+        const labels   = mkLabels(series);
+        const dataMcap = series.map(p => p.mcap || null);
+        const dataFdv  = series.map(p => p.fdv  || null);
+        const dataTvl  = series.map(p => p.tvl  || null);
+
         let datasets = [];
-
-        // Determine what the chart actually shows:
-        // _subMode: null = main metric, 'ratio' = ratio replaces main metric
-        const showRatio = (_subMode === 'ratio');
-
-        if (_mcapMode === 'mcap') {
-          if (showRatio) {
-            // Full chart replaced by MCap/TVL ratio
-            datasets.push({ label:'MCap / TVL', data:series.map(p=>p.mcap_tvl||null), borderColor:'#c77dff', backgroundColor:'rgba(199,125,255,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true });
-          } else {
-            datasets.push({ label:'Market Cap', data:series.map(p=>p.mcap||null), borderColor:'#7ee0ff', backgroundColor:'rgba(126,224,255,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true });
-          }
-        } else if (_mcapMode === 'fdv') {
-          if (showRatio) {
-            // Full chart replaced by FDV/TVL ratio
-            datasets.push({ label:'FDV / TVL', data:series.map(p=>p.fdv_tvl||null), borderColor:'#ff8ad8', backgroundColor:'rgba(255,138,216,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true });
-          } else {
-            datasets.push({ label:'FDV', data:series.map(p=>p.fdv||null), borderColor:'#ffd36b', backgroundColor:'rgba(255,211,107,0.07)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true });
-          }
-        } else if (_mcapMode === 'tvl') {
-          datasets.push({ label:'TVL', data:series.map(p=>p.tvl||null), borderColor:'#98ffb6', backgroundColor:'rgba(152,255,182,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true });
-        } else {
-          datasets.push({ label:'Market Cap', data:series.map(p=>p.mcap||null), borderColor:'#7ee0ff', backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:0.3, fill:false, spanGaps:true });
-          datasets.push({ label:'FDV', data:series.map(p=>p.fdv||null), borderColor:'#ffd36b', backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:0.3, fill:false, spanGaps:true });
+        if (_mcapMode === 'mcap' || _mcapMode === 'both') {
+          datasets.push({ label:'Market Cap', data:dataMcap, borderColor:'#7ee0ff', backgroundColor:'rgba(126,224,255,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:_mcapMode==='mcap', spanGaps:true });
+        }
+        if (_mcapMode === 'fdv' || _mcapMode === 'both') {
+          datasets.push({ label:'FDV', data:dataFdv, borderColor:'#ffd36b', backgroundColor:'rgba(255,211,107,0.06)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:_mcapMode==='fdv', spanGaps:true });
+        }
+        if (_mcapMode === 'tvl') {
+          datasets.push({ label:'TVL', data:dataTvl, borderColor:'#98ffb6', backgroundColor:'rgba(152,255,182,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true });
         }
 
-        // Chart label
-        const isRatio = showRatio;
-        const lblMap = {
-          mcap: isRatio ? 'MCap / TVL Ratio' : 'Market Cap',
-          fdv:  isRatio ? 'FDV / TVL Ratio'  : 'FDV',
-          tvl:  'TVL', both: 'Market Cap + FDV'
-        };
-        document.getElementById('rz-mcap-chart-label').textContent = lblMap[_mcapMode];
+        const lbl = _mcapMode==='mcap' ? 'Market Cap' : _mcapMode==='fdv' ? 'FDV' : _mcapMode==='tvl' ? 'TVL' : 'Market Cap + FDV';
+        document.getElementById('rz-mcap-chart-label').textContent = lbl;
 
-        // Y-axis format depends on what's shown
-        const yCallback = (showRatio) ? v => v.toFixed(2)+'x' : v => fmtM(v);
-        const tooltipFmt = (showRatio) ? ctx => ` ${ctx.dataset.label}: ${fmtR(ctx.raw)}` : ctx => ` ${ctx.dataset.label}: ${fmtM(ctx.raw)}`;
-
-        // Show/hide ratio button row — aligned left
-        const ratioRow   = document.getElementById('rz-ratio-row');
-        const btnMcapTvl = document.getElementById('rz-tvl-btn-mcap');
-        const btnFdvTvl  = document.getElementById('rz-tvl-btn-fdv');
-        if (_mcapMode === 'mcap') {
-          ratioRow.style.display   = 'block';
-          btnMcapTvl.style.display = '';
-          btnFdvTvl.style.display  = 'none';
-        } else if (_mcapMode === 'fdv') {
-          ratioRow.style.display   = 'block';
-          btnMcapTvl.style.display = 'none';
-          btnFdvTvl.style.display  = '';
+        // Show/hide ratio sub-panel
+        const ratioRow = document.getElementById('rz-ratio-row');
+        const tvlWrap  = document.getElementById('rz-tvl-wrap');
+        if (_mcapMode === 'mcap' || _mcapMode === 'fdv') {
+          ratioRow.style.display = 'flex';
+          tvlWrap.style.display  = 'block';
+          buildTvlChart(series);
         } else {
           ratioRow.style.display = 'none';
+          tvlWrap.style.display  = 'none';
         }
 
         const canvas = document.getElementById('rz-chart-mcap');
         canvas.style.display = 'block';
         document.getElementById('rz-mcap-loading-1').style.display = 'none';
-        if (_chart) _chart.destroy();
-
-        _chart = new Chart(canvas.getContext('2d'), {
+        if (_mcapChart) _mcapChart.destroy();
+        _mcapChart = new Chart(canvas.getContext('2d'), {
           type:'line', data:{labels, datasets},
           options:{ responsive:true, maintainAspectRatio:false,
             interaction:{mode:'index', intersect:false},
-            plugins:{
-              legend:{ display:_mcapMode==='both', labels:{color:'rgba(255,255,255,0.6)', font:{family:'Rajdhani',size:12}} },
-              tooltip:{ callbacks:{ label: tooltipFmt }}
-            },
+            plugins:{ legend:{display:_mcapMode==='both', labels:{color:'rgba(255,255,255,0.6)', font:{family:'Rajdhani',size:12}}},
+              tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmtM(ctx.raw)}} },
             scales:{
-              x:{ ticks:{color:'rgba(255,255,255,0.4)', maxTicksLimit:8, font:{family:'Rajdhani',size:11}}, grid:{color:'rgba(255,255,255,0.04)'} },
-              y:{ ticks:{color:'rgba(255,255,255,0.4)', font:{family:'Rajdhani',size:11}, callback: yCallback}, grid:{color:'rgba(255,255,255,0.04)'} }
+              x:{ticks:{color:'rgba(255,255,255,0.4)', maxTicksLimit:8, font:{family:'Rajdhani',size:11}}, grid:{color:'rgba(255,255,255,0.04)'}},
+              y:{ticks:{color:'rgba(255,255,255,0.4)', font:{family:'Rajdhani',size:11}, callback:v=>fmtM(v)}, grid:{color:'rgba(255,255,255,0.04)'}}
+            }
+          }
+        });
+      }
+
+      function buildTvlChart(series) {
+        if (!series) series = getActiveSeries();
+        const labels = mkLabels(series);
+        const data   = series.map(p => _tvlMode === 'mcap' ? (p.mcap_tvl || null) : (p.fdv_tvl || null));
+        const lbl    = _tvlMode === 'mcap' ? 'MCap / TVL Ratio' : 'FDV / TVL Ratio';
+        document.getElementById('rz-tvl-chart-label').textContent = lbl;
+        const canvas = document.getElementById('rz-chart-tvl');
+        canvas.style.display = 'block';
+        if (_tvlChart) _tvlChart.destroy();
+        _tvlChart = new Chart(canvas.getContext('2d'), {
+          type:'line', data:{labels, datasets:[{label:lbl, data,
+            borderColor: _tvlMode==='mcap' ? '#7ee0ff' : '#ffd36b',
+            backgroundColor: _tvlMode==='mcap' ? 'rgba(126,224,255,0.06)' : 'rgba(255,211,107,0.06)',
+            borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true}]},
+          options:{ responsive:true, maintainAspectRatio:false,
+            interaction:{mode:'index', intersect:false},
+            plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+lbl+': '+fmtR(ctx.raw)}} },
+            scales:{
+              x:{ticks:{color:'rgba(255,255,255,0.4)', maxTicksLimit:8, font:{family:'Rajdhani',size:11}}, grid:{color:'rgba(255,255,255,0.04)'}},
+              y:{ticks:{color:'rgba(255,255,255,0.4)', font:{family:'Rajdhani',size:11}, callback:v=>v.toFixed(2)+'x'}, grid:{color:'rgba(255,255,255,0.04)'}}
             }
           }
         });
@@ -4845,35 +4929,34 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         document.getElementById('rz-fdv-chg').innerHTML    = pctArrow(last.fdv, prev?.fdv);
         document.getElementById('rz-tvl-now').textContent  = fmtM(last.tvl);
         document.getElementById('rz-tvl-chg').innerHTML    = pctArrow(last.tvl, prev?.tvl);
+        document.getElementById('rz-mcap-tvl-now').textContent = fmtR(last.mcap_tvl);
+        document.getElementById('rz-fdv-tvl-now').textContent  = fmtR(last.fdv_tvl);
 
-        const mt = last.mcap_tvl, ft = last.fdv_tvl;
-        document.getElementById('rz-mcap-tvl-now').textContent  = fmtR(mt);
-        document.getElementById('rz-mcap-tvl-status').innerHTML = valuationBadge(mt);
-        document.getElementById('rz-fdv-tvl-now').textContent   = fmtR(ft);
-        document.getElementById('rz-fdv-tvl-status').innerHTML  = valuationBadge(ft);
-
+        // ATH / ATL calculations
         let athMcap={v:0,d:''}, athFdv={v:0,d:''}, athMT={v:0,d:''}, athFT={v:0,d:''};
         let atlMT={v:Infinity,d:''}, atlFT={v:Infinity,d:''};
+
         _series.forEach(p => {
-          if ((p.mcap||0)     > athMcap.v) athMcap={v:p.mcap,   d:p.date};
-          if ((p.fdv||0)      > athFdv.v)  athFdv ={v:p.fdv,    d:p.date};
-          if ((p.mcap_tvl||0) > athMT.v)   athMT  ={v:p.mcap_tvl,d:p.date};
-          if ((p.fdv_tvl||0)  > athFT.v)   athFT  ={v:p.fdv_tvl, d:p.date};
-          if (p.mcap_tvl && p.mcap_tvl < atlMT.v) atlMT={v:p.mcap_tvl,d:p.date};
-          if (p.fdv_tvl  && p.fdv_tvl  < atlFT.v) atlFT={v:p.fdv_tvl, d:p.date};
+          if ((p.mcap||0)    > athMcap.v) { athMcap={v:p.mcap,d:p.date}; }
+          if ((p.fdv||0)     > athFdv.v)  { athFdv ={v:p.fdv, d:p.date}; }
+          if ((p.mcap_tvl||0)> athMT.v)   { athMT  ={v:p.mcap_tvl,d:p.date}; }
+          if ((p.fdv_tvl||0) > athFT.v)   { athFT  ={v:p.fdv_tvl, d:p.date}; }
+          if (p.mcap_tvl && p.mcap_tvl < atlMT.v) { atlMT={v:p.mcap_tvl,d:p.date}; }
+          if (p.fdv_tvl  && p.fdv_tvl  < atlFT.v) { atlFT={v:p.fdv_tvl, d:p.date}; }
         });
-        document.getElementById('rz-mcap-ath').textContent          = fmtM(athMcap.v);
-        document.getElementById('rz-mcap-ath-date').textContent      = athMcap.d;
-        document.getElementById('rz-fdv-ath').textContent           = fmtM(athFdv.v);
-        document.getElementById('rz-fdv-ath-date').textContent       = athFdv.d;
-        document.getElementById('rz-mcap-tvl-ath').textContent       = fmtR(athMT.v);
-        document.getElementById('rz-mcap-tvl-ath-date').textContent  = athMT.d;
-        document.getElementById('rz-fdv-tvl-ath').textContent        = fmtR(athFT.v);
-        document.getElementById('rz-fdv-tvl-ath-date').textContent   = athFT.d;
-        document.getElementById('rz-mcap-tvl-atl').textContent       = atlMT.v < Infinity ? fmtR(atlMT.v) : '—';
-        document.getElementById('rz-mcap-tvl-atl-date').textContent  = atlMT.d;
-        document.getElementById('rz-fdv-tvl-atl').textContent        = atlFT.v < Infinity ? fmtR(atlFT.v) : '—';
-        document.getElementById('rz-fdv-tvl-atl-date').textContent   = atlFT.d;
+
+        document.getElementById('rz-mcap-ath').textContent      = fmtM(athMcap.v);
+        document.getElementById('rz-mcap-ath-date').textContent  = athMcap.d;
+        document.getElementById('rz-fdv-ath').textContent       = fmtM(athFdv.v);
+        document.getElementById('rz-fdv-ath-date').textContent   = athFdv.d;
+        document.getElementById('rz-mcap-tvl-ath').textContent   = fmtR(athMT.v);
+        document.getElementById('rz-mcap-tvl-ath-date').textContent = athMT.d;
+        document.getElementById('rz-fdv-tvl-ath').textContent    = fmtR(athFT.v);
+        document.getElementById('rz-fdv-tvl-ath-date').textContent  = athFT.d;
+        document.getElementById('rz-mcap-tvl-atl').textContent   = atlMT.v < Infinity ? fmtR(atlMT.v) : '—';
+        document.getElementById('rz-mcap-tvl-atl-date').textContent = atlMT.d;
+        document.getElementById('rz-fdv-tvl-atl').textContent    = atlFT.v < Infinity ? fmtR(atlFT.v) : '—';
+        document.getElementById('rz-fdv-tvl-atl-date').textContent  = atlFT.d;
       }
 
       async function loadMcapModule() {
@@ -4883,31 +4966,22 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           const json = await res.json();
           _series = json.series || [];
           _loaded = true;
-          buildChart();
+          buildMcapChart();
           updateKPIs();
         } catch(e) { console.error('MCap module error:', e); }
       }
 
       window.rzMcapSwitch = function(mode, btn) {
         _mcapMode = mode;
-        _subMode  = null;  // reset ratio — not pre-clicked
         ['rz-mcap-btn-mcap','rz-mcap-btn-fdv','rz-mcap-btn-tvl','rz-mcap-btn-both'].forEach(id => document.getElementById(id)?.classList.remove('active'));
-        // Also deactivate ratio buttons
-        ['rz-tvl-btn-mcap','rz-tvl-btn-fdv'].forEach(id => document.getElementById(id)?.classList.remove('active'));
         btn.classList.add('active');
-        buildChart();
+        buildMcapChart();
       };
       window.rzTvlSwitch = function(mode, btn) {
-        // Toggle: if already showing ratio, click again returns to main metric
-        if (_subMode === 'ratio') {
-          _subMode = null;
-          btn.classList.remove('active');
-        } else {
-          _subMode = 'ratio';
-          ['rz-tvl-btn-mcap','rz-tvl-btn-fdv'].forEach(id => document.getElementById(id)?.classList.remove('active'));
-          btn.classList.add('active');
-        }
-        buildChart();
+        _tvlMode = mode;
+        ['rz-tvl-btn-mcap','rz-tvl-btn-fdv'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+        btn.classList.add('active');
+        buildTvlChart();
       };
 
       const _origSwitch = window.rzCtxSwitch;
@@ -4919,6 +4993,262 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       window.rzCtxSelectChange = function(sel) {
         _origSelect(sel);
         if (sel.value === 'mcap') loadMcapModule();
+      };
+    })();
+
+  
+    // ══════════════════════════════════════════════════════
+    //  RIZE MARKET DEPTH MODULE — Kraken public API
+    // ══════════════════════════════════════════════════════
+    (function() {
+      const PAIRS = {
+        usd: { kraken: 'RIZEUSD', label: 'RIZE/USD', color: { bid:'#98ffb6', ask:'#ff6b8a' } },
+        eur: { kraken: 'RIZEEUR', label: 'RIZE/EUR', color: { bid:'#7ee0ff', ask:'#ffd36b' } },
+      };
+      const COUNT  = 200;
+      let _mode    = 'usd';
+      let _chart   = null;
+      let _loaded  = false;
+      let _cache   = {};   // { usd: {bids,asks}, eur: {bids,asks} }
+
+      // ── Formatters ──────────────────────────────────────
+      function fmtRize(v) {
+        if (v >= 1e6) return (v/1e6).toFixed(2) + 'M RIZE';
+        if (v >= 1e3) return (v/1e3).toFixed(1) + 'K RIZE';
+        return v.toFixed(0) + ' RIZE';
+      }
+      function fmtUsd(v) {
+        if (v >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
+        if (v >= 1e3) return '$' + (v/1e3).toFixed(1) + 'K';
+        return '$' + v.toFixed(2);
+      }
+      function fmtPrice(v, ccy) {
+        return (ccy === 'eur' ? '€' : '$') + v.toFixed(6);
+      }
+
+      // ── Fetch one pair ───────────────────────────────────
+      async function fetchPair(pair) {
+        const url = `https://api.kraken.com/0/public/Depth?pair=${pair}&count=${COUNT}`;
+        const res = await fetch(url);
+        const json = await res.json();
+        if (json.error && json.error.length) throw new Error(json.error[0]);
+        const key = Object.keys(json.result)[0];
+        const raw = json.result[key];
+        // Parse: [price_str, vol_str, ts] → {price, vol}
+        const bids = raw.bids.map(([p,v]) => ({ price: parseFloat(p), vol: parseFloat(v) }))
+                             .sort((a,b) => b.price - a.price);
+        const asks = raw.asks.map(([p,v]) => ({ price: parseFloat(p), vol: parseFloat(v) }))
+                             .sort((a,b) => a.price - b.price);
+        return { bids, asks };
+      }
+
+      // ── Build cumulative depth curve ─────────────────────
+      function cumulate(levels) {
+        let cum = 0;
+        return levels.map(l => { cum += l.vol; return { price: l.price, cum }; });
+      }
+
+      // ── Compute KPIs ─────────────────────────────────────
+      function computeKPIs(bids, asks, ccy) {
+        const bestBid = bids[0].price;
+        const bestAsk = asks[0].price;
+        const mid     = (bestBid + bestAsk) / 2;
+        const spread  = bestAsk - bestBid;
+        const spreadPct = (spread / mid) * 100;
+
+        // ±2% window
+        const lo = mid * 0.98, hi = mid * 1.02;
+        const bids2 = bids.filter(b => b.price >= lo);
+        const asks2 = asks.filter(a => a.price <= hi);
+        const totalBidRize = bids2.reduce((s,b) => s + b.vol, 0);
+        const totalAskRize = asks2.reduce((s,a) => s + a.vol, 0);
+        const totalBidUsd  = bids2.reduce((s,b) => s + b.vol * b.price, 0);
+        const totalAskUsd  = asks2.reduce((s,a) => s + a.vol * a.price, 0);
+        const ratio = totalBidRize / (totalAskRize || 1);
+
+        // Top wall: biggest single level
+        const bidWall = bids.reduce((m,b) => b.vol > m.vol ? b : m, bids[0]);
+        const askWall = asks.reduce((m,a) => a.vol > m.vol ? a : m, asks[0]);
+
+        // Market buy impact: spend $X, walk up asks
+        function impactBuy(usdAmount) {
+          let spent = 0, lastPrice = bestAsk;
+          for (const a of asks) {
+            const cost = a.vol * a.price;
+            if (spent + cost >= usdAmount) {
+              lastPrice = a.price;
+              break;
+            }
+            spent += cost;
+            lastPrice = a.price;
+          }
+          const pct = ((lastPrice - mid) / mid) * 100;
+          return { price: lastPrice, pct };
+        }
+
+        return { mid, spread, spreadPct, bestBid, bestAsk,
+          totalBidRize, totalAskRize, totalBidUsd, totalAskUsd, ratio,
+          bidWall, askWall,
+          impact10k: impactBuy(10000),
+          impact50k: impactBuy(50000),
+          impact100k: impactBuy(100000),
+          ccy };
+      }
+
+      // ── Render chart ─────────────────────────────────────
+      function renderChart(datasets, midPrice, ccy) {
+        const canvas = document.getElementById('rz-chart-depth');
+        canvas.style.display = 'block';
+        document.getElementById('rz-depth-loading').style.display = 'none';
+        if (_chart) _chart.destroy();
+        _chart = new Chart(canvas.getContext('2d'), {
+          type: 'line',
+          data: { datasets },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: { display: true, labels: { color:'rgba(255,255,255,0.6)', font:{family:'Rajdhani',size:12} } },
+              tooltip: {
+                callbacks: {
+                  title: ctx => (ccy === 'eur' ? '€' : '$') + parseFloat(ctx[0].label).toFixed(6),
+                  label: ctx => ` ${ctx.dataset.label}: ${fmtRize(ctx.raw.y)}`
+                }
+              },
+              annotation: midPrice ? {
+                annotations: {
+                  midLine: {
+                    type: 'line', xMin: midPrice, xMax: midPrice,
+                    borderColor: 'rgba(255,255,255,0.25)', borderWidth: 1, borderDash: [4,4],
+                    label: { content: 'Mid', display: true, color:'rgba(255,255,255,0.4)', font:{size:10} }
+                  }
+                }
+              } : {}
+            },
+            scales: {
+              x: {
+                type: 'linear',
+                ticks: { color:'rgba(255,255,255,0.4)', font:{family:'Rajdhani',size:10},
+                  callback: v => (ccy==='eur'?'€':'$') + v.toFixed(4), maxTicksLimit: 10 },
+                grid: { color:'rgba(255,255,255,0.04)' }
+              },
+              y: {
+                ticks: { color:'rgba(255,255,255,0.4)', font:{family:'Rajdhani',size:11},
+                  callback: v => fmtRize(v) },
+                grid: { color:'rgba(255,255,255,0.04)' }
+              }
+            }
+          }
+        });
+      }
+
+      // ── Build datasets from cached data ──────────────────
+      function buildDatasets() {
+        const datasets = [];
+        const pairs = _mode === 'both' ? ['usd','eur'] : [_mode];
+
+        for (const p of pairs) {
+          if (!_cache[p]) continue;
+          const { bids, asks } = _cache[p];
+          const cfg = PAIRS[p];
+
+          const cumBids = cumulate([...bids].reverse()).reverse(); // high→low price cumulative
+          const cumAsks = cumulate(asks);                          // low→high price cumulative
+
+          datasets.push({
+            label: `Bids (${cfg.label})`,
+            data: cumBids.map(d => ({ x: d.price, y: d.cum })),
+            borderColor: cfg.color.bid,
+            backgroundColor: cfg.color.bid.replace(')', ',0.15)').replace('rgb', 'rgba').replace('#98ffb6','rgba(152,255,182,0.12)').replace('#7ee0ff','rgba(126,224,255,0.12)'),
+            borderWidth: 1.5, pointRadius: 0, tension: 0, fill: true, stepped: true,
+          });
+          datasets.push({
+            label: `Asks (${cfg.label})`,
+            data: cumAsks.map(d => ({ x: d.price, y: d.cum })),
+            borderColor: cfg.color.ask,
+            backgroundColor: cfg.color.ask.replace('#ff6b8a','rgba(255,107,138,0.12)').replace('#ffd36b','rgba(255,211,107,0.12)'),
+            borderWidth: 1.5, pointRadius: 0, tension: 0, fill: true, stepped: true,
+          });
+        }
+
+        // Mid price for primary pair
+        const primary = _cache[_mode === 'both' ? 'usd' : _mode];
+        const mid = primary ? (primary.bids[0].price + primary.asks[0].price) / 2 : null;
+        const ccy = _mode === 'eur' ? 'eur' : 'usd';
+        renderChart(datasets, mid, ccy);
+      }
+
+      // ── Update KPI DOM ────────────────────────────────────
+      function updateKPIs(k) {
+        const sym = k.ccy === 'eur' ? '€' : '$';
+        document.getElementById('rz-depth-mid').textContent          = sym + k.mid.toFixed(6);
+        document.getElementById('rz-depth-spread').textContent       = sym + k.spread.toFixed(6);
+        document.getElementById('rz-depth-spread-pct').textContent   = k.spreadPct.toFixed(3) + '%';
+        document.getElementById('rz-depth-bid-wall').textContent     = fmtRize(k.bidWall.vol);
+        document.getElementById('rz-depth-bid-wall-price').textContent = '@ ' + fmtPrice(k.bidWall.price, k.ccy);
+        document.getElementById('rz-depth-ask-wall').textContent     = fmtRize(k.askWall.vol);
+        document.getElementById('rz-depth-ask-wall-price').textContent = '@ ' + fmtPrice(k.askWall.price, k.ccy);
+        document.getElementById('rz-depth-ratio').textContent        = k.ratio.toFixed(2) + 'x';
+        document.getElementById('rz-depth-ratio-sub').textContent    = k.ratio >= 1 ? 'Bid pressure' : 'Ask pressure';
+        document.getElementById('rz-depth-bids-rize').textContent    = fmtRize(k.totalBidRize);
+        document.getElementById('rz-depth-bids-usd').textContent     = fmtUsd(k.totalBidUsd) + ' within ±2%';
+        document.getElementById('rz-depth-asks-rize').textContent    = fmtRize(k.totalAskRize);
+        document.getElementById('rz-depth-asks-usd').textContent     = fmtUsd(k.totalAskUsd) + ' within ±2%';
+        document.getElementById('rz-depth-impact-10k').textContent   = fmtPrice(k.impact10k.price, k.ccy);
+        document.getElementById('rz-depth-impact-10k-sub').textContent  = '+' + k.impact10k.pct.toFixed(2) + '% slippage';
+        document.getElementById('rz-depth-impact-50k').textContent   = fmtPrice(k.impact50k.price, k.ccy);
+        document.getElementById('rz-depth-impact-50k-sub').textContent  = '+' + k.impact50k.pct.toFixed(2) + '% slippage';
+        document.getElementById('rz-depth-impact-100k').textContent  = fmtPrice(k.impact100k.price, k.ccy);
+        document.getElementById('rz-depth-impact-100k-sub').textContent = '+' + k.impact100k.pct.toFixed(2) + '% slippage';
+        document.getElementById('rz-depth-ts').textContent = 'Snapshot — ' + new Date().toLocaleTimeString();
+      }
+
+      // ── Load data ─────────────────────────────────────────
+      async function loadDepth(force) {
+        const toFetch = _mode === 'both' ? ['usd','eur'] : [_mode];
+        const missing = force ? toFetch : toFetch.filter(p => !_cache[p]);
+        if (!missing.length) { buildDatasets(); return; }
+
+        document.getElementById('rz-depth-loading').style.display = 'block';
+        document.getElementById('rz-chart-depth').style.display = 'none';
+
+        try {
+          await Promise.all(missing.map(async p => {
+            _cache[p] = await fetchPair(PAIRS[p].kraken);
+          }));
+          buildDatasets();
+          // KPIs from primary pair
+          const primary = _cache[_mode === 'both' ? 'usd' : _mode];
+          if (primary) updateKPIs(computeKPIs(primary.bids, primary.asks, _mode === 'eur' ? 'eur' : 'usd'));
+          _loaded = true;
+        } catch(e) {
+          document.getElementById('rz-depth-loading').textContent = 'Error: ' + e.message;
+          console.error('Depth error:', e);
+        }
+      }
+
+      // ── Public API ────────────────────────────────────────
+      window.rzDepthSwitch = function(mode, btn) {
+        _mode = mode;
+        ['rz-depth-btn-usd','rz-depth-btn-eur','rz-depth-btn-both'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+        btn.classList.add('active');
+        loadDepth(false);
+      };
+      window.rzDepthRefresh = function() {
+        _cache = {};
+        loadDepth(true);
+      };
+
+      // Hook tab switch
+      const _origSwitch = window.rzCtxSwitch;
+      window.rzCtxSwitch = function(tab, btn) {
+        _origSwitch(tab, btn);
+        if (tab === 'depth' && !_loaded) loadDepth(false);
+      };
+      const _origSelect = window.rzCtxSelectChange;
+      window.rzCtxSelectChange = function(sel) {
+        _origSelect(sel);
+        if (sel.value === 'depth' && !_loaded) loadDepth(false);
       };
     })();
 
