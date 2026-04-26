@@ -21,45 +21,45 @@ ENDPOINTS = {
     "bond-created":   "https://api.subgraph.ormilabs.com/api/public/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/1.0.0/gn",
 }
 
-# Each query uses cursor-based pagination via id_gt for reliability
+# Queries use skip-based pagination — SKIP replaced with integer at runtime
 QUERIES = {
     "pool-config": {
-        "poolUpdateds": """{ poolUpdateds(first:1000,orderBy:id,orderDirection:asc,where:{id_gt:"CURSOR"}) {
+        "poolUpdateds": """{ poolUpdateds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
             id blockNumber blockTimestamp transactionHash
             poolId maxMultiplier fullMaturityPeriod warmupPeriod distributionPeriod } }""",
-        "releaseWarmupUpdateds": """{ releaseWarmupUpdateds(first:1000,orderBy:id,orderDirection:asc,where:{id_gt:"CURSOR"}) {
+        "releaseWarmupUpdateds": """{ releaseWarmupUpdateds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
             id blockNumber blockTimestamp transactionHash warmupPeriod } }""",
-        "migratorAddeds": """{ migratorAddeds(first:1000,orderBy:id,orderDirection:asc,where:{id_gt:"CURSOR"}) {
+        "migratorAddeds": """{ migratorAddeds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
             id blockNumber blockTimestamp transactionHash migrator } }""",
-        "migratorRemoveds": """{ migratorRemoveds(first:1000,orderBy:id,orderDirection:asc,where:{id_gt:"CURSOR"}) {
+        "migratorRemoveds": """{ migratorRemoveds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
             id blockNumber blockTimestamp transactionHash migrator } }""",
     },
     "bond-lifecycle": {
-        "tokensReleaseds": """{ tokensReleaseds(first:1000,orderBy:id,orderDirection:asc,where:{id_gt:"CURSOR"}) {
+        "tokensReleaseds": """{ tokensReleaseds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
             id blockNumber blockTimestamp transactionHash bondId amount to } }""",
-        "bondMigrateds": """{ bondMigrateds(first:1000,orderBy:id,orderDirection:asc,where:{id_gt:"CURSOR"}) {
+        "bondMigrateds": """{ bondMigrateds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
             id blockNumber blockTimestamp transactionHash bondId fromPool toPool amount } }""",
-        "vestingUpdateds": """{ vestingUpdateds(first:1000,orderBy:id,orderDirection:asc,where:{id_gt:"CURSOR"}) {
+        "vestingUpdateds": """{ vestingUpdateds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
             id blockNumber blockTimestamp transactionHash bondId vestingEnd } }""",
-        "vestedTokenClaweds": """{ vestedTokenClaweds(first:1000,orderBy:id,orderDirection:asc,where:{id_gt:"CURSOR"}) {
+        "vestedTokenClaweds": """{ vestedTokenClaweds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
             id blockNumber blockTimestamp transactionHash bondId amount } }""",
     },
     "bond-broken": {
-        "bondBrokens": """{ bondBrokens(first:1000,orderBy:id,orderDirection:asc,where:{id_gt:"CURSOR"}) {
+        "bondBrokens": """{ bondBrokens(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
             id blockNumber blockTimestamp transactionHash bondId amount owner date } }""",
     },
     "nft-transfers": {
-        "transfers": """{ transfers(first:1000,orderBy:id,orderDirection:asc,where:{id_gt:"CURSOR"}) {
+        "transfers": """{ transfers(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
             id blockNumber blockTimestamp transactionHash from to tokenId transferCount } }""",
     },
     "bond-timemarker": {
-        "bondTimeMarkers": """{ bondTimeMarkers(first:1000,orderBy:id,orderDirection:asc,where:{id_gt:"CURSOR"}) {
+        "bondTimeMarkers": """{ bondTimeMarkers(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
             id blockNumber blockTimestamp transactionHash bondId timeMarker amount poolId } }""",
     },
     "bond-created": {
-        "bondCreateds": """{ bondCreateds(first:1000,orderBy:id,orderDirection:asc,where:{id_gt:"CURSOR"}) {
+        "bondCreateds": """{ bondCreateds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
             id blockNumber blockTimestamp transactionHash bondId amount owner poolId } }""",
-        "bondIncreaseds": """{ bondIncreaseds(first:1000,orderBy:id,orderDirection:asc,where:{id_gt:"CURSOR"}) {
+        "bondIncreaseds": """{ bondIncreaseds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
             id blockNumber blockTimestamp transactionHash bondId amount owner poolId } }""",
     },
 }
@@ -68,7 +68,13 @@ def gql(endpoint, query, retries=4):
     payload = json.dumps({"query": query}).encode()
     req = urllib.request.Request(
         endpoint, data=payload,
-        headers={"Content-Type":"application/json","Accept":"application/json"},
+        headers={
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "User-Agent": "Mozilla/5.0 (compatible; TokerizeBot/1.0; +https://tokerize.top)",
+                "Origin": "https://tokerize.top",
+                "Referer": "https://tokerize.top/",
+            },
         method="POST"
     )
     for attempt in range(retries):
@@ -87,12 +93,12 @@ def gql(endpoint, query, retries=4):
     return None
 
 def fetch_entity(name, endpoint, entity, query_tpl):
-    """Fetch all records for a single entity using cursor pagination."""
+    """Fetch all records using skip-based pagination (same as working scrapers)."""
     results = []
-    cursor = ""
+    skip = 0
     page = 0
     while True:
-        q = query_tpl.replace("CURSOR", cursor)
+        q = query_tpl.replace("SKIP", str(skip))
         data = gql(endpoint, q)
         if data is None:
             print(f"    [{name}:{entity}] fetch failed at page {page}, stopping", flush=True)
@@ -102,10 +108,10 @@ def fetch_entity(name, endpoint, entity, query_tpl):
             break
         results.extend(items)
         page += 1
-        print(f"    [{name}:{entity}] page {page}: +{len(items)} → total {len(results)}", flush=True)
+        print(f"    [{name}:{entity}] page {page} (skip={skip}): +{len(items)} → total {len(results)}", flush=True)
         if len(items) < 1000:
             break
-        cursor = items[-1]["id"]
+        skip += 1000
         time.sleep(0.3)
     return results
 
