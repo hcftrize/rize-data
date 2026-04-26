@@ -5289,8 +5289,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         for (const l of levels) {
           const raw    = l.price / tickSize;
           const bucket = Math.floor(raw) * tickSize;
-          const key    = bucket.toFixed(12);
-          if (!map.has(key)) map.set(key, { price: bucket, vol: 0 });
+          // Tout ce qui tombe sous 0.001 → regroupé dans la ligne 0.000
+          const finalBucket = bucket < 0.001 ? 0 : bucket;
+          const key = finalBucket.toFixed(12);
+          if (!map.has(key)) map.set(key, { price: finalBucket, vol: 0 });
           map.get(key).vol += l.vol;
         }
         const arr = Array.from(map.values());
@@ -5334,8 +5336,15 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         const tickAsk = getBestTickSize(asks, mid, false);
         const tick    = Math.max(tickBid, tickAsk); // tick unifié pour cohérence visuelle
 
-        const gBids = groupLevels(bids, tick, true);   // high→low
-        const gAsks = groupLevels(asks, tick, false);  // low→high
+        const gBidsRaw = groupLevels(bids, tick, true);   // high→low
+        const gAsks    = groupLevels(asks, tick, false);  // low→high
+
+        // Bids sous $0.001 → trop petits pour détailler, tout dans un seul paquet $0.000
+        const bidsAbove = gBidsRaw.filter(b => b.price >= 0.001);
+        const bidsSub   = gBidsRaw.filter(b => b.price < 0.001);
+        const gBids = bidsSub.length > 0
+          ? [...bidsAbove, { price: 0, vol: bidsSub.reduce((s,b) => s + b.vol, 0) }]
+          : bidsAbove;
 
         // Cumulative from best outward
         let c = 0;
