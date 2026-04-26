@@ -1010,8 +1010,8 @@ html, body { overflow-x: hidden; max-width: 100%; }
       font-weight: 700; line-height: 1.05; color: #fff; letter-spacing: 0.5px;
     }
     .conv-delta-sub {
-      display: block; font-family: 'DM Mono', monospace; font-size: 10px;
-      color: var(--muted); margin-top: 4px;
+      display: block; font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700;
+      color: var(--muted); margin-top: 4px; letter-spacing: 0.3px;
     }
     .conv-green { color: var(--green); }
     .conv-red   { color: var(--pink); }
@@ -1423,7 +1423,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <!-- Chart header -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
           <div id="rz-mcap-chart-label" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;flex:1">Market Cap</div>
-          <div class="conv-toggle-row" style="margin-bottom:0" id="rz-mcap-main-btns">
+          <div class="conv-toggle-row" style="margin-bottom:0">
             <button class="conv-toggle active" id="rz-mcap-btn-mcap" onclick="rzMcapSwitch('mcap',this)">Display MCap</button>
             <button class="conv-toggle" id="rz-mcap-btn-fdv" onclick="rzMcapSwitch('fdv',this)">Display FDV</button>
             <button class="conv-toggle" id="rz-mcap-btn-tvl" onclick="rzMcapSwitch('tvl',this)">Display TVL</button>
@@ -1431,30 +1431,19 @@ html, body { overflow-x: hidden; max-width: 100%; }
           </div>
         </div>
 
-        <!-- Main chart -->
-        <div class="ctx-chart-wrap" style="height:260px">
+        <!-- Ratio sub-toggle: only shown for mcap/fdv modes, same style as main btns -->
+        <div id="rz-ratio-row" style="display:none;justify-content:flex-end;margin-bottom:6px;margin-top:4px">
+          <button class="conv-toggle active" id="rz-tvl-btn-mcap" onclick="rzTvlSwitch('mcap',this)" style="display:none">MCap / TVL</button>
+          <button class="conv-toggle active" id="rz-tvl-btn-fdv" onclick="rzTvlSwitch('fdv',this)" style="display:none">FDV / TVL</button>
+        </div>
+
+        <!-- Single chart area -->
+        <div class="ctx-chart-wrap" style="height:280px">
           <div class="ctx-loading" id="rz-mcap-loading-1">Loading market data&hellip;</div>
           <canvas id="rz-chart-mcap" style="display:none"></canvas>
         </div>
 
-        <!-- Sub-ratio toggle — shown conditionally -->
-        <div id="rz-ratio-row" style="display:none;justify-content:flex-end;margin-top:10px;margin-bottom:6px">
-          <div class="conv-toggle-row" style="margin-bottom:0">
-            <button class="conv-toggle active" id="rz-tvl-btn-mcap" onclick="rzTvlSwitch('mcap',this)" style="font-size:11px;padding:4px 10px">MCap / TVL</button>
-            <button class="conv-toggle" id="rz-tvl-btn-fdv" onclick="rzTvlSwitch('fdv',this)" style="font-size:11px;padding:4px 10px">FDV / TVL</button>
-          </div>
-        </div>
-
-        <!-- Ratio chart — hidden by default -->
-        <div id="rz-tvl-wrap" style="display:none">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;margin-bottom:6px" id="rz-tvl-chart-label">MCap / TVL Ratio</div>
-          <div class="ctx-chart-wrap" style="height:200px">
-            <div class="ctx-loading" id="rz-mcap-loading-2" style="display:none"></div>
-            <canvas id="rz-chart-tvl" style="display:none"></canvas>
-          </div>
-        </div>
-
-        <!-- KPI row -->
+        <!-- KPI rows -->
         <div class="conv-sep" style="margin-top:16px"></div>
         <div class="conv-section-title" style="margin-top:12px">Market Stats</div>
         <div class="ctx-kpi-row">
@@ -1476,10 +1465,12 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <div class="ctx-kpi">
             <span class="ctx-kpi-label">MCap / TVL</span>
             <span class="ctx-kpi-value" id="rz-mcap-tvl-now" style="color:#c77dff">—</span>
+            <span class="conv-delta-sub" id="rz-mcap-tvl-status">&nbsp;</span>
           </div>
           <div class="ctx-kpi">
             <span class="ctx-kpi-label">FDV / TVL</span>
             <span class="ctx-kpi-value" id="rz-fdv-tvl-now" style="color:#ff8ad8">—</span>
+            <span class="conv-delta-sub" id="rz-fdv-tvl-status">&nbsp;</span>
           </div>
         </div>
         <div class="ctx-kpi-row" style="margin-top:8px">
@@ -3797,9 +3788,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const volumes = [];
       const rawDays = [];
       // Exclude today's point — volume is only complete at 00:15 UTC next day
-      const todayUTC = new Date().toISOString().slice(0, 10);
-      const filteredSeries = series.filter(p => p.date < todayUTC);
-      filteredSeries.forEach(p => {
+      series.forEach(p => {
         const d = new Date(p.date + 'T00:00:00Z');
         labels.push(d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" }));
         volumes.push(p.volume);
@@ -4722,10 +4711,9 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     (function() {
       const MCAP_URL = 'https://raw.githubusercontent.com/hcftrize/TOKERIZE/main/rize-data-hub/mcap-history.json';
       let _series    = [];
-      let _mcapChart = null;
-      let _tvlChart  = null;
-      let _mcapMode  = 'mcap';
-      let _tvlMode   = 'mcap';
+      let _chart     = null;  // single chart instance
+      let _mcapMode  = 'mcap';   // mcap | fdv | tvl | both
+      let _tvlMode   = 'mcap';   // ratio overlay: mcap=MCap/TVL, fdv=FDV/TVL
       let _loaded    = false;
 
       function fmtM(v) {
@@ -4741,8 +4729,14 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         const col = p >= 0 ? '#98ffb6' : 'var(--pink)';
         return `<span style="color:${col};font-size:13px;font-family:'Rajdhani',sans-serif;font-weight:700">${p>=0?'▲':'▼'} ${Math.abs(p).toFixed(2)}%</span>`;
       }
+      function valuationBadge(ratio) {
+        if (!ratio || ratio === 0) return '';
+        if (ratio < 0.95)  return '<span style="color:#98ffb6;font-weight:700">▼ UNDERVALUED</span>';
+        if (ratio <= 1.05) return '<span style="color:#ffd36b;font-weight:700">● FAIR VALUE</span>';
+        return '<span style="color:var(--pink);font-weight:700">▲ OVERVALUED</span>';
+      }
 
-      // Only use series points that have data — trim leading nulls
+      // Trim leading points with no data — start chart at first real data point
       function getActiveSeries() {
         let start = 0;
         for (let i = 0; i < _series.length; i++) {
@@ -4758,78 +4752,81 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         });
       }
 
-      function buildMcapChart() {
-        const series   = getActiveSeries();
-        const labels   = mkLabels(series);
-        const dataMcap = series.map(p => p.mcap || null);
-        const dataFdv  = series.map(p => p.fdv  || null);
-        const dataTvl  = series.map(p => p.tvl  || null);
+      function buildChart() {
+        const series = getActiveSeries();
+        const labels = mkLabels(series);
 
+        // Build datasets based on mode
         let datasets = [];
-        if (_mcapMode === 'mcap' || _mcapMode === 'both') {
-          datasets.push({ label:'Market Cap', data:dataMcap, borderColor:'#7ee0ff', backgroundColor:'rgba(126,224,255,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:_mcapMode==='mcap', spanGaps:true });
-        }
-        if (_mcapMode === 'fdv' || _mcapMode === 'both') {
-          datasets.push({ label:'FDV', data:dataFdv, borderColor:'#ffd36b', backgroundColor:'rgba(255,211,107,0.06)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:_mcapMode==='fdv', spanGaps:true });
-        }
-        if (_mcapMode === 'tvl') {
-          datasets.push({ label:'TVL', data:dataTvl, borderColor:'#98ffb6', backgroundColor:'rgba(152,255,182,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true });
+        let hasY2 = false;
+
+        if (_mcapMode === 'mcap') {
+          datasets.push({ label:'Market Cap', data:series.map(p=>p.mcap||null), borderColor:'#7ee0ff', backgroundColor:'rgba(126,224,255,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true, yAxisID:'y' });
+          if (_tvlMode === 'mcap') {
+            datasets.push({ label:'MCap/TVL', data:series.map(p=>p.mcap_tvl||null), borderColor:'rgba(199,125,255,0.8)', backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:0.3, fill:false, spanGaps:true, yAxisID:'y2', borderDash:[5,3] });
+            hasY2 = true;
+          }
+        } else if (_mcapMode === 'fdv') {
+          datasets.push({ label:'FDV', data:series.map(p=>p.fdv||null), borderColor:'#ffd36b', backgroundColor:'rgba(255,211,107,0.07)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true, yAxisID:'y' });
+          if (_tvlMode === 'fdv') {
+            datasets.push({ label:'FDV/TVL', data:series.map(p=>p.fdv_tvl||null), borderColor:'rgba(255,138,216,0.8)', backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:0.3, fill:false, spanGaps:true, yAxisID:'y2', borderDash:[5,3] });
+            hasY2 = true;
+          }
+        } else if (_mcapMode === 'tvl') {
+          datasets.push({ label:'TVL', data:series.map(p=>p.tvl||null), borderColor:'#98ffb6', backgroundColor:'rgba(152,255,182,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true, yAxisID:'y' });
+        } else { // both
+          datasets.push({ label:'Market Cap', data:series.map(p=>p.mcap||null), borderColor:'#7ee0ff', backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:0.3, fill:false, spanGaps:true, yAxisID:'y' });
+          datasets.push({ label:'FDV', data:series.map(p=>p.fdv||null), borderColor:'#ffd36b', backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:0.3, fill:false, spanGaps:true, yAxisID:'y' });
         }
 
-        const lbl = _mcapMode==='mcap' ? 'Market Cap' : _mcapMode==='fdv' ? 'FDV' : _mcapMode==='tvl' ? 'TVL' : 'Market Cap + FDV';
-        document.getElementById('rz-mcap-chart-label').textContent = lbl;
+        const lblMap = {mcap:'Market Cap', fdv:'FDV', tvl:'TVL', both:'Market Cap + FDV'};
+        document.getElementById('rz-mcap-chart-label').textContent = lblMap[_mcapMode];
 
-        // Show/hide ratio sub-panel
-        const ratioRow = document.getElementById('rz-ratio-row');
-        const tvlWrap  = document.getElementById('rz-tvl-wrap');
-        if (_mcapMode === 'mcap' || _mcapMode === 'fdv') {
-          ratioRow.style.display = 'flex';
-          tvlWrap.style.display  = 'block';
-          buildTvlChart(series);
+        // Ratio row: show correct button only
+        const ratioRow   = document.getElementById('rz-ratio-row');
+        const btnMcapTvl = document.getElementById('rz-tvl-btn-mcap');
+        const btnFdvTvl  = document.getElementById('rz-tvl-btn-fdv');
+        if (_mcapMode === 'mcap') {
+          ratioRow.style.display   = 'flex';
+          btnMcapTvl.style.display = '';
+          btnFdvTvl.style.display  = 'none';
+        } else if (_mcapMode === 'fdv') {
+          ratioRow.style.display   = 'flex';
+          btnMcapTvl.style.display = 'none';
+          btnFdvTvl.style.display  = '';
         } else {
-          ratioRow.style.display = 'none';
-          tvlWrap.style.display  = 'none';
+          ratioRow.style.display   = 'none';
         }
 
         const canvas = document.getElementById('rz-chart-mcap');
         canvas.style.display = 'block';
         document.getElementById('rz-mcap-loading-1').style.display = 'none';
-        if (_mcapChart) _mcapChart.destroy();
-        _mcapChart = new Chart(canvas.getContext('2d'), {
+        if (_chart) _chart.destroy();
+
+        const scales = {
+          x: { ticks:{color:'rgba(255,255,255,0.4)', maxTicksLimit:8, font:{family:'Rajdhani',size:11}}, grid:{color:'rgba(255,255,255,0.04)'} },
+          y: { ticks:{color:'rgba(255,255,255,0.4)', font:{family:'Rajdhani',size:11}, callback:v=>fmtM(v)}, grid:{color:'rgba(255,255,255,0.04)'} }
+        };
+        if (hasY2) {
+          scales.y2 = {
+            position:'right',
+            ticks:{ color:'rgba(199,125,255,0.7)', font:{family:'Rajdhani',size:10}, callback:v=>v.toFixed(2)+'x' },
+            grid:{ display:false }
+          };
+        }
+
+        _chart = new Chart(canvas.getContext('2d'), {
           type:'line', data:{labels, datasets},
           options:{ responsive:true, maintainAspectRatio:false,
             interaction:{mode:'index', intersect:false},
-            plugins:{ legend:{display:_mcapMode==='both', labels:{color:'rgba(255,255,255,0.6)', font:{family:'Rajdhani',size:12}}},
-              tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmtM(ctx.raw)}} },
-            scales:{
-              x:{ticks:{color:'rgba(255,255,255,0.4)', maxTicksLimit:8, font:{family:'Rajdhani',size:11}}, grid:{color:'rgba(255,255,255,0.04)'}},
-              y:{ticks:{color:'rgba(255,255,255,0.4)', font:{family:'Rajdhani',size:11}, callback:v=>fmtM(v)}, grid:{color:'rgba(255,255,255,0.04)'}}
-            }
-          }
-        });
-      }
-
-      function buildTvlChart(series) {
-        if (!series) series = getActiveSeries();
-        const labels = mkLabels(series);
-        const data   = series.map(p => _tvlMode === 'mcap' ? (p.mcap_tvl || null) : (p.fdv_tvl || null));
-        const lbl    = _tvlMode === 'mcap' ? 'MCap / TVL Ratio' : 'FDV / TVL Ratio';
-        document.getElementById('rz-tvl-chart-label').textContent = lbl;
-        const canvas = document.getElementById('rz-chart-tvl');
-        canvas.style.display = 'block';
-        if (_tvlChart) _tvlChart.destroy();
-        _tvlChart = new Chart(canvas.getContext('2d'), {
-          type:'line', data:{labels, datasets:[{label:lbl, data,
-            borderColor: _tvlMode==='mcap' ? '#7ee0ff' : '#ffd36b',
-            backgroundColor: _tvlMode==='mcap' ? 'rgba(126,224,255,0.06)' : 'rgba(255,211,107,0.06)',
-            borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true}]},
-          options:{ responsive:true, maintainAspectRatio:false,
-            interaction:{mode:'index', intersect:false},
-            plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>' '+lbl+': '+fmtR(ctx.raw)}} },
-            scales:{
-              x:{ticks:{color:'rgba(255,255,255,0.4)', maxTicksLimit:8, font:{family:'Rajdhani',size:11}}, grid:{color:'rgba(255,255,255,0.04)'}},
-              y:{ticks:{color:'rgba(255,255,255,0.4)', font:{family:'Rajdhani',size:11}, callback:v=>v.toFixed(2)+'x'}, grid:{color:'rgba(255,255,255,0.04)'}}
-            }
+            plugins:{
+              legend:{ display:_mcapMode==='both', labels:{color:'rgba(255,255,255,0.6)', font:{family:'Rajdhani',size:12}} },
+              tooltip:{ callbacks:{ label:ctx => {
+                if (ctx.dataset.yAxisID === 'y2') return ` ${ctx.dataset.label}: ${fmtR(ctx.raw)}`;
+                return ` ${ctx.dataset.label}: ${fmtM(ctx.raw)}`;
+              }}}
+            },
+            scales
           }
         });
       }
@@ -4845,34 +4842,35 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         document.getElementById('rz-fdv-chg').innerHTML    = pctArrow(last.fdv, prev?.fdv);
         document.getElementById('rz-tvl-now').textContent  = fmtM(last.tvl);
         document.getElementById('rz-tvl-chg').innerHTML    = pctArrow(last.tvl, prev?.tvl);
-        document.getElementById('rz-mcap-tvl-now').textContent = fmtR(last.mcap_tvl);
-        document.getElementById('rz-fdv-tvl-now').textContent  = fmtR(last.fdv_tvl);
 
-        // ATH / ATL calculations
+        const mt = last.mcap_tvl, ft = last.fdv_tvl;
+        document.getElementById('rz-mcap-tvl-now').textContent  = fmtR(mt);
+        document.getElementById('rz-mcap-tvl-status').innerHTML = valuationBadge(mt);
+        document.getElementById('rz-fdv-tvl-now').textContent   = fmtR(ft);
+        document.getElementById('rz-fdv-tvl-status').innerHTML  = valuationBadge(ft);
+
         let athMcap={v:0,d:''}, athFdv={v:0,d:''}, athMT={v:0,d:''}, athFT={v:0,d:''};
         let atlMT={v:Infinity,d:''}, atlFT={v:Infinity,d:''};
-
         _series.forEach(p => {
-          if ((p.mcap||0)    > athMcap.v) { athMcap={v:p.mcap,d:p.date}; }
-          if ((p.fdv||0)     > athFdv.v)  { athFdv ={v:p.fdv, d:p.date}; }
-          if ((p.mcap_tvl||0)> athMT.v)   { athMT  ={v:p.mcap_tvl,d:p.date}; }
-          if ((p.fdv_tvl||0) > athFT.v)   { athFT  ={v:p.fdv_tvl, d:p.date}; }
-          if (p.mcap_tvl && p.mcap_tvl < atlMT.v) { atlMT={v:p.mcap_tvl,d:p.date}; }
-          if (p.fdv_tvl  && p.fdv_tvl  < atlFT.v) { atlFT={v:p.fdv_tvl, d:p.date}; }
+          if ((p.mcap||0)     > athMcap.v) athMcap={v:p.mcap,   d:p.date};
+          if ((p.fdv||0)      > athFdv.v)  athFdv ={v:p.fdv,    d:p.date};
+          if ((p.mcap_tvl||0) > athMT.v)   athMT  ={v:p.mcap_tvl,d:p.date};
+          if ((p.fdv_tvl||0)  > athFT.v)   athFT  ={v:p.fdv_tvl, d:p.date};
+          if (p.mcap_tvl && p.mcap_tvl < atlMT.v) atlMT={v:p.mcap_tvl,d:p.date};
+          if (p.fdv_tvl  && p.fdv_tvl  < atlFT.v) atlFT={v:p.fdv_tvl, d:p.date};
         });
-
-        document.getElementById('rz-mcap-ath').textContent      = fmtM(athMcap.v);
-        document.getElementById('rz-mcap-ath-date').textContent  = athMcap.d;
-        document.getElementById('rz-fdv-ath').textContent       = fmtM(athFdv.v);
-        document.getElementById('rz-fdv-ath-date').textContent   = athFdv.d;
-        document.getElementById('rz-mcap-tvl-ath').textContent   = fmtR(athMT.v);
-        document.getElementById('rz-mcap-tvl-ath-date').textContent = athMT.d;
-        document.getElementById('rz-fdv-tvl-ath').textContent    = fmtR(athFT.v);
-        document.getElementById('rz-fdv-tvl-ath-date').textContent  = athFT.d;
-        document.getElementById('rz-mcap-tvl-atl').textContent   = atlMT.v < Infinity ? fmtR(atlMT.v) : '—';
-        document.getElementById('rz-mcap-tvl-atl-date').textContent = atlMT.d;
-        document.getElementById('rz-fdv-tvl-atl').textContent    = atlFT.v < Infinity ? fmtR(atlFT.v) : '—';
-        document.getElementById('rz-fdv-tvl-atl-date').textContent  = atlFT.d;
+        document.getElementById('rz-mcap-ath').textContent          = fmtM(athMcap.v);
+        document.getElementById('rz-mcap-ath-date').textContent      = athMcap.d;
+        document.getElementById('rz-fdv-ath').textContent           = fmtM(athFdv.v);
+        document.getElementById('rz-fdv-ath-date').textContent       = athFdv.d;
+        document.getElementById('rz-mcap-tvl-ath').textContent       = fmtR(athMT.v);
+        document.getElementById('rz-mcap-tvl-ath-date').textContent  = athMT.d;
+        document.getElementById('rz-fdv-tvl-ath').textContent        = fmtR(athFT.v);
+        document.getElementById('rz-fdv-tvl-ath-date').textContent   = athFT.d;
+        document.getElementById('rz-mcap-tvl-atl').textContent       = atlMT.v < Infinity ? fmtR(atlMT.v) : '—';
+        document.getElementById('rz-mcap-tvl-atl-date').textContent  = atlMT.d;
+        document.getElementById('rz-fdv-tvl-atl').textContent        = atlFT.v < Infinity ? fmtR(atlFT.v) : '—';
+        document.getElementById('rz-fdv-tvl-atl-date').textContent   = atlFT.d;
       }
 
       async function loadMcapModule() {
@@ -4882,22 +4880,28 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           const json = await res.json();
           _series = json.series || [];
           _loaded = true;
-          buildMcapChart();
+          buildChart();
           updateKPIs();
         } catch(e) { console.error('MCap module error:', e); }
       }
 
       window.rzMcapSwitch = function(mode, btn) {
         _mcapMode = mode;
+        // Reset ratio overlay when switching main mode
+        if (mode === 'mcap') _tvlMode = 'mcap';
+        if (mode === 'fdv')  _tvlMode = 'fdv';
         ['rz-mcap-btn-mcap','rz-mcap-btn-fdv','rz-mcap-btn-tvl','rz-mcap-btn-both'].forEach(id => document.getElementById(id)?.classList.remove('active'));
         btn.classList.add('active');
-        buildMcapChart();
+        buildChart();
       };
       window.rzTvlSwitch = function(mode, btn) {
         _tvlMode = mode;
-        ['rz-tvl-btn-mcap','rz-tvl-btn-fdv'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+        ['rz-tvl-btn-mcap','rz-tvl-btn-fdv'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.classList.remove('active');
+        });
         btn.classList.add('active');
-        buildTvlChart();
+        buildChart();
       };
 
       const _origSwitch = window.rzCtxSwitch;
