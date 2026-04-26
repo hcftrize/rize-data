@@ -5149,7 +5149,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           type:'line', data:{ datasets },
           options:{
             responsive:true, maintainAspectRatio:false,
-            interaction:{ mode:'index', intersect:false },
+            interaction:{ mode:'nearest', intersect:false, axis:'x' },
             plugins:{
               legend:{ display:true, labels:{ color:'rgba(255,255,255,0.6)', font:{family:'Rajdhani',size:12} } },
               tooltip:{
@@ -5273,10 +5273,15 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const MAX_OB_ROWS = 40;
 
       function getTickSequence(price) {
-        // Ticks progressifs par ordre de magnitude du prix
-        const mag = Math.pow(10, Math.floor(Math.log10(price)));
-        // On propose 5 niveaux de tick : 0.1x, 0.2x, 0.5x, 1x, 2x du mag
-        return [0.1, 0.2, 0.5, 1, 2, 5, 10].map(f => mag * f);
+        // Séquences fixes par palier de prix — règles Kraken-style
+        if (price < 0.001)  return [0.00001, 0.00002, 0.00005, 0.0001, 0.0002];
+        if (price < 0.01)   return [0.0001,  0.0002,  0.0005,  0.001,  0.002];
+        if (price < 0.10)   return [0.001,   0.002,   0.005,   0.01,   0.02];
+        if (price < 0.50)   return [0.01,    0.02,    0.05,    0.10,   0.20];
+        if (price < 1.00)   return [0.05,    0.10,    0.20,    0.50];
+        if (price < 10)     return [0.10,    0.20,    0.50,    1.00,   2.00];
+        if (price < 100)    return [1.00,    2.00,    5.00,    10.0];
+        return               [5.00,   10.0,   20.0,    50.0];
       }
 
       function groupLevels(levels, tickSize, isBid) {
@@ -5365,23 +5370,23 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
           // 5 cols: cum bids | bid price | sep | ask price | cum asks
           const cumBidCell = b
-            ? `<td style="padding:4px 12px;text-align:right;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;color:rgba(152,255,182,0.75);position:relative;width:27%;overflow:hidden">
+            ? `<td style="padding:5px 12px;text-align:right;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;color:rgba(152,255,182,0.75);position:relative;width:27%;overflow:hidden">
                 <div style="position:absolute;right:0;top:0;bottom:0;width:${bidBarW}%;background:rgba(152,255,182,0.07);pointer-events:none"></div>
                 <span style="position:relative">${fmtVol(b.cum)}</span></td>`
             : `<td style="width:27%"></td>`;
 
           const bidPriceCell = b
-            ? `<td style="padding:4px 8px;text-align:right;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:#98ffb6;white-space:nowrap;width:23%">${sym}${fmtP(b.price)}</td>`
+            ? `<td style="padding:5px 8px;text-align:right;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:#98ffb6;white-space:nowrap;width:23%">${sym}${fmtP(b.price)}</td>`
             : `<td style="width:23%"></td>`;
 
           const sepCell = `<td style="padding:0;width:0;border-left:1px solid rgba(255,255,255,0.12);border-right:1px solid rgba(255,255,255,0.12)"></td>`;
 
           const askPriceCell = a
-            ? `<td style="padding:4px 8px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--pink);white-space:nowrap;width:23%">${sym}${fmtP(a.price)}</td>`
+            ? `<td style="padding:5px 8px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--pink);white-space:nowrap;width:23%">${sym}${fmtP(a.price)}</td>`
             : `<td style="width:23%"></td>`;
 
           const cumAskCell = a
-            ? `<td style="padding:4px 12px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;color:rgba(255,107,138,0.75);position:relative;width:27%;overflow:hidden">
+            ? `<td style="padding:5px 12px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;color:rgba(255,107,138,0.75);position:relative;width:27%;overflow:hidden">
                 <div style="position:absolute;left:0;top:0;bottom:0;width:${askBarW}%;background:rgba(255,107,138,0.07);pointer-events:none"></div>
                 <span style="position:relative">${fmtVol(a.cum)}</span></td>`
             : `<td style="width:27%"></td>`;
@@ -5402,22 +5407,48 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         const bestAsk = asks[0].price;
         const mid     = (bestBid + bestAsk) / 2;
         const factor  = ZOOM_STEPS[zoomLevel];
+        const sym     = cfg.sym;
 
-        // Filter window around mid
         const zBids = bids.filter(b => b.price >= mid * (1 - factor));
         const zAsks = asks.filter(a => a.price <= mid * (1 + factor));
 
-        // Rebuild cumulative within window (reset to 0 from best)
         let cumB = 0;
-        const cumBids = zBids.map(b => { cumB += b.vol; return { x:b.price, y:cumB, val:cumB*b.price }; });
+        const cumBids = zBids.map(b => { cumB += b.vol; return { price:b.price, cumRize:cumB, cumVal:cumB*b.price }; });
         let cumA = 0;
-        const cumAsks = zAsks.map(a => { cumA += a.vol; return { x:a.price, y:cumA, val:cumA*a.price }; });
+        const cumAsks = zAsks.map(a => { cumA += a.vol; return { price:a.price, cumRize:cumA, cumVal:cumA*a.price }; });
 
-        if (!_chart) return;
-        // dataset[0] = Bids, dataset[1] = Asks (same order as renderChart)
-        _chart.data.datasets[0].data = cumBids;
-        _chart.data.datasets[1].data = cumAsks;
-        _chart.update('none');
+        // Destroy + recreate — fix tooltip index bug with mode:'nearest' axis:'x'
+        const canvas = document.getElementById('rz-chart-depth');
+        if (_chart) _chart.destroy();
+        _chart = new Chart(canvas.getContext('2d'), {
+          type:'line', data:{ datasets:[
+            { label:`Bids (${cfg.label})`,
+              data: cumBids.map(d=>({x:d.price, y:d.cumRize, val:d.cumVal})),
+              borderColor:cfg.color.bid,
+              backgroundColor:cfg.color.bid==='#98ffb6'?'rgba(152,255,182,0.12)':'rgba(126,224,255,0.12)',
+              borderWidth:1.5, pointRadius:0, tension:0, fill:true, stepped:'before' },
+            { label:`Asks (${cfg.label})`,
+              data: cumAsks.map(d=>({x:d.price, y:d.cumRize, val:d.cumVal})),
+              borderColor:cfg.color.ask,
+              backgroundColor:cfg.color.ask==='#ff6b8a'?'rgba(255,107,138,0.12)':'rgba(255,211,107,0.12)',
+              borderWidth:1.5, pointRadius:0, tension:0, fill:true, stepped:'before' }
+          ]},
+          options:{
+            responsive:true, maintainAspectRatio:false,
+            interaction:{ mode:'nearest', intersect:false, axis:'x' },
+            plugins:{
+              legend:{ display:true, labels:{ color:'rgba(255,255,255,0.6)', font:{family:'Rajdhani',size:12} } },
+              tooltip:{ callbacks:{
+                title: ctx => `Price: ${sym}${parseFloat(ctx[0].parsed.x).toFixed(6)}`,
+                label: ctx => ` ${ctx.dataset.label}: ${fmtRize(ctx.parsed.y)} (${fmtVal(ctx.raw.val, sym)})`
+              }}
+            },
+            scales:{
+              x:{ type:'linear', ticks:{ color:'#b6c1d8', font:{family:'Rajdhani',size:13,weight:'600'}, callback:v=>sym+v.toFixed(5), maxTicksLimit:8 }, grid:{ color:'rgba(255,255,255,0.04)' } },
+              y:{ ticks:{ color:'#b6c1d8', font:{family:'Rajdhani',size:13,weight:'600'}, callback:v=>fmtRize(v) }, grid:{ color:'rgba(255,255,255,0.04)' } }
+            }
+          }
+        });
       }
 
       window.rzDepthZoom = function(dir) {
