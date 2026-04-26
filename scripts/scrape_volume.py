@@ -80,6 +80,10 @@ def main():
         d = datetime.utcfromtimestamp(ts / 1000).strftime("%Y-%m-%d")
         by_date[d] = v  # last value wins
 
+    # Exclude today — CoinGecko already has a partial point for the current day
+    # The definitive value for today will be written by tomorrow's run
+    by_date.pop(today, None)
+
     new_series = [{"date": d, "volume": round(v, 2)}
                   for d, v in sorted(by_date.items())]
 
