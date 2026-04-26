@@ -1430,10 +1430,12 @@ html, body { overflow-x: hidden; max-width: 100%; }
             <button class="conv-toggle" id="rz-mcap-btn-both" onclick="rzMcapSwitch('both',this)">MCap + FDV</button>
           </div>
         </div>
-        <!-- Ratio sub-btn row: JS injects left offset to align under parent btn -->
-        <div id="rz-ratio-row" style="display:none;margin-bottom:6px">
-          <button class="conv-toggle" id="rz-tvl-btn-mcap" onclick="rzTvlSwitch('mcap',this)" style="display:none">MCap / TVL</button>
-          <button class="conv-toggle" id="rz-tvl-btn-fdv" onclick="rzTvlSwitch('fdv',this)" style="display:none">FDV / TVL</button>
+        <!-- Ratio sub-btn: same natural width as main buttons, right-aligned to match -->
+        <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+          <div id="rz-ratio-row" style="display:none">
+            <button class="conv-toggle" id="rz-tvl-btn-mcap" onclick="rzTvlSwitch('mcap',this)" style="display:none">MCap / TVL</button>
+            <button class="conv-toggle" id="rz-tvl-btn-fdv" onclick="rzTvlSwitch('fdv',this)" style="display:none">FDV / TVL</button>
+          </div>
         </div>
 
         <!-- Single chart area -->
@@ -4799,13 +4801,12 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         const ratioRow   = document.getElementById('rz-ratio-row');
         const btnMcapTvl = document.getElementById('rz-tvl-btn-mcap');
         const btnFdvTvl  = document.getElementById('rz-tvl-btn-fdv');
-        ratioRow.style.paddingLeft = '0';
         if (_mcapMode === 'mcap') {
-          ratioRow.style.display   = 'block';
+          ratioRow.style.display   = 'inline-flex';
           btnMcapTvl.style.display = '';
           btnFdvTvl.style.display  = 'none';
         } else if (_mcapMode === 'fdv') {
-          ratioRow.style.display   = 'block';
+          ratioRow.style.display   = 'inline-flex';
           btnMcapTvl.style.display = 'none';
           btnFdvTvl.style.display  = '';
         } else {
