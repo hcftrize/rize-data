@@ -1421,20 +1421,21 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div class="ctx-panel" id="rz-panel-mcap">
 
         <!-- Chart header -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
-          <div id="rz-mcap-chart-label" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;flex:1">Market Cap</div>
-          <div class="conv-toggle-row" style="margin-bottom:0">
-            <button class="conv-toggle active" id="rz-mcap-btn-mcap" onclick="rzMcapSwitch('mcap',this)">Display MCap</button>
-            <button class="conv-toggle" id="rz-mcap-btn-fdv" onclick="rzMcapSwitch('fdv',this)">Display FDV</button>
-            <button class="conv-toggle" id="rz-mcap-btn-tvl" onclick="rzMcapSwitch('tvl',this)">Display TVL</button>
-            <button class="conv-toggle" id="rz-mcap-btn-both" onclick="rzMcapSwitch('both',this)">MCap + FDV</button>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+          <div id="rz-mcap-chart-label" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;flex:1;padding-top:4px">Market Cap</div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+            <div class="conv-toggle-row" style="margin-bottom:0">
+              <button class="conv-toggle active" id="rz-mcap-btn-mcap" onclick="rzMcapSwitch('mcap',this)">Display MCap</button>
+              <button class="conv-toggle" id="rz-mcap-btn-fdv" onclick="rzMcapSwitch('fdv',this)">Display FDV</button>
+              <button class="conv-toggle" id="rz-mcap-btn-tvl" onclick="rzMcapSwitch('tvl',this)">Display TVL</button>
+              <button class="conv-toggle" id="rz-mcap-btn-both" onclick="rzMcapSwitch('both',this)">MCap + FDV</button>
+            </div>
+            <!-- Ratio sub-btn: appears under its parent button, not active by default -->
+            <div id="rz-ratio-row" style="display:none;justify-content:flex-end;width:100%">
+              <button class="conv-toggle" id="rz-tvl-btn-mcap" onclick="rzTvlSwitch('mcap',this)" style="display:none">MCap / TVL</button>
+              <button class="conv-toggle" id="rz-tvl-btn-fdv" onclick="rzTvlSwitch('fdv',this)" style="display:none">FDV / TVL</button>
+            </div>
           </div>
-        </div>
-
-        <!-- Ratio sub-toggle: only shown for mcap/fdv modes, same style as main btns -->
-        <div id="rz-ratio-row" style="display:none;justify-content:flex-end;margin-bottom:6px;margin-top:4px">
-          <button class="conv-toggle active" id="rz-tvl-btn-mcap" onclick="rzTvlSwitch('mcap',this)" style="display:none">MCap / TVL</button>
-          <button class="conv-toggle active" id="rz-tvl-btn-fdv" onclick="rzTvlSwitch('fdv',this)" style="display:none">FDV / TVL</button>
         </div>
 
         <!-- Single chart area -->
@@ -4713,7 +4714,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       let _series    = [];
       let _chart     = null;  // single chart instance
       let _mcapMode  = 'mcap';   // mcap | fdv | tvl | both
-      let _tvlMode   = 'mcap';   // ratio overlay: mcap=MCap/TVL, fdv=FDV/TVL
+      let _subMode   = null;     // null = show main metric, 'ratio' = show ratio
       let _loaded    = false;
 
       function fmtM(v) {
@@ -4755,34 +4756,47 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       function buildChart() {
         const series = getActiveSeries();
         const labels = mkLabels(series);
-
-        // Build datasets based on mode
         let datasets = [];
-        let hasY2 = false;
+
+        // Determine what the chart actually shows:
+        // _subMode: null = main metric, 'ratio' = ratio replaces main metric
+        const showRatio = (_subMode === 'ratio');
 
         if (_mcapMode === 'mcap') {
-          datasets.push({ label:'Market Cap', data:series.map(p=>p.mcap||null), borderColor:'#7ee0ff', backgroundColor:'rgba(126,224,255,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true, yAxisID:'y' });
-          if (_tvlMode === 'mcap') {
-            datasets.push({ label:'MCap/TVL', data:series.map(p=>p.mcap_tvl||null), borderColor:'rgba(199,125,255,0.8)', backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:0.3, fill:false, spanGaps:true, yAxisID:'y2', borderDash:[5,3] });
-            hasY2 = true;
+          if (showRatio) {
+            // Full chart replaced by MCap/TVL ratio
+            datasets.push({ label:'MCap / TVL', data:series.map(p=>p.mcap_tvl||null), borderColor:'#c77dff', backgroundColor:'rgba(199,125,255,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true });
+          } else {
+            datasets.push({ label:'Market Cap', data:series.map(p=>p.mcap||null), borderColor:'#7ee0ff', backgroundColor:'rgba(126,224,255,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true });
           }
         } else if (_mcapMode === 'fdv') {
-          datasets.push({ label:'FDV', data:series.map(p=>p.fdv||null), borderColor:'#ffd36b', backgroundColor:'rgba(255,211,107,0.07)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true, yAxisID:'y' });
-          if (_tvlMode === 'fdv') {
-            datasets.push({ label:'FDV/TVL', data:series.map(p=>p.fdv_tvl||null), borderColor:'rgba(255,138,216,0.8)', backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:0.3, fill:false, spanGaps:true, yAxisID:'y2', borderDash:[5,3] });
-            hasY2 = true;
+          if (showRatio) {
+            // Full chart replaced by FDV/TVL ratio
+            datasets.push({ label:'FDV / TVL', data:series.map(p=>p.fdv_tvl||null), borderColor:'#ff8ad8', backgroundColor:'rgba(255,138,216,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true });
+          } else {
+            datasets.push({ label:'FDV', data:series.map(p=>p.fdv||null), borderColor:'#ffd36b', backgroundColor:'rgba(255,211,107,0.07)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true });
           }
         } else if (_mcapMode === 'tvl') {
-          datasets.push({ label:'TVL', data:series.map(p=>p.tvl||null), borderColor:'#98ffb6', backgroundColor:'rgba(152,255,182,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true, yAxisID:'y' });
-        } else { // both
-          datasets.push({ label:'Market Cap', data:series.map(p=>p.mcap||null), borderColor:'#7ee0ff', backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:0.3, fill:false, spanGaps:true, yAxisID:'y' });
-          datasets.push({ label:'FDV', data:series.map(p=>p.fdv||null), borderColor:'#ffd36b', backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:0.3, fill:false, spanGaps:true, yAxisID:'y' });
+          datasets.push({ label:'TVL', data:series.map(p=>p.tvl||null), borderColor:'#98ffb6', backgroundColor:'rgba(152,255,182,0.08)', borderWidth:1.5, pointRadius:0, tension:0.3, fill:true, spanGaps:true });
+        } else {
+          datasets.push({ label:'Market Cap', data:series.map(p=>p.mcap||null), borderColor:'#7ee0ff', backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:0.3, fill:false, spanGaps:true });
+          datasets.push({ label:'FDV', data:series.map(p=>p.fdv||null), borderColor:'#ffd36b', backgroundColor:'transparent', borderWidth:1.5, pointRadius:0, tension:0.3, fill:false, spanGaps:true });
         }
 
-        const lblMap = {mcap:'Market Cap', fdv:'FDV', tvl:'TVL', both:'Market Cap + FDV'};
+        // Chart label
+        const isRatio = showRatio;
+        const lblMap = {
+          mcap: isRatio ? 'MCap / TVL Ratio' : 'Market Cap',
+          fdv:  isRatio ? 'FDV / TVL Ratio'  : 'FDV',
+          tvl:  'TVL', both: 'Market Cap + FDV'
+        };
         document.getElementById('rz-mcap-chart-label').textContent = lblMap[_mcapMode];
 
-        // Ratio row: show correct button only
+        // Y-axis format depends on what's shown
+        const yCallback = (showRatio) ? v => v.toFixed(2)+'x' : v => fmtM(v);
+        const tooltipFmt = (showRatio) ? ctx => ` ${ctx.dataset.label}: ${fmtR(ctx.raw)}` : ctx => ` ${ctx.dataset.label}: ${fmtM(ctx.raw)}`;
+
+        // Show/hide ratio button row
         const ratioRow   = document.getElementById('rz-ratio-row');
         const btnMcapTvl = document.getElementById('rz-tvl-btn-mcap');
         const btnFdvTvl  = document.getElementById('rz-tvl-btn-fdv');
@@ -4795,7 +4809,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           btnMcapTvl.style.display = 'none';
           btnFdvTvl.style.display  = '';
         } else {
-          ratioRow.style.display   = 'none';
+          ratioRow.style.display = 'none';
         }
 
         const canvas = document.getElementById('rz-chart-mcap');
@@ -4803,30 +4817,18 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         document.getElementById('rz-mcap-loading-1').style.display = 'none';
         if (_chart) _chart.destroy();
 
-        const scales = {
-          x: { ticks:{color:'rgba(255,255,255,0.4)', maxTicksLimit:8, font:{family:'Rajdhani',size:11}}, grid:{color:'rgba(255,255,255,0.04)'} },
-          y: { ticks:{color:'rgba(255,255,255,0.4)', font:{family:'Rajdhani',size:11}, callback:v=>fmtM(v)}, grid:{color:'rgba(255,255,255,0.04)'} }
-        };
-        if (hasY2) {
-          scales.y2 = {
-            position:'right',
-            ticks:{ color:'rgba(199,125,255,0.7)', font:{family:'Rajdhani',size:10}, callback:v=>v.toFixed(2)+'x' },
-            grid:{ display:false }
-          };
-        }
-
         _chart = new Chart(canvas.getContext('2d'), {
           type:'line', data:{labels, datasets},
           options:{ responsive:true, maintainAspectRatio:false,
             interaction:{mode:'index', intersect:false},
             plugins:{
               legend:{ display:_mcapMode==='both', labels:{color:'rgba(255,255,255,0.6)', font:{family:'Rajdhani',size:12}} },
-              tooltip:{ callbacks:{ label:ctx => {
-                if (ctx.dataset.yAxisID === 'y2') return ` ${ctx.dataset.label}: ${fmtR(ctx.raw)}`;
-                return ` ${ctx.dataset.label}: ${fmtM(ctx.raw)}`;
-              }}}
+              tooltip:{ callbacks:{ label: tooltipFmt }}
             },
-            scales
+            scales:{
+              x:{ ticks:{color:'rgba(255,255,255,0.4)', maxTicksLimit:8, font:{family:'Rajdhani',size:11}}, grid:{color:'rgba(255,255,255,0.04)'} },
+              y:{ ticks:{color:'rgba(255,255,255,0.4)', font:{family:'Rajdhani',size:11}, callback: yCallback}, grid:{color:'rgba(255,255,255,0.04)'} }
+            }
           }
         });
       }
@@ -4887,20 +4889,23 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
       window.rzMcapSwitch = function(mode, btn) {
         _mcapMode = mode;
-        // Reset ratio overlay when switching main mode
-        if (mode === 'mcap') _tvlMode = 'mcap';
-        if (mode === 'fdv')  _tvlMode = 'fdv';
+        _subMode  = null;  // reset ratio — not pre-clicked
         ['rz-mcap-btn-mcap','rz-mcap-btn-fdv','rz-mcap-btn-tvl','rz-mcap-btn-both'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+        // Also deactivate ratio buttons
+        ['rz-tvl-btn-mcap','rz-tvl-btn-fdv'].forEach(id => document.getElementById(id)?.classList.remove('active'));
         btn.classList.add('active');
         buildChart();
       };
       window.rzTvlSwitch = function(mode, btn) {
-        _tvlMode = mode;
-        ['rz-tvl-btn-mcap','rz-tvl-btn-fdv'].forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.classList.remove('active');
-        });
-        btn.classList.add('active');
+        // Toggle: if already showing ratio, click again returns to main metric
+        if (_subMode === 'ratio') {
+          _subMode = null;
+          btn.classList.remove('active');
+        } else {
+          _subMode = 'ratio';
+          ['rz-tvl-btn-mcap','rz-tvl-btn-fdv'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+          btn.classList.add('active');
+        }
         buildChart();
       };
 
