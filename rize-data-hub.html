@@ -1566,27 +1566,35 @@ html, body { overflow-x: hidden; max-width: 100%; }
               </div>
               <button id="rz-depth-refresh" onclick="rzDepthRefresh()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.15);padding:5px 14px;cursor:pointer;white-space:nowrap;transition:background 0.15s">&#8635; Refresh</button>
             </div>
-            <!-- Sub-btn: Order Book View — left-aligned under pair buttons -->
-            <div id="rz-depth-sub-row" style="display:block">
-              <button class="conv-toggle" id="rz-depth-btn-ob" onclick="rzDepthViewSwitch('ob',this)">Order Book View</button>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button class="conv-toggle" id="rz-depth-btn-ob" onclick="rzDepthViewSwitch(this)">Order Book View</button>
+              <span id="rz-depth-spread-inline" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:0.5px"></span>
             </div>
           </div>
         </div>
 
-        <!-- Chart: Depth curve -->
-        <div id="rz-depth-view-depth" class="ctx-chart-wrap" style="height:280px">
-          <div class="ctx-loading" id="rz-depth-loading">Loading order book&hellip;</div>
-          <canvas id="rz-chart-depth" style="display:none"></canvas>
+        <!-- Depth curve + zoom controls -->
+        <div id="rz-depth-view-depth">
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-bottom:6px">
+            <span style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">Zoom</span>
+            <button onclick="rzDepthZoom(-1)" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);width:28px;height:28px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center">−</button>
+            <button onclick="rzDepthZoom(1)"  style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);width:28px;height:28px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center">+</button>
+            <button onclick="rzDepthZoom(0)"  style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);padding:4px 10px;cursor:pointer">Reset</button>
+          </div>
+          <div class="ctx-chart-wrap" style="height:280px">
+            <div class="ctx-loading" id="rz-depth-loading">Loading order book&hellip;</div>
+            <canvas id="rz-chart-depth" style="display:none"></canvas>
+          </div>
         </div>
 
-        <!-- Chart: Order Book table view -->
-        <div id="rz-depth-view-ob" style="display:none;height:320px;overflow-y:auto">
-          <table id="rz-ob-table" style="width:100%;border-collapse:collapse;font-family:'Rajdhani',sans-serif;font-size:13px">
-            <thead>
+        <!-- Order Book table — 2 cols: Cum Bids | Price | Cum Asks -->
+        <div id="rz-depth-view-ob" style="display:none;height:340px;overflow-y:auto;background:rgba(0,0,0,0.2)">
+          <table id="rz-ob-table" style="width:100%;border-collapse:collapse">
+            <thead style="position:sticky;top:0;background:#060818;z-index:2">
               <tr>
-                <th style="padding:6px 10px;text-align:right;color:rgba(255,255,255,0.5);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.07);position:sticky;top:0;background:#060818;width:38%">Cumulative</th>
-                <th style="padding:6px 10px;text-align:center;color:rgba(255,255,255,0.5);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.07);position:sticky;top:0;background:#060818;width:24%">Price</th>
-                <th style="padding:6px 10px;text-align:left;color:rgba(255,255,255,0.5);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.07);position:sticky;top:0;background:#060818;width:38%">Size</th>
+                <th style="padding:6px 12px;text-align:right;color:#98ffb6;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.07);width:40%">Cum. Bids (RIZE)</th>
+                <th style="padding:6px 12px;text-align:center;color:rgba(255,255,255,0.5);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.07);width:20%">Price</th>
+                <th style="padding:6px 12px;text-align:left;color:var(--pink);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.07);width:40%">Cum. Asks (RIZE)</th>
               </tr>
             </thead>
             <tbody id="rz-ob-tbody"></tbody>
@@ -5218,31 +5226,36 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
       // ── Load ──────────────────────────────────────────────
       async function loadDepth(force) {
-        if (!force && _cache[_mode]) {
-          const cfg = PAIRS[_mode];
-          const { bids, asks } = _cache[_mode];
-          const mid = (bids[0].price + asks[0].price) / 2;
-          renderChart(bids, asks, cfg, mid);
-          updateKPIs(computeKPIs(bids, asks, cfg), cfg);
-          return;
+        const cfg = PAIRS[_mode];
+
+        // Show loading state in active view
+        if (_viewMode === 'ob') {
+          document.getElementById('rz-ob-tbody').innerHTML =
+            '<tr><td colspan="3" style="padding:20px;text-align:center;color:var(--muted);font-family:'Rajdhani',sans-serif">Loading order book…</td></tr>';
+        } else {
+          document.getElementById('rz-depth-loading').style.display = 'flex';
+          document.getElementById('rz-depth-loading').textContent = 'Loading order book…';
+          document.getElementById('rz-chart-depth').style.display = 'none';
         }
-        document.getElementById('rz-depth-loading').style.display = 'block';
-        document.getElementById('rz-depth-loading').textContent = 'Loading order book…';
-        document.getElementById('rz-chart-depth').style.display = 'none';
+
         try {
-          const cfg = PAIRS[_mode];
-          _cache[_mode] = await fetchPair(cfg.kraken);
+          // Always fetch fresh if forced or not cached
+          if (force || !_cache[_mode]) {
+            _cache[_mode] = await fetchPair(cfg.kraken);
+          }
           const { bids, asks } = _cache[_mode];
           const mid = (bids[0].price + asks[0].price) / 2;
+
+          // Always render both — cheap, ensures sync
           renderChart(bids, asks, cfg, mid);
-          updateKPIs(computeKPIs(bids, asks, cfg), cfg);
-          // Also render OB table so it's ready if user switches view
           renderOrderBook(bids, asks, cfg);
-          // If currently in OB view, show it
-          if (_viewMode === 'ob') {
-            document.getElementById('rz-depth-view-depth').style.display = 'none';
-            document.getElementById('rz-depth-view-ob').style.display = 'block';
-          }
+          updateKPIs(computeKPIs(bids, asks, cfg), cfg);
+
+          // Show correct view
+          const isOb = _viewMode === 'ob';
+          document.getElementById('rz-depth-view-depth').style.display = isOb ? 'none' : 'block';
+          document.getElementById('rz-depth-view-ob').style.display   = isOb ? 'block' : 'none';
+
           _loaded = true;
         } catch(e) {
           document.getElementById('rz-depth-loading').textContent = 'Error: ' + e.message;
@@ -5250,7 +5263,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         }
       }
 
-      // ── Grouping tick size (Kraken-style adaptive) ─────────
+      // ── Tick size adaptive (Kraken-style) ────────────────
       function getTickSize(price) {
         if (price < 0.001)  return 0.00005;
         if (price < 0.01)   return 0.0005;
@@ -5261,25 +5274,29 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       }
 
       function groupLevels(levels, tickSize, isBid) {
-        // Group individual price levels into buckets of tickSize
         const map = new Map();
         for (const l of levels) {
-          const bucket = isBid
-            ? Math.floor(l.price / tickSize) * tickSize
-            : Math.ceil(l.price / tickSize) * tickSize;
-          const key = bucket.toFixed(10);
+          const raw    = l.price / tickSize;
+          const bucket = isBid ? Math.floor(raw) * tickSize : Math.ceil(raw) * tickSize;
+          const key    = bucket.toFixed(12);
           if (!map.has(key)) map.set(key, { price: bucket, vol: 0 });
           map.get(key).vol += l.vol;
         }
         const arr = Array.from(map.values());
         return isBid
-          ? arr.sort((a,b) => b.price - a.price)   // bids: high→low
-          : arr.sort((a,b) => a.price - b.price);  // asks: low→high
+          ? arr.sort((a,b) => b.price - a.price)
+          : arr.sort((a,b) => a.price - b.price);
       }
 
-      // ── Order Book renderer (Kraken Pro style) ────────────
+      const fmtVol = v => {
+        if (v >= 1e6) return (v/1e6).toFixed(2) + 'M';
+        if (v >= 1e3) return Math.round(v/1e3).toLocaleString() + 'K';
+        return Math.round(v).toLocaleString();
+      };
+
+      // ── Order Book renderer — 2-col Kraken Pro style ─────
       function renderOrderBook(bids, asks, cfg) {
-        const sym  = cfg.sym;
+        const sym   = cfg.sym;
         const tbody = document.getElementById('rz-ob-tbody');
         if (!tbody) return;
 
@@ -5289,114 +5306,158 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         const spread  = bestAsk - bestBid;
         const tick    = getTickSize(mid);
 
-        // Group into Kraken-style price buckets
-        const groupedBids = groupLevels(bids, tick, true);
-        const groupedAsks = groupLevels(asks, tick, false);
+        const gBids = groupLevels(bids, tick, true);
+        const gAsks = groupLevels(asks, tick, false);
 
-        // Build cumulative arrays
-        let cumBid = 0;
-        const bidRows = groupedBids.map(b => {
-          cumBid += b.vol;
-          return { price: b.price, vol: b.vol, cum: cumBid };
-        });
+        // Cumulative bids (best → worst)
+        let c = 0;
+        const bidRows = gBids.map(b => { c += b.vol; return { price:b.price, cum:c }; });
 
-        let cumAsk = 0;
-        const askRows = groupedAsks.map(a => {
-          cumAsk += a.vol;
-          return { price: a.price, vol: a.vol, cum: cumAsk };
-        });
+        // Cumulative asks (best → worst)
+        c = 0;
+        const askRows = gAsks.map(a => { c += a.vol; return { price:a.price, cum:c }; });
 
         const maxCum = Math.max(
           bidRows.length ? bidRows[bidRows.length-1].cum : 1,
           askRows.length ? askRows[askRows.length-1].cum : 1
         );
 
-        // Determine price decimal places from tick
-        const pDec = Math.max(0, -Math.floor(Math.log10(tick)));
+        const pDec = Math.max(0, Math.ceil(-Math.log10(tick)));
         const fmtP = v => sym + v.toFixed(pDec);
-        const fmtV = v => {
-          if (v >= 1e6) return (v/1e6).toFixed(2) + 'M';
-          if (v >= 1e3) return Math.round(v/1e3) + 'K';
-          return Math.round(v).toLocaleString();
-        };
 
-        // Mid/spread row
+        // Spread inline label
         const spreadPct = mid > 0 ? ((spread/mid)*100).toFixed(3) : '—';
-        let html = `<tr style="background:rgba(255,255,255,0.05);border-top:1px solid rgba(255,255,255,0.12);border-bottom:1px solid rgba(255,255,255,0.12)">
-          <td colspan="2" style="padding:5px 10px;text-align:center;color:#fff;font-weight:700;font-size:14px;font-family:'Rajdhani',sans-serif">
-            ${fmtP(mid)} <span style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:400">&nbsp;Spread ${sym}${spread.toFixed(pDec)} (${spreadPct}%)</span>
-          </td>
-        </tr>`;
+        const spreadEl = document.getElementById('rz-depth-spread-inline');
+        if (spreadEl) spreadEl.textContent = `Spread: ${sym}${spread.toFixed(pDec)} (${spreadPct}%)`;
 
-        // Asks first (above mid), reversed so closest ask is nearest to mid
+        // Asks: display reversed (highest ask at top, closest to mid at bottom)
+        let html = '';
         const askDisplay = [...askRows].reverse();
         for (const a of askDisplay) {
           const barW = Math.round((a.cum / maxCum) * 100);
-          html += `<tr class="rz-ob-row" style="border-bottom:1px solid rgba(255,255,255,0.025)">
-            <td style="padding:3px 8px;text-align:right;color:var(--pink);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;position:relative;width:38%">
-              <div style="position:absolute;right:0;top:0;bottom:0;width:${barW}%;background:rgba(255,107,138,0.10);pointer-events:none"></div>
-              <span style="position:relative">${fmtV(a.cum)}</span>
+          html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.02)">
+            <td style="padding:2px 12px;text-align:right;color:rgba(255,107,138,0.55);font-family:'Rajdhani',sans-serif;font-size:12px;width:40%;position:relative">
+              <div style="position:absolute;right:0;top:0;bottom:0;width:${barW}%;background:rgba(255,107,138,0.07);pointer-events:none"></div>
+              <span style="position:relative">${fmtVol(a.cum)}</span>
             </td>
-            <td style="padding:3px 8px;text-align:center;color:var(--pink);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;width:24%">${fmtP(a.price)}</td>
-            <td style="padding:3px 8px;text-align:left;color:rgba(255,107,138,0.7);font-family:'Rajdhani',sans-serif;font-size:12px;width:38%">${fmtV(a.vol)}</td>
+            <td style="padding:2px 8px;text-align:center;color:var(--pink);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;width:20%;white-space:nowrap">${fmtP(a.price)}</td>
+            <td style="width:40%"></td>
           </tr>`;
         }
 
-        html += `<tr style="background:rgba(255,255,255,0.05);border-top:1px solid rgba(255,255,255,0.12);border-bottom:1px solid rgba(255,255,255,0.12)">
-          <td colspan="2" style="padding:5px 10px;text-align:center;color:#fff;font-weight:700;font-size:14px;font-family:'Rajdhani',sans-serif">
-            ${fmtP(mid)} <span style="font-size:11px;color:rgba(255,255,255,0.4);font-weight:400">&nbsp;Spread ${sym}${spread.toFixed(pDec)} (${spreadPct}%)</span>
+        // Mid row
+        html += `<tr style="background:rgba(255,255,255,0.04);border-top:1px solid rgba(255,255,255,0.10);border-bottom:1px solid rgba(255,255,255,0.10)">
+          <td colspan="3" style="padding:4px 12px;text-align:center;color:#fff;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700">
+            ${fmtP(mid)}
           </td>
         </tr>`;
 
-        // Bids below mid
+        // Bids: best bid at top (closest to mid)
         for (const b of bidRows) {
           const barW = Math.round((b.cum / maxCum) * 100);
-          html += `<tr class="rz-ob-row" style="border-bottom:1px solid rgba(255,255,255,0.025)">
-            <td style="padding:3px 8px;text-align:right;color:rgba(152,255,182,0.7);font-family:'Rajdhani',sans-serif;font-size:12px;width:38%">${fmtV(b.vol)}</td>
-            <td style="padding:3px 8px;text-align:center;color:#98ffb6;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;width:24%">${fmtP(b.price)}</td>
-            <td style="padding:3px 8px;text-align:left;color:#98ffb6;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:600;position:relative;width:38%">
-              <div style="position:absolute;left:0;top:0;bottom:0;width:${barW}%;background:rgba(152,255,182,0.10);pointer-events:none"></div>
-              <span style="position:relative">${fmtV(b.cum)}</span>
+          html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.02)">
+            <td style="width:40%"></td>
+            <td style="padding:2px 8px;text-align:center;color:#98ffb6;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;width:20%;white-space:nowrap">${fmtP(b.price)}</td>
+            <td style="padding:2px 12px;text-align:left;color:rgba(152,255,182,0.55);font-family:'Rajdhani',sans-serif;font-size:12px;width:40%;position:relative">
+              <div style="position:absolute;left:0;top:0;bottom:0;width:${barW}%;background:rgba(152,255,182,0.07);pointer-events:none"></div>
+              <span style="position:relative">${fmtVol(b.cum)}</span>
             </td>
           </tr>`;
         }
 
         tbody.innerHTML = html;
 
-        // Scroll to show mid price (separator row) in center
-        const wrap = document.getElementById('rz-depth-view-ob');
-        if (wrap) {
-          const midRowEl = tbody.querySelectorAll('tr')[askDisplay.length + 1];
-          if (midRowEl) setTimeout(() => midRowEl.scrollIntoView({ block:'center', behavior:'instant' }), 50);
+        // Scroll mid row into view
+        setTimeout(() => {
+          const rows = tbody.querySelectorAll('tr');
+          const midRow = rows[askDisplay.length];
+          if (midRow) midRow.scrollIntoView({ block:'center', behavior:'instant' });
+        }, 30);
+      }
+
+      // ── Zoom state for depth chart ─────────────────────────
+      let _zoomLevel = 0; // 0=full, >0=zoomed in
+      const ZOOM_STEPS = [1, 0.5, 0.25, 0.15, 0.08, 0.04];
+
+      window.rzDepthZoom = function(dir) {
+        if (dir === 0) { _zoomLevel = 0; }
+        else { _zoomLevel = Math.max(0, Math.min(ZOOM_STEPS.length-1, _zoomLevel + (dir > 0 ? 1 : -1))); }
+        const cached = _cache[_mode];
+        if (cached) {
+          const cfg = PAIRS[_mode];
+          const { bids, asks } = cached;
+          renderChartZoomed(bids, asks, cfg, _zoomLevel);
+        }
+      };
+
+      function renderChartZoomed(bids, asks, cfg, zoomLevel) {
+        const sym     = cfg.sym;
+        const bestBid = bids[0].price;
+        const bestAsk = asks[0].price;
+        const mid     = (bestBid + bestAsk) / 2;
+        const factor  = ZOOM_STEPS[zoomLevel];
+
+        // Filter to ±factor% around mid
+        const zBids = bids.filter(b => b.price >= mid * (1 - factor));
+        const zAsks = asks.filter(a => a.price <= mid * (1 + factor));
+
+        // Recalculate cumulative for zoomed window
+        let cumB = 0;
+        const cumBids = zBids.map(b => { cumB += b.vol; return { price:b.price, cumRize:cumB, cumVal:cumB*b.price }; });
+        let cumA = 0;
+        const cumAsks = zAsks.map(a => { cumA += a.vol; return { price:a.price, cumRize:cumA, cumVal:cumA*a.price }; });
+
+        const datasets = [
+          { label:`Bids (${cfg.label})`, data:cumBids.map(d=>({x:d.price,y:d.cumRize,val:d.cumVal})),
+            borderColor:cfg.color.bid, backgroundColor:cfg.color.bid==='#98ffb6'?'rgba(152,255,182,0.12)':'rgba(126,224,255,0.12)',
+            borderWidth:1.5, pointRadius:0, tension:0, fill:true, stepped:'before' },
+          { label:`Asks (${cfg.label})`, data:cumAsks.map(d=>({x:d.price,y:d.cumRize,val:d.cumVal})),
+            borderColor:cfg.color.ask, backgroundColor:cfg.color.ask==='#ff6b8a'?'rgba(255,107,138,0.12)':'rgba(255,211,107,0.12)',
+            borderWidth:1.5, pointRadius:0, tension:0, fill:true, stepped:'before' },
+        ];
+
+        if (_chart) {
+          _chart.data.datasets[0].data = datasets[0].data;
+          _chart.data.datasets[1].data = datasets[1].data;
+          _chart.update('none');
+        } else {
+          // Chart not built yet — build it
+          renderChart(bids, asks, cfg, mid);
         }
       }
 
-      let _viewMode = 'depth'; // 'depth' | 'ob'
+      let _viewMode = 'depth';
 
-      // ── View toggle: depth curve ↔ order book ────────────
-      window.rzDepthViewSwitch = function(view, btn) {
-        // Toggle — if already in ob, clicking again returns to depth
+      // ── Toggle depth ↔ order book ─────────────────────────
+      window.rzDepthViewSwitch = function(btn) {
         if (_viewMode === 'ob') {
+          // Switch back to depth
           _viewMode = 'depth';
+          btn.textContent = 'Order Book View';
           btn.classList.remove('active');
           document.getElementById('rz-depth-view-depth').style.display = 'block';
-          document.getElementById('rz-depth-view-ob').style.display = 'none';
-          return;
+          document.getElementById('rz-depth-view-ob').style.display   = 'none';
+        } else {
+          // Switch to OB
+          _viewMode = 'ob';
+          btn.textContent = 'Depth Chart View';
+          btn.classList.add('active');
+          document.getElementById('rz-depth-view-depth').style.display = 'none';
+          document.getElementById('rz-depth-view-ob').style.display   = 'block';
+          const cached = _cache[_mode];
+          if (cached) renderOrderBook(cached.bids, cached.asks, PAIRS[_mode]);
         }
-        _viewMode = 'ob';
-        btn.classList.add('active');
-        document.getElementById('rz-depth-view-depth').style.display = 'none';
-        document.getElementById('rz-depth-view-ob').style.display = 'block';
-        const cached = _cache[_mode];
-        if (cached) renderOrderBook(cached.bids, cached.asks, PAIRS[_mode]);
       };
 
       // ── Public ────────────────────────────────────────────
       window.rzDepthSwitch = function(mode, btn) {
         _mode = mode;
+        _zoomLevel = 0;
         ['rz-depth-btn-usd','rz-depth-btn-eur'].forEach(id => document.getElementById(id)?.classList.remove('active'));
         btn.classList.add('active');
-        loadDepth(false);
+        // Always force fresh load and render both views
+        delete _cache[_mode];
+        loadDepth(true);
       };
       window.rzDepthRefresh = function() {
         delete _cache[_mode];
