@@ -3695,9 +3695,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       const volumes = [];
       const rawDays = [];
       // Exclude today's point — volume is only complete at 00:15 UTC next day
-      const todayUTC = new Date().toISOString().slice(0, 10);
-      const filteredSeries = series.filter(p => p.date < todayUTC);
-      filteredSeries.forEach(p => {
+      series.forEach(p => {
         const d = new Date(p.date + 'T00:00:00Z');
         labels.push(d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" }));
         volumes.push(p.volume);
