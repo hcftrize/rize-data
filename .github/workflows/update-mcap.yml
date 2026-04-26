@@ -1,0 +1,45 @@
+name: Update MCap History
+
+on:
+  schedule:
+    - cron: "0 1 * * *"   # 01:00 UTC daily
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run scraper
+        run: python scripts/scrape_mcap.py
+
+      - name: Commit and push to dev
+        run: |
+          git config user.name  "tokerize-bot"
+          git config user.email "bot@tokerize.com"
+          git add rize-data-hub/mcap-history.json
+          if git diff --cached --quiet; then
+            echo "No changes."
+          else
+            git commit -m "chore(data): mcap-history $(date -u +%Y-%m-%d)"
+            git push origin dev
+          fi
+
+      - name: Push data file to main
+        run: |
+          git fetch origin main
+          git checkout main
+          git checkout dev -- rize-data-hub/mcap-history.json
+          git add rize-data-hub/mcap-history.json
+          git diff --staged --quiet || git commit -m "chore(data): mcap-history $(date -u +%Y-%m-%d)"
+          git push origin main
