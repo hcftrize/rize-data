@@ -74,24 +74,23 @@ def main():
     print(f"  → {len(raw_vols)} data points received")
 
     # Convert to [{date, volume}] — CoinGecko returns [timestamp_ms, value]
-    # Beyond 90 days: daily granularity at 00:00 UTC → date is correct as-is
-    # Within 90 days: hourly granularity → last value per day wins (closest to 23:59 UTC)
+    # Group by date (take last value per day to avoid duplicates at day boundaries)
     by_date: dict[str, float] = {}
     for ts, v in raw_vols:
         d = datetime.utcfromtimestamp(ts / 1000).strftime("%Y-%m-%d")
-        by_date[d] = v  # last value wins = most complete value for that day
+        by_date[d] = v  # last value wins
 
-    # Exclude today — volume is only complete at 00:00 UTC next day
-    # Tomorrow's run will write today's definitive value
+    # Exclude today — the hourly points for today are incomplete
+    # Tomorrow's run at 00:15 UTC will write today's definitive value
     by_date.pop(today, None)
 
     new_series = [{"date": d, "volume": round(v, 2)}
                   for d, v in sorted(by_date.items())]
 
-    # Always overwrite the entire fetch window (last 365 days)
-    # Keep only existing points strictly before the fetch window (history beyond 365 days)
-    fetch_start = new_series[0]["date"] if new_series else today
-    if existing_series:
+    # Merge with existing — existing points outside the fetch window are kept
+    if existing_series and not bootstrap:
+        # Keep existing points strictly before the fetch window
+        fetch_start = new_series[0]["date"] if new_series else today
         kept = [p for p in existing_series if p["date"] < fetch_start]
         merged = kept + new_series
     else:
