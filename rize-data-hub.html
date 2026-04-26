@@ -5265,38 +5265,21 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         }
       }
 
-      // ── Tick size adaptive — regroupement progressif ────────
-      // Règle: tick grandit avec le prix pour éviter des listes infinies
-      // < 0.001  → 0.00005  (micro)
-      // < 0.005  → 0.0001
-      // < 0.01   → 0.0005
-      // < 0.05   → 0.001
-      // < 0.1    → 0.005
-      // < 0.5    → 0.01     (paquets de 1 cent)
-      // < 1      → 0.05
-      // < 5      → 0.1
-      // < 10     → 0.5
-      // >= 10    → 1
-      function getTickSize(price) {
-        if (price < 0.001)  return 0.00005;
-        if (price < 0.005)  return 0.0001;
-        if (price < 0.01)   return 0.0005;
-        if (price < 0.05)   return 0.001;
-        if (price < 0.1)    return 0.005;
-        if (price < 0.5)    return 0.01;
-        if (price < 1)      return 0.05;
-        if (price < 5)      return 0.1;
-        if (price < 10)     return 0.5;
-        return 1;
+      // ── Tick size — séquences de ticks par ordre de magnitude ──
+      // On choisit le tick minimal donnant ≤ MAX_OB_ROWS lignes par side
+      const MAX_OB_ROWS = 40;
+
+      function getTickSequence(price) {
+        // Ticks progressifs par ordre de magnitude du prix
+        const mag = Math.pow(10, Math.floor(Math.log10(price)));
+        // On propose 5 niveaux de tick : 0.1x, 0.2x, 0.5x, 1x, 2x du mag
+        return [0.1, 0.2, 0.5, 1, 2, 5, 10].map(f => mag * f);
       }
 
       function groupLevels(levels, tickSize, isBid) {
         const map = new Map();
         for (const l of levels) {
           const raw    = l.price / tickSize;
-          // bids: floor (prend le bucket inférieur), asks: floor aussi
-          // pour que 0.0040 → bucket 0.0040, 0.0041 → 0.0040 (bids groupés vers le bas)
-          // pour asks: 0.0045 → bucket 0.0045, 0.0046 → 0.0045 (asks groupés vers le bas aussi)
           const bucket = Math.floor(raw) * tickSize;
           const key    = bucket.toFixed(12);
           if (!map.has(key)) map.set(key, { price: bucket, vol: 0 });
@@ -5304,8 +5287,18 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         }
         const arr = Array.from(map.values());
         return isBid
-          ? arr.sort((a,b) => b.price - a.price)   // high→low
-          : arr.sort((a,b) => a.price - b.price);   // low→high
+          ? arr.sort((a,b) => b.price - a.price)
+          : arr.sort((a,b) => a.price - b.price);
+      }
+
+      function getBestTickSize(levels, mid, isBid) {
+        // Cherche le tick le plus fin donnant <= MAX_OB_ROWS lignes
+        const ticks = getTickSequence(mid);
+        for (const tick of ticks) {
+          const grouped = groupLevels(levels, tick, isBid);
+          if (grouped.length <= MAX_OB_ROWS) return tick;
+        }
+        return ticks[ticks.length - 1]; // fallback: plus gros tick
       }
 
       const fmtVol = v => {
@@ -5324,7 +5317,11 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         const bestAsk = asks[0]?.price || 0;
         const mid     = (bestBid + bestAsk) / 2;
         const spread  = bestAsk - bestBid;
-        const tick    = getTickSize(mid);
+
+        // Tick adaptatif indépendant par side pour garantir ≤ MAX_OB_ROWS lignes
+        const tickBid = getBestTickSize(bids, mid, true);
+        const tickAsk = getBestTickSize(asks, mid, false);
+        const tick    = Math.max(tickBid, tickAsk); // tick unifié pour cohérence visuelle
 
         const gBids = groupLevels(bids, tick, true);   // high→low
         const gAsks = groupLevels(asks, tick, false);  // low→high
@@ -5340,13 +5337,14 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           askRows.length ? askRows[askRows.length-1].cum : 1
         );
 
-        const pDec = Math.max(0, Math.ceil(-Math.log10(tick)));
+        const pDec     = Math.max(0, Math.ceil(-Math.log10(tick)));
+        const spreadDec = pDec + 2; // spread beaucoup plus petit que tick → +2 déc
         const fmtP = v => v.toFixed(pDec);
 
         // Spread label under chart title
         const spreadPct = mid > 0 ? ((spread/mid)*100).toFixed(3) : '—';
         const spreadEl = document.getElementById('rz-depth-spread-inline');
-        if (spreadEl) spreadEl.textContent = `Spread: ${sym}${spread.toFixed(pDec)} (${spreadPct}%)`;
+        if (spreadEl) spreadEl.textContent = `Spread: ${sym}${spread.toFixed(spreadDec)} (${spreadPct}%)`;
 
         // face-à-face: bids[i] (best bid at top = highest) vs asks[i] (best ask at top = lowest)
         const maxRows = Math.max(bidRows.length, askRows.length);
@@ -5436,17 +5434,15 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       // ── Toggle depth ↔ order book ─────────────────────────
       window.rzDepthViewSwitch = function(btn) {
         if (_viewMode === 'ob') {
-          // Switch back to depth
           _viewMode = 'depth';
           btn.textContent = 'Order Book View';
           btn.classList.remove('active');
           document.getElementById('rz-depth-view-depth').style.display = 'block';
           document.getElementById('rz-depth-view-ob').style.display   = 'none';
         } else {
-          // Switch to OB
           _viewMode = 'ob';
           btn.textContent = 'Depth Chart View';
-          btn.classList.add('active');
+          btn.classList.remove('active'); // jamais cyan — c'est un switch, pas un état
           document.getElementById('rz-depth-view-depth').style.display = 'none';
           document.getElementById('rz-depth-view-ob').style.display   = 'block';
           const cached = _cache[_mode];
