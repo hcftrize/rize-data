@@ -80,10 +80,6 @@ def main():
         d = datetime.utcfromtimestamp(ts / 1000).strftime("%Y-%m-%d")
         by_date[d] = v  # last value wins
 
-    # Exclude today — the hourly points for today are incomplete
-    # Tomorrow's run at 00:15 UTC will write today's definitive value
-    by_date.pop(today, None)
-
     new_series = [{"date": d, "volume": round(v, 2)}
                   for d, v in sorted(by_date.items())]
 
