@@ -74,23 +74,26 @@ def main():
     print(f"  → {len(raw_vols)} data points received")
 
     # Convert to [{date, volume}] — CoinGecko returns [timestamp_ms, value]
-    # Group by date (take last value per day to avoid duplicates at day boundaries)
+    # CoinGecko total_volumes is a rolling 24h window.
+    # The point at 00:00 UTC on day D represents the volume of day D-1 (00:00 to 23:59:59 UTC).
+    # So we shift each timestamp back by 1 day to get the correct calendar date.
+    from datetime import timedelta as _td
     by_date: dict[str, float] = {}
     for ts, v in raw_vols:
-        d = datetime.utcfromtimestamp(ts / 1000).strftime("%Y-%m-%d")
-        by_date[d] = v  # last value wins
+        # Shift back 1 day: point labeled "Apr 26 00:00" = volume of Apr 25
+        d = (datetime.utcfromtimestamp(ts / 1000) - _td(days=1)).strftime("%Y-%m-%d")
+        by_date[d] = v  # last value wins = last point of the shifted day = most complete
 
-    # Exclude today — CoinGecko already has a partial point for the current day
-    # The definitive value for today will be written by tomorrow's run
+    # Exclude today — its definitive value will be written by tomorrow's run
     by_date.pop(today, None)
 
     new_series = [{"date": d, "volume": round(v, 2)}
                   for d, v in sorted(by_date.items())]
 
-    # Merge with existing — existing points outside the fetch window are kept
+    # Merge: new_series covers last 365 days (shifted) — overwrite everything in that window
+    # Existing points strictly before the window are kept (historical data beyond 365 days)
+    fetch_start = new_series[0]["date"] if new_series else today
     if existing_series and not bootstrap:
-        # Keep existing points strictly before the fetch window
-        fetch_start = new_series[0]["date"] if new_series else today
         kept = [p for p in existing_series if p["date"] < fetch_start]
         merged = kept + new_series
     else:
