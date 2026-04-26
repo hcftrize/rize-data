@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
 Daily incremental updater — merges new events (last 8 days) into existing JSONs.
-Runs after bootstrap is complete. Safe to run on partial/empty JSONs.
 Usage:
   python3 update_governance.py              # all 6
   python3 update_governance.py bond-broken  # single
 
-Fixes vs previous version:
-  - Entity names updated to match real Goldsky/Ormi schema (xxxEvents pattern)
-  - gql() handles 429 with progressive backoff (same as bootstrap)
-  - merge() uses 'id' dedup (unchanged, was correct)
+v4 — champs réels d'après introspection :
+  - orderBy:timestamp, filtre where:{timestamp_gt:"TS"}
+  - nftId, txHash, timestamp (pas blockTimestamp/transactionHash/bondId)
+  - pools et bondOwners : re-fetch complet (snapshots, pas d'events)
+  - Ormi : pauses + backoff 429
 """
 
 import json, time, sys, os, urllib.request, urllib.error
@@ -32,136 +32,186 @@ HEADERS = {
     "Referer":      "https://tokerize.top/",
 }
 
-# Entity names corrected to match actual GraphQL schema (xxxEvents pattern).
-# TS is replaced at runtime with the unix timestamp cutoff string.
+# Queries incrémentales — filtre sur timestamp (champ réel).
+# TS remplacé au runtime par le unix timestamp cutoff.
+# Snapshots (pools, bondOwners) : re-fetch complet sans filtre timestamp.
 QUERIES_INCR = {
     "pool-config": {
-        "poolUpdatedEvents": """{ poolUpdatedEvents(first:1000,orderBy:blockTimestamp,orderDirection:asc,where:{blockTimestamp_gt:"TS"}) {
-            id blockNumber blockTimestamp transactionHash poolId maxMultiplier fullMaturityPeriod warmupPeriod distributionPeriod } }""",
-        "releaseWarmupUpdatedEvents": """{ releaseWarmupUpdatedEvents(first:1000,orderBy:blockTimestamp,orderDirection:asc,where:{blockTimestamp_gt:"TS"}) {
-            id blockNumber blockTimestamp transactionHash warmupPeriod } }""",
-        "migratorAddedEvents": """{ migratorAddedEvents(first:1000,orderBy:blockTimestamp,orderDirection:asc,where:{blockTimestamp_gt:"TS"}) {
-            id blockNumber blockTimestamp transactionHash migrator } }""",
-        "migratorRemovedEvents": """{ migratorRemovedEvents(first:1000,orderBy:blockTimestamp,orderDirection:asc,where:{blockTimestamp_gt:"TS"}) {
-            id blockNumber blockTimestamp transactionHash migrator } }""",
+        # Snapshots : re-fetch complet (état courant des pools)
+        "pools": {
+            "mode": "snapshot",
+            "query": "{ pools(first:1000, orderBy:id, orderDirection:asc) { id poolId baseWeight maturedWeightBonus fullMaturity updatedAtDate updatedAtTimestamp } }",
+        },
+        "poolUpdatedEvents": {
+            "mode": "incremental",
+            "query": '{ poolUpdatedEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id poolId baseWeight maturedWeightBonus fullMaturity date blockNumber timestamp txHash } }',
+        },
+        "releaseWarmupUpdatedEvents": {
+            "mode": "incremental",
+            "query": '{ releaseWarmupUpdatedEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id value date blockNumber timestamp txHash } }',
+        },
+        "migratorAddedEvents": {
+            "mode": "incremental",
+            "query": '{ migratorAddedEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id migrator date blockNumber timestamp txHash } }',
+        },
+        "migratorRemovedEvents": {
+            "mode": "incremental",
+            "query": '{ migratorRemovedEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id migrator date blockNumber timestamp txHash } }',
+        },
     },
     "bond-lifecycle": {
-        "tokensReleasedEvents": """{ tokensReleasedEvents(first:1000,orderBy:blockTimestamp,orderDirection:asc,where:{blockTimestamp_gt:"TS"}) {
-            id blockNumber blockTimestamp transactionHash bondId amount to } }""",
-        "bondMigratedEvents": """{ bondMigratedEvents(first:1000,orderBy:blockTimestamp,orderDirection:asc,where:{blockTimestamp_gt:"TS"}) {
-            id blockNumber blockTimestamp transactionHash bondId fromPool toPool amount } }""",
-        "vestingUpdatedEvents": """{ vestingUpdatedEvents(first:1000,orderBy:blockTimestamp,orderDirection:asc,where:{blockTimestamp_gt:"TS"}) {
-            id blockNumber blockTimestamp transactionHash bondId vestingEnd } }""",
-        "vestedTokenClawedEvents": """{ vestedTokenClawedEvents(first:1000,orderBy:blockTimestamp,orderDirection:asc,where:{blockTimestamp_gt:"TS"}) {
-            id blockNumber blockTimestamp transactionHash bondId amount } }""",
+        "tokensReleasedEvents": {
+            "mode": "incremental",
+            "query": '{ tokensReleasedEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id nftId to amount date blockNumber timestamp txHash } }',
+        },
+        "bondMigratedEvents": {
+            "mode": "incremental",
+            "query": '{ bondMigratedEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id nftId toPool migrator date blockNumber timestamp txHash } }',
+        },
+        "vestingUpdatedEvents": {
+            "mode": "incremental",
+            "query": '{ vestingUpdatedEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id nftId amount cliff vesting start date blockNumber timestamp txHash } }',
+        },
+        "vestedTokenClawedEvents": {
+            "mode": "incremental",
+            "query": '{ vestedTokenClawedEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id nftId amount to date blockNumber timestamp txHash } }',
+        },
     },
     "bond-broken": {
-        "bondBrokenEvents": """{ bondBrokenEvents(first:1000,orderBy:blockTimestamp,orderDirection:asc,where:{blockTimestamp_gt:"TS"}) {
-            id blockNumber blockTimestamp transactionHash bondId amount owner date } }""",
+        "bondBrokenEvents": {
+            "mode": "incremental",
+            "query": '{ bondBrokenEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id nftId amount date blockNumber timestamp txHash } }',
+        },
     },
     "nft-transfers": {
-        "nftTransferEvents": """{ nftTransferEvents(first:1000,orderBy:blockTimestamp,orderDirection:asc,where:{blockTimestamp_gt:"TS"}) {
-            id blockNumber blockTimestamp transactionHash from to tokenId transferCount } }""",
+        "nftTransferEvents": {
+            "mode": "incremental",
+            "query": '{ nftTransferEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id tokenId from to isMint date blockNumber timestamp txHash } }',
+        },
+        "bondOwners": {
+            "mode": "snapshot",
+            "query": "{ bondOwners(first:1000, orderBy:id, orderDirection:asc) { id tokenId owner mintDate mintTimestamp lastTransferDate lastTransferTimestamp transferCount } }",
+        },
     },
     "bond-timemarker": {
-        "bondTimeMarkerEvents": """{ bondTimeMarkerEvents(first:1000,orderBy:blockTimestamp,orderDirection:asc,where:{blockTimestamp_gt:"TS"}) {
-            id blockNumber blockTimestamp transactionHash bondId timeMarker amount poolId } }""",
+        "bondTimeMarkerEvents": {
+            "mode": "incremental",
+            "query": '{ bondTimeMarkerEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id nftId timeMarker amount poolId date blockNumber timestamp txHash } }',
+        },
     },
     "bond-created": {
-        "bondCreatedEvents": """{ bondCreatedEvents(first:1000,orderBy:blockTimestamp,orderDirection:asc,where:{blockTimestamp_gt:"TS"}) {
-            id blockNumber blockTimestamp transactionHash bondId amount owner poolId } }""",
-        "bondIncreasedEvents": """{ bondIncreasedEvents(first:1000,orderBy:blockTimestamp,orderDirection:asc,where:{blockTimestamp_gt:"TS"}) {
-            id blockNumber blockTimestamp transactionHash bondId amount owner poolId } }""",
+        "bondCreatedEvents": {
+            "mode": "incremental",
+            "query": '{ bondCreatedEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id nftId amount owner poolId date blockNumber timestamp txHash } }',
+        },
+        "bondIncreasedEvents": {
+            "mode": "incremental",
+            "query": '{ bondIncreasedEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id nftId amount owner poolId date blockNumber timestamp txHash } }',
+        },
     },
 }
 
 
-def gql(endpoint, query, is_ormi=False, max_429_retries=8):
-    """
-    Execute a GraphQL query with robust retry logic.
-    - 429: progressive backoff (30s → 60s → 90s … max 120s), up to max_429_retries.
-    - Other failures: exponential backoff, 4 retries.
-    """
+# ── HTTP / GQL ────────────────────────────────────────────────────────────────
+
+def gql(endpoint, query, is_ormi=False, max_429=10):
     payload = json.dumps({"query": query}).encode()
     req = urllib.request.Request(endpoint, data=payload, headers=HEADERS, method="POST")
-
-    network_retries = 0
-    rate_retries    = 0
+    net_tries  = 0
+    rate_tries = 0
 
     while True:
         try:
             with urllib.request.urlopen(req, timeout=90) as r:
                 data = json.loads(r.read())
-
             if "errors" in data:
                 print(f"    GQL error: {data['errors'][0].get('message','?')}", flush=True)
                 return None
-
             return data.get("data", {})
-
         except urllib.error.HTTPError as e:
             if e.code == 429:
-                rate_retries += 1
-                if rate_retries > max_429_retries:
-                    print(f"    429 — too many retries ({max_429_retries}), giving up", flush=True)
+                rate_tries += 1
+                if rate_tries > max_429:
+                    print(f"    429 — max retries, giving up", flush=True)
                     return None
-                wait = min(30 * rate_retries, 120)
-                print(f"    429 — rate limited, attempt {rate_retries}/{max_429_retries}, waiting {wait}s…", flush=True)
+                wait = min(30 * rate_tries, 180)
+                print(f"    429 — retry {rate_tries}/{max_429} in {wait}s…", flush=True)
                 time.sleep(wait)
             else:
-                network_retries += 1
-                if network_retries > 4:
+                net_tries += 1
+                if net_tries > 4:
                     return None
-                wait = 2 ** (network_retries - 1)
-                print(f"    HTTP {e.code} — retry {network_retries}/4 in {wait}s", flush=True)
+                wait = 2 ** (net_tries - 1)
+                print(f"    HTTP {e.code} — retry {net_tries}/4 in {wait}s", flush=True)
                 time.sleep(wait)
-
         except Exception as e:
-            network_retries += 1
-            if network_retries > 4:
-                print(f"    Network error — giving up ({e})", flush=True)
+            net_tries += 1
+            if net_tries > 4:
+                print(f"    Error — giving up ({e})", flush=True)
                 return None
-            wait = 2 ** (network_retries - 1)
-            print(f"    Error ({e}) — retry {network_retries}/4 in {wait}s", flush=True)
+            wait = 2 ** (net_tries - 1)
+            print(f"    Error ({e}) — retry {net_tries}/4 in {wait}s", flush=True)
             time.sleep(wait)
 
 
-def fetch_new(subgraph_name, endpoint, entity, query_tpl, ts_cutoff, is_ormi=False):
-    """
-    Fetch all new records since ts_cutoff for one entity.
-    Uses blockTimestamp_gt cursor pagination to avoid skip > 5000 limits.
-    """
-    results   = []
-    cursor_ts = ts_cutoff
-    page      = 0
-    page_sleep = 6 if is_ormi else 0.4
+# ── Fetch helpers ─────────────────────────────────────────────────────────────
+
+def fetch_incremental(entity, query_tpl, ts_cutoff, endpoint, is_ormi=False):
+    """Fetch new events since ts_cutoff using cursor pagination."""
+    results    = []
+    cursor_ts  = ts_cutoff
+    page       = 0
+    page_sleep = 8 if is_ormi else 0.5
 
     while True:
         q = query_tpl.replace("TS", str(cursor_ts))
         data = gql(endpoint, q, is_ormi=is_ormi)
         if data is None:
             break
-
         items = data.get(entity, [])
         if not items:
             break
-
         results.extend(items)
         page += 1
-        print(f"    [{subgraph_name}:{entity}] page {page}: +{len(items)}", flush=True)
-
+        print(f"    [{entity}] page {page}: +{len(items)}", flush=True)
         if len(items) < 1000:
             break
+        cursor_ts = items[-1]["timestamp"]
+        time.sleep(page_sleep)
 
-        # Advance cursor to last item's timestamp to avoid skip > 5000
-        cursor_ts = items[-1]["blockTimestamp"]
+    return results
+
+
+def fetch_snapshot(entity, query, endpoint, is_ormi=False):
+    """Re-fetch complete snapshot (no timestamp filter), replaces existing."""
+    results    = []
+    # bondOwners / pools peuvent avoir > 1000 entrées → pagination par skip
+    # On réutilise la query telle quelle pour la page 0, puis on skip
+    base_query = query.rstrip("} \n")
+    skip       = 0
+    page_sleep = 8 if is_ormi else 0.5
+
+    # Simple : la query hardcodée a first:1000 — on pagine en modifiant skip
+    while True:
+        # Inject skip into query
+        q = query.replace("first:1000,", f"first:1000, skip:{skip},") if skip > 0 else query
+        data = gql(endpoint, q, is_ormi=is_ormi)
+        if data is None:
+            break
+        items = data.get(entity, [])
+        if not items:
+            break
+        results.extend(items)
+        print(f"    [{entity}] snapshot skip={skip}: +{len(items)}", flush=True)
+        if len(items) < 1000:
+            break
+        skip += 1000
         time.sleep(page_sleep)
 
     return results
 
 
 def merge(existing, new_items):
-    """Merge new items into existing list, dedup by id. Returns count added."""
     existing_ids = {item["id"] for item in existing}
     added = 0
     for item in new_items:
@@ -172,37 +222,48 @@ def merge(existing, new_items):
     return added
 
 
-def update_subgraph(name, endpoint, entities_queries, output_dir, days_back=8):
-    path       = os.path.join(output_dir, f"{name}.json")
-    is_ormi    = "ormilabs" in endpoint
-    ts_cutoff  = int((datetime.now(timezone.utc) - timedelta(days=days_back)).timestamp())
+# ── Per-subgraph update ───────────────────────────────────────────────────────
 
-    # Ormi: pause before hitting API
+def update_subgraph(name, endpoint, entities_cfg, out_dir, days_back=8):
+    path      = os.path.join(out_dir, f"{name}.json")
+    is_ormi   = "ormilabs" in endpoint
+    ts_cutoff = int((datetime.now(timezone.utc) - timedelta(days=days_back)).timestamp())
+
     if is_ormi:
-        print(f"  [Ormi] pausing 10s before update to reduce 429 risk…", flush=True)
-        time.sleep(10)
+        print(f"  [Ormi] pause 15s avant update…", flush=True)
+        time.sleep(15)
 
-    # Load existing JSON
     if os.path.exists(path):
         with open(path) as f:
             existing = json.load(f)
         data = existing.get("data", {})
     else:
-        print(f"  [{name}] No existing JSON — run bootstrap first", flush=True)
+        print(f"  [{name}] Pas de JSON existant — lance le bootstrap d'abord", flush=True)
         data = {}
 
-    total_added  = 0
-    inter_sleep  = 8 if is_ormi else 0.5
+    total_added = 0
+    inter_sleep = 10 if is_ormi else 0.8
 
-    for entity, query_tpl in entities_queries.items():
+    for entity, cfg in entities_cfg.items():
+        mode  = cfg["mode"]
+        query = cfg["query"]
+
         if entity not in data:
             data[entity] = []
-        print(f"  → {entity} (existing: {len(data[entity])})", flush=True)
 
-        new_items = fetch_new(name, endpoint, entity, query_tpl, ts_cutoff, is_ormi=is_ormi)
-        added     = merge(data[entity], new_items)
-        total_added += added
-        print(f"    +{added} new (total: {len(data[entity])})", flush=True)
+        print(f"  → {entity} [{mode}] (existant: {len(data[entity])})", flush=True)
+
+        if mode == "snapshot":
+            # Remplace complètement
+            new_items    = fetch_snapshot(entity, query, endpoint, is_ormi=is_ormi)
+            data[entity] = new_items
+            print(f"    snapshot refreshed: {len(new_items)} records", flush=True)
+        else:
+            new_items = fetch_incremental(entity, query, ts_cutoff, endpoint, is_ormi=is_ormi)
+            added     = merge(data[entity], new_items)
+            total_added += added
+            print(f"    +{added} nouveaux (total: {len(data[entity])})", flush=True)
+
         time.sleep(inter_sleep)
 
     ts = datetime.now(timezone.utc).isoformat()
@@ -217,8 +278,10 @@ def update_subgraph(name, endpoint, entities_queries, output_dir, days_back=8):
         json.dump(out, f, separators=(",", ":"))
 
     size_kb = os.path.getsize(path) // 1024
-    print(f"  ✓ {path} updated — +{total_added} new events — {size_kb} KB", flush=True)
+    print(f"  ✓ {path} — +{total_added} nouveaux events — {size_kb} KB", flush=True)
 
+
+# ── Entry point ───────────────────────────────────────────────────────────────
 
 def main():
     args    = [a for a in sys.argv[1:] if not a.startswith("--")]
@@ -226,7 +289,7 @@ def main():
     out_dir = "rize-governance-hub"
     os.makedirs(out_dir, exist_ok=True)
 
-    print(f"Governance incremental update — {datetime.now(timezone.utc).isoformat()}", flush=True)
+    print(f"Governance incremental update v4 — {datetime.now(timezone.utc).isoformat()}", flush=True)
 
     for name in targets:
         if name not in QUERIES_INCR:
@@ -236,7 +299,7 @@ def main():
         print(f"UPDATE: {name}", flush=True)
         update_subgraph(name, ENDPOINTS[name], QUERIES_INCR[name], out_dir)
 
-    print(f"\nDone at {datetime.now(timezone.utc).isoformat()}", flush=True)
+    print(f"\nDone — {datetime.now(timezone.utc).isoformat()}", flush=True)
 
 
 if __name__ == "__main__":
