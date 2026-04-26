@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """
 Bootstrap scraper — ALL 6 RIZE governance subgraphs.
-Full erasure + rewrite on each run (bootstrap mode).
+Full erasure + rewrite on each run.
 Usage:
   python3 scrape_governance.py                  # all 6
   python3 scrape_governance.py bond-broken      # single
-  python3 scrape_governance.py --bootstrap      # explicit full
-Output: rize-governance-hub/<name>.json
 """
 
-import json, time, sys, os, urllib.request
+import json, time, sys, os, urllib.request, urllib.error
 from datetime import datetime, timezone
 
 ENDPOINTS = {
@@ -21,149 +19,160 @@ ENDPOINTS = {
     "bond-created":   "https://api.subgraph.ormilabs.com/api/public/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/1.0.0/gn",
 }
 
-# Queries use skip-based pagination — SKIP replaced with integer at runtime
-QUERIES = {
+# Field templates — ENTITY and SKIP replaced at runtime after schema discovery
+# We store the fields we want per subgraph; entity name discovered via introspection
+FIELDS = {
     "pool-config": {
-        "poolUpdateds": """{ poolUpdateds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
-            id blockNumber blockTimestamp transactionHash
-            poolId maxMultiplier fullMaturityPeriod warmupPeriod distributionPeriod } }""",
-        "releaseWarmupUpdateds": """{ releaseWarmupUpdateds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
-            id blockNumber blockTimestamp transactionHash warmupPeriod } }""",
-        "migratorAddeds": """{ migratorAddeds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
-            id blockNumber blockTimestamp transactionHash migrator } }""",
-        "migratorRemoveds": """{ migratorRemoveds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
-            id blockNumber blockTimestamp transactionHash migrator } }""",
+        "poolupdateds":           "id blockNumber blockTimestamp transactionHash poolId maxMultiplier fullMaturityPeriod warmupPeriod distributionPeriod",
+        "releasewarmupupdateds":  "id blockNumber blockTimestamp transactionHash warmupPeriod",
+        "migratoraddeds":         "id blockNumber blockTimestamp transactionHash migrator",
+        "migratorremoveds":       "id blockNumber blockTimestamp transactionHash migrator",
     },
     "bond-lifecycle": {
-        "tokensReleaseds": """{ tokensReleaseds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
-            id blockNumber blockTimestamp transactionHash bondId amount to } }""",
-        "bondMigrateds": """{ bondMigrateds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
-            id blockNumber blockTimestamp transactionHash bondId fromPool toPool amount } }""",
-        "vestingUpdateds": """{ vestingUpdateds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
-            id blockNumber blockTimestamp transactionHash bondId vestingEnd } }""",
-        "vestedTokenClaweds": """{ vestedTokenClaweds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
-            id blockNumber blockTimestamp transactionHash bondId amount } }""",
+        "tokensreleaseds":        "id blockNumber blockTimestamp transactionHash bondId amount to",
+        "bondmigrateds":          "id blockNumber blockTimestamp transactionHash bondId fromPool toPool amount",
+        "vestingupdateds":        "id blockNumber blockTimestamp transactionHash bondId vestingEnd",
+        "vestedtokenclaweds":     "id blockNumber blockTimestamp transactionHash bondId amount",
     },
     "bond-broken": {
-        "bondBrokens": """{ bondBrokens(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
-            id blockNumber blockTimestamp transactionHash bondId amount owner date } }""",
+        "bondBrokens":            "id blockNumber blockTimestamp transactionHash bondId amount owner date",
     },
     "nft-transfers": {
-        "transfers": """{ transfers(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
-            id blockNumber blockTimestamp transactionHash from to tokenId transferCount } }""",
+        "transfers":              "id blockNumber blockTimestamp transactionHash from to tokenId transferCount",
     },
     "bond-timemarker": {
-        "bondTimeMarkers": """{ bondTimeMarkers(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
-            id blockNumber blockTimestamp transactionHash bondId timeMarker amount poolId } }""",
+        "bondtimemarkers":        "id blockNumber blockTimestamp transactionHash bondId timeMarker amount poolId",
     },
     "bond-created": {
-        "bondCreateds": """{ bondCreateds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
-            id blockNumber blockTimestamp transactionHash bondId amount owner poolId } }""",
-        "bondIncreaseds": """{ bondIncreaseds(first:1000,skip:SKIP,orderBy:blockTimestamp,orderDirection:asc) {
-            id blockNumber blockTimestamp transactionHash bondId amount owner poolId } }""",
+        "bondcreateds":           "id blockNumber blockTimestamp transactionHash bondId amount owner poolId",
+        "bondincreaseds":         "id blockNumber blockTimestamp transactionHash bondId amount owner poolId",
     },
 }
 
-def gql(endpoint, query, retries=4):
+HEADERS = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "User-Agent": "Mozilla/5.0 (compatible; TokerizeBot/1.0; +https://tokerize.top)",
+    "Origin": "https://tokerize.top",
+    "Referer": "https://tokerize.top/",
+}
+
+def gql(endpoint, query, retries=4, base_sleep=1):
     payload = json.dumps({"query": query}).encode()
-    req = urllib.request.Request(
-        endpoint, data=payload,
-        headers={
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "User-Agent": "Mozilla/5.0 (compatible; TokerizeBot/1.0; +https://tokerize.top)",
-                "Origin": "https://tokerize.top",
-                "Referer": "https://tokerize.top/",
-            },
-        method="POST"
-    )
+    req = urllib.request.Request(endpoint, data=payload, headers=HEADERS, method="POST")
     for attempt in range(retries):
         try:
-            with urllib.request.urlopen(req, timeout=45) as r:
+            with urllib.request.urlopen(req, timeout=60) as r:
                 data = json.loads(r.read())
             if "errors" in data:
-                print(f"    GQL error: {data['errors'][0].get('message','?')}", flush=True)
+                msg = data["errors"][0].get("message", "?")
+                print(f"    GQL error: {msg}", flush=True)
                 return None
             return data.get("data", {})
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                wait = 30
+                print(f"    Rate limited (429), waiting {wait}s...", flush=True)
+            else:
+                wait = base_sleep * (2 ** attempt)
+                print(f"    Attempt {attempt+1} HTTP {e.code}, retry in {wait}s", flush=True)
+            if attempt < retries - 1:
+                time.sleep(wait)
         except Exception as e:
-            wait = 2 ** attempt
-            print(f"    Attempt {attempt+1} failed ({e}), retrying in {wait}s...", flush=True)
+            wait = base_sleep * (2 ** attempt)
+            print(f"    Attempt {attempt+1} failed ({e}), retry in {wait}s", flush=True)
             if attempt < retries - 1:
                 time.sleep(wait)
     return None
 
-def fetch_entity(name, endpoint, entity, query_tpl):
-    """Fetch all records using skip-based pagination (same as working scrapers)."""
+def discover_schema(endpoint, is_ormi=False):
+    """Return dict of lowercase_name -> real_name for all queryable fields."""
+    q = "{ __schema { queryType { fields { name } } } }"
+    base = 3 if is_ormi else 1
+    data = gql(endpoint, q, base_sleep=base)
+    if not data:
+        return {}
+    fields = data.get("__schema", {}).get("queryType", {}).get("fields", [])
+    return {f["name"].lower(): f["name"] for f in fields if not f["name"].startswith("_")}
+
+def fetch_entity(endpoint, real_name, fields_str, is_ormi=False):
+    """Fetch all pages for one entity. Returns list of items."""
     results = []
     skip = 0
-    page = 0
+    page_sleep = 4 if is_ormi else 0.4
+    base_sleep = 3 if is_ormi else 1
     while True:
-        q = query_tpl.replace("SKIP", str(skip))
-        data = gql(endpoint, q)
+        q = f"""{{ {real_name}(first:1000, skip:{skip}, orderBy:blockTimestamp, orderDirection:asc) {{
+            {fields_str}
+        }} }}"""
+        data = gql(endpoint, q, base_sleep=base_sleep)
         if data is None:
-            print(f"    [{name}:{entity}] fetch failed at page {page}, stopping", flush=True)
+            print(f"      fetch failed at skip={skip}, stopping", flush=True)
             break
-        items = data.get(entity, [])
+        items = data.get(real_name, [])
         if not items:
             break
         results.extend(items)
-        page += 1
-        print(f"    [{name}:{entity}] page {page} (skip={skip}): +{len(items)} → total {len(results)}", flush=True)
+        print(f"      skip={skip}: +{len(items)} → total {len(results)}", flush=True)
         if len(items) < 1000:
             break
         skip += 1000
-        time.sleep(0.3)
+        time.sleep(page_sleep)
     return results
 
-def fetch_subgraph(name, endpoint, entities_queries):
+def fetch_subgraph(name, endpoint, fields_map):
+    is_ormi = "ormilabs" in endpoint
     print(f"\n{'='*60}", flush=True)
-    print(f"  SUBGRAPH: {name}", flush=True)
-    data = {}
-    for entity, query_tpl in entities_queries.items():
-        print(f"  → {entity}", flush=True)
-        data[entity] = fetch_entity(name, endpoint, entity, query_tpl)
-        time.sleep(0.5)
-    return data
+    print(f"  SUBGRAPH: {name} ({'Ormi' if is_ormi else 'Goldsky'})", flush=True)
 
-def write_json(name, data, output_dir):
-    ts = datetime.now(timezone.utc).isoformat()
-    out = {
-        "subgraph": name,
-        "scraped_at": ts,
-        "bootstrap": True,
-        "counts": {e: len(v) for e, v in data.items()},
-        "data": data,
-    }
-    path = os.path.join(output_dir, f"{name}.json")
-    with open(path, "w") as f:
-        json.dump(out, f, separators=(",", ":"))
-    size_kb = os.path.getsize(path) // 1024
-    print(f"\n  ✓ {path} — {size_kb} KB", flush=True)
-    return size_kb
+    print(f"  → Discovering schema...", flush=True)
+    schema = discover_schema(endpoint, is_ormi=is_ormi)
+    if schema:
+        print(f"  → Found {len(schema)} entities: {list(schema.values())[:10]}", flush=True)
+    else:
+        print(f"  → Schema discovery failed, using field names as-is", flush=True)
+
+    data = {}
+    for key_lower, fields_str in fields_map.items():
+        # Match our lowercase key to real entity name from schema
+        real = schema.get(key_lower, key_lower)
+        print(f"  → {key_lower} → {real}", flush=True)
+        items = fetch_entity(endpoint, real, fields_str, is_ormi=is_ormi)
+        data[real] = items
+        print(f"     Total: {len(items)}", flush=True)
+        time.sleep(2 if is_ormi else 0.5)
+
+    return data
 
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    targets = args if args else list(QUERIES.keys())
+    targets = args if args else list(FIELDS.keys())
     output_dir = "rize-governance-hub"
     os.makedirs(output_dir, exist_ok=True)
 
-    print(f"Starting governance bootstrap — {datetime.now(timezone.utc).isoformat()}", flush=True)
+    ts = datetime.now(timezone.utc).isoformat()
+    print(f"Governance bootstrap — {ts}", flush=True)
     print(f"Targets: {targets}", flush=True)
 
-    summary = {}
     for name in targets:
-        if name not in QUERIES:
-            print(f"Unknown subgraph: {name}", flush=True)
+        if name not in FIELDS:
+            print(f"Unknown: {name}", flush=True)
             continue
-        data = fetch_subgraph(name, ENDPOINTS[name], QUERIES[name])
-        size_kb = write_json(name, data, output_dir)
-        summary[name] = {"counts": {e: len(v) for e, v in data.items()}, "size_kb": size_kb}
+        data = fetch_subgraph(name, ENDPOINTS[name], FIELDS[name])
+        out = {
+            "subgraph": name,
+            "scraped_at": ts,
+            "bootstrap": True,
+            "counts": {e: len(v) for e, v in data.items()},
+            "data": data,
+        }
+        path = os.path.join(output_dir, f"{name}.json")
+        with open(path, "w") as f:
+            json.dump(out, f, separators=(",", ":"))
+        size_kb = os.path.getsize(path) // 1024
+        print(f"\n  ✓ {path} — {size_kb} KB | {out['counts']}", flush=True)
 
-    print(f"\n{'='*60}", flush=True)
-    print("BOOTSTRAP COMPLETE", flush=True)
-    for name, info in summary.items():
-        print(f"  {name}: {info['counts']} | {info['size_kb']} KB", flush=True)
-    print(f"Done at {datetime.now(timezone.utc).isoformat()}", flush=True)
+    print(f"\nDone — {datetime.now(timezone.utc).isoformat()}", flush=True)
 
 if __name__ == "__main__":
     main()
