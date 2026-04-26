@@ -4795,26 +4795,19 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         const yCallback = (showRatio) ? v => v.toFixed(2)+'x' : v => fmtM(v);
         const tooltipFmt = (showRatio) ? ctx => ` ${ctx.dataset.label}: ${fmtR(ctx.raw)}` : ctx => ` ${ctx.dataset.label}: ${fmtM(ctx.raw)}`;
 
-        // Show/hide ratio button row — aligned under its parent button
+        // Show/hide ratio button row — aligned left
         const ratioRow   = document.getElementById('rz-ratio-row');
         const btnMcapTvl = document.getElementById('rz-tvl-btn-mcap');
         const btnFdvTvl  = document.getElementById('rz-tvl-btn-fdv');
+        ratioRow.style.paddingLeft = '0';
         if (_mcapMode === 'mcap') {
           ratioRow.style.display   = 'block';
           btnMcapTvl.style.display = '';
           btnFdvTvl.style.display  = 'none';
-          // Align under "Display MCap" button
-          const parentBtn = document.getElementById('rz-mcap-btn-mcap');
-          const parentLeft = parentBtn ? parentBtn.offsetLeft : 0;
-          ratioRow.style.paddingLeft = parentLeft + 'px';
         } else if (_mcapMode === 'fdv') {
           ratioRow.style.display   = 'block';
           btnMcapTvl.style.display = 'none';
           btnFdvTvl.style.display  = '';
-          // Align under "Display FDV" button
-          const parentBtn = document.getElementById('rz-mcap-btn-fdv');
-          const parentLeft = parentBtn ? parentBtn.offsetLeft : 0;
-          ratioRow.style.paddingLeft = parentLeft + 'px';
         } else {
           ratioRow.style.display = 'none';
         }
