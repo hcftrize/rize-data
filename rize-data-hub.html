@@ -1582,7 +1582,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
         </div>
 
         <!-- Timestamp -->
-        <div style="text-align:right;font-family:'Rajdhani',sans-serif;font-size:11px;color:rgba(255,255,255,0.25);margin-top:4px" id="rz-depth-ts"></div>
+        <div style="text-align:right;font-family:'Rajdhani',sans-serif;font-size:12px;color:#b6c1d8;margin-top:4px;font-weight:600;letter-spacing:0.3px" id="rz-depth-ts"></div>
 
         <!-- KPIs -->
         <div class="conv-sep" style="margin-top:12px"></div>
@@ -5001,8 +5001,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     // ══════════════════════════════════════════════════════
     (function() {
       const PAIRS = {
-        usd: { kraken:'RIZEUSD', label:'RIZE / USD (Kraken)', sym:'$', color:{ bid:'#98ffb6', ask:'#ff6b8a' } },
-        eur: { kraken:'RIZEEUR', label:'RIZE / EUR (Kraken)', sym:'€', color:{ bid:'#7ee0ff', ask:'#ffd36b' } },
+        usd: { kraken:'RIZEUSD', label:'RIZE / USD Kraken', sym:'$', color:{ bid:'#98ffb6', ask:'#ff6b8a' } },
+        eur: { kraken:'RIZEEUR', label:'RIZE / EUR Kraken', sym:'€', color:{ bid:'#7ee0ff', ask:'#ffd36b' } },
       };
       const COUNT = 500;  // Kraken max
       let _mode   = 'usd';
@@ -5142,12 +5142,12 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
             scales:{
               x:{
                 type:'linear',
-                ticks:{ color:'rgba(255,255,255,0.5)', font:{family:'Rajdhani',size:12, weight:'600'},
+                ticks:{ color:'#b6c1d8', font:{family:'Rajdhani',size:13, weight:'600'},
                   callback: v => sym + v.toFixed(5), maxTicksLimit:8 },
                 grid:{ color:'rgba(255,255,255,0.04)' }
               },
               y:{
-                ticks:{ color:'rgba(255,255,255,0.5)', font:{family:'Rajdhani',size:12, weight:'600'},
+                ticks:{ color:'#b6c1d8', font:{family:'Rajdhani',size:13, weight:'600'},
                   callback: v => fmtRize(v) },
                 grid:{ color:'rgba(255,255,255,0.04)' }
               }
@@ -5182,7 +5182,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
         // Ratio: use actual bid/ask rize totals within ±2%
         const ratio = k.totalBidRize / (k.totalAskRize || 1);
-        document.getElementById('rz-depth-ratio').textContent        = ratio.toFixed(2) + 'x';
+        const ratioColor = ratio >= 1 ? '#98ffb6' : 'var(--pink)';
+        document.getElementById('rz-depth-ratio').innerHTML = `<span style="color:${ratioColor}">${ratio.toFixed(2)}x</span>`;
         document.getElementById('rz-depth-ratio-sub').innerHTML      = ratio >= 1
           ? '<span style="color:#98ffb6;font-weight:700">▲ Bid pressure</span>'
           : '<span style="color:var(--pink);font-weight:700">▼ Ask pressure</span>';
