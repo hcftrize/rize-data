@@ -1556,21 +1556,54 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div class="ctx-panel" id="rz-panel-depth">
 
         <!-- Header — same layout as RIZE Volume -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
-          <div id="rz-depth-chart-label" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;flex:1">Order Book Depth — RIZE / USD (Kraken)</div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div class="conv-toggle-row" style="margin-bottom:0">
-              <button class="conv-toggle active" id="rz-depth-btn-usd" onclick="rzDepthSwitch('usd',this)">RIZE / USD Kraken</button>
-              <button class="conv-toggle" id="rz-depth-btn-eur" onclick="rzDepthSwitch('eur',this)">RIZE / EUR Kraken</button>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:2px">
+            <div id="rz-depth-chart-label" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center">Order Book Depth — RIZE / USD Kraken</div>
+            <div id="rz-depth-spread-inline" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.3);letter-spacing:0.5px"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="conv-toggle-row" style="margin-bottom:0">
+                <button class="conv-toggle active" id="rz-depth-btn-usd" onclick="rzDepthSwitch('usd',this)">RIZE / USD Kraken</button>
+                <button class="conv-toggle" id="rz-depth-btn-eur" onclick="rzDepthSwitch('eur',this)">RIZE / EUR Kraken</button>
+              </div>
+              <button id="rz-depth-refresh" onclick="rzDepthRefresh()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.15);padding:5px 14px;cursor:pointer;white-space:nowrap;transition:background 0.15s">&#8635; Refresh</button>
             </div>
-            <button id="rz-depth-refresh" onclick="rzDepthRefresh()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.15);padding:5px 14px;cursor:pointer;white-space:nowrap;transition:background 0.15s">&#8635; Refresh</button>
+            <div>
+              <button class="conv-toggle" id="rz-depth-btn-ob" onclick="rzDepthViewSwitch(this)">Order Book View</button>
+            </div>
           </div>
         </div>
 
-        <!-- Chart -->
-        <div class="ctx-chart-wrap" style="height:280px">
-          <div class="ctx-loading" id="rz-depth-loading">Loading order book&hellip;</div>
-          <canvas id="rz-chart-depth" style="display:none"></canvas>
+        <!-- Depth curve + zoom controls -->
+        <div id="rz-depth-view-depth">
+          <div style="display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-bottom:6px">
+            <span style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted)">Zoom</span>
+            <button onclick="rzDepthZoom(-1)" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);width:28px;height:28px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center">−</button>
+            <button onclick="rzDepthZoom(1)"  style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);width:28px;height:28px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center">+</button>
+            <button onclick="rzDepthZoom(0)"  style="font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);padding:4px 10px;cursor:pointer">Reset</button>
+          </div>
+          <div class="ctx-chart-wrap" style="height:280px">
+            <div class="ctx-loading" id="rz-depth-loading">Loading order book&hellip;</div>
+            <canvas id="rz-chart-depth" style="display:none"></canvas>
+          </div>
+        </div>
+
+        <!-- Order Book table — 2 cols: Cum Bids | Price | Cum Asks -->
+        <!-- 5 cols: cum bids | bid price | sep | ask price | cum asks — equal weights -->
+        <div id="rz-depth-view-ob" style="display:none;height:340px;overflow-y:auto;background:rgba(0,0,0,0.2)">
+          <table id="rz-ob-table" style="width:100%;border-collapse:collapse;table-layout:fixed">
+            <thead style="position:sticky;top:0;background:#060818;z-index:2">
+              <tr>
+                <th style="padding:6px 12px;text-align:right;color:#98ffb6;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.07);width:27%">Cum. Bids</th>
+                <th style="padding:6px 8px;text-align:right;color:#98ffb6;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.07);width:23%">Bid Price</th>
+                <th style="padding:0;width:0;border-left:1px solid rgba(255,255,255,0.12);border-right:1px solid rgba(255,255,255,0.12);border-bottom:1px solid rgba(255,255,255,0.07)"></th>
+                <th style="padding:6px 8px;text-align:left;color:var(--pink);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.07);width:23%">Ask Price</th>
+                <th style="padding:6px 12px;text-align:left;color:var(--pink);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.07);width:27%">Cum. Asks</th>
+              </tr>
+            </thead>
+            <tbody id="rz-ob-tbody"></tbody>
+          </table>
         </div>
 
         <!-- Timestamp -->
@@ -5116,7 +5149,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           type:'line', data:{ datasets },
           options:{
             responsive:true, maintainAspectRatio:false,
-            interaction:{ mode:'index', intersect:false },
+            interaction:{ mode:'nearest', intersect:false, axis:'x' },
             plugins:{
               legend:{ display:true, labels:{ color:'rgba(255,255,255,0.6)', font:{family:'Rajdhani',size:12} } },
               tooltip:{
@@ -5198,24 +5231,36 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
       // ── Load ──────────────────────────────────────────────
       async function loadDepth(force) {
-        if (!force && _cache[_mode]) {
-          const cfg = PAIRS[_mode];
-          const { bids, asks } = _cache[_mode];
-          const mid = (bids[0].price + asks[0].price) / 2;
-          renderChart(bids, asks, cfg, mid);
-          updateKPIs(computeKPIs(bids, asks, cfg), cfg);
-          return;
+        const cfg = PAIRS[_mode];
+
+        // Show loading state in active view
+        if (_viewMode === 'ob') {
+          document.getElementById('rz-ob-tbody').innerHTML =
+            '<tr><td colspan="3" style="padding:20px;text-align:center;color:var(--muted);font-family:Rajdhani,sans-serif">Loading order book…</td></tr>';
+        } else {
+          document.getElementById('rz-depth-loading').style.display = 'flex';
+          document.getElementById('rz-depth-loading').textContent = 'Loading order book…';
+          document.getElementById('rz-chart-depth').style.display = 'none';
         }
-        document.getElementById('rz-depth-loading').style.display = 'block';
-        document.getElementById('rz-depth-loading').textContent = 'Loading order book…';
-        document.getElementById('rz-chart-depth').style.display = 'none';
+
         try {
-          const cfg = PAIRS[_mode];
-          _cache[_mode] = await fetchPair(cfg.kraken);
+          // Always fetch fresh if forced or not cached
+          if (force || !_cache[_mode]) {
+            _cache[_mode] = await fetchPair(cfg.kraken);
+          }
           const { bids, asks } = _cache[_mode];
           const mid = (bids[0].price + asks[0].price) / 2;
+
+          // Always render both — cheap, ensures sync
           renderChart(bids, asks, cfg, mid);
+          renderOrderBook(bids, asks, cfg);
           updateKPIs(computeKPIs(bids, asks, cfg), cfg);
+
+          // Show correct view
+          const isOb = _viewMode === 'ob';
+          document.getElementById('rz-depth-view-depth').style.display = isOb ? 'none' : 'block';
+          document.getElementById('rz-depth-view-ob').style.display   = isOb ? 'block' : 'none';
+
           _loaded = true;
         } catch(e) {
           document.getElementById('rz-depth-loading').textContent = 'Error: ' + e.message;
@@ -5223,12 +5268,252 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         }
       }
 
+      // ── Tick size — séquences de ticks par ordre de magnitude ──
+      // On choisit le tick minimal donnant ≤ MAX_OB_ROWS lignes par side
+      const MAX_OB_ROWS = 40;
+
+      function getTickSequence(price) {
+        // Règle : le tick définit le PAS d'affichage
+        // < 0.001  → pas de 0.001 (0.001, 0.002, 0.003...)
+        // < 0.01   → pas de 0.001 (0.001, 0.002, 0.003...) puis 0.005 si trop
+        // < 0.10   → pas de 0.01  (0.01, 0.02, 0.03...)
+        // < 0.50   → pas de 0.05  (0.05, 0.10, 0.15...)
+        // < 1.00   → pas de 0.10  (0.10, 0.20, 0.30...)
+        // < 10     → pas de 1     (1, 2, 3...)
+        // < 100    → pas de 10    (10, 20, 30...)
+        if (price < 0.01)  return [0.001, 0.002, 0.005, 0.01];
+        if (price < 0.10)  return [0.01,  0.02,  0.05,  0.10];
+        if (price < 0.50)  return [0.05,  0.10,  0.20,  0.50];
+        if (price < 1.00)  return [0.10,  0.20,  0.50,  1.00];
+        if (price < 10)    return [1.00,  2.00,  5.00,  10.0];
+        if (price < 100)   return [10.0,  20.0,  50.0,  100.];
+        return              [50.0,  100.,  200.,  500.];
+      }
+
+      function groupLevels(levels, tickSize, isBid) {
+        const map = new Map();
+        for (const l of levels) {
+          const raw    = l.price / tickSize;
+          const bucket = Math.floor(raw) * tickSize;
+          // Tout ce qui tombe sous 0.001 → regroupé dans la ligne 0.000
+          const finalBucket = bucket < 0.001 ? 0 : bucket;
+          const key = finalBucket.toFixed(12);
+          if (!map.has(key)) map.set(key, { price: finalBucket, vol: 0 });
+          map.get(key).vol += l.vol;
+        }
+        const arr = Array.from(map.values());
+        return isBid
+          ? arr.sort((a,b) => b.price - a.price)
+          : arr.sort((a,b) => a.price - b.price);
+      }
+
+      function getBestTickSize(levels, mid, isBid) {
+        // Cherche le tick donnant 10 ≤ lignes ≤ MAX_OB_ROWS
+        // null = données trop peu denses → utiliser levels bruts
+        const ticks = getTickSequence(mid);
+        for (const tick of ticks) {
+          const grouped = groupLevels(levels, tick, isBid);
+          if (grouped.length > MAX_OB_ROWS) continue; // trop grand, essayer tick plus gros
+          if (grouped.length >= 10) return tick;       // parfait
+          return null; // moins de 10 lignes même avec ce tick → raw
+        }
+        return ticks[ticks.length - 1];
+      }
+
+      const fmtVol = v => {
+        if (v >= 1e6) return (v/1e6).toFixed(2) + 'M';
+        if (v >= 1e3) return Math.round(v/1e3).toLocaleString() + 'K';
+        return Math.round(v).toLocaleString();
+      };
+
+      // ── Order Book renderer — face-à-face Kraken Pro ─────
+      function renderOrderBook(bids, asks, cfg) {
+        const sym   = cfg.sym;
+        const tbody = document.getElementById('rz-ob-tbody');
+        if (!tbody) return;
+
+        const bestBid = bids[0]?.price || 0;
+        const bestAsk = asks[0]?.price || 0;
+        const mid     = (bestBid + bestAsk) / 2;
+        const spread  = bestAsk - bestBid;
+
+        // Tick adaptatif indépendant par side pour garantir ≤ MAX_OB_ROWS lignes
+        const tickBid = getBestTickSize(bids, mid, true);
+        const tickAsk = getBestTickSize(asks, mid, false);
+        const tick    = Math.max(tickBid, tickAsk); // tick unifié pour cohérence visuelle
+
+        const gBidsRaw = groupLevels(bids, tick, true);   // high→low
+        const gAsks    = groupLevels(asks, tick, false);  // low→high
+
+        // Bids sous $0.001 → trop petits pour détailler, tout dans un seul paquet $0.000
+        const bidsAbove = gBidsRaw.filter(b => b.price >= 0.001);
+        const bidsSub   = gBidsRaw.filter(b => b.price < 0.001);
+        const gBids = bidsSub.length > 0
+          ? [...bidsAbove, { price: 0, vol: bidsSub.reduce((s,b) => s + b.vol, 0) }]
+          : bidsAbove;
+
+        // Cumulative from best outward
+        let c = 0;
+        const bidRows = gBids.map(b => { c += b.vol; return { price:b.price, cum:c }; });
+        c = 0;
+        const askRows = gAsks.map(a => { c += a.vol; return { price:a.price, cum:c }; });
+
+        const maxCum = Math.max(
+          bidRows.length ? bidRows[bidRows.length-1].cum : 1,
+          askRows.length ? askRows[askRows.length-1].cum : 1
+        );
+
+        const pDec     = Math.max(0, Math.ceil(-Math.log10(tick)));
+        const spreadDec = pDec + 2; // spread beaucoup plus petit que tick → +2 déc
+        const fmtP = v => v.toFixed(pDec);
+
+        // Spread label under chart title
+        const spreadPct = mid > 0 ? ((spread/mid)*100).toFixed(3) : '—';
+        const spreadEl = document.getElementById('rz-depth-spread-inline');
+        if (spreadEl) spreadEl.textContent = `Spread: ${sym}${spread.toFixed(spreadDec)} (${spreadPct}%)`;
+
+        // face-à-face: bids[i] (best bid at top = highest) vs asks[i] (best ask at top = lowest)
+        const maxRows = Math.max(bidRows.length, askRows.length);
+        let html = '';
+
+        for (let i = 0; i < maxRows; i++) {
+          const b = bidRows[i];
+          const a = askRows[i];
+
+          const bidBarW = b ? Math.round((b.cum / maxCum) * 100) : 0;
+          const askBarW = a ? Math.round((a.cum / maxCum) * 100) : 0;
+
+          // 5 cols: cum bids | bid price | sep | ask price | cum asks
+          const cumBidCell = b
+            ? `<td style="padding:5px 12px;text-align:right;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;color:rgba(152,255,182,0.75);position:relative;width:27%;overflow:hidden">
+                <div style="position:absolute;right:0;top:0;bottom:0;width:${bidBarW}%;background:rgba(152,255,182,0.07);pointer-events:none"></div>
+                <span style="position:relative">${fmtVol(b.cum)}</span></td>`
+            : `<td style="width:27%"></td>`;
+
+          const bidPriceCell = b
+            ? `<td style="padding:5px 8px;text-align:right;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:#98ffb6;white-space:nowrap;width:23%">${sym}${fmtP(b.price)}</td>`
+            : `<td style="width:23%"></td>`;
+
+          const sepCell = `<td style="padding:0;width:0;border-left:1px solid rgba(255,255,255,0.12);border-right:1px solid rgba(255,255,255,0.12)"></td>`;
+
+          const askPriceCell = a
+            ? `<td style="padding:5px 8px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--pink);white-space:nowrap;width:23%">${sym}${fmtP(a.price)}</td>`
+            : `<td style="width:23%"></td>`;
+
+          const cumAskCell = a
+            ? `<td style="padding:5px 12px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;color:rgba(255,107,138,0.75);position:relative;width:27%;overflow:hidden">
+                <div style="position:absolute;left:0;top:0;bottom:0;width:${askBarW}%;background:rgba(255,107,138,0.07);pointer-events:none"></div>
+                <span style="position:relative">${fmtVol(a.cum)}</span></td>`
+            : `<td style="width:27%"></td>`;
+
+          html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.025)">${cumBidCell}${bidPriceCell}${sepCell}${askPriceCell}${cumAskCell}</tr>`;
+        }
+
+        tbody.innerHTML = html;
+      }
+
+
+      // ── Zoom state + logic ───────────────────────────────
+      const ZOOM_STEPS = [1, 0.5, 0.25, 0.15, 0.08, 0.04]; // fraction of mid price ±
+      let _zoomLevel = 0;
+
+      function renderChartZoomed(bids, asks, cfg, zoomLevel) {
+        const bestBid = bids[0].price;
+        const bestAsk = asks[0].price;
+        const mid     = (bestBid + bestAsk) / 2;
+        const factor  = ZOOM_STEPS[zoomLevel];
+        const sym     = cfg.sym;
+
+        const zBids = bids.filter(b => b.price >= mid * (1 - factor));
+        const zAsks = asks.filter(a => a.price <= mid * (1 + factor));
+
+        let cumB = 0;
+        const cumBids = zBids.map(b => { cumB += b.vol; return { price:b.price, cumRize:cumB, cumVal:cumB*b.price }; });
+        let cumA = 0;
+        const cumAsks = zAsks.map(a => { cumA += a.vol; return { price:a.price, cumRize:cumA, cumVal:cumA*a.price }; });
+
+        // Destroy + recreate — fix tooltip index bug with mode:'nearest' axis:'x'
+        const canvas = document.getElementById('rz-chart-depth');
+        if (_chart) _chart.destroy();
+        _chart = new Chart(canvas.getContext('2d'), {
+          type:'line', data:{ datasets:[
+            { label:`Bids (${cfg.label})`,
+              data: cumBids.map(d=>({x:d.price, y:d.cumRize, val:d.cumVal})),
+              borderColor:cfg.color.bid,
+              backgroundColor:cfg.color.bid==='#98ffb6'?'rgba(152,255,182,0.12)':'rgba(126,224,255,0.12)',
+              borderWidth:1.5, pointRadius:0, tension:0, fill:true, stepped:'before' },
+            { label:`Asks (${cfg.label})`,
+              data: cumAsks.map(d=>({x:d.price, y:d.cumRize, val:d.cumVal})),
+              borderColor:cfg.color.ask,
+              backgroundColor:cfg.color.ask==='#ff6b8a'?'rgba(255,107,138,0.12)':'rgba(255,211,107,0.12)',
+              borderWidth:1.5, pointRadius:0, tension:0, fill:true, stepped:'before' }
+          ]},
+          options:{
+            responsive:true, maintainAspectRatio:false,
+            interaction:{ mode:'nearest', intersect:false, axis:'x' },
+            plugins:{
+              legend:{ display:true, labels:{ color:'rgba(255,255,255,0.6)', font:{family:'Rajdhani',size:12} } },
+              tooltip:{ callbacks:{
+                title: ctx => `Price: ${sym}${parseFloat(ctx[0].parsed.x).toFixed(6)}`,
+                label: ctx => ` ${ctx.dataset.label}: ${fmtRize(ctx.parsed.y)} (${fmtVal(ctx.raw.val, sym)})`
+              }}
+            },
+            scales:{
+              x:{ type:'linear', ticks:{ color:'#b6c1d8', font:{family:'Rajdhani',size:13,weight:'600'}, callback:v=>sym+v.toFixed(5), maxTicksLimit:8 }, grid:{ color:'rgba(255,255,255,0.04)' } },
+              y:{ ticks:{ color:'#b6c1d8', font:{family:'Rajdhani',size:13,weight:'600'}, callback:v=>fmtRize(v) }, grid:{ color:'rgba(255,255,255,0.04)' } }
+            }
+          }
+        });
+      }
+
+      window.rzDepthZoom = function(dir) {
+        if (dir === 0) {
+          _zoomLevel = 0;
+        } else {
+          _zoomLevel = Math.max(0, Math.min(ZOOM_STEPS.length - 1, _zoomLevel + (dir > 0 ? 1 : -1)));
+        }
+        const cached = _cache[_mode];
+        if (!cached) return;
+        const cfg = PAIRS[_mode];
+        const { bids, asks } = cached;
+        if (_zoomLevel === 0) {
+          const mid = (bids[0].price + asks[0].price) / 2;
+          renderChart(bids, asks, cfg, mid);
+        } else {
+          renderChartZoomed(bids, asks, cfg, _zoomLevel);
+        }
+      };
+
+      let _viewMode = 'depth';
+
+      // ── Toggle depth ↔ order book ─────────────────────────
+      window.rzDepthViewSwitch = function(btn) {
+        if (_viewMode === 'ob') {
+          _viewMode = 'depth';
+          btn.textContent = 'Order Book View';
+          btn.classList.remove('active');
+          document.getElementById('rz-depth-view-depth').style.display = 'block';
+          document.getElementById('rz-depth-view-ob').style.display   = 'none';
+        } else {
+          _viewMode = 'ob';
+          btn.textContent = 'Depth Chart View';
+          btn.classList.remove('active'); // jamais cyan — c'est un switch, pas un état
+          document.getElementById('rz-depth-view-depth').style.display = 'none';
+          document.getElementById('rz-depth-view-ob').style.display   = 'block';
+          const cached = _cache[_mode];
+          if (cached) renderOrderBook(cached.bids, cached.asks, PAIRS[_mode]);
+        }
+      };
+
       // ── Public ────────────────────────────────────────────
       window.rzDepthSwitch = function(mode, btn) {
         _mode = mode;
+        _zoomLevel = 0;
         ['rz-depth-btn-usd','rz-depth-btn-eur'].forEach(id => document.getElementById(id)?.classList.remove('active'));
         btn.classList.add('active');
-        loadDepth(false);
+        // Always force fresh load and render both views
+        delete _cache[_mode];
+        loadDepth(true);
       };
       window.rzDepthRefresh = function() {
         delete _cache[_mode];
