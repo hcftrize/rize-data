@@ -7,8 +7,9 @@ on:
         description: 'Subgraph to update (leave empty for all 6)'
         required: false
         default: ''
-  # No schedule here — triggered by cron-job.org at 02:30 UTC daily
-  # cron-job.org → POST https://api.github.com/repos/hcftrize/TOKERIZE/actions/workflows/update-governance.yml/dispatches
+
+permissions:
+  contents: write
 
 jobs:
   update:
