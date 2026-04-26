@@ -1421,21 +1421,19 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <div class="ctx-panel" id="rz-panel-mcap">
 
         <!-- Chart header -->
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
-          <div id="rz-mcap-chart-label" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;flex:1;padding-top:4px">Market Cap</div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
-            <div class="conv-toggle-row" style="margin-bottom:0">
-              <button class="conv-toggle active" id="rz-mcap-btn-mcap" onclick="rzMcapSwitch('mcap',this)">Display MCap</button>
-              <button class="conv-toggle" id="rz-mcap-btn-fdv" onclick="rzMcapSwitch('fdv',this)">Display FDV</button>
-              <button class="conv-toggle" id="rz-mcap-btn-tvl" onclick="rzMcapSwitch('tvl',this)">Display TVL</button>
-              <button class="conv-toggle" id="rz-mcap-btn-both" onclick="rzMcapSwitch('both',this)">MCap + FDV</button>
-            </div>
-            <!-- Ratio sub-btn: appears under its parent button, not active by default -->
-            <div id="rz-ratio-row" style="display:none;justify-content:flex-end;width:100%">
-              <button class="conv-toggle" id="rz-tvl-btn-mcap" onclick="rzTvlSwitch('mcap',this)" style="display:none">MCap / TVL</button>
-              <button class="conv-toggle" id="rz-tvl-btn-fdv" onclick="rzTvlSwitch('fdv',this)" style="display:none">FDV / TVL</button>
-            </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:8px">
+          <div id="rz-mcap-chart-label" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;flex:1">Market Cap</div>
+          <div class="conv-toggle-row" style="margin-bottom:0">
+            <button class="conv-toggle active" id="rz-mcap-btn-mcap" onclick="rzMcapSwitch('mcap',this)">Display MCap</button>
+            <button class="conv-toggle" id="rz-mcap-btn-fdv" onclick="rzMcapSwitch('fdv',this)">Display FDV</button>
+            <button class="conv-toggle" id="rz-mcap-btn-tvl" onclick="rzMcapSwitch('tvl',this)">Display TVL</button>
+            <button class="conv-toggle" id="rz-mcap-btn-both" onclick="rzMcapSwitch('both',this)">MCap + FDV</button>
           </div>
+        </div>
+        <!-- Ratio sub-btn row: JS injects left offset to align under parent btn -->
+        <div id="rz-ratio-row" style="display:none;margin-bottom:6px">
+          <button class="conv-toggle" id="rz-tvl-btn-mcap" onclick="rzTvlSwitch('mcap',this)" style="display:none">MCap / TVL</button>
+          <button class="conv-toggle" id="rz-tvl-btn-fdv" onclick="rzTvlSwitch('fdv',this)" style="display:none">FDV / TVL</button>
         </div>
 
         <!-- Single chart area -->
@@ -4739,9 +4737,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
       // Trim leading points with no data — start chart at first real data point
       function getActiveSeries() {
+        // Start at first point that has mcap — avoids TVL-only points before genesis
         let start = 0;
         for (let i = 0; i < _series.length; i++) {
-          if (_series[i].mcap || _series[i].tvl) { start = i; break; }
+          if (_series[i].mcap && _series[i].mcap > 0) { start = i; break; }
         }
         return _series.slice(start);
       }
@@ -4796,18 +4795,26 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         const yCallback = (showRatio) ? v => v.toFixed(2)+'x' : v => fmtM(v);
         const tooltipFmt = (showRatio) ? ctx => ` ${ctx.dataset.label}: ${fmtR(ctx.raw)}` : ctx => ` ${ctx.dataset.label}: ${fmtM(ctx.raw)}`;
 
-        // Show/hide ratio button row
+        // Show/hide ratio button row — aligned under its parent button
         const ratioRow   = document.getElementById('rz-ratio-row');
         const btnMcapTvl = document.getElementById('rz-tvl-btn-mcap');
         const btnFdvTvl  = document.getElementById('rz-tvl-btn-fdv');
         if (_mcapMode === 'mcap') {
-          ratioRow.style.display   = 'flex';
+          ratioRow.style.display   = 'block';
           btnMcapTvl.style.display = '';
           btnFdvTvl.style.display  = 'none';
+          // Align under "Display MCap" button
+          const parentBtn = document.getElementById('rz-mcap-btn-mcap');
+          const parentLeft = parentBtn ? parentBtn.offsetLeft : 0;
+          ratioRow.style.paddingLeft = parentLeft + 'px';
         } else if (_mcapMode === 'fdv') {
-          ratioRow.style.display   = 'flex';
+          ratioRow.style.display   = 'block';
           btnMcapTvl.style.display = 'none';
           btnFdvTvl.style.display  = '';
+          // Align under "Display FDV" button
+          const parentBtn = document.getElementById('rz-mcap-btn-fdv');
+          const parentLeft = parentBtn ? parentBtn.offsetLeft : 0;
+          ratioRow.style.paddingLeft = parentLeft + 'px';
         } else {
           ratioRow.style.display = 'none';
         }
