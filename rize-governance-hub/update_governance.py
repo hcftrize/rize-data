@@ -182,19 +182,19 @@ def fetch_incremental(entity, query_tpl, ts_cutoff, endpoint, is_ormi=False):
     return results
 
 
-def fetch_snapshot(entity, query, endpoint, is_ormi=False):
-    """Re-fetch complete snapshot (no timestamp filter), replaces existing."""
+def fetch_snapshot(entity, endpoint, fields_str, is_ormi=False):
+    """
+    Re-fetch snapshot complet via cursor id_gt (pas de skip).
+    orderBy:id — les snapshots (pools, bondOwners) n'ont pas de timestamp.
+    """
     results    = []
-    # bondOwners / pools peuvent avoir > 1000 entrées → pagination par skip
-    # On réutilise la query telle quelle pour la page 0, puis on skip
-    base_query = query.rstrip("} \n")
-    skip       = 0
+    cursor     = None
+    page       = 0
     page_sleep = 8 if is_ormi else 0.5
 
-    # Simple : la query hardcodée a first:1000 — on pagine en modifiant skip
     while True:
-        # Inject skip into query
-        q = query.replace("first:1000,", f"first:1000, skip:{skip},") if skip > 0 else query
+        where = f', where: {{id_gt: "{cursor}"}}' if cursor else ""
+        q = f"{{ {entity}(first:1000{where}, orderBy:id, orderDirection:asc) {{ {fields_str} }} }}"
         data = gql(endpoint, q, is_ormi=is_ormi)
         if data is None:
             break
@@ -202,10 +202,11 @@ def fetch_snapshot(entity, query, endpoint, is_ormi=False):
         if not items:
             break
         results.extend(items)
-        print(f"    [{entity}] snapshot skip={skip}: +{len(items)}", flush=True)
+        page += 1
+        print(f"    [{entity}] snapshot page {page}: +{len(items)} → total {len(results)}", flush=True)
         if len(items) < 1000:
             break
-        skip += 1000
+        cursor = items[-1]["id"]
         time.sleep(page_sleep)
 
     return results
@@ -254,8 +255,12 @@ def update_subgraph(name, endpoint, entities_cfg, out_dir, days_back=8):
         print(f"  → {entity} [{mode}] (existant: {len(data[entity])})", flush=True)
 
         if mode == "snapshot":
-            # Remplace complètement
-            new_items    = fetch_snapshot(entity, query, endpoint, is_ormi=is_ormi)
+            # Extrait les champs depuis la query hardcodée pour les passer à fetch_snapshot
+            # On parse les champs entre { } de la query
+            import re
+            m = re.search(r'\{[^{]*\{([^}]+)\}', query)
+            fields_str = m.group(1).strip() if m else "id"
+            new_items    = fetch_snapshot(entity, endpoint, fields_str, is_ormi=is_ormi)
             data[entity] = new_items
             print(f"    snapshot refreshed: {len(new_items)} records", flush=True)
         else:
