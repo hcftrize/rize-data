@@ -45,6 +45,7 @@ jobs:
       - name: Merge JSONs into main
         run: |
           git checkout main
-          git checkout dev -- rize-governance-hub/*.json
+          git checkout dev -- rize-governance-hub/
+          git add -f rize-governance-hub/
           git diff --cached --quiet || git commit -m "chore: governance update (main sync) $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           git push origin main
