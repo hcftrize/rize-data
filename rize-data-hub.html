@@ -5294,7 +5294,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         return Math.round(v).toLocaleString();
       };
 
-      // ── Order Book renderer — 2-col Kraken Pro style ─────
+      // ── Order Book renderer — face-à-face Kraken Pro ─────
       function renderOrderBook(bids, asks, cfg) {
         const sym   = cfg.sym;
         const tbody = document.getElementById('rz-ob-tbody');
@@ -5306,14 +5306,12 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         const spread  = bestAsk - bestBid;
         const tick    = getTickSize(mid);
 
-        const gBids = groupLevels(bids, tick, true);
-        const gAsks = groupLevels(asks, tick, false);
+        const gBids = groupLevels(bids, tick, true);   // high→low
+        const gAsks = groupLevels(asks, tick, false);  // low→high
 
-        // Cumulative bids (best → worst)
+        // Cumulative from best outward
         let c = 0;
         const bidRows = gBids.map(b => { c += b.vol; return { price:b.price, cum:c }; });
-
-        // Cumulative asks (best → worst)
         c = 0;
         const askRows = gAsks.map(a => { c += a.vol; return { price:a.price, cum:c }; });
 
@@ -5323,108 +5321,93 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         );
 
         const pDec = Math.max(0, Math.ceil(-Math.log10(tick)));
-        const fmtP = v => sym + v.toFixed(pDec);
+        const fmtP = v => v.toFixed(pDec);
 
-        // Spread inline label
+        // Spread label under chart title
         const spreadPct = mid > 0 ? ((spread/mid)*100).toFixed(3) : '—';
         const spreadEl = document.getElementById('rz-depth-spread-inline');
         if (spreadEl) spreadEl.textContent = `Spread: ${sym}${spread.toFixed(pDec)} (${spreadPct}%)`;
 
-        // Asks: display reversed (highest ask at top, closest to mid at bottom)
+        // face-à-face: bids[i] (best bid at top = highest) vs asks[i] (best ask at top = lowest)
+        const maxRows = Math.max(bidRows.length, askRows.length);
         let html = '';
-        const askDisplay = [...askRows].reverse();
-        for (const a of askDisplay) {
-          const barW = Math.round((a.cum / maxCum) * 100);
-          html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.02)">
-            <td style="padding:2px 12px;text-align:right;color:rgba(255,107,138,0.55);font-family:'Rajdhani',sans-serif;font-size:12px;width:40%;position:relative">
-              <div style="position:absolute;right:0;top:0;bottom:0;width:${barW}%;background:rgba(255,107,138,0.07);pointer-events:none"></div>
-              <span style="position:relative">${fmtVol(a.cum)}</span>
-            </td>
-            <td style="padding:2px 8px;text-align:center;color:var(--pink);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;width:20%;white-space:nowrap">${fmtP(a.price)}</td>
-            <td style="width:40%"></td>
-          </tr>`;
-        }
 
-        // Mid row
-        html += `<tr style="background:rgba(255,255,255,0.04);border-top:1px solid rgba(255,255,255,0.10);border-bottom:1px solid rgba(255,255,255,0.10)">
-          <td colspan="3" style="padding:4px 12px;text-align:center;color:#fff;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700">
-            ${fmtP(mid)}
-          </td>
-        </tr>`;
+        for (let i = 0; i < maxRows; i++) {
+          const b = bidRows[i];
+          const a = askRows[i];
 
-        // Bids: best bid at top (closest to mid)
-        for (const b of bidRows) {
-          const barW = Math.round((b.cum / maxCum) * 100);
-          html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.02)">
-            <td style="width:40%"></td>
-            <td style="padding:2px 8px;text-align:center;color:#98ffb6;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;width:20%;white-space:nowrap">${fmtP(b.price)}</td>
-            <td style="padding:2px 12px;text-align:left;color:rgba(152,255,182,0.55);font-family:'Rajdhani',sans-serif;font-size:12px;width:40%;position:relative">
-              <div style="position:absolute;left:0;top:0;bottom:0;width:${barW}%;background:rgba(152,255,182,0.07);pointer-events:none"></div>
-              <span style="position:relative">${fmtVol(b.cum)}</span>
-            </td>
-          </tr>`;
+          const bidBarW = b ? Math.round((b.cum / maxCum) * 100) : 0;
+          const askBarW = a ? Math.round((a.cum / maxCum) * 100) : 0;
+
+          const cumBidCell = b
+            ? `<td style="padding:2px 10px;text-align:right;font-family:'Rajdhani',sans-serif;font-size:12px;color:rgba(152,255,182,0.6);position:relative;width:33%">
+                <div style="position:absolute;right:0;top:0;bottom:0;width:${bidBarW}%;background:rgba(152,255,182,0.07);pointer-events:none"></div>
+                <span style="position:relative">${fmtVol(b.cum)}</span></td>`
+            : `<td style="width:33%"></td>`;
+
+          const bidPriceCell = b
+            ? `<td style="padding:2px 6px;text-align:right;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#98ffb6;white-space:nowrap;width:17%;border-right:1px solid rgba(255,255,255,0.08)">${sym}${fmtP(b.price)}</td>`
+            : `<td style="width:17%;border-right:1px solid rgba(255,255,255,0.08)"></td>`;
+
+          const askPriceCell = a
+            ? `<td style="padding:2px 6px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--pink);white-space:nowrap;width:17%">${sym}${fmtP(a.price)}</td>`
+            : `<td style="width:17%"></td>`;
+
+          const cumAskCell = a
+            ? `<td style="padding:2px 10px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:12px;color:rgba(255,107,138,0.6);position:relative;width:33%">
+                <div style="position:absolute;left:0;top:0;bottom:0;width:${askBarW}%;background:rgba(255,107,138,0.07);pointer-events:none"></div>
+                <span style="position:relative">${fmtVol(a.cum)}</span></td>`
+            : `<td style="width:33%"></td>`;
+
+          html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.025)">${cumBidCell}${bidPriceCell}${askPriceCell}${cumAskCell}</tr>`;
         }
 
         tbody.innerHTML = html;
-
-        // Scroll mid row into view
-        setTimeout(() => {
-          const rows = tbody.querySelectorAll('tr');
-          const midRow = rows[askDisplay.length];
-          if (midRow) midRow.scrollIntoView({ block:'center', behavior:'instant' });
-        }, 30);
       }
 
-      // ── Zoom state for depth chart ─────────────────────────
-      let _zoomLevel = 0; // 0=full, >0=zoomed in
-      const ZOOM_STEPS = [1, 0.5, 0.25, 0.15, 0.08, 0.04];
 
-      window.rzDepthZoom = function(dir) {
-        if (dir === 0) { _zoomLevel = 0; }
-        else { _zoomLevel = Math.max(0, Math.min(ZOOM_STEPS.length-1, _zoomLevel + (dir > 0 ? 1 : -1))); }
-        const cached = _cache[_mode];
-        if (cached) {
-          const cfg = PAIRS[_mode];
-          const { bids, asks } = cached;
-          renderChartZoomed(bids, asks, cfg, _zoomLevel);
-        }
-      };
+      // ── Zoom state + logic ───────────────────────────────
+      const ZOOM_STEPS = [1, 0.5, 0.25, 0.15, 0.08, 0.04]; // fraction of mid price ±
+      let _zoomLevel = 0;
 
       function renderChartZoomed(bids, asks, cfg, zoomLevel) {
-        const sym     = cfg.sym;
         const bestBid = bids[0].price;
         const bestAsk = asks[0].price;
         const mid     = (bestBid + bestAsk) / 2;
         const factor  = ZOOM_STEPS[zoomLevel];
 
-        // Filter to ±factor% around mid
         const zBids = bids.filter(b => b.price >= mid * (1 - factor));
         const zAsks = asks.filter(a => a.price <= mid * (1 + factor));
 
-        // Recalculate cumulative for zoomed window
         let cumB = 0;
         const cumBids = zBids.map(b => { cumB += b.vol; return { price:b.price, cumRize:cumB, cumVal:cumB*b.price }; });
         let cumA = 0;
         const cumAsks = zAsks.map(a => { cumA += a.vol; return { price:a.price, cumRize:cumA, cumVal:cumA*a.price }; });
 
-        const datasets = [
-          { label:`Bids (${cfg.label})`, data:cumBids.map(d=>({x:d.price,y:d.cumRize,val:d.cumVal})),
-            borderColor:cfg.color.bid, backgroundColor:cfg.color.bid==='#98ffb6'?'rgba(152,255,182,0.12)':'rgba(126,224,255,0.12)',
-            borderWidth:1.5, pointRadius:0, tension:0, fill:true, stepped:'before' },
-          { label:`Asks (${cfg.label})`, data:cumAsks.map(d=>({x:d.price,y:d.cumRize,val:d.cumVal})),
-            borderColor:cfg.color.ask, backgroundColor:cfg.color.ask==='#ff6b8a'?'rgba(255,107,138,0.12)':'rgba(255,211,107,0.12)',
-            borderWidth:1.5, pointRadius:0, tension:0, fill:true, stepped:'before' },
-        ];
-
         if (_chart) {
-          _chart.data.datasets[0].data = datasets[0].data;
-          _chart.data.datasets[1].data = datasets[1].data;
+          _chart.data.datasets[0].data = cumBids.map(d => ({x:d.price, y:d.cumRize, val:d.cumVal}));
+          _chart.data.datasets[1].data = cumAsks.map(d => ({x:d.price, y:d.cumRize, val:d.cumVal}));
           _chart.update('none');
-        } else {
-          // Chart not built yet — build it
-          renderChart(bids, asks, cfg, mid);
         }
       }
+
+      window.rzDepthZoom = function(dir) {
+        if (dir === 0) {
+          _zoomLevel = 0;
+        } else {
+          _zoomLevel = Math.max(0, Math.min(ZOOM_STEPS.length - 1, _zoomLevel + (dir > 0 ? 1 : -1)));
+        }
+        const cached = _cache[_mode];
+        if (!cached) return;
+        const cfg = PAIRS[_mode];
+        const { bids, asks } = cached;
+        if (_zoomLevel === 0) {
+          const mid = (bids[0].price + asks[0].price) / 2;
+          renderChart(bids, asks, cfg, mid);
+        } else {
+          renderChartZoomed(bids, asks, cfg, _zoomLevel);
+        }
+      };
 
       let _viewMode = 'depth';
 
