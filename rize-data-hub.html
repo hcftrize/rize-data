@@ -1563,14 +1563,13 @@ html, body { overflow-x: hidden; max-width: 100%; }
       <!-- Panel — RIZE Market Depth -->
       <div class="ctx-panel" id="rz-panel-depth">
 
-        <!-- Header -->
+        <!-- Header — same layout as RIZE Volume -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
-          <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);flex:1">Order Book Depth — Kraken</div>
+          <div id="rz-depth-chart-label" style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);text-align:center;flex:1">Order Book Depth — RIZE / USD (Kraken)</div>
           <div style="display:flex;align-items:center;gap:8px">
             <div class="conv-toggle-row" style="margin-bottom:0">
-              <button class="conv-toggle active" id="rz-depth-btn-usd" onclick="rzDepthSwitch('usd',this)">RIZE / USD</button>
-              <button class="conv-toggle" id="rz-depth-btn-eur" onclick="rzDepthSwitch('eur',this)">RIZE / EUR</button>
-              <button class="conv-toggle" id="rz-depth-btn-both" onclick="rzDepthSwitch('both',this)">USD + EUR</button>
+              <button class="conv-toggle active" id="rz-depth-btn-usd" onclick="rzDepthSwitch('usd',this)">RIZE / USD Kraken</button>
+              <button class="conv-toggle" id="rz-depth-btn-eur" onclick="rzDepthSwitch('eur',this)">RIZE / EUR Kraken</button>
             </div>
             <button id="rz-depth-refresh" onclick="rzDepthRefresh()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.15);padding:5px 14px;cursor:pointer;white-space:nowrap;transition:background 0.15s">&#8635; Refresh</button>
           </div>
@@ -1582,12 +1581,12 @@ html, body { overflow-x: hidden; max-width: 100%; }
           <canvas id="rz-chart-depth" style="display:none"></canvas>
         </div>
 
-        <!-- Last updated -->
+        <!-- Timestamp -->
         <div style="text-align:right;font-family:'Rajdhani',sans-serif;font-size:11px;color:rgba(255,255,255,0.25);margin-top:4px" id="rz-depth-ts"></div>
 
         <!-- KPIs -->
         <div class="conv-sep" style="margin-top:12px"></div>
-        <div class="conv-section-title" style="margin-top:12px">Market Depth Stats</div>
+        <div class="conv-section-title" style="margin-top:12px" id="rz-depth-stats-title">Market Depth Stats — RIZE / USD</div>
         <div class="ctx-kpi-row">
           <div class="ctx-kpi">
             <span class="ctx-kpi-label">Mid Price</span>
@@ -1599,17 +1598,17 @@ html, body { overflow-x: hidden; max-width: 100%; }
             <span class="conv-delta-sub" id="rz-depth-spread-pct">&nbsp;</span>
           </div>
           <div class="ctx-kpi">
-            <span class="ctx-kpi-label">Bid Wall (top)</span>
+            <span class="ctx-kpi-label">Bid Wall (largest)</span>
             <span class="ctx-kpi-value" id="rz-depth-bid-wall" style="color:#98ffb6">—</span>
             <span class="conv-delta-sub" id="rz-depth-bid-wall-price">&nbsp;</span>
           </div>
           <div class="ctx-kpi">
-            <span class="ctx-kpi-label">Ask Wall (top)</span>
+            <span class="ctx-kpi-label">Ask Wall (largest)</span>
             <span class="ctx-kpi-value" id="rz-depth-ask-wall" style="color:var(--pink)">—</span>
             <span class="conv-delta-sub" id="rz-depth-ask-wall-price">&nbsp;</span>
           </div>
           <div class="ctx-kpi">
-            <span class="ctx-kpi-label">Bid/Ask Ratio</span>
+            <span class="ctx-kpi-label">Bid/Ask Ratio ±2%</span>
             <span class="ctx-kpi-value" id="rz-depth-ratio" style="color:#ffd36b">—</span>
             <span class="conv-delta-sub" id="rz-depth-ratio-sub">&nbsp;</span>
           </div>
@@ -1626,17 +1625,17 @@ html, body { overflow-x: hidden; max-width: 100%; }
             <span class="conv-delta-sub" id="rz-depth-asks-usd">&nbsp;</span>
           </div>
           <div class="ctx-kpi">
-            <span class="ctx-kpi-label">$10k Market Buy → Price</span>
+            <span class="ctx-kpi-label" id="rz-depth-impact-10k-label">$10k Buy → Price</span>
             <span class="ctx-kpi-value" id="rz-depth-impact-10k" style="color:#c77dff">—</span>
             <span class="conv-delta-sub" id="rz-depth-impact-10k-sub">&nbsp;</span>
           </div>
           <div class="ctx-kpi">
-            <span class="ctx-kpi-label">$50k Market Buy → Price</span>
+            <span class="ctx-kpi-label" id="rz-depth-impact-50k-label">$50k Buy → Price</span>
             <span class="ctx-kpi-value" id="rz-depth-impact-50k" style="color:#ff8ad8">—</span>
             <span class="conv-delta-sub" id="rz-depth-impact-50k-sub">&nbsp;</span>
           </div>
           <div class="ctx-kpi">
-            <span class="ctx-kpi-label">$100k Market Buy → Price</span>
+            <span class="ctx-kpi-label" id="rz-depth-impact-100k-label">$100k Buy → Price</span>
             <span class="ctx-kpi-value" id="rz-depth-impact-100k" style="color:#ffd36b">—</span>
             <span class="conv-delta-sub" id="rz-depth-impact-100k-sub">&nbsp;</span>
           </div>
@@ -5002,224 +5001,226 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     // ══════════════════════════════════════════════════════
     (function() {
       const PAIRS = {
-        usd: { kraken: 'RIZEUSD', label: 'RIZE/USD', color: { bid:'#98ffb6', ask:'#ff6b8a' } },
-        eur: { kraken: 'RIZEEUR', label: 'RIZE/EUR', color: { bid:'#7ee0ff', ask:'#ffd36b' } },
+        usd: { kraken:'RIZEUSD', label:'RIZE / USD (Kraken)', sym:'$', color:{ bid:'#98ffb6', ask:'#ff6b8a' } },
+        eur: { kraken:'RIZEEUR', label:'RIZE / EUR (Kraken)', sym:'€', color:{ bid:'#7ee0ff', ask:'#ffd36b' } },
       };
-      const COUNT  = 200;
-      let _mode    = 'usd';
-      let _chart   = null;
-      let _loaded  = false;
-      let _cache   = {};   // { usd: {bids,asks}, eur: {bids,asks} }
+      const COUNT = 500;  // Kraken max
+      let _mode   = 'usd';
+      let _chart  = null;
+      let _loaded = false;
+      let _cache  = {};
 
-      // ── Formatters ──────────────────────────────────────
+      // ── Formatters ────────────────────────────────────────
       function fmtRize(v) {
         if (v >= 1e6) return (v/1e6).toFixed(2) + 'M RIZE';
         if (v >= 1e3) return (v/1e3).toFixed(1) + 'K RIZE';
         return v.toFixed(0) + ' RIZE';
       }
-      function fmtUsd(v) {
-        if (v >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
-        if (v >= 1e3) return '$' + (v/1e3).toFixed(1) + 'K';
-        return '$' + v.toFixed(2);
-      }
-      function fmtPrice(v, ccy) {
-        return (ccy === 'eur' ? '€' : '$') + v.toFixed(6);
+      function fmtVal(v, sym) {
+        if (v >= 1e6) return sym + (v/1e6).toFixed(2) + 'M';
+        if (v >= 1e3) return sym + (v/1e3).toFixed(1) + 'K';
+        return sym + v.toFixed(2);
       }
 
-      // ── Fetch one pair ───────────────────────────────────
+      // ── Fetch one pair ────────────────────────────────────
       async function fetchPair(pair) {
         const url = `https://api.kraken.com/0/public/Depth?pair=${pair}&count=${COUNT}`;
-        const res = await fetch(url);
+        const res  = await fetch(url);
         const json = await res.json();
         if (json.error && json.error.length) throw new Error(json.error[0]);
         const key = Object.keys(json.result)[0];
         const raw = json.result[key];
-        // Parse: [price_str, vol_str, ts] → {price, vol}
-        const bids = raw.bids.map(([p,v]) => ({ price: parseFloat(p), vol: parseFloat(v) }))
+        const bids = raw.bids.map(([p,v]) => ({ price:parseFloat(p), vol:parseFloat(v) }))
                              .sort((a,b) => b.price - a.price);
-        const asks = raw.asks.map(([p,v]) => ({ price: parseFloat(p), vol: parseFloat(v) }))
+        const asks = raw.asks.map(([p,v]) => ({ price:parseFloat(p), vol:parseFloat(v) }))
                              .sort((a,b) => a.price - b.price);
         return { bids, asks };
       }
 
-      // ── Build cumulative depth curve ─────────────────────
+      // ── Cumulative depth ──────────────────────────────────
       function cumulate(levels) {
         let cum = 0;
-        return levels.map(l => { cum += l.vol; return { price: l.price, cum }; });
+        return levels.map(l => { cum += l.vol; return { price:l.price, cumRize:cum, cumVal:cum * l.price }; });
       }
 
-      // ── Compute KPIs ─────────────────────────────────────
-      function computeKPIs(bids, asks, ccy) {
+      // ── KPIs ─────────────────────────────────────────────
+      function computeKPIs(bids, asks, cfg) {
         const bestBid = bids[0].price;
         const bestAsk = asks[0].price;
         const mid     = (bestBid + bestAsk) / 2;
         const spread  = bestAsk - bestBid;
         const spreadPct = (spread / mid) * 100;
+        const sym = cfg.sym;
 
-        // ±2% window
         const lo = mid * 0.98, hi = mid * 1.02;
         const bids2 = bids.filter(b => b.price >= lo);
         const asks2 = asks.filter(a => a.price <= hi);
         const totalBidRize = bids2.reduce((s,b) => s + b.vol, 0);
         const totalAskRize = asks2.reduce((s,a) => s + a.vol, 0);
-        const totalBidUsd  = bids2.reduce((s,b) => s + b.vol * b.price, 0);
-        const totalAskUsd  = asks2.reduce((s,a) => s + a.vol * a.price, 0);
+        const totalBidVal  = bids2.reduce((s,b) => s + b.vol * b.price, 0);
+        const totalAskVal  = asks2.reduce((s,a) => s + a.vol * a.price, 0);
         const ratio = totalBidRize / (totalAskRize || 1);
 
-        // Top wall: biggest single level
         const bidWall = bids.reduce((m,b) => b.vol > m.vol ? b : m, bids[0]);
         const askWall = asks.reduce((m,a) => a.vol > m.vol ? a : m, asks[0]);
 
-        // Market buy impact: spend $X, walk up asks
-        function impactBuy(usdAmount) {
+        function impactBuy(amount) {
           let spent = 0, lastPrice = bestAsk;
           for (const a of asks) {
             const cost = a.vol * a.price;
-            if (spent + cost >= usdAmount) {
-              lastPrice = a.price;
-              break;
-            }
-            spent += cost;
-            lastPrice = a.price;
+            if (spent + cost >= amount) { lastPrice = a.price; break; }
+            spent += cost; lastPrice = a.price;
           }
-          const pct = ((lastPrice - mid) / mid) * 100;
-          return { price: lastPrice, pct };
+          return { price: lastPrice, pct: ((lastPrice - mid) / mid) * 100 };
         }
 
-        return { mid, spread, spreadPct, bestBid, bestAsk,
-          totalBidRize, totalAskRize, totalBidUsd, totalAskUsd, ratio,
+        const amt = sym === '€' ? 9200 : 10000;  // ~$10k equivalent
+        const amt2 = sym === '€' ? 46000 : 50000;
+        const amt3 = sym === '€' ? 92000 : 100000;
+
+        return { mid, spread, spreadPct, bestBid, bestAsk, sym,
+          totalBidRize, totalAskRize, totalBidVal, totalAskVal, ratio,
           bidWall, askWall,
-          impact10k: impactBuy(10000),
-          impact50k: impactBuy(50000),
-          impact100k: impactBuy(100000),
-          ccy };
+          impact10k: impactBuy(amt),
+          impact50k: impactBuy(amt2),
+          impact100k: impactBuy(amt3),
+          amt, amt2, amt3 };
       }
 
-      // ── Render chart ─────────────────────────────────────
-      function renderChart(datasets, midPrice, ccy) {
+      // ── Render chart ──────────────────────────────────────
+      function renderChart(bids, asks, cfg, mid) {
+        const sym = cfg.sym;
+
+        // Bids: high→low price, cumulative from best bid outward
+        const cumBids = cumulate([...bids]);          // sorted high→low already
+        // Asks: low→high price, cumulative from best ask outward
+        const cumAsks = cumulate([...asks]);          // sorted low→high already
+
+        const datasets = [
+          {
+            label: `Bids (${cfg.label})`,
+            data: cumBids.map(d => ({ x:d.price, y:d.cumRize, val:d.cumVal })),
+            borderColor: cfg.color.bid,
+            backgroundColor: cfg.color.bid === '#98ffb6' ? 'rgba(152,255,182,0.12)' : 'rgba(126,224,255,0.12)',
+            borderWidth:1.5, pointRadius:0, tension:0, fill:true, stepped:'before',
+          },
+          {
+            label: `Asks (${cfg.label})`,
+            data: cumAsks.map(d => ({ x:d.price, y:d.cumRize, val:d.cumVal })),
+            borderColor: cfg.color.ask,
+            backgroundColor: cfg.color.ask === '#ff6b8a' ? 'rgba(255,107,138,0.12)' : 'rgba(255,211,107,0.12)',
+            borderWidth:1.5, pointRadius:0, tension:0, fill:true, stepped:'before',
+          }
+        ];
+
         const canvas = document.getElementById('rz-chart-depth');
         canvas.style.display = 'block';
         document.getElementById('rz-depth-loading').style.display = 'none';
         if (_chart) _chart.destroy();
+
         _chart = new Chart(canvas.getContext('2d'), {
-          type: 'line',
-          data: { datasets },
-          options: {
-            responsive: true, maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            plugins: {
-              legend: { display: true, labels: { color:'rgba(255,255,255,0.6)', font:{family:'Rajdhani',size:12} } },
-              tooltip: {
-                callbacks: {
-                  title: ctx => (ccy === 'eur' ? '€' : '$') + parseFloat(ctx[0].label).toFixed(6),
-                  label: ctx => ` ${ctx.dataset.label}: ${fmtRize(ctx.raw.y)}`
-                }
-              },
-              annotation: midPrice ? {
-                annotations: {
-                  midLine: {
-                    type: 'line', xMin: midPrice, xMax: midPrice,
-                    borderColor: 'rgba(255,255,255,0.25)', borderWidth: 1, borderDash: [4,4],
-                    label: { content: 'Mid', display: true, color:'rgba(255,255,255,0.4)', font:{size:10} }
+          type:'line', data:{ datasets },
+          options:{
+            responsive:true, maintainAspectRatio:false,
+            interaction:{ mode:'index', intersect:false },
+            plugins:{
+              legend:{ display:true, labels:{ color:'rgba(255,255,255,0.6)', font:{family:'Rajdhani',size:12} } },
+              tooltip:{
+                callbacks:{
+                  title: ctx => {
+                    const price = parseFloat(ctx[0].parsed.x);
+                    return `Price: ${sym}${price.toFixed(6)}`;
+                  },
+                  label: ctx => {
+                    const rize = ctx.parsed.y;
+                    const val  = ctx.raw.val;
+                    return ` ${ctx.dataset.label}: ${fmtRize(rize)} (${fmtVal(val, sym)})`;
                   }
                 }
-              } : {}
+              }
             },
-            scales: {
-              x: {
-                type: 'linear',
-                ticks: { color:'rgba(255,255,255,0.4)', font:{family:'Rajdhani',size:10},
-                  callback: v => (ccy==='eur'?'€':'$') + v.toFixed(4), maxTicksLimit: 10 },
-                grid: { color:'rgba(255,255,255,0.04)' }
+            scales:{
+              x:{
+                type:'linear',
+                ticks:{ color:'rgba(255,255,255,0.5)', font:{family:'Rajdhani',size:12, weight:'600'},
+                  callback: v => sym + v.toFixed(5), maxTicksLimit:8 },
+                grid:{ color:'rgba(255,255,255,0.04)' }
               },
-              y: {
-                ticks: { color:'rgba(255,255,255,0.4)', font:{family:'Rajdhani',size:11},
+              y:{
+                ticks:{ color:'rgba(255,255,255,0.5)', font:{family:'Rajdhani',size:12, weight:'600'},
                   callback: v => fmtRize(v) },
-                grid: { color:'rgba(255,255,255,0.04)' }
+                grid:{ color:'rgba(255,255,255,0.04)' }
               }
             }
           }
         });
       }
 
-      // ── Build datasets from cached data ──────────────────
-      function buildDatasets() {
-        const datasets = [];
-        const pairs = _mode === 'both' ? ['usd','eur'] : [_mode];
+      // ── Update KPIs ───────────────────────────────────────
+      function updateKPIs(k, cfg) {
+        const sym = k.sym;
+        const pairLabel = cfg.label;
 
-        for (const p of pairs) {
-          if (!_cache[p]) continue;
-          const { bids, asks } = _cache[p];
-          const cfg = PAIRS[p];
+        document.getElementById('rz-depth-stats-title').textContent = `Market Depth Stats — ${pairLabel}`;
+        document.getElementById('rz-depth-chart-label').textContent = `Order Book Depth — ${pairLabel}`;
 
-          const cumBids = cumulate([...bids].reverse()).reverse(); // high→low price cumulative
-          const cumAsks = cumulate(asks);                          // low→high price cumulative
+        // Impact labels adapt to currency
+        const s10  = sym === '€' ? '€9.2k' : '$10k';
+        const s50  = sym === '€' ? '€46k'  : '$50k';
+        const s100 = sym === '€' ? '€92k'  : '$100k';
+        document.getElementById('rz-depth-impact-10k-label').textContent  = `${s10} Buy → Price`;
+        document.getElementById('rz-depth-impact-50k-label').textContent  = `${s50} Buy → Price`;
+        document.getElementById('rz-depth-impact-100k-label').textContent = `${s100} Buy → Price`;
 
-          datasets.push({
-            label: `Bids (${cfg.label})`,
-            data: cumBids.map(d => ({ x: d.price, y: d.cum })),
-            borderColor: cfg.color.bid,
-            backgroundColor: cfg.color.bid.replace(')', ',0.15)').replace('rgb', 'rgba').replace('#98ffb6','rgba(152,255,182,0.12)').replace('#7ee0ff','rgba(126,224,255,0.12)'),
-            borderWidth: 1.5, pointRadius: 0, tension: 0, fill: true, stepped: true,
-          });
-          datasets.push({
-            label: `Asks (${cfg.label})`,
-            data: cumAsks.map(d => ({ x: d.price, y: d.cum })),
-            borderColor: cfg.color.ask,
-            backgroundColor: cfg.color.ask.replace('#ff6b8a','rgba(255,107,138,0.12)').replace('#ffd36b','rgba(255,211,107,0.12)'),
-            borderWidth: 1.5, pointRadius: 0, tension: 0, fill: true, stepped: true,
-          });
-        }
-
-        // Mid price for primary pair
-        const primary = _cache[_mode === 'both' ? 'usd' : _mode];
-        const mid = primary ? (primary.bids[0].price + primary.asks[0].price) / 2 : null;
-        const ccy = _mode === 'eur' ? 'eur' : 'usd';
-        renderChart(datasets, mid, ccy);
-      }
-
-      // ── Update KPI DOM ────────────────────────────────────
-      function updateKPIs(k) {
-        const sym = k.ccy === 'eur' ? '€' : '$';
         document.getElementById('rz-depth-mid').textContent          = sym + k.mid.toFixed(6);
         document.getElementById('rz-depth-spread').textContent       = sym + k.spread.toFixed(6);
         document.getElementById('rz-depth-spread-pct').textContent   = k.spreadPct.toFixed(3) + '%';
         document.getElementById('rz-depth-bid-wall').textContent     = fmtRize(k.bidWall.vol);
-        document.getElementById('rz-depth-bid-wall-price').textContent = '@ ' + fmtPrice(k.bidWall.price, k.ccy);
+        document.getElementById('rz-depth-bid-wall-price').textContent = '@ ' + sym + k.bidWall.price.toFixed(6);
         document.getElementById('rz-depth-ask-wall').textContent     = fmtRize(k.askWall.vol);
-        document.getElementById('rz-depth-ask-wall-price').textContent = '@ ' + fmtPrice(k.askWall.price, k.ccy);
-        document.getElementById('rz-depth-ratio').textContent        = k.ratio.toFixed(2) + 'x';
-        document.getElementById('rz-depth-ratio-sub').textContent    = k.ratio >= 1 ? 'Bid pressure' : 'Ask pressure';
+        document.getElementById('rz-depth-ask-wall-price').textContent = '@ ' + sym + k.askWall.price.toFixed(6);
+
+        // Ratio: use actual bid/ask rize totals within ±2%
+        const ratio = k.totalBidRize / (k.totalAskRize || 1);
+        document.getElementById('rz-depth-ratio').textContent        = ratio.toFixed(2) + 'x';
+        document.getElementById('rz-depth-ratio-sub').innerHTML      = ratio >= 1
+          ? '<span style="color:#98ffb6;font-weight:700">▲ Bid pressure</span>'
+          : '<span style="color:var(--pink);font-weight:700">▼ Ask pressure</span>';
+
         document.getElementById('rz-depth-bids-rize').textContent    = fmtRize(k.totalBidRize);
-        document.getElementById('rz-depth-bids-usd').textContent     = fmtUsd(k.totalBidUsd) + ' within ±2%';
+        document.getElementById('rz-depth-bids-usd').textContent     = fmtVal(k.totalBidVal, sym) + ' within ±2%';
         document.getElementById('rz-depth-asks-rize').textContent    = fmtRize(k.totalAskRize);
-        document.getElementById('rz-depth-asks-usd').textContent     = fmtUsd(k.totalAskUsd) + ' within ±2%';
-        document.getElementById('rz-depth-impact-10k').textContent   = fmtPrice(k.impact10k.price, k.ccy);
+        document.getElementById('rz-depth-asks-usd').textContent     = fmtVal(k.totalAskVal, sym) + ' within ±2%';
+
+        document.getElementById('rz-depth-impact-10k').textContent   = sym + k.impact10k.price.toFixed(6);
         document.getElementById('rz-depth-impact-10k-sub').textContent  = '+' + k.impact10k.pct.toFixed(2) + '% slippage';
-        document.getElementById('rz-depth-impact-50k').textContent   = fmtPrice(k.impact50k.price, k.ccy);
+        document.getElementById('rz-depth-impact-50k').textContent   = sym + k.impact50k.price.toFixed(6);
         document.getElementById('rz-depth-impact-50k-sub').textContent  = '+' + k.impact50k.pct.toFixed(2) + '% slippage';
-        document.getElementById('rz-depth-impact-100k').textContent  = fmtPrice(k.impact100k.price, k.ccy);
+        document.getElementById('rz-depth-impact-100k').textContent  = sym + k.impact100k.price.toFixed(6);
         document.getElementById('rz-depth-impact-100k-sub').textContent = '+' + k.impact100k.pct.toFixed(2) + '% slippage';
         document.getElementById('rz-depth-ts').textContent = 'Snapshot — ' + new Date().toLocaleTimeString();
       }
 
-      // ── Load data ─────────────────────────────────────────
+      // ── Load ──────────────────────────────────────────────
       async function loadDepth(force) {
-        const toFetch = _mode === 'both' ? ['usd','eur'] : [_mode];
-        const missing = force ? toFetch : toFetch.filter(p => !_cache[p]);
-        if (!missing.length) { buildDatasets(); return; }
-
+        if (!force && _cache[_mode]) {
+          const cfg = PAIRS[_mode];
+          const { bids, asks } = _cache[_mode];
+          const mid = (bids[0].price + asks[0].price) / 2;
+          renderChart(bids, asks, cfg, mid);
+          updateKPIs(computeKPIs(bids, asks, cfg), cfg);
+          return;
+        }
         document.getElementById('rz-depth-loading').style.display = 'block';
+        document.getElementById('rz-depth-loading').textContent = 'Loading order book…';
         document.getElementById('rz-chart-depth').style.display = 'none';
-
         try {
-          await Promise.all(missing.map(async p => {
-            _cache[p] = await fetchPair(PAIRS[p].kraken);
-          }));
-          buildDatasets();
-          // KPIs from primary pair
-          const primary = _cache[_mode === 'both' ? 'usd' : _mode];
-          if (primary) updateKPIs(computeKPIs(primary.bids, primary.asks, _mode === 'eur' ? 'eur' : 'usd'));
+          const cfg = PAIRS[_mode];
+          _cache[_mode] = await fetchPair(cfg.kraken);
+          const { bids, asks } = _cache[_mode];
+          const mid = (bids[0].price + asks[0].price) / 2;
+          renderChart(bids, asks, cfg, mid);
+          updateKPIs(computeKPIs(bids, asks, cfg), cfg);
           _loaded = true;
         } catch(e) {
           document.getElementById('rz-depth-loading').textContent = 'Error: ' + e.message;
@@ -5227,19 +5228,18 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         }
       }
 
-      // ── Public API ────────────────────────────────────────
+      // ── Public ────────────────────────────────────────────
       window.rzDepthSwitch = function(mode, btn) {
         _mode = mode;
-        ['rz-depth-btn-usd','rz-depth-btn-eur','rz-depth-btn-both'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+        ['rz-depth-btn-usd','rz-depth-btn-eur'].forEach(id => document.getElementById(id)?.classList.remove('active'));
         btn.classList.add('active');
         loadDepth(false);
       };
       window.rzDepthRefresh = function() {
-        _cache = {};
+        delete _cache[_mode];
         loadDepth(true);
       };
 
-      // Hook tab switch
       const _origSwitch = window.rzCtxSwitch;
       window.rzCtxSwitch = function(tab, btn) {
         _origSwitch(tab, btn);
