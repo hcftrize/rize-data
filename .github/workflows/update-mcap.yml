@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "0 1 * * *"   # 01:00 UTC daily
   workflow_dispatch:
+    inputs:
+      bootstrap:
+        description: "Full history from genesis (true = bootstrap)"
+        required: false
+        default: "false"
 
 permissions:
   contents: write
@@ -21,7 +26,12 @@ jobs:
           python-version: "3.12"
 
       - name: Run scraper
-        run: python scripts/scrape_mcap.py
+        run: |
+          if [ "${{ github.event.inputs.bootstrap }}" = "true" ]; then
+            python scripts/scrape_mcap.py --bootstrap
+          else
+            python scripts/scrape_mcap.py
+          fi
 
       - name: Commit and push to dev
         run: |
