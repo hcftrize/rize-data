@@ -91,7 +91,7 @@ def main():
             if old != volume:
                 print(f"  {date_str}: {f'${old:,.2f}' if old else 'new'} → ${volume:,.2f}")
                 updated.append(date_str)
-        time.sleep(0.5)  # respect CoinGecko rate limit
+        time.sleep(3.0)  # respect CoinGecko rate limit (30 req/min)
 
     # Rebuild series sorted by date
     final_series = [{"date": d, "volume": v} for d, v in sorted(by_date.items())]
