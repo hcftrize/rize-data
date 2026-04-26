@@ -145,38 +145,57 @@ def resolve_name(want, confirmed):
     return confirmed.get(want.lower(), want)
 
 
-# ── Pagination skip-based ─────────────────────────────────────────────────────
+# ── Pagination cursor-based (timestamp_gt / id_gt) ───────────────────────────
+# The Graph hard limit: skip > 5000 boucle ou échoue.
+# On utilise un curseur sur le dernier timestamp/id vu → pas de limite.
 
 def fetch_entity(endpoint, entity_name, fields_str, is_ormi=False):
-    order_by   = "id" if entity_name in SNAPSHOT_ENTITIES else "timestamp"
-    results    = []
-    skip       = 0
-    page_sleep = 8 if is_ormi else 0.5
+    is_snapshot = entity_name in SNAPSHOT_ENTITIES
+    order_by    = "id" if is_snapshot else "timestamp"
+    cursor_field = "id" if is_snapshot else "timestamp"
+    page_sleep  = 8 if is_ormi else 0.5
+
+    results = []
+    cursor  = None   # None = première page, pas de filtre
+    page    = 0
 
     while True:
+        # Filtre curseur : on prend tout ce qui est > dernier vu
+        if cursor is None:
+            where_clause = ""
+        else:
+            where_clause = f', where: {{{cursor_field}_gt: "{cursor}"}}'
+
         q = (
             f"{{ {entity_name}("
-            f"first:1000, skip:{skip}, "
+            f"first:1000"
+            f"{where_clause}, "
             f"orderBy:{order_by}, orderDirection:asc"
             f") {{ {fields_str} }} }}"
         )
         data = gql(endpoint, q, is_ormi=is_ormi)
 
         if data is None:
-            print(f"      fetch failed at skip={skip}, stopping", flush=True)
+            print(f"      fetch failed (page {page}), stopping", flush=True)
             break
 
         items = data.get(entity_name, [])
         if not items:
             break
 
-        results.extend(items)
-        print(f"      skip={skip:>6}: +{len(items):>4} → total {len(results)}", flush=True)
+        # Déduplique par id au cas où le curseur chevauche
+        seen_ids = {r["id"] for r in results}
+        new_items = [i for i in items if i["id"] not in seen_ids]
+        results.extend(new_items)
+        page += 1
+
+        print(f"      page={page:>3}: +{len(new_items):>4} → total {len(results)}", flush=True)
 
         if len(items) < 1000:
-            break
+            break  # dernière page
 
-        skip += 1000
+        # Avance le curseur sur la valeur du dernier item
+        cursor = items[-1][cursor_field]
         time.sleep(page_sleep)
 
     return results
