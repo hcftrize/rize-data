@@ -1590,13 +1590,16 @@ html, body { overflow-x: hidden; max-width: 100%; }
         </div>
 
         <!-- Order Book table — 2 cols: Cum Bids | Price | Cum Asks -->
+        <!-- 5 cols: cum bids | bid price | sep | ask price | cum asks — equal weights -->
         <div id="rz-depth-view-ob" style="display:none;height:340px;overflow-y:auto;background:rgba(0,0,0,0.2)">
-          <table id="rz-ob-table" style="width:100%;border-collapse:collapse">
+          <table id="rz-ob-table" style="width:100%;border-collapse:collapse;table-layout:fixed">
             <thead style="position:sticky;top:0;background:#060818;z-index:2">
               <tr>
-                <th style="padding:6px 12px;text-align:right;color:#98ffb6;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.07);width:40%">Cum. Bids (RIZE)</th>
-                <th style="padding:6px 12px;text-align:center;color:rgba(255,255,255,0.5);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.07);width:20%">Price</th>
-                <th style="padding:6px 12px;text-align:left;color:var(--pink);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.07);width:40%">Cum. Asks (RIZE)</th>
+                <th style="padding:6px 12px;text-align:right;color:#98ffb6;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.07);width:27%">Cum. Bids</th>
+                <th style="padding:6px 8px;text-align:right;color:#98ffb6;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.07);width:23%">Bid Price</th>
+                <th style="padding:0;width:0;border-left:1px solid rgba(255,255,255,0.12);border-right:1px solid rgba(255,255,255,0.12);border-bottom:1px solid rgba(255,255,255,0.07)"></th>
+                <th style="padding:6px 8px;text-align:left;color:var(--pink);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.07);width:23%">Ask Price</th>
+                <th style="padding:6px 12px;text-align:left;color:var(--pink);font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;text-transform:uppercase;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.07);width:27%">Cum. Asks</th>
               </tr>
             </thead>
             <tbody id="rz-ob-tbody"></tbody>
@@ -5292,13 +5295,16 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       }
 
       function getBestTickSize(levels, mid, isBid) {
-        // Cherche le tick le plus fin donnant <= MAX_OB_ROWS lignes
+        // Cherche le tick donnant 10 ≤ lignes ≤ MAX_OB_ROWS
+        // null = données trop peu denses → utiliser levels bruts
         const ticks = getTickSequence(mid);
         for (const tick of ticks) {
           const grouped = groupLevels(levels, tick, isBid);
-          if (grouped.length <= MAX_OB_ROWS) return tick;
+          if (grouped.length > MAX_OB_ROWS) continue; // trop grand, essayer tick plus gros
+          if (grouped.length >= 10) return tick;       // parfait
+          return null; // moins de 10 lignes même avec ce tick → raw
         }
-        return ticks[ticks.length - 1]; // fallback: plus gros tick
+        return ticks[ticks.length - 1];
       }
 
       const fmtVol = v => {
@@ -5357,27 +5363,30 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           const bidBarW = b ? Math.round((b.cum / maxCum) * 100) : 0;
           const askBarW = a ? Math.round((a.cum / maxCum) * 100) : 0;
 
+          // 5 cols: cum bids | bid price | sep | ask price | cum asks
           const cumBidCell = b
-            ? `<td style="padding:2px 10px;text-align:right;font-family:'Rajdhani',sans-serif;font-size:12px;color:rgba(152,255,182,0.6);position:relative;width:33%">
+            ? `<td style="padding:4px 12px;text-align:right;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;color:rgba(152,255,182,0.75);position:relative;width:27%;overflow:hidden">
                 <div style="position:absolute;right:0;top:0;bottom:0;width:${bidBarW}%;background:rgba(152,255,182,0.07);pointer-events:none"></div>
                 <span style="position:relative">${fmtVol(b.cum)}</span></td>`
-            : `<td style="width:33%"></td>`;
+            : `<td style="width:27%"></td>`;
 
           const bidPriceCell = b
-            ? `<td style="padding:2px 6px;text-align:right;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:#98ffb6;white-space:nowrap;width:17%;border-right:1px solid rgba(255,255,255,0.08)">${sym}${fmtP(b.price)}</td>`
-            : `<td style="width:17%;border-right:1px solid rgba(255,255,255,0.08)"></td>`;
+            ? `<td style="padding:4px 8px;text-align:right;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:#98ffb6;white-space:nowrap;width:23%">${sym}${fmtP(b.price)}</td>`
+            : `<td style="width:23%"></td>`;
+
+          const sepCell = `<td style="padding:0;width:0;border-left:1px solid rgba(255,255,255,0.12);border-right:1px solid rgba(255,255,255,0.12)"></td>`;
 
           const askPriceCell = a
-            ? `<td style="padding:2px 6px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--pink);white-space:nowrap;width:17%">${sym}${fmtP(a.price)}</td>`
-            : `<td style="width:17%"></td>`;
+            ? `<td style="padding:4px 8px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--pink);white-space:nowrap;width:23%">${sym}${fmtP(a.price)}</td>`
+            : `<td style="width:23%"></td>`;
 
           const cumAskCell = a
-            ? `<td style="padding:2px 10px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:12px;color:rgba(255,107,138,0.6);position:relative;width:33%">
+            ? `<td style="padding:4px 12px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;color:rgba(255,107,138,0.75);position:relative;width:27%;overflow:hidden">
                 <div style="position:absolute;left:0;top:0;bottom:0;width:${askBarW}%;background:rgba(255,107,138,0.07);pointer-events:none"></div>
                 <span style="position:relative">${fmtVol(a.cum)}</span></td>`
-            : `<td style="width:33%"></td>`;
+            : `<td style="width:27%"></td>`;
 
-          html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.025)">${cumBidCell}${bidPriceCell}${askPriceCell}${cumAskCell}</tr>`;
+          html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.025)">${cumBidCell}${bidPriceCell}${sepCell}${askPriceCell}${cumAskCell}</tr>`;
         }
 
         tbody.innerHTML = html;
