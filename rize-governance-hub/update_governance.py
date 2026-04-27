@@ -5,26 +5,34 @@ Usage:
   python3 update_governance.py              # all 6
   python3 update_governance.py bond-broken  # single
 
-v4 — champs réels d'après introspection :
+v5 — endpoints Ormi privés avec Authorization: Bearer
+  - bond-created    → ORMI_API_KEY
+  - bond-timemarker → ORMI_API_KEY_2
   - orderBy:timestamp, filtre where:{timestamp_gt:"TS"}
   - nftId, txHash, timestamp (pas blockTimestamp/transactionHash/bondId)
-  - pools et bondOwners : re-fetch complet (snapshots, pas d'events)
-  - Ormi : pauses + backoff 429
 """
 
 import json, time, sys, os, urllib.request, urllib.error
 from datetime import datetime, timezone, timedelta
+
+ORMI_API_KEY   = os.environ.get("ORMI_API_KEY", "")    # bond-created
+ORMI_API_KEY_2 = os.environ.get("ORMI_API_KEY_2", "")  # bond-timemarker
 
 ENDPOINTS = {
     "pool-config":     "https://api.goldsky.com/api/public/project_cmocpxhlpgzgs01y06xr9dto2/subgraphs/tokerize-pool-config/1.0.0/gn",
     "bond-lifecycle":  "https://api.goldsky.com/api/public/project_cmocnm0h8gx3n01y7hpoe4kxv/subgraphs/tokerize-bond-lifecycle/1.0.0/gn",
     "bond-broken":     "https://api.goldsky.com/api/public/project_cmocqkq31mv0m010y19bu6obd/subgraphs/tokerize-bond-broken/1.0.0/gn",
     "nft-transfers":   "https://api.goldsky.com/api/public/project_cmocqwx6tnlbf010yce109jo9/subgraphs/tokerize-nft-transfers/1.0.0/gn",
-    "bond-timemarker": "https://api.subgraph.ormilabs.com/api/public/ac2ecb60-44a8-4df2-83cb-08bd1bced775/subgraphs/tokerize-bond-timemarker/1.0.0/gn",
-    "bond-created":    "https://api.subgraph.ormilabs.com/api/public/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/1.0.0/gn",
+    "bond-timemarker": "https://api.subgraph.ormilabs.com/api/private/ac2ecb60-44a8-4df2-83cb-08bd1bced775/subgraphs/tokerize-bond-timemarker/latest/gn",
+    "bond-created":    "https://api.subgraph.ormilabs.com/api/private/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/latest/gn",
 }
 
-HEADERS = {
+ORMI_KEYS = {
+    "bond-timemarker": ORMI_API_KEY_2,
+    "bond-created":    ORMI_API_KEY,
+}
+
+HEADERS_BASE = {
     "Content-Type": "application/json",
     "Accept":       "application/json",
     "User-Agent":   "Mozilla/5.0 (compatible; TokerizeBot/1.0; +https://tokerize.top)",
@@ -32,12 +40,16 @@ HEADERS = {
     "Referer":      "https://tokerize.top/",
 }
 
-# Queries incrémentales — filtre sur timestamp (champ réel).
-# TS remplacé au runtime par le unix timestamp cutoff.
-# Snapshots (pools, bondOwners) : re-fetch complet sans filtre timestamp.
+def get_headers(subgraph_name=None):
+    h = dict(HEADERS_BASE)
+    if subgraph_name and subgraph_name in ORMI_KEYS:
+        key = ORMI_KEYS[subgraph_name]
+        if key:
+            h["Authorization"] = f"Bearer {key}"
+    return h
+
 QUERIES_INCR = {
     "pool-config": {
-        # Snapshots : re-fetch complet (état courant des pools)
         "pools": {
             "mode": "snapshot",
             "query": "{ pools(first:1000, orderBy:id, orderDirection:asc) { id poolId baseWeight maturedWeightBonus fullMaturity updatedAtDate updatedAtTimestamp } }",
@@ -114,9 +126,9 @@ QUERIES_INCR = {
 
 # ── HTTP / GQL ────────────────────────────────────────────────────────────────
 
-def gql(endpoint, query, is_ormi=False, max_429=10):
+def gql(endpoint, query, subgraph_name=None, is_ormi=False, max_429=10):
     payload = json.dumps({"query": query}).encode()
-    req = urllib.request.Request(endpoint, data=payload, headers=HEADERS, method="POST")
+    req = urllib.request.Request(endpoint, data=payload, headers=get_headers(subgraph_name), method="POST")
     net_tries  = 0
     rate_tries = 0
 
@@ -156,18 +168,16 @@ def gql(endpoint, query, is_ormi=False, max_429=10):
 
 # ── Fetch helpers ─────────────────────────────────────────────────────────────
 
-def fetch_incremental(entity, query_tpl, ts_cutoff, endpoint, is_ormi=False):
-    """Fetch new events since ts_cutoff using cursor pagination."""
-    results    = []
-    cursor_ts  = ts_cutoff
-    page       = 0
-    page_sleep = 1.2 if is_ormi else 0.5  # Ormi 1 req/s
+def fetch_incremental(entity, query_tpl, ts_cutoff, endpoint, subgraph_name=None, is_ormi=False):
+    results   = []
+    cursor_ts = ts_cutoff
+    page      = 0
 
     while True:
         q = query_tpl.replace("TS", str(cursor_ts))
         if is_ormi and page > 0:
             time.sleep(1.2)
-        data = gql(endpoint, q, is_ormi=is_ormi)
+        data = gql(endpoint, q, subgraph_name=subgraph_name, is_ormi=is_ormi)
         if data is None:
             break
         items = data.get(entity, [])
@@ -180,27 +190,22 @@ def fetch_incremental(entity, query_tpl, ts_cutoff, endpoint, is_ormi=False):
             break
         cursor_ts = items[-1]["timestamp"]
         if not is_ormi:
-            time.sleep(page_sleep)
+            time.sleep(0.5)
 
     return results
 
 
-def fetch_snapshot(entity, endpoint, fields_str, is_ormi=False):
-    """
-    Re-fetch snapshot complet via cursor id_gt (pas de skip).
-    orderBy:id — les snapshots (pools, bondOwners) n'ont pas de timestamp.
-    """
-    results    = []
-    cursor     = None
-    page       = 0
-    page_sleep = 1.2 if is_ormi else 0.5  # Ormi 1 req/s
+def fetch_snapshot(entity, endpoint, fields_str, subgraph_name=None, is_ormi=False):
+    results = []
+    cursor  = None
+    page    = 0
 
     while True:
         where = f', where: {{id_gt: "{cursor}"}}' if cursor else ""
         q = f"{{ {entity}(first:1000{where}, orderBy:id, orderDirection:asc) {{ {fields_str} }} }}"
         if is_ormi and page > 0:
             time.sleep(1.2)
-        data = gql(endpoint, q, is_ormi=is_ormi)
+        data = gql(endpoint, q, subgraph_name=subgraph_name, is_ormi=is_ormi)
         if data is None:
             break
         items = data.get(entity, [])
@@ -213,7 +218,7 @@ def fetch_snapshot(entity, endpoint, fields_str, is_ormi=False):
             break
         cursor = items[-1]["id"]
         if not is_ormi:
-            time.sleep(page_sleep)
+            time.sleep(0.5)
 
     return results
 
@@ -249,7 +254,7 @@ def update_subgraph(name, endpoint, entities_cfg, out_dir, days_back=8):
         data = {}
 
     total_added = 0
-    inter_sleep = 1.2 if is_ormi else 0.8  # Ormi 1 req/s
+    inter_sleep = 1.2 if is_ormi else 0.8
 
     for entity, cfg in entities_cfg.items():
         mode  = cfg["mode"]
@@ -261,16 +266,14 @@ def update_subgraph(name, endpoint, entities_cfg, out_dir, days_back=8):
         print(f"  → {entity} [{mode}] (existant: {len(data[entity])})", flush=True)
 
         if mode == "snapshot":
-            # Extrait les champs depuis la query hardcodée pour les passer à fetch_snapshot
-            # On parse les champs entre { } de la query
             import re
             m = re.search(r'\{[^{]*\{([^}]+)\}', query)
             fields_str = m.group(1).strip() if m else "id"
-            new_items    = fetch_snapshot(entity, endpoint, fields_str, is_ormi=is_ormi)
+            new_items    = fetch_snapshot(entity, endpoint, fields_str, subgraph_name=name, is_ormi=is_ormi)
             data[entity] = new_items
             print(f"    snapshot refreshed: {len(new_items)} records", flush=True)
         else:
-            new_items = fetch_incremental(entity, query, ts_cutoff, endpoint, is_ormi=is_ormi)
+            new_items = fetch_incremental(entity, query, ts_cutoff, endpoint, subgraph_name=name, is_ormi=is_ormi)
             added     = merge(data[entity], new_items)
             total_added += added
             print(f"    +{added} nouveaux (total: {len(data[entity])})", flush=True)
@@ -300,7 +303,7 @@ def main():
     out_dir = "rize-governance-hub"
     os.makedirs(out_dir, exist_ok=True)
 
-    print(f"Governance incremental update v4 — {datetime.now(timezone.utc).isoformat()}", flush=True)
+    print(f"Governance incremental update v5 — {datetime.now(timezone.utc).isoformat()}", flush=True)
 
     for name in targets:
         if name not in QUERIES_INCR:
