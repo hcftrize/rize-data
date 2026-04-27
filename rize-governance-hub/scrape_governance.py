@@ -123,10 +123,11 @@ def gql(endpoint, query, is_ormi=False, max_429=10):
 def ormi_discover(endpoint):
     """
     Tente l'introspection Ormi pour confirmer les noms d'entités.
-    Retourne dict lowercase→realname, ou {} si 429 persistant.
+    Pause de 2s avant pour respecter le 1 req/s du plan free.
+    Retourne dict lowercase→realname, ou {} si échec.
     """
-    print(f"    [Ormi] pause 15s avant introspection…", flush=True)
-    time.sleep(15)
+    print(f"    [Ormi] pause 2s avant introspection…", flush=True)
+    time.sleep(2)
     q = "{ __schema { queryType { fields { name } } } }"
     data = gql(endpoint, q, is_ormi=True, max_429=4)
     if not data:
@@ -150,17 +151,18 @@ def resolve_name(want, confirmed):
 # On utilise un curseur sur le dernier timestamp/id vu → pas de limite.
 
 def fetch_entity(endpoint, entity_name, fields_str, is_ormi=False):
-    is_snapshot = entity_name in SNAPSHOT_ENTITIES
-    order_by    = "id" if is_snapshot else "timestamp"
+    is_snapshot  = entity_name in SNAPSHOT_ENTITIES
+    order_by     = "id" if is_snapshot else "timestamp"
     cursor_field = "id" if is_snapshot else "timestamp"
-    page_sleep  = 8 if is_ormi else 0.5
+    # Ormi free plan = 1 req/s max → on attend 1.2s entre chaque requête pour
+    # rester confortablement sous la limite. Goldsky = 0.5s suffit.
+    page_sleep   = 1.2 if is_ormi else 0.5
 
     results = []
-    cursor  = None   # None = première page, pas de filtre
+    cursor  = None
     page    = 0
 
     while True:
-        # Filtre curseur : on prend tout ce qui est > dernier vu
         if cursor is None:
             where_clause = ""
         else:
@@ -173,6 +175,11 @@ def fetch_entity(endpoint, entity_name, fields_str, is_ormi=False):
             f"orderBy:{order_by}, orderDirection:asc"
             f") {{ {fields_str} }} }}"
         )
+
+        # Pour Ormi : pause AVANT la requête pour garantir 1 req/s
+        if is_ormi and page > 0:
+            time.sleep(1.2)
+
         data = gql(endpoint, q, is_ormi=is_ormi)
 
         if data is None:
@@ -183,8 +190,7 @@ def fetch_entity(endpoint, entity_name, fields_str, is_ormi=False):
         if not items:
             break
 
-        # Déduplique par id au cas où le curseur chevauche
-        seen_ids = {r["id"] for r in results}
+        seen_ids  = {r["id"] for r in results}
         new_items = [i for i in items if i["id"] not in seen_ids]
         results.extend(new_items)
         page += 1
@@ -192,11 +198,9 @@ def fetch_entity(endpoint, entity_name, fields_str, is_ormi=False):
         print(f"      page={page:>3}: +{len(new_items):>4} → total {len(results)}", flush=True)
 
         if len(items) < 1000:
-            break  # dernière page
+            break
 
-        # Avance le curseur sur la valeur du dernier item
         cursor = items[-1][cursor_field]
-        time.sleep(page_sleep)
 
     return results
 
@@ -213,7 +217,7 @@ def fetch_subgraph(name, endpoint, entities):
     confirmed = ormi_discover(endpoint) if is_ormi else {}
 
     result_data = {}
-    inter_sleep = 10 if is_ormi else 0.8
+    inter_sleep = 1.2 if is_ormi else 0.8  # Ormi 1 req/s = 1.2s entre entités
 
     for entity_name, fields_str in entities.items():
         real_name = resolve_name(entity_name, confirmed)
