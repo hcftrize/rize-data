@@ -27,7 +27,7 @@ ENDPOINTS = {
     "bond-broken":     "https://api.goldsky.com/api/public/project_cmocqkq31mv0m010y19bu6obd/subgraphs/tokerize-bond-broken/1.0.0/gn",
     "nft-transfers":   "https://api.goldsky.com/api/public/project_cmocqwx6tnlbf010yce109jo9/subgraphs/tokerize-nft-transfers/1.0.0/gn",
     "bond-timemarker": "https://api.subgraph.ormilabs.com/api/private/ac2ecb60-44a8-4df2-83cb-08bd1bced775/subgraphs/tokerize-bond-timemarker/scraper/gn",
-    "bond-created":    "https://api.subgraph.ormilabs.com/api/private/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/scraper77/gn",
+    "bond-created":    "https://api.subgraph.ormilabs.com/api/private/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/s88/gn",
 }
 
 # Clé API par subgraph
@@ -181,7 +181,7 @@ def fetch_entity(endpoint, entity_name, fields_str, subgraph_name=None, is_ormi=
         )
 
         if is_ormi and page > 0:
-            time.sleep(60)
+            time.sleep(120)
 
         data = gql(endpoint, q, subgraph_name=subgraph_name, is_ormi=is_ormi)
 
