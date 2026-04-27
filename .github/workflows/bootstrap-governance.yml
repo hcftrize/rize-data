@@ -27,6 +27,9 @@ jobs:
           python-version: '3.11'
 
       - name: Run bootstrap scraper
+        env:
+          ORMI_API_KEY:   ${{ secrets.ORMI_API_KEY }}
+          ORMI_API_KEY_2: ${{ secrets.ORMI_API_KEY_2 }}
         run: |
           if [ -n "${{ github.event.inputs.subgraph }}" ]; then
             python3 rize-governance-hub/scrape_governance.py "${{ github.event.inputs.subgraph }}"
