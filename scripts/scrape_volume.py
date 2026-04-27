@@ -30,7 +30,7 @@ RIZE_GENESIS  = date(2025, 5, 15)
 OUTPUT        = Path(__file__).parent.parent / "rize-data-hub" / "volume-history.json"
 TIMEOUT       = 30
 WINDOW_DAYS   = 7
-SLEEP_BETWEEN = 3.0
+SLEEP_BETWEEN = 15.0   # CoinGecko free tier ≈ 5 req/min → 12s min, 15s pour être safe
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
