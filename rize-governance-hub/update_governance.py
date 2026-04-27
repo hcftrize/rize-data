@@ -161,10 +161,12 @@ def fetch_incremental(entity, query_tpl, ts_cutoff, endpoint, is_ormi=False):
     results    = []
     cursor_ts  = ts_cutoff
     page       = 0
-    page_sleep = 8 if is_ormi else 0.5
+    page_sleep = 1.2 if is_ormi else 0.5  # Ormi 1 req/s
 
     while True:
         q = query_tpl.replace("TS", str(cursor_ts))
+        if is_ormi and page > 0:
+            time.sleep(1.2)
         data = gql(endpoint, q, is_ormi=is_ormi)
         if data is None:
             break
@@ -177,7 +179,8 @@ def fetch_incremental(entity, query_tpl, ts_cutoff, endpoint, is_ormi=False):
         if len(items) < 1000:
             break
         cursor_ts = items[-1]["timestamp"]
-        time.sleep(page_sleep)
+        if not is_ormi:
+            time.sleep(page_sleep)
 
     return results
 
@@ -190,11 +193,13 @@ def fetch_snapshot(entity, endpoint, fields_str, is_ormi=False):
     results    = []
     cursor     = None
     page       = 0
-    page_sleep = 8 if is_ormi else 0.5
+    page_sleep = 1.2 if is_ormi else 0.5  # Ormi 1 req/s
 
     while True:
         where = f', where: {{id_gt: "{cursor}"}}' if cursor else ""
         q = f"{{ {entity}(first:1000{where}, orderBy:id, orderDirection:asc) {{ {fields_str} }} }}"
+        if is_ormi and page > 0:
+            time.sleep(1.2)
         data = gql(endpoint, q, is_ormi=is_ormi)
         if data is None:
             break
@@ -207,7 +212,8 @@ def fetch_snapshot(entity, endpoint, fields_str, is_ormi=False):
         if len(items) < 1000:
             break
         cursor = items[-1]["id"]
-        time.sleep(page_sleep)
+        if not is_ormi:
+            time.sleep(page_sleep)
 
     return results
 
@@ -231,8 +237,8 @@ def update_subgraph(name, endpoint, entities_cfg, out_dir, days_back=8):
     ts_cutoff = int((datetime.now(timezone.utc) - timedelta(days=days_back)).timestamp())
 
     if is_ormi:
-        print(f"  [Ormi] pause 15s avant update…", flush=True)
-        time.sleep(15)
+        print(f"  [Ormi] pause 2s avant update…", flush=True)
+        time.sleep(2)
 
     if os.path.exists(path):
         with open(path) as f:
@@ -243,7 +249,7 @@ def update_subgraph(name, endpoint, entities_cfg, out_dir, days_back=8):
         data = {}
 
     total_added = 0
-    inter_sleep = 10 if is_ormi else 0.8
+    inter_sleep = 1.2 if is_ormi else 0.8  # Ormi 1 req/s
 
     for entity, cfg in entities_cfg.items():
         mode  = cfg["mode"]
