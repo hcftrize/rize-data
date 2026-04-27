@@ -23,8 +23,8 @@ ENDPOINTS = {
     "bond-lifecycle":  "https://api.goldsky.com/api/public/project_cmocnm0h8gx3n01y7hpoe4kxv/subgraphs/tokerize-bond-lifecycle/1.0.0/gn",
     "bond-broken":     "https://api.goldsky.com/api/public/project_cmocqkq31mv0m010y19bu6obd/subgraphs/tokerize-bond-broken/1.0.0/gn",
     "nft-transfers":   "https://api.goldsky.com/api/public/project_cmocqwx6tnlbf010yce109jo9/subgraphs/tokerize-nft-transfers/1.0.0/gn",
-    "bond-timemarker": "https://api.subgraph.ormilabs.com/api/private/ac2ecb60-44a8-4df2-83cb-08bd1bced775/subgraphs/tokerize-bond-timemarker/latest/gn",
-    "bond-created":    "https://api.subgraph.ormilabs.com/api/private/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/latest/gn",
+    "bond-timemarker": "https://api.subgraph.ormilabs.com/api/private/ac2ecb60-44a8-4df2-83cb-08bd1bced775/subgraphs/tokerize-bond-timemarker/scraper/gn",
+    "bond-created":    "https://api.subgraph.ormilabs.com/api/private/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/scraper/gn",
 }
 
 ORMI_KEYS = {
@@ -106,19 +106,23 @@ QUERIES_INCR = {
         },
     },
     "bond-timemarker": {
-        "bondTimeMarkerEvents": {
-            "mode": "incremental",
-            "query": '{ bondTimeMarkerEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id nftId timeMarker amount poolId date blockNumber timestamp txHash } }',
+        "bondTimeMarkerSnapshots": {
+            "mode": "snapshot",
+            "query": "{ bondTimeMarkerSnapshots(first:1000, orderBy:id, orderDirection:asc) { id nftId timeMarker amount poolId blockNumber timestamp } }",
         },
     },
     "bond-created": {
         "bondCreatedEvents": {
             "mode": "incremental",
-            "query": '{ bondCreatedEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id nftId amount owner poolId date blockNumber timestamp txHash } }',
+            "query": '{ bondCreatedEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id nftId owner poolId amount date blockNumber timestamp txHash } }',
         },
-        "bondIncreasedEvents": {
+        "increaseBondEvents": {
             "mode": "incremental",
-            "query": '{ bondIncreasedEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id nftId amount owner poolId date blockNumber timestamp txHash } }',
+            "query": '{ increaseBondEvents(first:1000,orderBy:timestamp,orderDirection:asc,where:{timestamp_gt:"TS"}) { id nftId amount date blockNumber timestamp txHash } }',
+        },
+        "bonds": {
+            "mode": "snapshot",
+            "query": "{ bonds(first:1000, orderBy:id, orderDirection:asc) { id nftId owner poolId createdAtDate createdAtTimestamp createdAtBlock totalDeposited increaseCount lastDepositDate lastDepositTimestamp } }",
         },
     },
 }
