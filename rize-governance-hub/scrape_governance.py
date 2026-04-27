@@ -6,29 +6,36 @@ Usage:
   python3 scrape_governance.py                  # all 6
   python3 scrape_governance.py bond-broken      # single
 
-v4 — champs hardcodés d'après introspection GraphQL réelle :
+v5 — endpoints Ormi privés avec Authorization: Bearer
+  - bond-created    → ORMI_API_KEY
+  - bond-timemarker → ORMI_API_KEY_2
   - orderBy:timestamp partout (blockTimestamp n'existe pas)
-  - nftId = bond NFT ID (pas bondId), txHash (pas transactionHash)
-  - owner absent des events Goldsky (présent seulement dans bondOwners)
-  - pool-config : entité 'pools' ajoutée (snapshot état actuel des pools)
-  - Ormi : pauses longues + backoff progressif 429 (max 180s)
+  - nftId = bond NFT ID, txHash (pas transactionHash)
+  - Ormi : 1.2s entre requêtes pour rester sous 1 req/s
 """
 
 import json, time, sys, os, urllib.request, urllib.error
 from datetime import datetime, timezone
+
+# Clés API Ormi depuis variables d'environnement (secrets GitHub Actions)
+ORMI_API_KEY   = os.environ.get("ORMI_API_KEY", "")    # bond-created
+ORMI_API_KEY_2 = os.environ.get("ORMI_API_KEY_2", "")  # bond-timemarker
 
 ENDPOINTS = {
     "pool-config":     "https://api.goldsky.com/api/public/project_cmocpxhlpgzgs01y06xr9dto2/subgraphs/tokerize-pool-config/1.0.0/gn",
     "bond-lifecycle":  "https://api.goldsky.com/api/public/project_cmocnm0h8gx3n01y7hpoe4kxv/subgraphs/tokerize-bond-lifecycle/1.0.0/gn",
     "bond-broken":     "https://api.goldsky.com/api/public/project_cmocqkq31mv0m010y19bu6obd/subgraphs/tokerize-bond-broken/1.0.0/gn",
     "nft-transfers":   "https://api.goldsky.com/api/public/project_cmocqwx6tnlbf010yce109jo9/subgraphs/tokerize-nft-transfers/1.0.0/gn",
-    "bond-timemarker": "https://api.subgraph.ormilabs.com/api/public/ac2ecb60-44a8-4df2-83cb-08bd1bced775/subgraphs/tokerize-bond-timemarker/1.0.0/gn",
-    "bond-created":    "https://api.subgraph.ormilabs.com/api/public/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/1.0.0/gn",
+    "bond-timemarker": "https://api.subgraph.ormilabs.com/api/private/ac2ecb60-44a8-4df2-83cb-08bd1bced775/subgraphs/tokerize-bond-timemarker/latest/gn",
+    "bond-created":    "https://api.subgraph.ormilabs.com/api/private/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/latest/gn",
 }
 
-# Champs réels vérifiés par introspection directe sur chaque subgraph Goldsky.
-# Ormi : convention identique supposée (nftId, timestamp, txHash).
-# Entités sans timestamp (snapshots) : orderBy:id utilisé à la place.
+# Clé API par subgraph
+ORMI_KEYS = {
+    "bond-timemarker": ORMI_API_KEY_2,
+    "bond-created":    ORMI_API_KEY,
+}
+
 ENTITIES = {
     "pool-config": {
         "pools":                     "id poolId baseWeight maturedWeightBonus fullMaturity updatedAtDate updatedAtTimestamp",
@@ -50,8 +57,6 @@ ENTITIES = {
         "nftTransferEvents": "id tokenId from to isMint date blockNumber timestamp txHash",
         "bondOwners":        "id tokenId owner mintDate mintTimestamp lastTransferDate lastTransferTimestamp transferCount",
     },
-    # Ormi — noms et champs supposés d'après convention Goldsky observée.
-    # Si les noms sont faux, l'erreur GQL indiquera le vrai nom.
     "bond-timemarker": {
         "bondTimeMarkerEvents": "id nftId timeMarker amount poolId date blockNumber timestamp txHash",
     },
@@ -61,10 +66,9 @@ ENTITIES = {
     },
 }
 
-# Entités snapshot (pas d'events, pas de timestamp) → orderBy:id
 SNAPSHOT_ENTITIES = {"pools", "bondOwners"}
 
-HEADERS = {
+HEADERS_BASE = {
     "Content-Type": "application/json",
     "Accept":       "application/json",
     "User-Agent":   "Mozilla/5.0 (compatible; TokerizeBot/1.0; +https://tokerize.top)",
@@ -72,12 +76,20 @@ HEADERS = {
     "Referer":      "https://tokerize.top/",
 }
 
+def get_headers(subgraph_name=None):
+    h = dict(HEADERS_BASE)
+    if subgraph_name and subgraph_name in ORMI_KEYS:
+        key = ORMI_KEYS[subgraph_name]
+        if key:
+            h["Authorization"] = f"Bearer {key}"
+    return h
+
 
 # ── HTTP / GQL ────────────────────────────────────────────────────────────────
 
-def gql(endpoint, query, is_ormi=False, max_429=10):
+def gql(endpoint, query, subgraph_name=None, is_ormi=False, max_429=10):
     payload = json.dumps({"query": query}).encode()
-    req = urllib.request.Request(endpoint, data=payload, headers=HEADERS, method="POST")
+    req = urllib.request.Request(endpoint, data=payload, headers=get_headers(subgraph_name), method="POST")
     net_tries  = 0
     rate_tries = 0
 
@@ -120,16 +132,11 @@ def gql(endpoint, query, is_ormi=False, max_429=10):
 
 # ── Ormi : confirmer les noms d'entités si possible ──────────────────────────
 
-def ormi_discover(endpoint):
-    """
-    Tente l'introspection Ormi pour confirmer les noms d'entités.
-    Pause de 2s avant pour respecter le 1 req/s du plan free.
-    Retourne dict lowercase→realname, ou {} si échec.
-    """
+def ormi_discover(endpoint, subgraph_name):
     print(f"    [Ormi] pause 2s avant introspection…", flush=True)
     time.sleep(2)
     q = "{ __schema { queryType { fields { name } } } }"
-    data = gql(endpoint, q, is_ormi=True, max_429=4)
+    data = gql(endpoint, q, subgraph_name=subgraph_name, is_ormi=True, max_429=4)
     if not data:
         print(f"    [Ormi] introspection échouée — noms hardcodés utilisés", flush=True)
         return {}
@@ -140,23 +147,17 @@ def ormi_discover(endpoint):
 
 
 def resolve_name(want, confirmed):
-    """Résout le vrai nom depuis le dict confirmed (lowercase→real), ou retourne want."""
     if not confirmed:
         return want
     return confirmed.get(want.lower(), want)
 
 
-# ── Pagination cursor-based (timestamp_gt / id_gt) ───────────────────────────
-# The Graph hard limit: skip > 5000 boucle ou échoue.
-# On utilise un curseur sur le dernier timestamp/id vu → pas de limite.
+# ── Pagination cursor-based ───────────────────────────────────────────────────
 
-def fetch_entity(endpoint, entity_name, fields_str, is_ormi=False):
+def fetch_entity(endpoint, entity_name, fields_str, subgraph_name=None, is_ormi=False):
     is_snapshot  = entity_name in SNAPSHOT_ENTITIES
     order_by     = "id" if is_snapshot else "timestamp"
     cursor_field = "id" if is_snapshot else "timestamp"
-    # Ormi free plan = 1 req/s max → on attend 1.2s entre chaque requête pour
-    # rester confortablement sous la limite. Goldsky = 0.5s suffit.
-    page_sleep   = 1.2 if is_ormi else 0.5
 
     results = []
     cursor  = None
@@ -176,11 +177,10 @@ def fetch_entity(endpoint, entity_name, fields_str, is_ormi=False):
             f") {{ {fields_str} }} }}"
         )
 
-        # Pour Ormi : pause AVANT la requête pour garantir 1 req/s
         if is_ormi and page > 0:
             time.sleep(1.2)
 
-        data = gql(endpoint, q, is_ormi=is_ormi)
+        data = gql(endpoint, q, subgraph_name=subgraph_name, is_ormi=is_ormi)
 
         if data is None:
             print(f"      fetch failed (page {page}), stopping", flush=True)
@@ -201,6 +201,8 @@ def fetch_entity(endpoint, entity_name, fields_str, is_ormi=False):
             break
 
         cursor = items[-1][cursor_field]
+        if not is_ormi:
+            time.sleep(0.5)
 
     return results
 
@@ -214,17 +216,17 @@ def fetch_subgraph(name, endpoint, entities):
     print(f"\n{'='*62}", flush=True)
     print(f"  SUBGRAPH: {name}  [{provider}]", flush=True)
 
-    confirmed = ormi_discover(endpoint) if is_ormi else {}
+    confirmed = ormi_discover(endpoint, name) if is_ormi else {}
 
     result_data = {}
-    inter_sleep = 1.2 if is_ormi else 0.8  # Ormi 1 req/s = 1.2s entre entités
+    inter_sleep = 1.2 if is_ormi else 0.8
 
     for entity_name, fields_str in entities.items():
         real_name = resolve_name(entity_name, confirmed)
         label     = f"{entity_name} → {real_name}" if real_name != entity_name else entity_name
         print(f"  → {label}", flush=True)
 
-        items = fetch_entity(endpoint, real_name, fields_str, is_ormi=is_ormi)
+        items = fetch_entity(endpoint, real_name, fields_str, subgraph_name=name, is_ormi=is_ormi)
         result_data[real_name] = items
         print(f"     ✓ {len(items)} records", flush=True)
         time.sleep(inter_sleep)
@@ -241,7 +243,7 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
 
     ts = datetime.now(timezone.utc).isoformat()
-    print(f"Governance bootstrap v4 — {ts}", flush=True)
+    print(f"Governance bootstrap v5 — {ts}", flush=True)
     print(f"Targets: {targets}", flush=True)
 
     for name in targets:
