@@ -25,8 +25,8 @@ jobs:
 
       - name: Install Goldsky CLI
         run: |
-          curl -fsSL https://cli.goldsky.com/install | bash
-          echo "$HOME/.goldsky/bin" >> $GITHUB_PATH
+          curl -fsSL https://cli.goldsky.com/install | bash -s -- -f
+          echo "/usr/local/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
         working-directory: goldsky-governance
