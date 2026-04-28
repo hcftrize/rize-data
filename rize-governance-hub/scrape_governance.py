@@ -27,7 +27,7 @@ ENDPOINTS = {
     "bond-broken":     "https://api.goldsky.com/api/public/project_cmocqkq31mv0m010y19bu6obd/subgraphs/tokerize-bond-broken/1.0.0/gn",
     "nft-transfers":   "https://api.goldsky.com/api/public/project_cmocqwx6tnlbf010yce109jo9/subgraphs/tokerize-nft-transfers/1.0.0/gn",
     "bond-timemarker": "https://api.subgraph.ormilabs.com/api/private/ac2ecb60-44a8-4df2-83cb-08bd1bced775/subgraphs/tokerize-bond-timemarker/scraper/gn",
-    "bond-created":    "https://api.subgraph.ormilabs.com/api/private/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/s88/gn",
+    "bond-created":    "https://api.subgraph.ormilabs.com/api/private/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/ormiteamarepussies/gn",
 }
 
 # Clé API par subgraph
@@ -90,7 +90,7 @@ def get_headers(subgraph_name=None):
 
 # ── HTTP / GQL ────────────────────────────────────────────────────────────────
 
-def gql(endpoint, query, subgraph_name=None, is_ormi=False, max_429=10):
+def gql(endpoint, query, subgraph_name=None, is_ormi=False, max_429=999999):
     payload = json.dumps({"query": query}).encode()
     req = urllib.request.Request(endpoint, data=payload, headers=get_headers(subgraph_name), method="POST")
     net_tries  = 0
@@ -108,12 +108,9 @@ def gql(endpoint, query, subgraph_name=None, is_ormi=False, max_429=10):
         except urllib.error.HTTPError as e:
             if e.code == 429:
                 rate_tries += 1
-                if rate_tries > max_429:
-                    print(f"    429 — max retries ({max_429}), giving up", flush=True)
-                    return None
-                wait = min(30 * rate_tries, 180)
-                print(f"    429 — retry {rate_tries}/{max_429} in {wait}s…", flush=True)
-                time.sleep(wait)
+                # Retry infini — attend 60s fixe à chaque fois
+                print(f"    429 — retry #{rate_tries}, waiting 60s…", flush=True)
+                time.sleep(60)
             else:
                 net_tries += 1
                 if net_tries > 4:
