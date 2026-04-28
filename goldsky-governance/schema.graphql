@@ -1,6 +1,6 @@
 # ── bond-created ─────────────────────────────────────────────────────────────
 
-type Bond @entity {
+type Bond @entity(immutable: false) {
   id: ID!
   nftId: BigInt!
   owner: Bytes!
@@ -110,7 +110,7 @@ type VestedTokenClawedEvent @entity(immutable: true) {
 
 # ── pool-config ───────────────────────────────────────────────────────────────
 
-type Pool @entity {
+type Pool @entity(immutable: false) {
   id: ID!
   poolId: Int!
   baseWeight: BigInt!
@@ -174,7 +174,7 @@ type NftTransferEvent @entity(immutable: true) {
   txHash: Bytes!
 }
 
-type BondOwner @entity {
+type BondOwner @entity(immutable: false) {
   id: ID!
   tokenId: BigInt!
   owner: Bytes!
