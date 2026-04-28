@@ -1033,7 +1033,7 @@
 
     const events = d.bondBrokenEvents || [];
     const totalBreaks = events.length;
-    const totalRize = events.reduce((s,e) => s + parseAmt(e.amount), 0) / DECIMALS;
+    const totalRize = events.reduce((s,e) => s + parseAmt(e.amount), 0);
 
     document.getElementById('conv-total-breaks').textContent = totalBreaks.toLocaleString();
     document.getElementById('conv-total-breaks-sub').textContent = 'all time';
@@ -1045,7 +1045,7 @@
     for (const [key, secs] of Object.entries(windows)) {
       const cutoff = now - secs;
       const filtered = events.filter(e => parseInt(e.timestamp) > cutoff);
-      const rize = filtered.reduce((s,e) => s + parseAmt(e.amount), 0) / DECIMALS;
+      const rize = filtered.reduce((s,e) => s + parseAmt(e.amount), 0);
       document.getElementById('conv-flow-'+key).textContent = filtered.length.toLocaleString();
       document.getElementById('conv-flow-'+key+'-rize').textContent = fmt(rize,2) + ' RIZE';
     }
@@ -1056,7 +1056,7 @@
     events.filter(e => parseInt(e.timestamp) > cutoff90).forEach(e => {
       const day = tsToDate(e.timestamp);
       if (!daily[day]) daily[day] = 0;
-      daily[day] += parseAmt(e.amount) / DECIMALS;
+      daily[day] += parseAmt(e.amount);
     });
     const labels = Object.keys(daily).sort();
     const values = labels.map(d => daily[d]);
@@ -1080,7 +1080,7 @@
     });
 
     // Whales
-    const whales = events.filter(e => parseAmt(e.amount)/DECIMALS >= WHALE_THRESHOLD)
+    const whales = events.filter(e => parseAmt(e.amount) >= WHALE_THRESHOLD)
       .sort((a,b) => parseAmt(b.amount) - parseAmt(a.amount))
       .slice(0,50);
     const tbody = document.getElementById('conv-whale-tbody');
@@ -1088,7 +1088,7 @@
       tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">No whale events found</td></tr>';
     } else {
       tbody.innerHTML = whales.map(e => {
-        const amt = parseAmt(e.amount)/DECIMALS;
+        const amt = parseAmt(e.amount);
         return `<tr>
           <td class="td-muted">${e.date || tsToDate(e.timestamp)}</td>
           <td class="td-cyan">#${e.nftId}</td>
@@ -1166,7 +1166,7 @@
       const day = e.date || tsToDate(e.timestamp);
       if (!daily[day]) daily[day] = { count: 0, rize: 0 };
       daily[day].count++;
-      daily[day].rize += parseAmt(e.amount) / DECIMALS;
+      daily[day].rize += parseAmt(e.amount);
     });
 
     const days = Object.keys(daily).sort();
@@ -1256,7 +1256,7 @@
       const day = e.date || tsToDate(e.timestamp);
       if (!daily[day]) daily[day] = { count:0, rize:0 };
       daily[day].count++;
-      daily[day].rize += parseAmt(e.amount)/DECIMALS;
+      daily[day].rize += parseAmt(e.amount);
     });
 
     // Monthly
@@ -1278,7 +1278,7 @@
     document.getElementById('cal-last-month').textContent = lastM.count.toLocaleString();
     document.getElementById('cal-last-month-rize').textContent = fmt(lastM.rize,2) + ' RIZE';
     document.getElementById('cal-all-time').textContent = events.length.toLocaleString();
-    const totalRize = events.reduce((s,e) => s + parseAmt(e.amount)/DECIMALS, 0);
+    const totalRize = events.reduce((s,e) => s + parseAmt(e.amount), 0);
     document.getElementById('cal-all-rize').textContent = fmt(totalRize,2);
 
     calRender();
@@ -1355,7 +1355,7 @@
     if (!d) return;
 
     allWhaleEvents = (d.bondBrokenEvents || [])
-      .map(e => ({ ...e, _rize: parseAmt(e.amount)/DECIMALS }))
+      .map(e => ({ ...e, _rize: parseAmt(e.amount) }))
       .sort((a,b) => b._rize - a._rize);
 
     // KPIs
@@ -1413,13 +1413,13 @@
     const e30 = events.filter(e => parseInt(e.timestamp) > now - 86400*30);
     const e90 = events.filter(e => parseInt(e.timestamp) > now - 86400*90);
 
-    const rize30 = e30.reduce((s,e) => s + parseAmt(e.amount)/DECIMALS, 0);
-    const rize90 = e90.reduce((s,e) => s + parseAmt(e.amount)/DECIMALS, 0);
+    const rize30 = e30.reduce((s,e) => s + parseAmt(e.amount), 0);
+    const rize90 = e90.reduce((s,e) => s + parseAmt(e.amount), 0);
     const avg30 = rize30 / 30;
     const avg90 = rize90 / 90;
 
     const trendRatio = avg90 > 0 ? avg30 / avg90 : 1;
-    const whales5m = events.filter(e => parseAmt(e.amount)/DECIMALS >= 5_000_000);
+    const whales5m = events.filter(e => parseAmt(e.amount) >= 5_000_000);
     const whalePct = events.length > 0 ? whales5m.length / events.length * 100 : 0;
 
     // Score: lower breaks = better conviction
@@ -1482,7 +1482,7 @@
       e.from.toLowerCase() === addr || e.to.toLowerCase() === addr
     );
     const breaks = (breakData?.bondBrokenEvents || []).filter(e => tokenIds.has(e.nftId.toString()));
-    const totalBroken = breaks.reduce((s,e) => s + parseAmt(e.amount)/DECIMALS, 0);
+    const totalBroken = breaks.reduce((s,e) => s + parseAmt(e.amount), 0);
     const totalNFTs = owners.length;
 
     const label = CEX_MAP[addr] ? `<span style="color:var(--gold);font-family:'Rajdhani',sans-serif;font-weight:700;margin-left:8px">[${CEX_MAP[addr]}]</span>` : '';
@@ -1520,7 +1520,7 @@
         <tbody>${sortedBreaks.slice(0,30).map(e => `<tr>
           <td class="td-muted">${e.date || tsToDate(e.timestamp)}</td>
           <td class="td-cyan">#${e.nftId}</td>
-          <td class="td-pink">${fmt(parseAmt(e.amount)/DECIMALS,2)} RIZE</td>
+          <td class="td-pink">${fmt(parseAmt(e.amount),2)} RIZE</td>
           <td><a href="https://basescan.org/tx/${e.txHash}" target="_blank" rel="noopener" style="color:var(--cyan);font-family:'DM Mono',monospace;font-size:12px;text-decoration:none">${fmtAddr(e.txHash)} ↗</a></td>
         </tr>`).join('')}</tbody>
       </table></div>`;
