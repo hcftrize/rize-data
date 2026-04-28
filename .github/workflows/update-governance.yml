@@ -1,12 +1,15 @@
 name: Update Governance JSONs (Daily)
 
 on:
+  schedule:
+    # Daily at 02:00 UTC
+    - cron: "0 2 * * *"
   workflow_dispatch:
     inputs:
       subgraph:
-        description: 'Subgraph to update (leave empty for all 6)'
+        description: "Subgraph to update (leave empty for all 6)"
         required: false
-        default: ''
+        default: ""
 
 permissions:
   contents: write
@@ -16,20 +19,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout dev
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: dev
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Run incremental updater
         env:
-          ORMI_API_KEY:   ${{ secrets.ORMI_API_KEY }}
-          ORMI_API_KEY_2: ${{ secrets.ORMI_API_KEY_2 }}
+          GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
         run: |
           if [ -n "${{ github.event.inputs.subgraph }}" ]; then
             python3 rize-governance-hub/update_governance.py "${{ github.event.inputs.subgraph }}"
