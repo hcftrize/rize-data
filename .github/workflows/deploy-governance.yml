@@ -23,8 +23,10 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install graph-cli
-        run: npm install -g @graphprotocol/graph-cli
+      - name: Install graph-cli and goldsky
+        run: |
+          npm install -g @graphprotocol/graph-cli
+          npm install -g @goldskycom/cli
 
       - name: Install dependencies
         working-directory: goldsky-governance
@@ -38,13 +40,10 @@ jobs:
         working-directory: goldsky-governance
         run: graph build
 
-      - name: Install Goldsky CLI
-        run: curl https://goldsky.com/install | bash
-
       - name: Deploy to Goldsky
         working-directory: goldsky-governance
         env:
           GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
         run: |
-          goldsky subgraph deploy tokerize-governance-unified/${{ github.event.inputs.version }} \
-            --token $GOLDSKY_API_KEY
+          goldsky login --token $GOLDSKY_API_KEY
+          goldsky subgraph deploy tokerize-governance-unified/${{ github.event.inputs.version }} --path .
