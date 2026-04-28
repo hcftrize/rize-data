@@ -1,0 +1,50 @@
+name: Deploy Bond Created Subgraph (Goldsky)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Subgraph version (e.g. 1.0.0)"
+        required: true
+        default: "1.0.0"
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Goldsky CLI
+        run: |
+          curl -fsSL https://cli.goldsky.com/install | bash
+          echo "$HOME/.goldsky/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        working-directory: goldsky-governance
+        run: npm install
+
+      - name: Generate types
+        working-directory: goldsky-governance
+        run: npx graph codegen
+
+      - name: Build subgraph
+        working-directory: goldsky-governance
+        run: npx graph build
+
+      - name: Deploy to Goldsky
+        working-directory: goldsky-governance
+        env:
+          GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY_7 }}
+        run: |
+          goldsky subgraph deploy tokerize-bond-created/${{ github.event.inputs.version }} \
+            --path . \
+            --token $GOLDSKY_API_KEY
