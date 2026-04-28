@@ -57,26 +57,27 @@ dataSources:
           handler: handleIncreaseBond
       file: ./src/mapping.ts
 
-  # ── nft-transfers ────────────────────────────────────────────────────────────
-  # Uncomment and fill bondNft address when available
-  # - kind: ethereum
-  #   name: BondNFT
-  #   network: base
-  #   source:
-  #     address: "BOND_NFT_CONTRACT_ADDRESS"
-  #     abi: BondNFT
-  #     startBlock: 44821957
-  #   mapping:
-  #     kind: ethereum/events
-  #     apiVersion: 0.0.7
-  #     language: wasm/assemblyscript
-  #     entities:
-  #       - NftTransferEvent
-  #       - BondOwner
-  #     abis:
-  #       - name: BondNFT
-  #         file: ./abis/BondNFT.json
-  #     eventHandlers:
-  #       - event: Transfer(indexed address,indexed address,indexed uint256)
-  #         handler: handleNftTransfer
-  #     file: ./src/mapping.ts
+  # ── nft-transfers ─────────────────────────────────────────────────────────────
+  # BondNFT contract: 0xF33F231B769CCC1C7f74190De14340fBD51879FF (gRize ERC721)
+  # Soulbound by default — transfers are mints only unless breakSoulBoundSpell()
+  - kind: ethereum
+    name: BondNFT
+    network: base
+    source:
+      address: "0xF33F231B769CCC1C7f74190De14340fBD51879FF"
+      abi: BondNFT
+      startBlock: 44821957
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - NftTransferEvent
+        - BondOwner
+      abis:
+        - name: BondNFT
+          file: ./abis/BondNFT.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleNftTransfer
+      file: ./src/mapping.ts
