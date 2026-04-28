@@ -7,9 +7,11 @@ Usage:
   python3 update_governance.py              # all 6
   python3 update_governance.py bond-broken  # single
 
-v1-unified — migrated from 6 Ormi/Goldsky endpoints to single Goldsky endpoint.
-  - snapshot entities  (pools, bonds, bondOwners): full refresh, upsert by id
-  - incremental entities (all events): append where timestamp_gt last known
+v2-unified — full immutable logic: nothing is ever deleted from the JSONs.
+  - All entities use incremental fetch (timestamp_gt last known).
+  - Event entities  (*Events, bondTimeMarkerSnapshots): pure append by id.
+  - State entities  (bonds, pools, bondOwners): upsert by id — update if
+    exists, append if new. Never deletes.
 """
 
 import json, time, sys, os, urllib.request, urllib.error
@@ -35,84 +37,96 @@ HEADERS = {
 }
 
 # ── Entity config ─────────────────────────────────────────────────────────────
-# mode "incremental": append where timestamp_gt last known timestamp
-# mode "snapshot":    full refresh, upsert by id (state entities)
+# All entities are incremental — nothing ever deleted from the JSON.
+#
+# mode "append":  pure append by id. For immutable event records.
+#                 Cursor: last known timestamp in the JSON.
+#
+# mode "upsert":  fetch recent records, upsert by id into the JSON.
+#                 For state entities that can evolve (bonds, pools, bondOwners).
+#                 Cursor: last known updatedAtTimestamp / lastTransferTimestamp
+#                 / lastDepositTimestamp in the JSON — only fetches records
+#                 that have had activity in the window.
+#                 NEVER deletes existing records.
 
 QUERIES = {
     "pool-config": {
         "pools": {
-            "mode":   "snapshot",
-            "fields": "id poolId baseWeight maturedWeightBonus fullMaturity updatedAtDate updatedAtTimestamp",
+            "mode":      "upsert",
+            "fields":    "id poolId baseWeight maturedWeightBonus fullMaturity updatedAtDate updatedAtTimestamp",
+            "cursor_field": "updatedAtTimestamp",
         },
         "poolUpdatedEvents": {
-            "mode":   "incremental",
-            "fields": "id poolId baseWeight maturedWeightBonus fullMaturity date blockNumber timestamp txHash",
+            "mode":      "append",
+            "fields":    "id poolId baseWeight maturedWeightBonus fullMaturity date blockNumber timestamp txHash",
         },
         "releaseWarmupUpdatedEvents": {
-            "mode":   "incremental",
-            "fields": "id value date blockNumber timestamp txHash",
+            "mode":      "append",
+            "fields":    "id value date blockNumber timestamp txHash",
         },
         "migratorAddedEvents": {
-            "mode":   "incremental",
-            "fields": "id migrator date blockNumber timestamp txHash",
+            "mode":      "append",
+            "fields":    "id migrator date blockNumber timestamp txHash",
         },
         "migratorRemovedEvents": {
-            "mode":   "incremental",
-            "fields": "id migrator date blockNumber timestamp txHash",
+            "mode":      "append",
+            "fields":    "id migrator date blockNumber timestamp txHash",
         },
     },
     "bond-lifecycle": {
         "tokensReleasedEvents": {
-            "mode":   "incremental",
-            "fields": "id nftId to amount date blockNumber timestamp txHash",
+            "mode":      "append",
+            "fields":    "id nftId to amount date blockNumber timestamp txHash",
         },
         "bondMigratedEvents": {
-            "mode":   "incremental",
-            "fields": "id nftId toPool migrator date blockNumber timestamp txHash",
+            "mode":      "append",
+            "fields":    "id nftId toPool migrator date blockNumber timestamp txHash",
         },
         "vestingUpdatedEvents": {
-            "mode":   "incremental",
-            "fields": "id nftId amount cliff vesting start date blockNumber timestamp txHash",
+            "mode":      "append",
+            "fields":    "id nftId amount cliff vesting start date blockNumber timestamp txHash",
         },
         "vestedTokenClawedEvents": {
-            "mode":   "incremental",
-            "fields": "id nftId amount to date blockNumber timestamp txHash",
+            "mode":      "append",
+            "fields":    "id nftId amount to date blockNumber timestamp txHash",
         },
     },
     "bond-broken": {
         "bondBrokenEvents": {
-            "mode":   "incremental",
-            "fields": "id nftId amount date blockNumber timestamp txHash",
+            "mode":      "append",
+            "fields":    "id nftId amount date blockNumber timestamp txHash",
         },
     },
     "nft-transfers": {
         "nftTransferEvents": {
-            "mode":   "incremental",
-            "fields": "id tokenId from to isMint date blockNumber timestamp txHash",
+            "mode":      "append",
+            "fields":    "id tokenId from to isMint date blockNumber timestamp txHash",
         },
         "bondOwners": {
-            "mode":   "snapshot",
-            "fields": "id tokenId owner mintDate mintTimestamp lastTransferDate lastTransferTimestamp transferCount",
+            "mode":      "upsert",
+            "fields":    "id tokenId owner mintDate mintTimestamp lastTransferDate lastTransferTimestamp transferCount",
+            "cursor_field": "lastTransferTimestamp",
         },
     },
     "bond-timemarker": {
         "bondTimeMarkerSnapshots": {
-            "mode":   "incremental",
-            "fields": "id nftId timeMarker amount poolId blockNumber timestamp",
+            "mode":      "append",
+            "fields":    "id nftId timeMarker amount poolId blockNumber timestamp",
         },
     },
     "bond-created": {
         "bondCreatedEvents": {
-            "mode":   "incremental",
-            "fields": "id nftId owner poolId amount date blockNumber timestamp txHash",
+            "mode":      "append",
+            "fields":    "id nftId owner poolId amount date blockNumber timestamp txHash",
         },
         "increaseBondEvents": {
-            "mode":   "incremental",
-            "fields": "id nftId amount date blockNumber timestamp txHash",
+            "mode":      "append",
+            "fields":    "id nftId amount date blockNumber timestamp txHash",
         },
         "bonds": {
-            "mode":   "snapshot",
-            "fields": "id nftId owner poolId createdAtDate createdAtTimestamp createdAtBlock totalDeposited increaseCount lastDepositDate lastDepositTimestamp",
+            "mode":      "upsert",
+            "fields":    "id nftId owner poolId createdAtDate createdAtTimestamp createdAtBlock totalDeposited increaseCount lastDepositDate lastDepositTimestamp",
+            "cursor_field": "lastDepositTimestamp",
         },
     },
 }
@@ -160,18 +174,23 @@ def gql(query, max_429=10):
             print(f"    Error ({e}) — retry {net_tries}/4 in {wait}s", flush=True)
             time.sleep(wait)
 
-# ── Fetch helpers ─────────────────────────────────────────────────────────────
+# ── Fetch ─────────────────────────────────────────────────────────────────────
 
-def fetch_incremental(entity, fields, ts_cutoff):
-    """Fetch all records with timestamp > ts_cutoff, paginating."""
+def fetch_since(entity, fields, cursor_field, last_value, fallback_cutoff):
+    """
+    Fetch all records where cursor_field > last_value, paginating.
+    Used for both append (events) and upsert (state entities).
+    cursor_field is always a timestamp field.
+    """
+    cutoff    = last_value if last_value > 0 else fallback_cutoff
+    cursor_ts = str(cutoff)
     results   = []
-    cursor_ts = str(ts_cutoff)
     page      = 0
     while True:
         q = (
             f'{{ {entity}('
-            f'first:1000, orderBy:timestamp, orderDirection:asc, '
-            f'where:{{timestamp_gt:"{cursor_ts}"}}'
+            f'first:1000, orderBy:{cursor_field}, orderDirection:asc, '
+            f'where:{{{cursor_field}_gt:"{cursor_ts}"}}'
             f') {{ {fields} }} }}'
         )
         data = gql(q)
@@ -185,43 +204,23 @@ def fetch_incremental(entity, fields, ts_cutoff):
         print(f"    [{entity}] page {page}: +{len(items)}", flush=True)
         if len(items) < 1000:
             break
-        cursor_ts = items[-1]["timestamp"]
+        cursor_ts = items[-1][cursor_field]
         time.sleep(0.3)
     return results
 
+# ── Merge ─────────────────────────────────────────────────────────────────────
 
-def fetch_snapshot(entity, fields):
-    """Full fetch of a state entity, paginating by id."""
-    results = []
-    cursor  = None
-    page    = 0
-    while True:
-        where = f', where:{{id_gt:"{cursor}"}}' if cursor else ""
-        q = (
-            f"{{ {entity}("
-            f"first:1000{where}, orderBy:id, orderDirection:asc"
-            f") {{ {fields} }} }}"
-        )
-        data = gql(q)
-        if data is None:
-            break
-        items = data.get(entity, [])
-        if not items:
-            break
-        results.extend(items)
-        page += 1
-        print(f"    [{entity}] snapshot page {page}: +{len(items)} → total {len(results)}", flush=True)
-        if len(items) < 1000:
-            break
-        cursor = items[-1]["id"]
-        time.sleep(0.3)
-    return results
+def get_last_value(records, field):
+    """Return max value of field across all records, or 0."""
+    if not records:
+        return 0
+    values = [int(r[field]) for r in records if field in r and r[field] is not None]
+    return max(values) if values else 0
 
-# ── Merge helpers ─────────────────────────────────────────────────────────────
 
-def merge_append(existing, new_items):
-    """Append new event records that don't already exist."""
-    existing_ids = {item["id"] for item in existing}
+def do_append(existing, new_items):
+    """Pure append — only add records whose id is not already present."""
+    existing_ids = {r["id"] for r in existing}
     added = 0
     for item in new_items:
         if item["id"] not in existing_ids:
@@ -231,10 +230,10 @@ def merge_append(existing, new_items):
     return added
 
 
-def merge_upsert(existing, new_items):
-    """Upsert state records by id — update existing, append new."""
-    existing_map = {item["id"]: item for item in existing}
-    updated = added = 0
+def do_upsert(existing, new_items):
+    """Upsert by id — update if exists, append if new. Never deletes."""
+    existing_map = {r["id"]: r for r in existing}
+    added = updated = 0
     for item in new_items:
         if item["id"] in existing_map:
             existing_map[item["id"]] = item
@@ -246,25 +245,17 @@ def merge_upsert(existing, new_items):
 
 # ── Per-subgraph update ───────────────────────────────────────────────────────
 
-def get_last_timestamp(records):
-    """Return the max timestamp already in the file as int, or 0."""
-    if not records:
-        return 0
-    return max(int(r["timestamp"]) for r in records if "timestamp" in r)
-
-
 def update_subgraph(name, entities_cfg, out_dir, days_back=9):
     path = os.path.join(out_dir, f"{name}.json")
 
-    if os.path.exists(path):
-        with open(path) as f:
-            existing = json.load(f)
-        data = existing.get("data", {})
-    else:
+    if not os.path.exists(path):
         print(f"  [{name}] No existing JSON — run bootstrap first", flush=True)
         return 0
 
-    # Fallback cutoff: now - days_back (safety net for empty entities)
+    with open(path) as f:
+        existing = json.load(f)
+    data = existing.get("data", {})
+
     fallback_cutoff = int(
         (datetime.now(timezone.utc) - timedelta(days=days_back)).timestamp()
     )
@@ -275,28 +266,27 @@ def update_subgraph(name, entities_cfg, out_dir, days_back=9):
     total_added = 0
 
     for entity, cfg in entities_cfg.items():
-        mode   = cfg["mode"]
-        fields = cfg["fields"]
+        mode         = cfg["mode"]
+        fields       = cfg["fields"]
+        cursor_field = cfg.get("cursor_field", "timestamp")
 
         existing_records = data.get(entity, [])
-        print(f"  → {entity} [{mode}] (existing: {len(existing_records)})", flush=True)
+        last_val = get_last_value(existing_records, cursor_field)
+        print(f"  → {entity} [{mode}] (existing: {len(existing_records)}, last {cursor_field}: {last_val})", flush=True)
 
-        if mode == "snapshot":
-            new_items = fetch_snapshot(entity, fields)
-            merged, added, updated = merge_upsert(existing_records, new_items)
-            data[entity] = merged
-            total_added += added
-            print(f"     ✓ +{added} new, {updated} updated (total: {len(merged)})", flush=True)
+        new_items = fetch_since(entity, fields, cursor_field, last_val, fallback_cutoff)
 
-        else:  # incremental
-            last_ts = get_last_timestamp(existing_records)
-            cutoff  = last_ts if last_ts > 0 else fallback_cutoff
-            print(f"     last timestamp: {cutoff}", flush=True)
-            new_items = fetch_incremental(entity, fields, cutoff)
-            added     = merge_append(existing_records, new_items)
+        if mode == "append":
+            added = do_append(existing_records, new_items)
             data[entity] = existing_records
             total_added += added
             print(f"     ✓ +{added} new (total: {len(existing_records)})", flush=True)
+
+        else:  # upsert
+            merged, added, updated = do_upsert(existing_records, new_items)
+            data[entity] = merged
+            total_added += added
+            print(f"     ✓ +{added} new, {updated} updated (total: {len(merged)})", flush=True)
 
         time.sleep(0.5)
 
@@ -319,7 +309,7 @@ def main():
     out_dir = "rize-governance-hub"
     os.makedirs(out_dir, exist_ok=True)
 
-    print(f"Governance updater v1-unified — {datetime.now(timezone.utc).isoformat()}", flush=True)
+    print(f"Governance updater v2-unified — {datetime.now(timezone.utc).isoformat()}", flush=True)
     print(f"Endpoint: {UNIFIED_ENDPOINT}", flush=True)
     print(f"Targets: {targets}", flush=True)
 
