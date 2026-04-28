@@ -1,3 +1,167 @@
+# ── bond-created ─────────────────────────────────────────────────────────────
+
+type Bond @entity {
+  id: ID!
+  nftId: BigInt!
+  owner: Bytes!
+  poolId: Int!
+  createdAtDate: String!
+  createdAtTimestamp: BigInt!
+  createdAtBlock: BigInt!
+  totalDeposited: BigDecimal!
+  increaseCount: Int!
+  lastDepositDate: String!
+  lastDepositTimestamp: BigInt!
+}
+
+type BondCreatedEvent @entity(immutable: true) {
+  id: ID!
+  nftId: BigInt!
+  owner: Bytes!
+  poolId: Int!
+  amount: BigDecimal!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type IncreaseBondEvent @entity(immutable: true) {
+  id: ID!
+  nftId: BigInt!
+  amount: BigDecimal!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+# ── bond-timemarker ───────────────────────────────────────────────────────────
+
+type BondTimeMarkerSnapshot @entity(immutable: true) {
+  id: ID!
+  nftId: BigInt!
+  timeMarker: BigInt!
+  amount: BigDecimal!
+  poolId: Int!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+# ── bond-broken ───────────────────────────────────────────────────────────────
+
+type BondBrokenEvent @entity(immutable: true) {
+  id: ID!
+  nftId: BigInt!
+  amount: BigDecimal!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+# ── bond-lifecycle ────────────────────────────────────────────────────────────
+
+type TokensReleasedEvent @entity(immutable: true) {
+  id: ID!
+  nftId: BigInt!
+  to: Bytes!
+  amount: BigDecimal!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type BondMigratedEvent @entity(immutable: true) {
+  id: ID!
+  nftId: BigInt!
+  toPool: Int!
+  migrator: Bytes!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type VestingUpdatedEvent @entity(immutable: true) {
+  id: ID!
+  nftId: BigInt!
+  amount: BigDecimal!
+  cliff: BigInt!
+  vesting: BigInt!
+  start: BigInt!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type VestedTokenClawedEvent @entity(immutable: true) {
+  id: ID!
+  nftId: BigInt!
+  amount: BigDecimal!
+  to: Bytes!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+# ── pool-config ───────────────────────────────────────────────────────────────
+
+type Pool @entity {
+  id: ID!
+  poolId: Int!
+  baseWeight: BigInt!
+  maturedWeightBonus: BigInt!
+  fullMaturity: BigInt!
+  updatedAtDate: String!
+  updatedAtTimestamp: BigInt!
+}
+
+type PoolUpdatedEvent @entity(immutable: true) {
+  id: ID!
+  poolId: Int!
+  baseWeight: BigInt!
+  maturedWeightBonus: BigInt!
+  fullMaturity: BigInt!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type ReleaseWarmupUpdatedEvent @entity(immutable: true) {
+  id: ID!
+  value: BigInt!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type MigratorAddedEvent @entity(immutable: true) {
+  id: ID!
+  migrator: Bytes!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type MigratorRemovedEvent @entity(immutable: true) {
+  id: ID!
+  migrator: Bytes!
+  date: String!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+# ── nft-transfers ─────────────────────────────────────────────────────────────
+# NOTE: requires bondNft contract address — add as second dataSource when available
+
 type NftTransferEvent @entity(immutable: true) {
   id: ID!
   tokenId: BigInt!
@@ -10,7 +174,7 @@ type NftTransferEvent @entity(immutable: true) {
   txHash: Bytes!
 }
 
-type BondOwner @entity(immutable: false) {
+type BondOwner @entity {
   id: ID!
   tokenId: BigInt!
   owner: Bytes!
