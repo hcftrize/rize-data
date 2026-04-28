@@ -1,1534 +1,1634 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<title>RIZE Governance Hub &mdash; Tokerize</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<style>
-@font-face{font-family:'Rajdhani';src:url('/assets/fonts/rajdhani.semibold.ttf') format('truetype');font-weight:600;font-style:normal;}
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap');
+  <meta charset="UTF-8"/>
+  <title>RIZE Governance Hub &mdash; Tokerize</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="RIZE on-chain governance intelligence — bonding analytics, leaderboard, conviction heatmap, whale alerts and more."/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-/* ── Variables (light mode — same as rize-ecosystem) ── */
-:root{
-  --black:#000; --navy:#0d2d4e; --navy2:#1a3a5c; --bluelt:#e8f0f7;
-  --white:#fff; --off:#f7f7f5; --text:#111; --muted:#666;
-  --border:#e0e0e0; --shadow:0 2px 20px rgba(0,0,0,0.08);
-  /* Chart colours kept dark so charts remain readable */
-  --chart-bg:#f7f9fc; --cyan:#0d2d4e; --gold:#7a5a00; --pink:#a02020;
-  --green:#1a7a4a;
-}
+  <style>
+    @font-face{font-family:'Rajdhani';src:url('/assets/fonts/rajdhani.semibold.ttf') format('truetype');font-weight:600;font-style:normal;}
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&display=swap');
 
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Rajdhani',sans-serif;background:var(--white);color:var(--text);min-height:100vh;}
+    /* ═══════════════════════════ VARIABLES ═══════════════════════════ */
+    :root {
+      --black:        #000000;
+      --navy:         #0d2d4e;
+      --navy2:        #1a3a5c;
+      --bg:           #000000;
+      --panel:        #060818;
+      --panel-2:      #060818;
+      --border:       rgba(255,255,255,0.10);
+      --border-strong:rgba(126,224,255,0.20);
+      --text:         #f7f2e8;
+      --muted:        #b6c1d8;
+      --cyan:         #7ee0ff;
+      --gold:         #ffd36b;
+      --green:        #3DBE47;
+      --green2:       #98ffb6;
+      --pink:         #ff8ad8;
+      --shadow:       0 0 32px rgba(0,0,0,0.7);
+    }
 
-/* ── Header / nav ── */
-.site-header{width:100%;background:var(--black);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:96px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,0.08);}
-.site-header-logo img{height:72px;display:block;}
-.site-nav{display:flex;align-items:center;gap:0;}
-.site-nav a{color:rgba(255,255,255,1.0);text-decoration:none;font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:6px 20px;transition:color 0.2s;border-right:1px solid rgba(255,255,255,0.1);}
-.site-nav a:first-child{border-left:1px solid rgba(255,255,255,0.1);}
-.site-nav a:hover{color:#fff;}
-.site-nav a.nav-hub{color:#fff;background:var(--navy);border:none;padding:8px 20px;margin-left:16px;letter-spacing:1.5px;transition:background 0.2s;}
-.site-nav a.nav-hub:hover{background:var(--navy2);}
+    /* ═══════════════════════════ RESET ═══════════════════════════ */
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{overflow-x:hidden;max-width:100%;}
+    body{font-family:'Rajdhani',"Trebuchet MS","Verdana",sans-serif;background:#030810;color:var(--text);min-height:100vh;}
 
-/* ── Footer ── */
-.site-footer{background:var(--black);color:rgba(255,255,255,0.5);padding:40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-top:80px;border-top:1px solid rgba(255,255,255,0.08);}
-.footer-logo img{height:60px;}
-.footer-nav{display:flex;gap:24px;}
-.footer-nav a{color:rgba(255,255,255,1.0);text-decoration:none;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;letter-spacing:2px;text-transform:uppercase;transition:color 0.2s;}
-.footer-nav a:hover{color:#fff;}
-.footer-copy{font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.85);}
-.footer-disclaimer{font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,0.75);margin-top:4px;letter-spacing:0.3px;}
+    /* ═══════════════════════════ SCROLLBAR ═══════════════════════════ */
+    ::-webkit-scrollbar{width:5px;height:5px;}
+    ::-webkit-scrollbar-track{background:#000;}
+    ::-webkit-scrollbar-thumb{background:#1a1a1a;}
+    ::-webkit-scrollbar-thumb:hover{background:rgba(126,224,255,0.3);}
 
-/* ── Hero ── */
-.eco-hero{background:var(--black);padding:48px 40px 40px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:48px;}
-.eco-eyebrow{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:14px;display:block;}
-.eco-hero h1{font-family:'Rajdhani',sans-serif;font-size:clamp(28px,4vw,52px);font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#fff;margin-bottom:12px;}
-.eco-hero p{font-family:'DM Mono',monospace;font-size:14px;color:rgba(255,255,255,0.75);line-height:1.7;max-width:600px;}
-.back-to-hub{display:inline-flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,0.35);padding:6px 16px;margin-bottom:24px;background:rgba(255,255,255,0.07);transition:background 0.2s;}
-.back-to-hub:hover{background:rgba(255,255,255,0.14);}
+    /* ═══════════════════════════ HEADER ═══════════════════════════ */
+    .site-header{width:100%;background:var(--black);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:96px;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,0.08);}
+    .site-header-logo img{height:72px;display:block;}
+    .site-nav{display:flex;align-items:center;gap:0;}
+    .site-nav a{color:rgba(255,255,255,1.0);text-decoration:none;font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:6px 20px;transition:color 0.2s;border-right:1px solid rgba(255,255,255,0.1);}
+    .site-nav a:first-child{border-left:1px solid rgba(255,255,255,0.1);}
+    .site-nav a:hover{color:#fff;}
+    .site-nav a.nav-hub{color:#fff;background:var(--navy);border:none;padding:8px 20px;margin-left:16px;letter-spacing:1.5px;transition:background 0.2s;}
+    .site-nav a.nav-hub:hover{background:var(--navy2);}
+    .nav-toggle{display:none;}
+    .nav-toggle-label{display:none;cursor:pointer;flex-direction:column;gap:5px;padding:8px;margin-left:auto;}
+    .nav-toggle-label span{display:block;width:24px;height:2px;background:#fff;transition:transform 0.2s,opacity 0.2s;}
+    .nav-toggle:checked~.site-nav{display:flex;}
+    .nav-toggle:checked+.nav-toggle-label span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+    .nav-toggle:checked+.nav-toggle-label span:nth-child(2){opacity:0;}
+    .nav-toggle:checked+.nav-toggle-label span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
 
-/* ── Content wrap ── */
-.eco-wrap{max-width:1200px;margin:0 auto;padding:0 28px 80px;}
+    /* ═══════════════════════════ FOOTER ═══════════════════════════ */
+    .site-footer{background:var(--black);color:rgba(255,255,255,0.5);padding:40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;margin-top:80px;border-top:1px solid rgba(255,255,255,0.08);}
+    .footer-logo img{height:60px;opacity:1;}
+    .footer-nav{display:flex;gap:24px;}
+    .footer-nav a{color:rgba(255,255,255,1.0);text-decoration:none;font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:600;letter-spacing:2px;text-transform:uppercase;transition:color 0.2s;}
+    .footer-nav a:hover{color:#fff;}
+    .footer-copy{font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.85);}
 
-/* ── Module (lc) — same as rize-ecosystem ── */
-.lc{margin-bottom:48px;border:1px solid #e0e0e0;border-top:3px solid var(--navy);background:#fff;}
-.lc-header{padding:28px 32px;display:flex;align-items:flex-start;justify-content:space-between;cursor:pointer;user-select:none;}
-.lc-header-text{flex:1;}
-.lc-header h2{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--navy);margin:0 0 4px;}
-.lc-header p{font-family:'DM Mono',monospace;font-size:13px;color:#555;margin:4px 0 0;}
-.lc-toggle{width:32px;height:32px;border:1px solid #dde4ed;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:16px;margin-top:2px;transition:background 0.15s,border-color 0.15s;}
-.lc-toggle svg{transition:transform 0.28s ease;}
-.lc-toggle:hover{background:#eef3f8;border-color:var(--navy);}
-.lc-body{overflow:hidden;transition:max-height 0.38s ease,opacity 0.3s ease;max-height:9999px;opacity:1;}
-.lc-body.collapsed{max-height:0;opacity:0;}
-.lc.collapsed .lc-toggle svg{transform:rotate(-90deg);}
-.lc-body-inner{padding:0 32px 32px;}
+    /* ═══════════════════════════ HERO ═══════════════════════════ */
+    .hub-hero{background:var(--black);padding:48px 40px 40px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:24px;}
+    .back-to-hub{display:inline-flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,0.35);padding:6px 16px;margin-bottom:24px;background:rgba(255,255,255,0.07);transition:background 0.2s,color 0.2s;}
+    .back-to-hub:hover{background:rgba(255,255,255,0.16);color:#fff;}
+    .eco-eyebrow{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:14px;display:block;}
+    .hub-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:clamp(28px,4vw,52px);line-height:1.0;text-transform:uppercase;letter-spacing:2px;color:#ffffff;margin-bottom:12px;}
+    .hub-grid{display:grid;grid-template-columns:1.2fr 0.8fr;gap:26px;align-items:end;}
+    .hub-right{display:flex;justify-content:flex-end;align-items:flex-end;}
+    .hub-sub{font-family:'DM Mono',monospace;font-size:14px;color:rgba(255,255,255,0.75);line-height:1.7;max-width:600px;}
+    .live-box{min-width:220px;padding:16px 18px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);text-align:right;}
+    .live-label{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:rgba(255,255,255,0.6);margin-bottom:6px;font-family:'DM Mono',monospace;}
+    .live-value{font-family:'Rajdhani','Arial Black',sans-serif;font-size:32px;font-weight:700;line-height:1;color:#fff;letter-spacing:0.5px;}
 
-/* ── info-box ── */
-.info-box{margin:20px 0 0;border:1px solid #e0e0e0;border-left:3px solid var(--navy);background:#f7f9fc;padding:24px 28px;min-height:80px;}
-.ib-prompt{font-family:'DM Mono',monospace;font-size:13px;color:#777;font-style:italic;}
-.ib-title{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--navy);margin-bottom:14px;}
-.ib-text{font-family:'DM Mono',monospace;font-size:14px;color:#111;line-height:1.85;}
+    /* ═══════════════════════════ HUB WRAP ═══════════════════════════ */
+    .hub-wrap{max-width:1380px;margin:0 auto;padding:28px;}
 
-/* ── RIZENET GOVERNANCE (from rize-ecosystem) ── */
-.gov-table-wrap{overflow-x:auto;margin-top:16px;}
-.gov-table{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:14px;}
-.gov-table thead tr{background:var(--navy);}
-.gov-table thead th{color:#fff;font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:10px 14px;text-align:left;white-space:nowrap;}
-.gov-table tbody tr{border-bottom:1px solid #eee;cursor:pointer;transition:background 0.15s;}
-.gov-table tbody tr:hover{background:#f0f5fa;}
-.gov-table tbody tr.on{background:#dce8f2;}
-.gov-table tbody td{padding:10px 14px;vertical-align:middle;color:#222;}
-.gov-table tbody td:first-child{font-weight:700;color:var(--navy);font-family:'Rajdhani',sans-serif;font-size:16px;}
-.gov-status{display:inline-block;padding:3px 12px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
-.gov-status.inprogress{background:#e8f0fa;color:#1a5a9a;border:1px solid #b8cce0;}
-.gov-status.executed{background:#e8f5ee;color:#1a7a4a;border:1px solid #a8d8bc;}
-.gov-status.rejected{background:#faeaea;color:#a02020;border:1px solid #e0b0b0;}
-.gov-status.pending{background:#f5f0e8;color:#7a5a1a;border:1px solid #d8c8a0;}
-.rip-bonded-hero{margin-top:8px;background:var(--navy);padding:28px 32px;border-left:4px solid #4a7ca0;display:flex;flex-direction:column;gap:10px;}
-.rip-bonded-hero-label{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.75);}
-.rip-bonded-hero-main{display:flex;align-items:center;gap:16px;}
-.rip-bonded-hero-val{font-family:'Rajdhani',sans-serif;font-size:clamp(36px,5vw,56px);font-weight:700;color:#fff;letter-spacing:1px;line-height:1;}
-.rip-bonded-hero-logo{width:36px;height:36px;opacity:0.9;flex-shrink:0;}
-.rip-bonded-hero-usd{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.75);padding-top:10px;border-top:1px solid rgba(255,255,255,0.12);}
-.rip-bonded-hero-sub{font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,0.6);}
+    /* ═══════════════════════════ NAVIGATION SELECT ═══════════════════════════ */
+    .gov-nav-wrap{margin-bottom:24px;}
+    .ctx-tabs-select{width:100%;padding:12px 16px;background:rgba(6,8,24,0.95);border:1px solid var(--cyan);color:var(--cyan);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;cursor:pointer;outline:none;margin-bottom:0;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 7 6-7' stroke='%237ee0ff' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px;}
+    .ctx-tabs-select option{background:#060818;color:#fff;font-size:17px;}
 
-/* ── GOVERNANCE ACTIVITY module — light-mode overrides for dark charts ── */
-/* We keep chart tooltips/axes dark for readability but adapt containers */
-.ga-wrap{padding:0 0 16px;}
-.ga-section-label{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--navy);margin:24px 0 12px;border-bottom:1px solid #e0e0e0;padding-bottom:6px;}
+    /* ═══════════════════════════ SECTIONS ═══════════════════════════ */
+    .section{margin-bottom:28px;padding:26px;border:1px solid var(--border);background:var(--panel-2);box-shadow:var(--shadow);}
+    .section-titlebar{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+    .section-titlebar::before{content:"";display:block;width:4px;height:32px;background:var(--cyan);flex-shrink:0;}
+    .section-title{margin:0 0 8px;font-family:'Rajdhani',"Helvetica Neue",Arial,sans-serif;font-weight:700;font-size:32px;line-height:1.1;letter-spacing:1.5px;text-transform:uppercase;color:white;}
+    .section-titlebar .section-title{margin:0;}
+    .section-titlebar-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:8px;margin-bottom:6px;cursor:pointer;user-select:none;}
+    .section-sub{margin:0 0 20px;font-size:16px;line-height:1.5;color:var(--muted);max-width:900px;font-family:"Trebuchet MS","Verdana",sans-serif;}
 
-/* Chart container — white bg with navy border */
-.ga-chart-wrap{width:100%;height:320px;position:relative;background:#f7f9fc;border:1px solid #e0e0e0;padding:12px 8px 8px;}
-.ga-chart-wrap canvas{width:100%!important;height:100%!important;}
-.ga-loading{display:flex;align-items:center;justify-content:center;height:100%;font-family:'DM Mono',monospace;font-size:13px;color:#888;letter-spacing:1px;}
+    /* Collapsible */
+    .section-collapse-toggle{width:28px;height:28px;border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:12px;transition:background 0.15s,border-color 0.15s;background:rgba(255,255,255,0.04);}
+    .section-collapse-toggle svg{transition:transform 0.28s ease;}
+    .section-collapse-toggle:hover{background:rgba(126,224,255,0.08);border-color:var(--cyan);}
+    .section.hub-collapsed .section-collapse-toggle svg{transform:rotate(-90deg);}
+    .section-body{overflow:hidden;transition:max-height 0.38s ease,opacity 0.3s ease;max-height:9999px;opacity:1;}
+    .section-body.collapsed{max-height:0;opacity:0;}
 
-/* KPI row — light */
-.ga-kpi-row{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;}
-.ga-kpi{flex:1;min-width:140px;padding:14px 16px;border:1px solid #e0e0e0;background:#f7f9fc;}
-.ga-kpi-label{display:block;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#888;margin-bottom:8px;}
-.ga-kpi-value{display:block;font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;line-height:1.05;color:var(--navy);letter-spacing:0.5px;}
-.ga-kpi-sub{display:block;font-family:'DM Mono',monospace;font-size:10px;color:#888;margin-top:4px;}
+    /* ═══════════════════════════ METRICS ═══════════════════════════ */
+    .metrics{display:grid;grid-template-columns:repeat(4,minmax(180px,1fr));gap:16px;}
+    .metric{padding:16px;border:1px solid rgba(255,255,255,0.07);background:linear-gradient(180deg,rgba(126,224,255,0.03),transparent 60%),rgba(255,255,255,0.015);min-height:115px;}
+    .metric-label{display:block;margin-bottom:10px;color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:1.2px;font-family:"Trebuchet MS","Verdana",sans-serif;}
+    .metric-value{display:block;font-family:'Rajdhani','Arial Black',sans-serif;font-size:30px;line-height:1.08;color:white;word-break:break-word;font-weight:700;letter-spacing:0.5px;}
+    .metric-value.accent-cyan{color:var(--cyan);}
+    .metric-value.accent-gold{color:var(--gold);}
+    .metric-value.accent-green{color:#98ffb6;}
+    .metric-value.accent-pink{color:var(--pink);}
+    .metric-sub{display:block;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);margin-top:4px;}
 
-/* Toggle buttons */
-.ga-toggle-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
-.ga-toggle{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#666;background:#f0f0f0;border:1px solid #ddd;padding:5px 14px;cursor:pointer;transition:background 0.15s,color 0.15s,border-color 0.15s;white-space:nowrap;}
-.ga-toggle:hover{background:#e8f0fa;color:var(--navy);}
-.ga-toggle.active{color:var(--navy);border-color:var(--navy);background:#dce8f2;}
+    /* ═══════════════════════════ TABLES ═══════════════════════════ */
+    .table-wrap{overflow-x:auto;border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.008);}
+    table{width:100%;border-collapse:collapse;min-width:640px;}
+    th,td{padding:14px 14px;border-bottom:1px solid rgba(255,255,255,0.07);text-align:left;vertical-align:middle;font-family:'Rajdhani',monospace;}
+    th{position:sticky;top:0;background:rgba(6,8,24,0.99);color:rgba(255,255,255,0.92);font-size:16px;text-transform:uppercase;letter-spacing:1.5px;z-index:1;font-weight:700;}
+    td{color:white;font-size:20px;font-weight:600;}
+    tbody tr:hover td{background:rgba(126,224,255,0.03);}
+    .td-cyan{color:var(--cyan)!important;}
+    .td-gold{color:var(--gold)!important;}
+    .td-green{color:#98ffb6!important;font-weight:700;}
+    .td-pink{color:var(--pink)!important;font-weight:700;}
+    .td-muted{color:var(--muted)!important;}
 
-/* Sep */
-.ga-sep{height:1px;background:#e0e0e0;margin:20px 0;}
+    /* ═══════════════════════════ SCREENSHOT / WM ═══════════════════════════ */
+    .screenshot-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:rgba(126,224,255,0.06);border:1px solid rgba(126,224,255,0.22);color:var(--cyan);font-family:'Rajdhani',monospace;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;cursor:pointer;transition:background 0.15s,color 0.15s;}
+    .screenshot-btn:hover{background:rgba(126,224,255,0.18);color:#fff;}
+    .wm-badge{flex:1;display:flex;align-items:center;justify-content:flex-end;padding:0 14px 0 0;margin-left:auto;opacity:0;overflow:hidden;min-width:0;text-align:right;pointer-events:none;}
+    .screenshot-mode .wm-badge{opacity:0.52;}
+    .wm-text-tokerize{font-family:'Rajdhani',monospace;font-size:21px;font-weight:700;color:#ffffff;letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
 
-/* Section title inside module */
-.ga-sub-title{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--navy);margin-bottom:12px;}
+    /* ═══════════════════════════ LOADING / ERROR ═══════════════════════════ */
+    .loading-text{color:var(--muted);font-size:14px;font-family:"Trebuchet MS","Verdana",sans-serif;animation:pulse 1.4s ease-in-out infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+    .error-box{padding:18px 20px;border:1px solid rgba(255,138,216,0.28);background:rgba(255,138,216,0.05);color:var(--pink);font-size:15px;font-family:"Trebuchet MS","Verdana",sans-serif;}
+    .placeholder-box{padding:32px 20px;border:1px dashed rgba(126,224,255,0.15);text-align:center;color:var(--muted);font-family:'DM Mono',monospace;font-size:13px;line-height:1.8;}
+    .placeholder-box span{display:block;font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:rgba(126,224,255,0.4);letter-spacing:2px;margin-bottom:8px;}
 
-/* Stat row 3-col */
-.ga-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px;}
+    /* ═══════════════════════════ CONV TOGGLES ═══════════════════════════ */
+    .conv-toggle-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+    .conv-toggle{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);padding:5px 14px;cursor:pointer;transition:background 0.15s,color 0.15s,border-color 0.15s;white-space:nowrap;}
+    .conv-toggle:hover{color:#fff;}
+    .conv-toggle.active{color:var(--cyan);border-color:var(--cyan);background:rgba(126,224,255,0.07);}
 
-/* Whale table */
-.ga-whale-table{width:100%;border-collapse:collapse;margin-top:12px;font-family:'DM Mono',monospace;font-size:13px;}
-.ga-whale-table th{background:var(--navy);color:#fff;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;text-align:left;border-bottom:1px solid #e0e0e0;}
-.ga-whale-table td{padding:8px 12px;font-size:13px;border-bottom:1px solid #eee;color:#222;}
-.ga-whale-table td a{color:var(--navy);text-decoration:none;font-size:12px;}
-.ga-whale-table td a:hover{text-decoration:underline;}
-.ga-whale-table tbody tr:hover td{background:#f0f5fa;}
+    /* ═══════════════════════════ KPI ROW ═══════════════════════════ */
+    .ctx-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+    .ctx-kpi{padding:14px 16px;border:1px solid rgba(255,255,255,0.07);background:linear-gradient(180deg,rgba(126,224,255,0.03),transparent 60%),rgba(255,255,255,0.015);}
+    .ctx-kpi-label{display:block;font-family:"Trebuchet MS",sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px;}
+    .ctx-kpi-value{display:block;font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;line-height:1.05;color:#fff;letter-spacing:0.5px;}
+    .ctx-kpi-sub{display:block;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--muted);margin-top:4px;letter-spacing:0.3px;}
 
-/* Tokenomics table */
-.ga-tok-table{width:100%;border-collapse:collapse;margin-top:12px;}
-.ga-tok-table th{background:#eef3f8;color:var(--navy);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;padding:10px 12px;text-align:left;border-bottom:1px solid #e0e0e0;}
-.ga-tok-table td{padding:10px 12px;font-size:16px;font-family:'Rajdhani',sans-serif;font-weight:600;border-bottom:1px solid #eee;color:#222;}
-.ga-tok-table tr:last-child td{font-weight:700;color:var(--navy);border-top:1px solid #b8cce0;border-bottom:none;}
-.ga-tok-table .tok-cat{color:var(--navy);}
+    /* ═══════════════════════════ CHART WRAP ═══════════════════════════ */
+    .ctx-chart-wrap{position:relative;width:100%;height:280px;}
+    .ctx-chart-wrap canvas{width:100%!important;}
 
-/* Unlock tabs */
-.ga-unlock-tabs{display:flex;gap:0;border-bottom:1px solid #e0e0e0;margin-bottom:16px;flex-wrap:wrap;}
-.ga-unlock-tab{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#888;padding:8px 18px;cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.18s,border-color 0.18s;white-space:nowrap;}
-.ga-unlock-tab:hover{color:var(--navy);}
-.ga-unlock-tab.ga-active{color:var(--navy);border-bottom-color:var(--navy);}
-.ga-unlock-panel{display:none;}
-.ga-unlock-panel.ga-visible{display:block;}
+    /* ═══════════════════════════ LIVE DOT ═══════════════════════════ */
+    .live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#98ffb6;margin-right:5px;animation:livepulse 1.8s ease-in-out infinite;}
+    @keyframes livepulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.35;transform:scale(0.65);}}
+    .live-badge{font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#98ffb6;}
 
-/* Live dot */
-.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#1a7a4a;margin-right:6px;animation:livepulse 1.8s ease-in-out infinite;}
-@keyframes livepulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
-.live-badge{display:inline-flex;align-items:center;font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#1a7a4a;}
+    /* ═══════════════════════════ BAR PROGRESS ═══════════════════════════ */
+    .bar-track{width:100%;height:6px;background:rgba(255,255,255,0.08);border-radius:0;overflow:hidden;margin-top:6px;}
+    .bar-fill{height:100%;background:var(--cyan);border-radius:0;transition:width 0.4s ease;}
+    .bar-fill.gold{background:var(--gold);}
+    .bar-fill.green{background:#98ffb6;}
+    .bar-fill.pink{background:var(--pink);}
 
-/* Sub-module select (light mode — mirrors rize-data-hub ctx-tabs-select) */
-.ga-mod-select-wrap{display:block;margin-bottom:20px;}
-.ga-mod-select{
-  width:100%;padding:12px 16px;
-  background:#fff;
-  border:2px solid var(--navy);
-  color:var(--navy);
-  font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;
-  text-transform:uppercase;letter-spacing:1.5px;
-  cursor:pointer;outline:none;
-  appearance:none;-webkit-appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 7 6-7' stroke='%230d2d4e' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 14px center;padding-right:40px;
-}
-.ga-mod-select option{background:#fff;color:#111;font-size:16px;}
-@media(min-width:701px){.ga-mod-select{font-size:18px;padding:12px 20px;padding-right:48px;}}
-.ga-mod-panel{display:none;padding-top:24px;}
-.ga-mod-panel.ga-mod-visible{display:block;}
+    /* ═══════════════════════════ POOL BADGE ═══════════════════════════ */
+    .pool-badge{display:inline-block;padding:3px 10px;border:1px solid rgba(126,224,255,0.3);background:rgba(126,224,255,0.06);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--cyan);}
 
-/* KPI labels black for readability */
-.ga-kpi-label{color:#111!important;}
-.ga-sub-title{color:#111!important;}
+    /* ═══════════════════════════ WALLET SEARCH ═══════════════════════════ */
+    .wallet-search-row{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+    .wallet-input{flex:1;min-width:280px;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--cyan);font-family:'DM Mono',monospace;font-size:14px;outline:none;}
+    .wallet-input::placeholder{color:rgba(126,224,255,0.35);}
+    .wallet-btn{padding:10px 22px;background:rgba(126,224,255,0.08);border:1px solid var(--cyan);color:var(--cyan);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;cursor:pointer;white-space:nowrap;transition:background 0.2s,color 0.2s;}
+    .wallet-btn:hover{background:rgba(126,224,255,0.22);color:white;}
 
-/* Scrollbar */
-::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:#f0f0f0;}::-webkit-scrollbar-thumb{background:var(--navy);}
+    /* ═══════════════════════════ CALCULATOR ═══════════════════════════ */
+    .calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+    .calc-field{margin-bottom:14px;}
+    .calc-label{display:block;font-family:'DM Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px;}
+    .calc-input{width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--cyan);font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;outline:none;}
+    .calc-result-box{padding:20px;border:1px solid rgba(126,224,255,0.2);background:rgba(126,224,255,0.04);margin-top:16px;}
+    .calc-result-label{font-family:'DM Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px;}
+    .calc-result-value{font-family:'Rajdhani',sans-serif;font-size:36px;font-weight:700;color:var(--cyan);}
 
-/* ── Bond Calculator ── */
-.bc-select-wrap{display:block;margin-bottom:20px;}
-.bc-select{width:100%;padding:12px 16px;background:#fff;border:2px solid var(--navy);color:var(--navy);font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='10' viewBox='0 0 14 10'%3E%3Cpath d='M1 1l6 7 6-7' stroke='%230d2d4e' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:40px;}
-.bc-select option{background:#fff;color:#111;font-size:16px;}
-.bc-panel{display:none;padding-top:20px;}
-.bc-panel.bc-visible{display:block;}
-.bc-input-row{display:flex;gap:10px;align-items:stretch;margin-bottom:20px;flex-wrap:wrap;}
-.bc-input{flex:1;min-width:180px;padding:12px 16px;border:1px solid #dde4ed;background:#f7f9fc;font-family:'DM Mono',monospace;font-size:15px;color:#111;outline:none;transition:border-color 0.18s;}
-.bc-input:focus{border-color:var(--navy);}
-.bc-input::placeholder{color:#aaa;}
-.bc-btn{padding:12px 28px;background:var(--navy);color:#fff;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;cursor:pointer;transition:background 0.18s;white-space:nowrap;}
-.bc-btn:hover{background:var(--navy2);}
-.bc-btn:disabled{opacity:0.45;cursor:not-allowed;}
-.bc-result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
-.bc-card{padding:16px 18px;border:1px solid #e0e0e0;background:#f7f9fc;border-top:3px solid var(--navy);}
-.bc-card-label{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:#888;margin-bottom:8px;display:block;}
-.bc-card-value{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;color:var(--navy);line-height:1.1;}
-.bc-card-sub{font-family:'DM Mono',monospace;font-size:11px;color:#444;margin-top:4px;display:block;}
-.bc-card.bc-highlight .bc-card-value{color:#1a7a4a;}
-.bc-card.bc-gold .bc-card-value{color:#7a5a00;}
-.bc-progress-wrap{margin-bottom:20px;}
-.bc-progress-label{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#111;margin-bottom:8px;}
-.bc-progress-bar{width:100%;height:10px;background:#e0e0e0;border-radius:0;overflow:hidden;}
-.bc-progress-fill{height:100%;background:linear-gradient(90deg,#1a5a9a,#1a7a4a);transition:width 0.6s ease;}
-.bc-progress-sub{font-family:'DM Mono',monospace;font-size:12px;color:#888;margin-top:6px;}
-.bc-sim-inputs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
-.bc-sim-label{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#111;margin-bottom:6px;display:block;}
-.bc-chart-wrap{width:100%;height:260px;position:relative;background:#f7f9fc;border:1px solid #e0e0e0;padding:12px 8px 8px;margin-top:16px;}
-.bc-chart-wrap canvas{width:100%!important;height:100%!important;}
-.bc-error{font-family:'DM Mono',monospace;font-size:13px;color:#a02020;padding:12px 0;}
-.bc-loading{font-family:'DM Mono',monospace;font-size:13px;color:#888;padding:12px 0;}
-@media(max-width:700px){
-  .bc-result-grid{grid-template-columns:1fr 1fr;}
-  .bc-sim-inputs{grid-template-columns:1fr;}
-  .bc-card-value{font-size:20px;}
-}
+    /* ═══════════════════════════ SEPARATOR ═══════════════════════════ */
+    .sep{height:1px;background:rgba(255,255,255,0.07);margin:20px 0;}
 
-/* Mobile */
-html,body{overflow-x:hidden;max-width:100%;}
-.nav-toggle{display:none;}
-.nav-toggle-label{display:none;cursor:pointer;flex-direction:column;gap:5px;padding:8px;margin-left:auto;}
-.nav-toggle-label span{display:block;width:24px;height:2px;background:#fff;transition:transform 0.2s,opacity 0.2s;}
-.nav-toggle:checked ~ .site-nav{display:flex;}
-.nav-toggle:checked + .nav-toggle-label span:nth-child(1){transform:translateY(7px) rotate(45deg);}
-.nav-toggle:checked + .nav-toggle-label span:nth-child(2){opacity:0;}
-.nav-toggle:checked + .nav-toggle-label span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
-@media(max-width:768px){
-  .nav-toggle-label{display:flex;}
-  .site-nav{display:none;position:absolute;top:68px;left:0;right:0;background:#000;flex-direction:column;gap:0;z-index:99;border-bottom:1px solid rgba(255,255,255,0.1);padding:8px 0;}
-  .site-nav a{font-size:14px!important;padding:12px 20px!important;border-right:none!important;border-left:none!important;border-bottom:1px solid rgba(255,255,255,0.07);letter-spacing:1.5px!important;width:100%;}
-  .site-nav a:first-child{border-left:none!important;}
-  .site-nav a.nav-hub{margin-left:0!important;background:var(--navy);text-align:center;}
-  .site-header{position:relative;flex-wrap:wrap;padding:0 16px;height:68px;}
-  .site-header-logo img{height:48px;}
-  .eco-hero{padding:32px 16px;}
-  .eco-wrap{padding:0 16px 60px;}
-  .lc-header{padding:20px 16px;}
-  .lc-body-inner{padding:0 16px 24px;}
-  .ga-stat-row{grid-template-columns:1fr 1fr;}
-  .ga-kpi-row{gap:8px;}
-  .ga-kpi{min-width:100px;padding:10px 12px;}
-  .ga-kpi-value{font-size:20px;}
-  .site-footer{flex-direction:column;align-items:flex-start;padding:28px 16px;gap:16px;}
-}
-@media(max-width:600px){
-  .ga-whale-table th,.ga-whale-table td{font-size:11px;padding:6px 8px;}
-}
-</style>
+    /* ═══════════════════════════ SECTION INNER TITLE ═══════════════════════════ */
+    .inner-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:12px;}
+
+    /* ═══════════════════════════ GOV PANELS ═══════════════════════════ */
+    .gov-panel{display:none;}
+    .gov-panel.active{display:block;}
+
+    /* ═══════════════════════════ HEATMAP ═══════════════════════════ */
+    .heatmap-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin-top:8px;}
+    .heatmap-cell{aspect-ratio:1;border-radius:0;cursor:pointer;transition:opacity 0.15s;}
+    .heatmap-cell:hover{opacity:0.7;}
+    .heatmap-legend{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap;}
+    .heatmap-legend-item{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);}
+    .heatmap-legend-swatch{width:14px;height:14px;flex-shrink:0;}
+
+    /* ═══════════════════════════ RESPONSIVE ═══════════════════════════ */
+    @media(max-width:900px){
+      .hub-grid{grid-template-columns:1fr;}
+      .hub-right{justify-content:flex-start;}
+      .hub-wrap{padding:16px;}
+      .metrics{grid-template-columns:repeat(2,1fr);}
+      .site-header{padding:0 16px;height:68px;}
+      .site-header-logo img{height:48px;}
+      .site-nav a{font-size:11px;padding:5px 10px;letter-spacing:1.2px;}
+      .site-nav a.nav-hub{margin-left:8px;padding:6px 12px;}
+      .site-footer{flex-direction:column;align-items:flex-start;padding:28px 16px;gap:16px;}
+      .ctx-kpi-row{grid-template-columns:repeat(2,1fr);}
+      .calc-grid{grid-template-columns:1fr;}
+    }
+    @media(max-width:768px){
+      .nav-toggle-label{display:flex;}
+      .site-nav{display:none;position:absolute;top:68px;left:0;right:0;background:#000;flex-direction:column;gap:0;z-index:99;border-bottom:1px solid rgba(255,255,255,0.1);padding:8px 0;}
+      .site-nav a{font-size:14px!important;padding:12px 20px!important;border-right:none!important;border-left:none!important;border-bottom:1px solid rgba(255,255,255,0.07);letter-spacing:1.5px!important;width:100%;}
+      .site-nav a:first-child{border-left:none!important;}
+      .site-nav a.nav-hub{margin-left:0!important;background:var(--navy);text-align:center;}
+      .site-header{position:relative;flex-wrap:wrap;}
+      .hub-hero{padding:32px 16px;}
+      .screenshot-btn .screenshot-label{display:none;}
+      .screenshot-btn{padding:8px 10px;gap:0;}
+      .heatmap-grid{grid-template-columns:repeat(6,1fr);}
+    }
+    @media(max-width:600px){
+      .metrics{grid-template-columns:repeat(2,1fr);}
+      .ctx-kpi-row{grid-template-columns:1fr 1fr;}
+    }
+  </style>
 </head>
 <body>
 
-<header class="site-header">
-  <a href="/" class="site-header-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></a>
-  <input type="checkbox" id="nav-toggle" class="nav-toggle">
-  <label for="nav-toggle" class="nav-toggle-label"><span></span><span></span><span></span></label>
-  <nav class="site-nav">
-    <a href="/">Home</a>
-    <a href="/about">About</a>
-    <a href="/hub" class="nav-hub">Tokerize Data Hub</a>
-  </nav>
-</header>
+  <!-- ═══════════════════════════════════════════════════════════
+       HEADER
+  ═══════════════════════════════════════════════════════════ -->
+  <header class="site-header">
+    <a href="/" class="site-header-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></a>
+    <input type="checkbox" id="nav-toggle" class="nav-toggle">
+    <label for="nav-toggle" class="nav-toggle-label"><span></span><span></span><span></span></label>
+    <nav class="site-nav">
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/hub" class="nav-hub">Tokerize Data Hub</a>
+    </nav>
+  </header>
 
-<div class="eco-hero">
-  <div style="max-width:1200px;margin:0 auto">
-    <a href="/hub" class="back-to-hub">← Back to Hub</a>
-    <span class="eco-eyebrow">RIZE Governance Hub</span>
-    <h1>Governance Activity</h1>
-    <p>Live on-chain conviction data, community proposals, tokenomics and supply dynamics — everything shaping the Rizenet governance ecosystem.</p>
-  </div>
-</div>
 
-<div class="eco-wrap">
-
-  <!-- ══════════════════════════════════════════════════
-       MODULE 1 — RIZENET GOVERNANCE (from rize-ecosystem)
-  ══════════════════════════════════════════════════ -->
-  <div class="lc" id="lc-gov">
-    <div class="lc-header" onclick="toggleLc('lc-gov')">
-      <div class="lc-header-text">
-        <h2>Rizenet Governance</h2>
-        <p>Community governance proposals shaping the Rizenet ecosystem</p>
-      </div>
-      <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    </div>
-    <div class="lc-body" id="lc-gov-body">
-      <div class="lc-body-inner">
-
-        <!-- Sub-module select -->
-        <div class="bc-select-wrap">
-          <select class="bc-select" id="gov-mod-select" onchange="govModSwitch(this.value)">
-            <option value="proposals">Governance Proposals</option>
-            <option value="calculator">Bond Power Calculator</option>
-          </select>
+  <!-- ═══════════════════════════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="hub-hero">
+    <div style="max-width:1380px;margin:0 auto">
+      <a href="/hub" class="back-to-hub">&larr; Back to Tokerize Data Hub</a>
+      <span class="eco-eyebrow">RIZE Community &mdash; On-Chain Governance Intelligence</span>
+      <div class="hub-grid">
+        <div>
+          <h2 class="hub-title">RIZE Governance Hub</h2>
+          <p class="hub-sub">Institutional-grade on-chain governance analytics for RIZE. Track bonding conviction, whale movements, power concentration, release calendar, maturity distribution and more — powered by live subgraph data.</p>
         </div>
-
-        <!-- ── Panel: Governance Proposals ── -->
-        <div class="bc-panel bc-visible" id="gov-mod-proposals">
-
-          <!-- Bonded hero -->
-          <div class="rip-bonded-hero">
-            <div class="rip-bonded-hero-label">RIZE bonded by the community so far</div>
-            <div class="rip-bonded-hero-main">
-              <div class="rip-bonded-hero-val" id="rip-bonded-tokens">—</div>
-              <img src="https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/assets/explore-rize/rize-token.png" alt="RIZE" class="rip-bonded-hero-logo"/>
-            </div>
-            <div class="rip-bonded-hero-usd" id="rip-bonded-usd"></div>
-            <div class="rip-bonded-hero-sub" id="rip-bonding-status">Loading live data…</div>
+        <div class="hub-right">
+          <div class="live-box">
+            <div class="live-label"><span class="live-dot"></span>Total Bonded RIZE</div>
+            <div class="live-value" id="hero-bonded">Loading&hellip;</div>
+            <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);margin-top:6px" id="hero-bonded-pct">&nbsp;</div>
           </div>
-
-          <!-- Proposals table -->
-          <div class="gov-table-wrap">
-            <table class="gov-table">
-              <thead>
-                <tr>
-                  <th>Proposal</th>
-                  <th style="width:120px">Status</th>
-                  <th style="width:200px">Category</th>
-                </tr>
-              </thead>
-              <tbody id="rip-tbody">
-                <tr onclick="ripPick('rip-01')">
-                  <td>Proposal 01 — Canton Incentives &amp; Ecosystem Alignment</td>
-                  <td><span class="gov-status pending">Pending</span></td>
-                  <td><span style="font-family:'DM Mono',monospace;font-size:11px;color:#111">Governance · Tokenomics</span></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Learn box -->
-          <div class="info-box" id="rip-box">
-            <p class="ib-prompt" id="rip-prompt" style="color:#444">Click on any governance proposal to learn more about it.</p>
-            <div class="ib-title" id="rip-detail-title" style="display:none"></div>
-            <div class="ib-text" id="rip-detail-body" style="display:none"></div>
-          </div>
-
-        </div><!-- end gov-mod-proposals -->
-
-        <!-- ── Panel: Bond Power Calculator ── -->
-        <div class="bc-panel" id="gov-mod-calculator">
-
-          <!-- Inner toggle: My Bond / Simulator -->
-          <div class="ga-toggle-row" style="margin-bottom:20px">
-            <button class="ga-toggle active" id="bc-btn-lookup" onclick="bcSwitch('lookup',this)">My Bond</button>
-            <button class="ga-toggle" id="bc-btn-sim" onclick="bcSwitch('sim',this)">Simulator</button>
-          </div>
-
-          <!-- ── My Bond panel ── -->
-          <div id="bc-panel-lookup">
-            <div style="font-family:'DM Mono',monospace;font-size:12px;color:#111;margin-bottom:12px">Enter your Bond # (e.g. 1317) or a wallet address (0x…)</div>
-            <div class="bc-input-row">
-              <input class="bc-input" id="bc-input" placeholder="Bond # or 0x wallet…" autocomplete="off" spellcheck="false" onkeydown="if(event.key==='Enter')bcLookup()"/>
-              <button class="bc-btn" id="bc-search-btn" onclick="bcLookup()">Search</button>
-            </div>
-            <div id="bc-lookup-result"></div>
-          </div>
-
-          <!-- ── Simulator panel ── -->
-          <div id="bc-panel-sim" style="display:none">
-            <div style="font-family:'DM Mono',monospace;font-size:12px;color:#888;margin-bottom:16px">Simulate the voting power of any bond over time.</div>
-            <div class="bc-sim-inputs">
-              <div>
-                <span class="bc-sim-label">RIZE Amount</span>
-                <input class="bc-input" id="bc-sim-amount" type="number" placeholder="e.g. 500000" min="1" oninput="bcSimCalc()"/>
-              </div>
-              <div>
-                <span class="bc-sim-label">Bond Creation Date</span>
-                <input class="bc-input" id="bc-sim-date" type="date" oninput="bcSimCalc()"/>
-              </div>
-            </div>
-            <div id="bc-sim-result"></div>
-            <div class="bc-chart-wrap" id="bc-sim-chart-wrap" style="display:none">
-              <canvas id="bc-sim-chart"></canvas>
-            </div>
-          </div>
-
-        </div><!-- end gov-mod-calculator -->
-
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════════
-       MODULE 2 — GOVERNANCE ACTIVITY (conviction + tokenomics)
-  ══════════════════════════════════════════════════ -->
-  <div class="lc" id="lc-activity">
-    <div class="lc-header" onclick="toggleLc('lc-activity')">
-      <div class="lc-header-text">
-        <h2>Governance Activity</h2>
-        <p>Live conviction data, bonding flows, unbonding queue and RIZE tokenomics</p>
-      </div>
-      <div class="lc-toggle"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4L6 8L10 4" stroke="#0d2d4e" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       APP CONTENT WRAPPER
+  ═══════════════════════════════════════════════════════════ -->
+  <div class="hub-wrap">
+
+    <!-- ── NAVIGATION SELECT ── -->
+    <div class="gov-nav-wrap">
+      <select class="ctx-tabs-select" id="gov-select" onchange="govSwitch(this.value)">
+        <option value="conviction">1. RIZE Holders Conviction</option>
+        <option value="tokenomics">2. RIZE Tokenomics</option>
+        <option value="leaderboard">3. Governance Leaderboard</option>
+        <option value="heatmap">4. Conviction Heatmap</option>
+        <option value="concentration">5. Power Concentration &amp; HHI</option>
+        <option value="calendar">6. Release Calendar</option>
+        <option value="wallet">7. Wallet Deep Dive</option>
+        <option value="whale">8. Whale Alert Timeline</option>
+        <option value="maturity">9. Maturity Distribution</option>
+        <option value="momentum">10. Governance Momentum Score</option>
+        <option value="bondage">11. Bond Age Analysis</option>
+        <option value="calculator">12. Bond Power Calculator</option>
+      </select>
     </div>
-    <div class="lc-body" id="lc-activity-body">
-      <div class="lc-body-inner">
 
-        <!-- Sub-module select -->
-        <div class="ga-mod-select-wrap">
-          <select class="ga-mod-select" id="ga-mod-select" onchange="gaModSelectChange(this)">
-            <option value="conviction">RIZE Holders Conviction</option>
-            <option value="tokenomics">RIZE Tokenomics</option>
-          </select>
+
+    <!-- ══════════════════════════════════════════════════════════
+         PANEL 1 — RIZE HOLDERS CONVICTION
+    ══════════════════════════════════════════════════════════ -->
+    <div class="gov-panel active" id="gov-panel-conviction">
+      <section class="section">
+        <div class="section-titlebar-row" onclick="toggleSection(this)">
+          <div class="section-titlebar" style="margin:0">
+            <span class="section-title">RIZE Holders Conviction</span>
+          </div>
+          <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
+          <button class="screenshot-btn" onclick="event.stopPropagation();takeScreenshot('gov-panel-conviction','conviction')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+          <div class="section-collapse-toggle"><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 6 5-6" stroke="#7ee0ff" stroke-width="2" stroke-linecap="round"/></svg></div>
         </div>
+        <div class="section-body">
+          <p class="section-sub">Live view of RIZE bonded on-chain vs available on exchanges. Tracks governance conviction in real time from Base RPC.</p>
 
-        <!-- ── Sub-module: RIZE Holders Conviction ── -->
-        <div class="ga-mod-panel ga-mod-visible" id="ga-mod-conviction">
-
-          <!-- Chart toggles -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
-            <div id="ga-conv-label" style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--navy)">RIZE Bonded vs On Exchanges</div>
-            <div class="ga-toggle-row" style="margin-bottom:0">
-              <button class="ga-toggle active" id="ga-btn-main" onclick="gaSwitchChart('main',this)">Bonded / Exchanges</button>
-              <button class="ga-toggle" id="ga-btn-flows" onclick="gaSwitchChart('flows',this)">Governance Flows</button>
-              <button class="ga-toggle" id="ga-btn-unbqueue" onclick="gaSwitchChart('unbqueue',this)">Unbonding Queue</button>
+          <!-- KPIs live -->
+          <div class="ctx-kpi-row" id="conv-kpi-row">
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label"><span class="live-dot"></span>Total Bonded <span class="live-badge">LIVE</span></span>
+              <span class="ctx-kpi-value accent-cyan" id="conv-total-bonded">—</span>
+              <span class="ctx-kpi-sub" id="conv-total-bonded-usd">&nbsp;</span>
+            </div>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">% of Supply Bonded</span>
+              <span class="ctx-kpi-value accent-gold" id="conv-pct-bonded">—</span>
+              <span class="ctx-kpi-sub">out of 5B RIZE</span>
+            </div>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">Total Bond Breaks</span>
+              <span class="ctx-kpi-value" id="conv-total-breaks">—</span>
+              <span class="ctx-kpi-sub" id="conv-total-breaks-sub">&nbsp;</span>
+            </div>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">RIZE Released</span>
+              <span class="ctx-kpi-value accent-pink" id="conv-total-released">—</span>
+              <span class="ctx-kpi-sub">all time unbonded</span>
             </div>
           </div>
 
-          <!-- Chart: Main -->
-          <div id="ga-wrap-main" class="ga-chart-wrap">
-            <div class="ga-loading" id="ga-loading-main">Loading on-chain data…</div>
-            <canvas id="ga-chart-main" style="display:none"></canvas>
+          <!-- Bond Breaks Chart -->
+          <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px;text-align:center">Bond Breaks — Daily Volume (RIZE)</div>
+          <div class="ctx-chart-wrap" style="height:260px;">
+            <canvas id="conv-chart-daily"></canvas>
           </div>
 
-          <!-- Chart: Governance Flows -->
-          <div id="ga-wrap-flows" style="display:none">
-            <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
-              <button id="ga-flows-hist-btn" onclick="gaToggleFlowHistory()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#666;background:#f0f0f0;border:1px solid #ddd;padding:5px 14px;cursor:pointer;white-space:nowrap">See Full History</button>
-            </div>
-            <div class="ga-chart-wrap">
-              <div class="ga-loading" id="ga-loading-flows">Loading…</div>
-              <canvas id="ga-chart-flows" style="display:none"></canvas>
-            </div>
-          </div>
+          <div class="sep"></div>
 
-          <!-- Chart: Unbonding Queue -->
-          <div id="ga-wrap-unbqueue" style="display:none">
-            <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
-              <button id="ga-unbqueue-hist-btn" onclick="gaToggleUnbqueueHistory()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#666;background:#f0f0f0;border:1px solid #ddd;padding:5px 14px;cursor:pointer;white-space:nowrap">See Full History</button>
+          <!-- Governance Flows -->
+          <div class="inner-title">Governance Flows — Net Bond Breaks</div>
+          <div class="ctx-kpi-row" id="conv-flow-row">
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">24h Breaks</span>
+              <span class="ctx-kpi-value" id="conv-flow-1d">—</span>
+              <span class="ctx-kpi-sub" id="conv-flow-1d-rize">&nbsp;</span>
             </div>
-            <div class="ga-chart-wrap">
-              <div class="ga-loading" id="ga-loading-unbqueue">Loading Goldsky data…</div>
-              <canvas id="ga-chart-unbqueue" style="display:none"></canvas>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">7d Breaks</span>
+              <span class="ctx-kpi-value" id="conv-flow-7d">—</span>
+              <span class="ctx-kpi-sub" id="conv-flow-7d-rize">&nbsp;</span>
             </div>
-          </div>
-
-          <!-- Live KPIs -->
-          <div class="ga-stat-row" style="margin-top:16px">
-            <div class="ga-kpi">
-              <span class="ga-kpi-label"><span class="live-dot"></span>Total Bonded <span class="live-badge">LIVE</span></span>
-              <span class="ga-kpi-value" id="ga-live-bonded" style="color:#1a7a4a">—</span>
-              <span class="ga-kpi-sub" id="ga-live-bonded-sub">&nbsp;</span>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">30d Breaks</span>
+              <span class="ctx-kpi-value" id="conv-flow-30d">—</span>
+              <span class="ctx-kpi-sub" id="conv-flow-30d-rize">&nbsp;</span>
             </div>
-            <div class="ga-kpi">
-              <span class="ga-kpi-label"><span class="live-dot"></span>Unbonding Queue <span class="live-badge">LIVE</span></span>
-              <span class="ga-kpi-value" id="ga-live-unbonding" style="color:#7a5a00">—</span>
-              <span class="ga-kpi-sub" id="ga-live-unbonding-sub">&nbsp;</span>
-            </div>
-            <div class="ga-kpi">
-              <span class="ga-kpi-label">On Exchanges <span style="font-size:9px;color:#333;letter-spacing:0.5px;font-weight:700">(last snapshot)</span></span>
-              <span class="ga-kpi-value" id="ga-live-cex">—</span>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">90d Breaks</span>
+              <span class="ctx-kpi-value" id="conv-flow-90d">—</span>
+              <span class="ctx-kpi-sub" id="conv-flow-90d-rize">&nbsp;</span>
             </div>
           </div>
 
-          <div class="ga-sep"></div>
+          <div class="sep"></div>
 
-          <div class="ga-sub-title">Governance Flows</div>
-          <div class="ga-kpi-row">
-            <div class="ga-kpi"><span class="ga-kpi-label">24h Bonded</span><span class="ga-kpi-value" id="ga-gov-1d">—</span><span class="ga-kpi-sub" id="ga-gov-1d-sub">&nbsp;</span></div>
-            <div class="ga-kpi"><span class="ga-kpi-label">7d Bonded</span><span class="ga-kpi-value" id="ga-gov-7d">—</span><span class="ga-kpi-sub" id="ga-gov-7d-sub">&nbsp;</span></div>
-            <div class="ga-kpi"><span class="ga-kpi-label">30d Bonded</span><span class="ga-kpi-value" id="ga-gov-30d">—</span><span class="ga-kpi-sub" id="ga-gov-30d-sub">&nbsp;</span></div>
-            <div class="ga-kpi"><span class="ga-kpi-label">90d Bonded</span><span class="ga-kpi-value" id="ga-gov-90d">—</span><span class="ga-kpi-sub" id="ga-gov-90d-sub">&nbsp;</span></div>
+          <!-- Whale Movements -->
+          <div class="inner-title">Whale Bond Breaks &mdash; Transactions &gt; 5M RIZE</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Date</th><th>NFT ID</th><th>Amount (RIZE)</th><th>Tx</th></tr></thead>
+              <tbody id="conv-whale-tbody"><tr><td colspan="4" class="loading-text" style="text-align:center;padding:20px">Loading whale data&hellip;</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         PANEL 2 — RIZE TOKENOMICS
+    ══════════════════════════════════════════════════════════ -->
+    <div class="gov-panel" id="gov-panel-tokenomics">
+      <section class="section">
+        <div class="section-titlebar-row" onclick="toggleSection(this)">
+          <div class="section-titlebar" style="margin:0">
+            <span class="section-title">RIZE Tokenomics</span>
+          </div>
+          <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
+          <button class="screenshot-btn" onclick="event.stopPropagation();takeScreenshot('gov-panel-tokenomics','tokenomics')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+          <div class="section-collapse-toggle"><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 6 5-6" stroke="#7ee0ff" stroke-width="2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="section-body">
+          <p class="section-sub">RIZE governance token supply breakdown, pool configuration and bonding mechanics.</p>
+
+          <div class="metrics" id="tok-metrics">
+            <div class="metric"><span class="metric-label">Total Supply</span><span class="metric-value accent-gold">5,000,000,000</span><span class="metric-sub">RIZE — fixed</span></div>
+            <div class="metric"><span class="metric-label">Max Bond Boost</span><span class="metric-value accent-cyan">3.0×</span><span class="metric-sub">at 36 months full maturity</span></div>
+            <div class="metric"><span class="metric-label">Base Weight</span><span class="metric-value" id="tok-base-weight">—</span><span class="metric-sub" id="tok-base-weight-sub">from pool config</span></div>
+            <div class="metric"><span class="metric-label">Full Maturity</span><span class="metric-value" id="tok-full-maturity">—</span><span class="metric-sub">months to max boost</span></div>
           </div>
 
-          <div class="ga-sep"></div>
+          <div class="sep"></div>
 
-          <div class="ga-sub-title">Exchanges Net Flow</div>
-          <div class="ga-kpi-row">
-            <div class="ga-kpi"><span class="ga-kpi-label">24h Net Flow</span><span class="ga-kpi-value" id="ga-cex-1d">—</span><span class="ga-kpi-sub" id="ga-cex-1d-sub">&nbsp;</span></div>
-            <div class="ga-kpi"><span class="ga-kpi-label">7d Net Flow</span><span class="ga-kpi-value" id="ga-cex-7d">—</span><span class="ga-kpi-sub" id="ga-cex-7d-sub">&nbsp;</span></div>
-            <div class="ga-kpi"><span class="ga-kpi-label">30d Net Flow</span><span class="ga-kpi-value" id="ga-cex-30d">—</span><span class="ga-kpi-sub" id="ga-cex-30d-sub">&nbsp;</span></div>
-            <div class="ga-kpi"><span class="ga-kpi-label">90d Net Flow</span><span class="ga-kpi-value" id="ga-cex-90d">—</span><span class="ga-kpi-sub" id="ga-cex-90d-sub">&nbsp;</span></div>
-          </div>
-
-          <div class="ga-sep"></div>
-
-          <div class="ga-sub-title">Whales Movements — Transactions &gt; 5M RIZE</div>
-          <div style="overflow-x:auto">
-            <div style="color:#888;font-family:'DM Mono',monospace;font-size:13px;padding:12px 0" id="ga-whale-loading">Loading whale data…</div>
-            <table class="ga-whale-table" id="ga-whale-table" style="display:none">
-              <thead><tr><th>Date</th><th>Amount</th><th>Direction</th><th>From</th><th>To</th><th>Tx</th></tr></thead>
-              <tbody id="ga-whale-tbody"></tbody>
+          <!-- Pool Config -->
+          <div class="inner-title">Pool Configuration — Active Parameters</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Pool ID</th><th>Base Weight</th><th>Matured Bonus</th><th>Full Maturity</th><th>Last Updated</th></tr></thead>
+              <tbody id="tok-pool-tbody"><tr><td colspan="5" class="loading-text" style="text-align:center;padding:20px">Loading pool data&hellip;</td></tr></tbody>
             </table>
           </div>
 
-        </div><!-- end ga-mod-conviction -->
+          <div class="sep"></div>
 
-        <!-- ── Sub-module: RIZE Tokenomics ── -->
-        <div class="ga-mod-panel" id="ga-mod-tokenomics">
+          <!-- Pool Update History -->
+          <div class="inner-title">Pool Update History</div>
+          <div class="table-wrap" style="max-height:320px;overflow-y:auto">
+            <table>
+              <thead><tr><th>Date</th><th>Pool ID</th><th>Base Weight</th><th>Matured Bonus</th><th>Full Maturity</th><th>Tx</th></tr></thead>
+              <tbody id="tok-updates-tbody"><tr><td colspan="6" class="loading-text" style="text-align:center;padding:20px">Loading history&hellip;</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
 
-          <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:32px;align-items:center" id="ga-tok-grid">
-            <div style="display:flex;align-items:center;justify-content:center;">
-              <div style="width:100%;max-width:300px;height:300px"><canvas id="ga-chart-alloc"></canvas></div>
+
+    <!-- ══════════════════════════════════════════════════════════
+         PANEL 3 — GOVERNANCE LEADERBOARD (Ormi pending)
+    ══════════════════════════════════════════════════════════ -->
+    <div class="gov-panel" id="gov-panel-leaderboard">
+      <section class="section">
+        <div class="section-titlebar-row" onclick="toggleSection(this)">
+          <div class="section-titlebar" style="margin:0">
+            <span class="section-title">Governance Leaderboard</span>
+          </div>
+          <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
+          <button class="screenshot-btn" onclick="event.stopPropagation();takeScreenshot('gov-panel-leaderboard','leaderboard')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+          <div class="section-collapse-toggle"><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 6 5-6" stroke="#7ee0ff" stroke-width="2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="section-body">
+          <p class="section-sub">Top addresses ranked by Voting Power = Amount × Boost (1× to 3× based on time since bond creation). Requires bond-created + bond-timemarker data.</p>
+          <div id="leaderboard-content">
+            <div class="placeholder-box"><span>⏳ DATA PENDING</span>Awaiting bond-created &amp; bond-timemarker subgraph data.<br>Leaderboard will auto-populate once JSONs are available.</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         PANEL 4 — CONVICTION HEATMAP
+    ══════════════════════════════════════════════════════════ -->
+    <div class="gov-panel" id="gov-panel-heatmap">
+      <section class="section">
+        <div class="section-titlebar-row" onclick="toggleSection(this)">
+          <div class="section-titlebar" style="margin:0">
+            <span class="section-title">Conviction Heatmap</span>
+          </div>
+          <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
+          <button class="screenshot-btn" onclick="event.stopPropagation();takeScreenshot('gov-panel-heatmap','heatmap')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+          <div class="section-collapse-toggle"><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 6 5-6" stroke="#7ee0ff" stroke-width="2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="section-body">
+          <p class="section-sub">Calendar heatmap of bond break intensity. Each cell = one day. Color intensity = RIZE volume broken that day. Red = high activity (low conviction). Green = low activity (high conviction).</p>
+
+          <div class="ctx-kpi-row">
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">Peak Break Day</span>
+              <span class="ctx-kpi-value accent-pink" id="hm-peak-day">—</span>
+              <span class="ctx-kpi-sub" id="hm-peak-amount">&nbsp;</span>
+            </div>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">Avg Daily Breaks</span>
+              <span class="ctx-kpi-value accent-gold" id="hm-avg-daily">—</span>
+              <span class="ctx-kpi-sub">RIZE / day</span>
+            </div>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">Days Analyzed</span>
+              <span class="ctx-kpi-value" id="hm-days-count">—</span>
+              <span class="ctx-kpi-sub">since genesis</span>
+            </div>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">Quiet Days (0 breaks)</span>
+              <span class="ctx-kpi-value accent-green" id="hm-quiet-days">—</span>
+              <span class="ctx-kpi-sub">high conviction days</span>
+            </div>
+          </div>
+
+          <div id="heatmap-container">
+            <div class="loading-text" id="hm-loading">Building heatmap&hellip;</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         PANEL 5 — POWER CONCENTRATION & HHI (Ormi pending)
+    ══════════════════════════════════════════════════════════ -->
+    <div class="gov-panel" id="gov-panel-concentration">
+      <section class="section">
+        <div class="section-titlebar-row" onclick="toggleSection(this)">
+          <div class="section-titlebar" style="margin:0">
+            <span class="section-title">Power Concentration &amp; HHI</span>
+          </div>
+          <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
+          <button class="screenshot-btn" onclick="event.stopPropagation();takeScreenshot('gov-panel-concentration','hhi')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+          <div class="section-collapse-toggle"><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 6 5-6" stroke="#7ee0ff" stroke-width="2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="section-body">
+          <p class="section-sub">Herfindahl-Hirschman Index (HHI) measures governance power concentration. A score near 0 = perfectly decentralized. Near 10,000 = monopoly. Top 10 / Top 50 / Top 100 breakdown.</p>
+          <div class="placeholder-box"><span>⏳ DATA PENDING</span>Awaiting bond-created &amp; bond-timemarker subgraph data.<br>HHI and power concentration will auto-populate once JSONs are available.</div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         PANEL 6 — RELEASE CALENDAR
+    ══════════════════════════════════════════════════════════ -->
+    <div class="gov-panel" id="gov-panel-calendar">
+      <section class="section">
+        <div class="section-titlebar-row" onclick="toggleSection(this)">
+          <div class="section-titlebar" style="margin:0">
+            <span class="section-title">Release Calendar</span>
+          </div>
+          <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
+          <button class="screenshot-btn" onclick="event.stopPropagation();takeScreenshot('gov-panel-calendar','release-calendar')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+          <div class="section-collapse-toggle"><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 6 5-6" stroke="#7ee0ff" stroke-width="2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="section-body">
+          <p class="section-sub">Historical and projected RIZE release schedule from bond breaks. Daily and monthly aggregates from bond-broken events.</p>
+
+          <div class="ctx-kpi-row">
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">This Month Breaks</span>
+              <span class="ctx-kpi-value accent-pink" id="cal-this-month">—</span>
+              <span class="ctx-kpi-sub" id="cal-this-month-rize">&nbsp;</span>
+            </div>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">Last Month Breaks</span>
+              <span class="ctx-kpi-value" id="cal-last-month">—</span>
+              <span class="ctx-kpi-sub" id="cal-last-month-rize">&nbsp;</span>
+            </div>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">All Time Breaks</span>
+              <span class="ctx-kpi-value accent-gold" id="cal-all-time">—</span>
+              <span class="ctx-kpi-sub">total events</span>
+            </div>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">All Time Released</span>
+              <span class="ctx-kpi-value accent-green" id="cal-all-rize">—</span>
+              <span class="ctx-kpi-sub">RIZE total</span>
+            </div>
+          </div>
+
+          <!-- Toggle view -->
+          <div class="conv-toggle-row">
+            <button class="conv-toggle active" id="cal-btn-monthly" onclick="calSwitch('monthly',this)">Monthly View</button>
+            <button class="conv-toggle" id="cal-btn-daily" onclick="calSwitch('daily',this)">Daily (Last 90 Days)</button>
+          </div>
+
+          <div class="ctx-chart-wrap" style="height:300px;">
+            <canvas id="cal-chart"></canvas>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="inner-title">Monthly Breakdown</div>
+          <div class="table-wrap" style="max-height:400px;overflow-y:auto">
+            <table>
+              <thead><tr><th>Month</th><th>Break Events</th><th>RIZE Released</th><th>Avg per Event</th><th>vs Prior Month</th></tr></thead>
+              <tbody id="cal-monthly-tbody"><tr><td colspan="5" class="loading-text" style="text-align:center;padding:20px">Loading calendar data&hellip;</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         PANEL 7 — WALLET DEEP DIVE
+    ══════════════════════════════════════════════════════════ -->
+    <div class="gov-panel" id="gov-panel-wallet">
+      <section class="section">
+        <div class="section-titlebar-row" onclick="toggleSection(this)">
+          <div class="section-titlebar" style="margin:0">
+            <span class="section-title">Wallet Deep Dive</span>
+          </div>
+          <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
+          <button class="screenshot-btn" onclick="event.stopPropagation();takeScreenshot('gov-panel-wallet','wallet')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+          <div class="section-collapse-toggle"><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 6 5-6" stroke="#7ee0ff" stroke-width="2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="section-body">
+          <p class="section-sub">Full on-chain profile for any wallet address. NFT holdings, bond breaks history, transfers, total released.</p>
+
+          <div class="wallet-search-row">
+            <input type="text" class="wallet-input" id="wallet-input" placeholder="0x… enter wallet address" />
+            <button class="wallet-btn" onclick="walletLookup()">Analyse</button>
+          </div>
+
+          <div id="wallet-results">
+            <div class="placeholder-box"><span>🔍 ENTER WALLET</span>Type or paste an address above to see full governance profile.<br>NFT bonds, break history, transfers, voting power.</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         PANEL 8 — WHALE ALERT TIMELINE
+    ══════════════════════════════════════════════════════════ -->
+    <div class="gov-panel" id="gov-panel-whale">
+      <section class="section">
+        <div class="section-titlebar-row" onclick="toggleSection(this)">
+          <div class="section-titlebar" style="margin:0">
+            <span class="section-title">Whale Alert Timeline</span>
+          </div>
+          <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
+          <button class="screenshot-btn" onclick="event.stopPropagation();takeScreenshot('gov-panel-whale','whale-alert')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+          <div class="section-collapse-toggle"><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 6 5-6" stroke="#7ee0ff" stroke-width="2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="section-body">
+          <p class="section-sub">Large bond break events sorted by size. Filter by threshold to surface significant governance exits.</p>
+
+          <!-- Filter row -->
+          <div class="conv-toggle-row" style="margin-bottom:16px">
+            <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);align-self:center;margin-right:4px">Min size:</span>
+            <button class="conv-toggle active" onclick="whaleFilter(1e6,this)">1M+</button>
+            <button class="conv-toggle" onclick="whaleFilter(5e6,this)">5M+</button>
+            <button class="conv-toggle" onclick="whaleFilter(10e6,this)">10M+</button>
+            <button class="conv-toggle" onclick="whaleFilter(50e6,this)">50M+</button>
+            <button class="conv-toggle" onclick="whaleFilter(0,this)">All</button>
+          </div>
+
+          <!-- Summary KPIs -->
+          <div class="ctx-kpi-row" id="whale-kpi-row">
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">Whales (&gt;5M)</span>
+              <span class="ctx-kpi-value accent-pink" id="whale-count-5m">—</span>
+              <span class="ctx-kpi-sub">total events</span>
+            </div>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">Largest Single Break</span>
+              <span class="ctx-kpi-value accent-gold" id="whale-largest">—</span>
+              <span class="ctx-kpi-sub" id="whale-largest-date">&nbsp;</span>
+            </div>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">Whale Volume (total)</span>
+              <span class="ctx-kpi-value accent-cyan" id="whale-volume">—</span>
+              <span class="ctx-kpi-sub">RIZE &gt;5M breaks</span>
+            </div>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">Last Whale Event</span>
+              <span class="ctx-kpi-value" id="whale-last-date">—</span>
+              <span class="ctx-kpi-sub" id="whale-last-amount">&nbsp;</span>
+            </div>
+          </div>
+
+          <div class="table-wrap" style="max-height:500px;overflow-y:auto">
+            <table>
+              <thead><tr><th>#</th><th>Date</th><th>NFT ID</th><th>Amount (RIZE)</th><th>Tx</th></tr></thead>
+              <tbody id="whale-tbody"><tr><td colspan="5" class="loading-text" style="text-align:center;padding:20px">Loading whale data&hellip;</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         PANEL 9 — MATURITY DISTRIBUTION (Ormi pending)
+    ══════════════════════════════════════════════════════════ -->
+    <div class="gov-panel" id="gov-panel-maturity">
+      <section class="section">
+        <div class="section-titlebar-row" onclick="toggleSection(this)">
+          <div class="section-titlebar" style="margin:0">
+            <span class="section-title">Maturity Distribution</span>
+          </div>
+          <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
+          <button class="screenshot-btn" onclick="event.stopPropagation();takeScreenshot('gov-panel-maturity','maturity')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+          <div class="section-collapse-toggle"><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 6 5-6" stroke="#7ee0ff" stroke-width="2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="section-body">
+          <p class="section-sub">Distribution of active bonds by maturity stage (0–12m, 12–24m, 24–36m, 36m+). Shows concentration of voting power at each maturity tier. Formula: VP = Amount × (1 + min(months/36, 1) × 2).</p>
+          <div class="placeholder-box"><span>⏳ DATA PENDING</span>Awaiting bond-created &amp; bond-timemarker subgraph data.<br>Maturity distribution will auto-populate once JSONs are available.</div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         PANEL 10 — GOVERNANCE MOMENTUM SCORE
+    ══════════════════════════════════════════════════════════ -->
+    <div class="gov-panel" id="gov-panel-momentum">
+      <section class="section">
+        <div class="section-titlebar-row" onclick="toggleSection(this)">
+          <div class="section-titlebar" style="margin:0">
+            <span class="section-title">Governance Momentum Score</span>
+          </div>
+          <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
+          <button class="screenshot-btn" onclick="event.stopPropagation();takeScreenshot('gov-panel-momentum','momentum')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+          <div class="section-collapse-toggle"><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 6 5-6" stroke="#7ee0ff" stroke-width="2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="section-body">
+          <p class="section-sub">Composite score (0–100) measuring governance health. Combines: break rate trend, new bonds rate (pending Ormi), whale concentration, avg bond age. Higher = stronger conviction.</p>
+
+          <!-- Score gauge -->
+          <div style="text-align:center;padding:32px 0 20px">
+            <div style="font-family:'DM Mono',monospace;font-size:12px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:12px">Governance Momentum Score</div>
+            <div id="momentum-score-display" style="font-family:'Rajdhani',sans-serif;font-size:96px;font-weight:700;line-height:1;color:var(--cyan);letter-spacing:-2px">—</div>
+            <div id="momentum-score-label" style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:8px">Computing…</div>
+          </div>
+
+          <div class="ctx-kpi-row" id="momentum-kpi-row">
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">Break Rate Trend</span>
+              <span class="ctx-kpi-value" id="mom-break-trend">—</span>
+              <span class="ctx-kpi-sub">30d vs 90d avg</span>
+            </div>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">Whale Pressure</span>
+              <span class="ctx-kpi-value" id="mom-whale-pressure">—</span>
+              <span class="ctx-kpi-sub">% of breaks &gt;5M</span>
+            </div>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">Daily Break Avg</span>
+              <span class="ctx-kpi-value" id="mom-daily-avg">—</span>
+              <span class="ctx-kpi-sub">RIZE / day (30d)</span>
+            </div>
+            <div class="ctx-kpi">
+              <span class="ctx-kpi-label">Releases (30d)</span>
+              <span class="ctx-kpi-value accent-pink" id="mom-releases-30d">—</span>
+              <span class="ctx-kpi-sub">RIZE unbonded</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         PANEL 11 — BOND AGE ANALYSIS (Ormi pending)
+    ══════════════════════════════════════════════════════════ -->
+    <div class="gov-panel" id="gov-panel-bondage">
+      <section class="section">
+        <div class="section-titlebar-row" onclick="toggleSection(this)">
+          <div class="section-titlebar" style="margin:0">
+            <span class="section-title">Bond Age Analysis</span>
+          </div>
+          <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
+          <button class="screenshot-btn" onclick="event.stopPropagation();takeScreenshot('gov-panel-bondage','bond-age')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+          <div class="section-collapse-toggle"><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 6 5-6" stroke="#7ee0ff" stroke-width="2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="section-body">
+          <p class="section-sub">How long are bonds held before being broken? Distribution of bond lifespans from creation to break. Diamond hands vs paper hands analysis.</p>
+          <div class="placeholder-box"><span>⏳ DATA PENDING</span>Awaiting bond-created subgraph data.<br>Bond age analysis will auto-populate once JSON is available.</div>
+        </div>
+      </section>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════
+         PANEL 12 — BOND POWER CALCULATOR
+    ══════════════════════════════════════════════════════════ -->
+    <div class="gov-panel" id="gov-panel-calculator">
+      <section class="section">
+        <div class="section-titlebar-row" onclick="toggleSection(this)">
+          <div class="section-titlebar" style="margin:0">
+            <span class="section-title">Bond Power Calculator</span>
+          </div>
+          <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
+          <button class="screenshot-btn" onclick="event.stopPropagation();takeScreenshot('gov-panel-calculator','bond-power')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+          <div class="section-collapse-toggle"><svg width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1l5 6 5-6" stroke="#7ee0ff" stroke-width="2" stroke-linecap="round"/></svg></div>
+        </div>
+        <div class="section-body">
+          <p class="section-sub">Simulate your bond voting power. Enter amount and bond age to compute boost multiplier and voting power score.</p>
+
+          <div class="calc-grid">
+            <div>
+              <div class="calc-field">
+                <label class="calc-label">RIZE Amount</label>
+                <input type="number" class="calc-input" id="calc-amount" placeholder="1000000" oninput="calcUpdate()"/>
+              </div>
+              <div class="calc-field">
+                <label class="calc-label">Bond Age (months)</label>
+                <input type="number" class="calc-input" id="calc-months" placeholder="12" min="0" max="36" oninput="calcUpdate()"/>
+              </div>
+              <div class="calc-field">
+                <label class="calc-label">Bond Creation Date (optional)</label>
+                <input type="date" class="calc-input" id="calc-date" onchange="calcFromDate()"/>
+              </div>
             </div>
             <div>
-              <div style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--navy);margin-bottom:12px">Allocation &amp; Vesting — 5B RIZE</div>
-              <div style="overflow-x:auto">
-                <table class="ga-tok-table">
-                  <thead><tr><th>Category</th><th>%</th><th>Tokens</th><th>Cliff</th><th>Vesting</th></tr></thead>
-                  <tbody>
-                    <tr><td class="tok-cat">Seed</td><td style="color:#1a7a4a">5%</td><td>250M</td><td>6m</td><td>12m</td></tr>
-                    <tr><td class="tok-cat">Partnerships &amp; Growth</td><td style="color:#1a7a4a">7%</td><td>350M</td><td>6m</td><td>12m</td></tr>
-                    <tr><td class="tok-cat">Marketing &amp; Incubation</td><td style="color:#1a5a9a">3%</td><td>150M</td><td>3m</td><td>9m</td></tr>
-                    <tr><td class="tok-cat">Private Sale</td><td style="color:#1a5a9a">7%</td><td>350M</td><td>—</td><td>—</td></tr>
-                    <tr><td class="tok-cat">Strategic Reserve</td><td style="color:#7a5a00">10%</td><td>500M</td><td>0m</td><td>12m</td></tr>
-                    <tr><td class="tok-cat">Liquidity</td><td style="color:#7a5a00">10%</td><td>500M</td><td>—</td><td>—</td></tr>
-                    <tr><td class="tok-cat">Airdrop</td><td style="color:#a02020">4%</td><td>200M</td><td>1m</td><td>6m</td></tr>
-                    <tr><td class="tok-cat">Governance</td><td style="color:#a02020">30%</td><td>1.5B</td><td>12m</td><td>36m</td></tr>
-                    <tr><td class="tok-cat">Treasury</td><td style="color:#5a2a8a">10%</td><td>500M</td><td>—</td><td>—</td></tr>
-                    <tr><td class="tok-cat">T-RIZE Team</td><td style="color:#5a2a8a">14%</td><td>700M</td><td>24m</td><td>24m</td></tr>
-                    <tr><td><strong>TOTAL</strong></td><td><strong>100%</strong></td><td><strong>5B</strong></td><td></td><td></td></tr>
-                  </tbody>
-                </table>
+              <div class="calc-result-box">
+                <div class="calc-result-label">Boost Multiplier</div>
+                <div class="calc-result-value" id="calc-boost">1.00×</div>
+              </div>
+              <div class="calc-result-box" style="margin-top:12px">
+                <div class="calc-result-label">Voting Power (VP)</div>
+                <div class="calc-result-value" id="calc-vp" style="color:var(--gold)">—</div>
+              </div>
+              <div class="calc-result-box" style="margin-top:12px">
+                <div class="calc-result-label">% of Max VP at 36m</div>
+                <div class="calc-result-value" id="calc-pct" style="color:#98ffb6">—</div>
               </div>
             </div>
           </div>
 
-          <div style="margin-top:24px">
-            <div style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--navy);margin-bottom:10px">Vesting Schedule</div>
-            <div class="ga-chart-wrap" style="height:280px"><canvas id="ga-chart-vesting"></canvas></div>
-          </div>
+          <div class="sep"></div>
 
-          <div style="margin-top:24px">
-            <div class="ga-sub-title">Burn &amp; Supply Unlock Events</div>
-            <div class="ga-unlock-tabs" id="ga-unlock-tabs">
-              <button class="ga-unlock-tab ga-active" onclick="gaUnlockSwitch('burn',this)">Burn Events (1)</button>
-              <button class="ga-unlock-tab" onclick="gaUnlockSwitch('pending',this)">Next Unlocks</button>
-              <button class="ga-unlock-tab" onclick="gaUnlockSwitch('ongoing',this)">Ongoing Releases</button>
-              <button class="ga-unlock-tab" onclick="gaUnlockSwitch('done',this)">Past Unlocks</button>
-            </div>
-            <div id="ga-unlock-burn" class="ga-unlock-panel ga-visible"><span style="color:#888;font-size:13px">Loading…</span></div>
-            <div id="ga-unlock-pending" class="ga-unlock-panel"><span style="color:#888;font-size:13px">Computing…</span></div>
-            <div id="ga-unlock-ongoing" class="ga-unlock-panel"><span style="color:#888;font-size:13px">Computing…</span></div>
-            <div id="ga-unlock-done" class="ga-unlock-panel"><span style="color:#888;font-size:13px">Computing…</span></div>
-          </div>
-
-        </div><!-- end ga-mod-tokenomics -->
-
-      </div>
-    </div>
-  </div>
-
-</div><!-- end eco-wrap -->
-
-<footer class="site-footer">
-  <div class="footer-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></div>
-  <nav class="footer-nav">
-    <a href="/">Home</a><a href="/about">About</a><a href="/hub">Tokerize Data Hub</a>
-  </nav>
-  <div>
-    <p class="footer-copy">Tokerize &mdash; RIZE Community Tokenization Hub</p>
-    <p class="footer-disclaimer">Tokerize is a community built website.</p>
-    <p class="footer-disclaimer">We are not affiliated with T-RIZE or Canton Network.</p>
-  </div>
-</footer>
-
-<!-- Chart.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-
-<script>
-/* ══════════════════════════════════════════════════════════════
-   MODULE COLLAPSE / EXPAND — modules stay OPEN on load
-══════════════════════════════════════════════════════════════ */
-function toggleLc(id) {
-  const lc   = document.getElementById(id);
-  const body = document.getElementById(id + '-body');
-  if (!lc || !body) return;
-  lc.classList.toggle('collapsed');
-  body.classList.toggle('collapsed');
-  const svg = lc.querySelector('.lc-toggle svg path');
-  // svg rotation handled via CSS .lc.collapsed .lc-toggle svg
-}
-// Modules start OPEN — no collapse on load (unlike rize-ecosystem)
-
-
-/* ══════════════════════════════════════════════════════════════
-   RIZENET GOVERNANCE MODULE
-══════════════════════════════════════════════════════════════ */
-var RIP_PROPOSALS = [
-  {
-    id: 'rip-01',
-    title: 'Proposal 01 — Canton Incentives & Ecosystem Alignment',
-    status: 'Pending',
-    category: 'Governance · Tokenomics',
-    body: 'The T-RIZE team has hinted at a first governance proposal introducing Canton Incentives — a mechanism that would directly connect RIZE holders and the broader Rizenet ecosystem to the institutional revenue flows generated by T-RIZE activity on the Canton Network. The proposal is expected to introduce incentive structures that reward long-term bonding, align token holders with Canton Network growth, and create a stronger institutional bridge between the RIZE community and the Canton ecosystem. This reflects T-RIZE as a Premier Member, Validator, and RWA issuer on Canton — a network processing $3T+ in monthly transaction volume.'
-  }
-];
-
-var ripActive = null;
-window.ripPick = function(id) {
-  var p = RIP_PROPOSALS.find(function(x){ return x.id === id; });
-  if (!p) return;
-  var box = document.getElementById('rip-box');
-  var prompt = document.getElementById('rip-prompt');
-  var titleEl = document.getElementById('rip-detail-title');
-  var textEl  = document.getElementById('rip-detail-body');
-  if (ripActive === id) {
-    ripActive = null;
-    document.querySelectorAll('#rip-tbody tr').forEach(function(r){ r.classList.remove('on'); });
-    prompt.style.display = ''; titleEl.style.display = 'none'; textEl.style.display = 'none';
-    return;
-  }
-  ripActive = id;
-  document.querySelectorAll('#rip-tbody tr').forEach(function(r){ r.classList.remove('on'); });
-  var row = document.querySelector('#rip-tbody tr[onclick*="' + id + '"]');
-  if (row) row.classList.add('on');
-  prompt.style.display = 'none'; titleEl.style.display = 'block'; textEl.style.display = 'block';
-  titleEl.textContent = p.title;
-  textEl.innerHTML = '<p style="font-family:\'DM Mono\',monospace;font-size:13px;color:#222;line-height:1.85;">' + p.body + '</p>'
-    + '<div style="font-family:\'DM Mono\',monospace;font-size:11px;color:#888;margin-top:14px;line-height:2;">'
-    + '<div>Status: <span style="color:#7a5a1a;font-weight:700">' + p.status + '</span></div>'
-    + '<div>Category: <span style="color:#333">' + p.category + '</span></div></div>';
-  box.scrollIntoView({behavior:'smooth',block:'nearest'});
-};
-
-/* ── Bonding widget ── */
-var RIP_CONTRACT = '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE';
-var RIP_TOKEN    = '0x9818B6c09f5ECc843060927E8587c427C7C93583';
-var RIP_RPC      = 'https://mainnet.base.org';
-function ripRpc(method, params) {
-  return fetch(RIP_RPC, { method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({jsonrpc:'2.0',method,params,id:1}) }).then(r => r.json());
-}
-function ripHexToTokens(hex) {
-  if (!hex || hex === '0x') return null;
-  try { var raw = BigInt(hex); if (raw === 0n) return null; return Number(raw / 1000000000000000000n); } catch(e) { return null; }
-}
-function ripGetPrice() {
-  return fetch('https://api.dexscreener.com/latest/dex/tokens/' + RIP_TOKEN)
-    .then(r => r.json())
-    .then(d => { var pairs = d.pairs||[]; var a = pairs.find(p=>p.dexId==='aerodrome')||pairs[0]; return a&&a.priceUsd?parseFloat(a.priceUsd):null; })
-    .catch(() => null);
-}
-function ripBalanceOf() {
-  var padded = '000000000000000000000000' + RIP_CONTRACT.slice(2).toLowerCase();
-  return ripRpc('eth_call',[{to:RIP_TOKEN,data:'0x70a08231'+padded},'latest'])
-    .then(res => ripHexToTokens(res.result)).catch(() => null);
-}
-function ripTrySelector(sel) {
-  return ripRpc('eth_call',[{to:RIP_CONTRACT,data:sel},'latest'])
-    .then(res => { var r=res.result; if(!r||r==='0x'||/^0x0+$/.test(r)) return null; return ripHexToTokens(r); })
-    .catch(() => null);
-}
-function ripUpdateWidget(tokens, price) {
-  var tokEl = document.getElementById('rip-bonded-tokens');
-  var usdEl = document.getElementById('rip-bonded-usd');
-  var subEl = document.getElementById('rip-bonding-status');
-  if (!tokEl) return;
-  if (tokens !== null && tokens > 0) {
-    var lastUpdated = Date.now();
-    tokEl.textContent = tokens.toLocaleString('en-US') + ' RIZE';
-    usdEl.textContent = price ? '$' + (tokens*price).toLocaleString('en-US',{maximumFractionDigits:0}) + ' USD value' : 'USD value unavailable';
-    function updateAgo() {
-      var sec = Math.round((Date.now()-lastUpdated)/1000);
-      subEl.textContent = 'Live · Base Mainnet · last updated ' + (sec<60?sec+'s ago':Math.round(sec/60)+'min ago');
-    }
-    updateAgo(); clearInterval(window._ripAgoTimer);
-    window._ripAgoTimer = setInterval(updateAgo, 10000);
-    // Sync to Governance Activity KPI — same source, same value
-    const gaEl = document.getElementById('ga-live-bonded');
-    if (gaEl) { gaEl.textContent = tokens.toLocaleString('en-US') + ' RIZE'; gaEl.style.color='#1a7a4a'; }
-  } else { tokEl.textContent='—'; usdEl.textContent=''; subEl.textContent='Data failed to load'; }
-}
-function ripLoad() {
-  var SELS = ['0x6c8c2b8b','0x817b1cd2','0x0d10a163','0x56891412','0x6f307dc3'];
-  var chain = ripBalanceOf();
-  SELS.forEach(sel => { chain = chain.then(prev => prev!==null?prev:ripTrySelector(sel)); });
-  Promise.all([chain,ripGetPrice()]).then(res => ripUpdateWidget(res[0],res[1]));
-}
-
-
-/* ══════════════════════════════════════════════════════════════
-   GOVERNANCE ACTIVITY MODULE
-   — Light-mode adaptation of conviction + tokenomics
-══════════════════════════════════════════════════════════════ */
-
-/* Shared chart options — adapted for light mode */
-const gaCharts = { main: null, flows: null, unbqueue: null, alloc: null, vesting: null };
-
-function gaBaseOpts() {
-  const isDesktop = window.innerWidth > 700;
-  return {
-    responsive: true, maintainAspectRatio: false,
-    interaction: { mode: 'index', intersect: false },
-    plugins: {
-      legend: { labels: { color: '#444', font: { family: 'Trebuchet MS, Verdana, sans-serif', size: isDesktop?13:11 }, boxWidth: 12, boxHeight: 12, padding: 16 } },
-      tooltip: {
-        backgroundColor: '#0d2d4e', borderColor: 'rgba(13,45,78,0.3)', borderWidth: 1,
-        titleColor: '#fff', bodyColor: '#e8f0f7',
-        titleFont: { family: 'Rajdhani, sans-serif', size: isDesktop?14:12, weight: '700' },
-        bodyFont: { family: 'Trebuchet MS, sans-serif', size: isDesktop?12:11 }, padding: 10,
-      },
-    },
-    scales: {
-      x: { ticks: { color: '#666', font: { family: 'Trebuchet MS, Verdana, sans-serif', size: isDesktop?12:10 }, maxRotation: 35, autoSkip: true, maxTicksLimit: window.innerWidth<600?6:14 }, grid: { color: 'rgba(0,0,0,0.06)' } },
-      y: { ticks: { color: '#666', font: { family: 'Trebuchet MS, Verdana, sans-serif', size: isDesktop?12:10 } }, grid: { color: 'rgba(0,0,0,0.06)' } },
-    },
-  };
-}
-
-function gaFmt(n) {
-  if (n===null||n===undefined||isNaN(n)) return '—';
-  if (Math.abs(n)>=1e9) return (n/1e9).toFixed(2)+'B';
-  if (Math.abs(n)>=1e6) return (n/1e6).toFixed(1)+'M';
-  if (Math.abs(n)>=1e3) return (n/1e3).toFixed(0)+'K';
-  return n.toLocaleString('en-US',{maximumFractionDigits:0});
-}
-
-/* ── Data sources ── */
-const CONV = {
-  GOV_CONTRACT: '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE',
-  RIZE_TOKEN:   '0x9818B6c09f5ECc843060927E8587c427C7C93583',
-  DECIMALS:     1e18,
-  CEX: {
-    'Kraken Hot 1':'0x02Ac4617Fe004cf8Cd9c988Ff9C905b2Ec676C2d',
-    'Kraken Cold 1':'0x7DAFbA1d69F6C01AE7567Ffd7b046Ca03B706f83',
-    'Kraken Cold 2':'0xd2DD7b597Fd2435b6dB61ddf48544fd931e6869F',
-    'Kraken Hot 2':'0xcC282E2004428939ee5149A9e7872F0B4d5d5ec7',
-    'Revolut':'0x9b0c45d46D386cEdD98873168C36efd0DcBa8d46',
-    'MEXC':'0x4e3ae00E8323558fA5Cac04b152238924AA31B60',
-    'Bitpanda Cold':'0x0529ea5885702715e83923c59746ae8734c553B7',
-    'Bitpanda Hot':'0xB7C5F84455c86f9972A80e82939f7CE40b481664',
-    'Ourbit':'0x4D59BEC2b09052c60C6149c623fb3a461fB1Fe74',
-    'Gate':'0x0D0707963952f2fBA59dD06f2b425ace40b492Fe',
-  },
-  initialized: false,
-};
-
-async function gaFetchHistory() {
-  const URLS = [
-    'https://raw.githubusercontent.com/hcftrize/TOKERIZE/main/rize-data-hub/conviction-history.json',
-    'https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/rize-data-hub/conviction-history.json',
-  ];
-  for (const url of URLS) {
-    try {
-      const r = await fetch(url); if (!r.ok) continue;
-      const d = await r.json();
-      return { bondedSeries: d.bonded||[], cexSeries: d.cex||[], whales: d.whales||[], addressLabels: d.address_labels||{} };
-    } catch(e) { continue; }
-  }
-  return { bondedSeries:[], cexSeries:[], whales:[], addressLabels:{} };
-}
-
-async function gaFetchUnbondingQueue() {
-  const GOLDSKY = 'https://api.goldsky.com/api/public/project_cmoa6u5wk3kx201y4g3s52z77/subgraphs/tokerize-bond-broken/1.1.0/gn';
-  const cutoff  = new Date(Date.now()-7*86400000).toISOString().slice(0,10);
-  const query   = JSON.stringify({query:`{bondBrokens(first:1000,orderBy:timestamp,orderDirection:desc,where:{date_gte:"${cutoff}"}){id amount date}}`});
-  try {
-    const r = await fetch(GOLDSKY,{method:'POST',headers:{'Content-Type':'application/json'},body:query});
-    const j = await r.json();
-    return (j.data?.bondBrokens||[]).reduce((s,e)=>s+parseFloat(e.amount||0),0);
-  } catch(e) { return 0; }
-}
-
-async function gaFetchUnbqueueJSON() {
-  const URLS = [
-    'https://raw.githubusercontent.com/hcftrize/TOKERIZE/main/rize-data-hub/unbonding-queue.json',
-    'https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/rize-data-hub/unbonding-queue.json',
-  ];
-  for (const url of URLS) {
-    try { const r=await fetch(url); if(!r.ok) continue; const d=await r.json(); if(d.series?.length) return d.series; } catch(e) { continue; }
-  }
-  return null;
-}
-
-function gaBuildSeriesFromJSON(arr) {
-  if (!arr?.length) return {labels:[],data:[],rawDays:[]};
-  return {
-    labels:  arr.map(e=>new Date(e.date+'T00:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'2-digit'})),
-    data:    arr.map(e=>e.value),
-    rawDays: arr.map(e=>e.date),
-  };
-}
-
-function gaCalcDelta(data, rawDays, days) {
-  if (!data.length||!rawDays) return null;
-  const pastKey = new Date(Date.now()-days*86400000).toISOString().slice(0,10);
-  const pastIdx = rawDays.findIndex(d=>d>=pastKey);
-  if (pastIdx<0) return null;
-  return data[data.length-1]-data[pastIdx];
-}
-
-/* ── Chart switch ── */
-let _gaFlowFull={labels:[],data:[]}, _gaFlowShowFull=false;
-let _gaUnbqueueFull={labels:[],data:[],rawDays:[]}, _gaUnbqueueShowFull=false;
-
-window.gaSwitchChart = function(which, btn) {
-  document.querySelectorAll('.ga-toggle').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  ['main','flows','unbqueue'].forEach(k=>{
-    const el=document.getElementById('ga-wrap-'+k); if(el) el.style.display='none';
-  });
-  const label = document.getElementById('ga-conv-label');
-  if (which==='main') {
-    document.getElementById('ga-wrap-main').style.display='block';
-    if(label) label.textContent='RIZE Bonded vs On Exchanges';
-  } else if (which==='flows') {
-    document.getElementById('ga-wrap-flows').style.display='block';
-    if(label) label.textContent='Governance Flows (Daily)';
-  } else if (which==='unbqueue') {
-    document.getElementById('ga-wrap-unbqueue').style.display='block';
-    if(label) label.textContent='Unbonding Queue (7-Day Rolling)';
-    if (!gaCharts.unbqueue) gaRenderUnbqueueChart();
-  }
-};
-
-window.gaToggleFlowHistory = function() {
-  _gaFlowShowFull = !_gaFlowShowFull;
-  gaDrawFlowChart(_gaFlowFull, _gaFlowShowFull);
-};
-window.gaToggleUnbqueueHistory = function() {
-  _gaUnbqueueShowFull = !_gaUnbqueueShowFull;
-  gaDrawUnbqueueChart(_gaUnbqueueFull, _gaUnbqueueShowFull);
-};
-
-/* ── Render main chart ── */
-function gaRenderMainChart(govSeries, cexSeries) {
-  const cv = document.getElementById('ga-chart-main');
-  if (!cv) return;
-  document.getElementById('ga-loading-main').style.display='none';
-  cv.style.display='block';
-  if (gaCharts.main) { gaCharts.main.destroy(); gaCharts.main=null; }
-  const masterLabels = govSeries.labels.length>=cexSeries.labels.length?govSeries.labels:cexSeries.labels;
-  function pad(s,master) { const d=master.length-s.length; return d<=0?s:[...Array(d).fill(null),...s]; }
-  const opts = gaBaseOpts();
-  opts.scales.y.ticks.callback = v=>gaFmt(v);
-  opts.plugins.tooltip.callbacks = {label: c=>' '+c.dataset.label+': '+gaFmt(c.parsed.y)+' RIZE'};
-  gaCharts.main = new Chart(cv.getContext('2d'),{
-    type:'line',
-    data:{labels:masterLabels,datasets:[
-      {label:'RIZE Bonded (Governance)',data:pad(govSeries.data,{length:masterLabels.length}),borderColor:'#0d2d4e',backgroundColor:'rgba(13,45,78,0.08)',fill:true,tension:0.25,pointRadius:0,borderWidth:2.5,spanGaps:true},
-      {label:'RIZE On Exchanges',data:pad(cexSeries.data,{length:masterLabels.length}),borderColor:'#a02020',backgroundColor:'rgba(160,32,32,0.07)',fill:true,tension:0.25,pointRadius:0,borderWidth:2,spanGaps:true},
-    ]},
-    options:opts,
-  });
-}
-
-/* ── Render flow chart ── */
-function gaRenderFlowChart(govSeries) {
-  const {labels,data}=govSeries;
-  if (data.length<2) return;
-  const flowLabels=[],flowData=[];
-  for (let i=1;i<data.length;i++){const d=data[i]-data[i-1];if(d!==0){flowLabels.push(labels[i]);flowData.push(Math.round(d));}}
-  _gaFlowFull={labels:flowLabels,data:flowData};
-  _gaFlowShowFull=false;
-  gaDrawFlowChart(_gaFlowFull,false);
-}
-function gaDrawFlowChart(series, isFull) {
-  const cv=document.getElementById('ga-chart-flows');
-  const loadEl=document.getElementById('ga-loading-flows');
-  if (!cv) return;
-  if (loadEl) loadEl.style.display='none'; cv.style.display='block';
-  if (gaCharts.flows) { gaCharts.flows.destroy(); gaCharts.flows=null; }
-  let labels=series.labels, data=series.data;
-  if (!isFull&&labels.length>60){labels=labels.slice(-60);data=data.slice(-60);}
-  const btn=document.getElementById('ga-flows-hist-btn');
-  if (btn) btn.textContent=isFull?'Last 2 Months':'See Full History';
-  const opts=gaBaseOpts();
-  opts.scales.y.ticks.callback=v=>(v>0?'+':'')+gaFmt(v);
-  opts.scales.y.beginAtZero=false;
-  opts.scales.y.grid={color:(ctx)=>(ctx.tick?.value===0)?'rgba(13,45,78,0.25)':'rgba(0,0,0,0.05)'};
-  opts.plugins.tooltip.callbacks={label:c=>{const v=c.parsed.y;return(v>=0?' Net Bonding: +':' Net Unbonding: ')+gaFmt(v)+' RIZE';}};
-  const bgCols=data.map(v=>v>=0?'rgba(26,122,74,0.55)':'rgba(160,32,32,0.55)');
-  const bdrCols=data.map(v=>v>=0?'#1a7a4a':'#a02020');
-  gaCharts.flows=new Chart(cv.getContext('2d'),{
-    type:'bar',data:{labels,datasets:[{label:'Governance Flows',data,backgroundColor:bgCols,borderColor:bdrCols,borderWidth:1}]},
-    options:opts,
-  });
-}
-
-/* ── Render unbonding queue chart ── */
-async function gaRenderUnbqueueChart() {
-  const loadEl=document.getElementById('ga-loading-unbqueue');
-  try {
-    const series=await gaFetchUnbqueueJSON();
-    if (!series) { if(loadEl) loadEl.textContent='Data not yet available.'; return; }
-    _gaUnbqueueFull=gaBuildSeriesFromJSON(series);
-    gaDrawUnbqueueChart(_gaUnbqueueFull,false);
-  } catch(e) { if(loadEl){loadEl.textContent='⚠ Could not load data.';loadEl.style.color='#a02020';} }
-}
-function gaDrawUnbqueueChart(series, isFull) {
-  const cv=document.getElementById('ga-chart-unbqueue');
-  const loadEl=document.getElementById('ga-loading-unbqueue');
-  if (!cv) return;
-  if (loadEl) loadEl.style.display='none'; cv.style.display='block';
-  if (gaCharts.unbqueue) { gaCharts.unbqueue.destroy(); gaCharts.unbqueue=null; }
-  let labels=series.labels, data=series.data;
-  if (!isFull&&labels.length>60){labels=labels.slice(-60);data=data.slice(-60);}
-  const btn=document.getElementById('ga-unbqueue-hist-btn');
-  if (btn) btn.textContent=isFull?'Last 2 Months':'See Full History';
-  const opts=gaBaseOpts();
-  opts.scales.y.ticks.callback=v=>gaFmt(v);
-  opts.plugins.legend.display=false;
-  opts.plugins.tooltip.callbacks={label:c=>' Unbonding Queue: '+gaFmt(c.parsed.y)+' RIZE'};
-  gaCharts.unbqueue=new Chart(cv.getContext('2d'),{
-    type:'line',
-    data:{labels,datasets:[{label:'Unbonding Queue',data,borderColor:'#7a5a00',backgroundColor:'rgba(122,90,0,0.1)',fill:true,tension:0.35,pointRadius:0,borderWidth:2.5,spanGaps:true}]},
-    options:opts,
-  });
-}
-
-/* ── Render live KPIs ── */
-function gaRenderLive(bonded, unbonding, cexTotal) {
-  const s=(id,val,col)=>{const el=document.getElementById(id);if(el){el.textContent=val;if(col)el.style.color=col;}};
-  // ga-live-bonded is set by ripLoad (same Base mainnet source as module 1)
-  s('ga-live-unbonding', gaFmt(unbonding)+' RIZE','#7a5a00');
-  s('ga-live-cex', gaFmt(cexTotal)+' RIZE','#0d2d4e');
-}
-
-/* ── Render deltas ── */
-function gaRenderGovDeltas(govSeries) {
-  [['1d',1],['7d',7],['30d',30],['90d',90]].forEach(([id,days])=>{
-    const delta=gaCalcDelta(govSeries.data,govSeries.rawDays,days);
-    const el=document.getElementById('ga-gov-'+id);
-    const sub=document.getElementById('ga-gov-'+id+'-sub');
-    if (!el) return;
-    if (delta===null){el.textContent='—';return;}
-    const sign=delta>=0?'+':'';
-    const isGood=delta>0;
-    el.textContent=sign+gaFmt(delta)+' RIZE';
-    el.style.color=isGood?'#1a7a4a':'#a02020';
-    if (sub) {
-      const pastKey=new Date(Date.now()-days*86400000).toISOString().slice(0,10);
-      const pastIdx=govSeries.rawDays.findIndex(d=>d>=pastKey);
-      if (pastIdx>=0&&govSeries.data[pastIdx]>0) {
-        const pct=(delta/govSeries.data[pastIdx])*100;
-        sub.innerHTML=`<span style="font-size:13px;font-family:'Rajdhani',sans-serif;font-weight:700">${pct>=0?'▲':'▼'} ${Math.abs(pct).toFixed(2)}%</span>`;
-        sub.style.color=pct>=0?'#1a7a4a':'#a02020';
-      } else { sub.innerHTML='&nbsp;'; }
-    }
-  });
-}
-
-function gaRenderCexDeltas(cexSeries) {
-  [['1d',1],['7d',7],['30d',30],['90d',90]].forEach(([id,days])=>{
-    const delta=gaCalcDelta(cexSeries.data,cexSeries.rawDays,days);
-    const el=document.getElementById('ga-cex-'+id);
-    const sub=document.getElementById('ga-cex-'+id+'-sub');
-    if (!el) return;
-    if (delta===null){el.textContent='—';return;}
-    const sign=delta>=0?'+':'';
-    const isGood=delta<0; // outflow bullish
-    el.textContent=sign+gaFmt(delta)+' RIZE';
-    el.style.color=isGood?'#1a7a4a':'#a02020';
-    if (sub) sub.innerHTML='&nbsp;';
-  });
-}
-
-/* ── Render whales ── */
-function gaRenderWhales(whales, addressLabels) {
-  addressLabels=addressLabels||{};
-  const loading=document.getElementById('ga-whale-loading');
-  const table=document.getElementById('ga-whale-table');
-  const tbody=document.getElementById('ga-whale-tbody');
-  if (!tbody) return;
-  if (loading) loading.style.display='none';
-  if (!whales.length) { if(loading){loading.style.display='block';loading.textContent='No whale transactions found (>5M RIZE).';} return; }
-  const cexMap={};
-  Object.entries(CONV.CEX).forEach(([n,a])=>{cexMap[a.toLowerCase()]=n;});
-  cexMap[CONV.GOV_CONTRACT.toLowerCase()]='Governance';
-  const resolveAddr=(addr,fb)=>{ if(!addr) return 'Unknown'; const k=addr.toLowerCase(); return addressLabels[k]||cexMap[k]||fb||(addr.slice(0,6)+'…'+addr.slice(-4)); };
-  tbody.innerHTML=whales.map(w=>{
-    const val=w.amount||0, dateStr=w.date||'—';
-    const govA=CONV.GOV_CONTRACT.toLowerCase(), fromL=(w.from||'').toLowerCase(), toL=(w.to||'').toLowerCase();
-    const isCex=a=>Object.values(CONV.CEX).some(ca=>ca.toLowerCase()===a)||!!addressLabels[a];
-    const fCex=isCex(fromL), tCex=isCex(toL);
-    let dir,dirColor;
-    if(toL===govA){dir='↗ Bond';dirColor='#1a7a4a';}
-    else if(fromL===govA){dir='↙ Release';dirColor='#1a5a9a';}
-    else if(fCex&&tCex){dir='⇄ CEX Internal';dirColor='#888';}
-    else if(!fCex&&tCex){dir='↓ Inflow';dirColor='#a02020';}
-    else if(fCex&&!tCex){dir='↑ Outflow';dirColor='#1a7a4a';}
-    else{dir='→ Transfer';dirColor='#7a5a00';}
-    const fromLbl=resolveAddr(w.from,w.from_label), toLbl=resolveAddr(w.to,w.to_label);
-    const txUrl='https://basescan.org/tx/'+(w.tx||'');
-    return `<tr>
-      <td style="color:#111;white-space:nowrap">${dateStr}</td>
-      <td style="font-weight:700;color:#111">${gaFmt(val)} RIZE</td>
-      <td style="color:${dirColor};font-weight:700">${dir}</td>
-      <td style="color:#111">${fromLbl}</td>
-      <td style="color:#111">${toLbl}</td>
-      <td><a href="${txUrl}" target="_blank" rel="noopener">${w.tx?(w.tx.slice(0,6)+'…'+w.tx.slice(-4)):'—'}</a></td>
-    </tr>`;
-  }).join('');
-  if (table) table.style.display='table';
-}
-
-/* ── Render tokenomics ── */
-function gaRenderTokenomics() {
-  const TOTAL=5_000_000_000;
-  const TGE=new Date('2025-05-15T00:00:00Z');
-  const today=new Date();
-  const categories=[
-    {name:'Seed',alloc:0.05,cliff:6,vest:12,color:'#1a7a4a'},
-    {name:'Partnerships & Growth',alloc:0.07,cliff:6,vest:12,color:'rgba(26,122,74,0.55)'},
-    {name:'Marketing & Incubation',alloc:0.03,cliff:3,vest:9,color:'rgba(26,122,74,0.35)'},
-    {name:'Private Sale',alloc:0.07,cliff:0,vest:0,color:'#1a5a9a'},
-    {name:'Strategic Reserve',alloc:0.10,cliff:0,vest:12,color:'rgba(26,90,154,0.5)'},
-    {name:'Liquidity',alloc:0.10,cliff:0,vest:0,color:'#c8960a'},
-    {name:'Airdrop',alloc:0.04,cliff:1,vest:6,color:'#a02020'},
-    {name:'Governance',alloc:0.30,cliff:12,vest:36,color:'#5a2a8a'},
-    {name:'Treasury',alloc:0.10,cliff:0,vest:0,color:'rgba(90,42,138,0.5)'},
-    {name:'T-RIZE Team',alloc:0.14,cliff:24,vest:24,color:'rgba(200,150,10,0.55)'},
-  ];
-  function unlockedAt(cat,m){const t=TOTAL*cat.alloc;if(cat.vest===0)return t;if(m<cat.cliff)return 0;return Math.min(t,t*((m-cat.cliff)/cat.vest));}
-
-  // Doughnut
-  const cvA=document.getElementById('ga-chart-alloc');
-  if (cvA&&!gaCharts.alloc) {
-    gaCharts.alloc=new Chart(cvA.getContext('2d'),{
-      type:'doughnut',
-      data:{labels:categories.map(c=>c.name),datasets:[{data:categories.map(c=>c.alloc*100),backgroundColor:categories.map(c=>c.color),borderColor:'#fff',borderWidth:2,hoverOffset:8}]},
-      options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#0d2d4e',titleColor:'#fff',bodyColor:'#e8f0f7',callbacks:{label:c=>` ${c.label}: ${Math.round(c.parsed*10)/10}%`}}}},
-    });
-  }
-
-  // Vesting
-  const MONTHS=49;
-  const vestLabels=Array.from({length:MONTHS},(_,m)=>{const d=new Date(TGE);d.setUTCMonth(d.getUTCMonth()+m);return d.toLocaleDateString('en-US',{month:'short',year:'2-digit'});});
-  const cvV=document.getElementById('ga-chart-vesting');
-  if (cvV&&!gaCharts.vesting) {
-    const vestOpts=gaBaseOpts();
-    vestOpts.scales.y.title={display:true,text:'RIZE circulating',color:'#666',font:{size:11}};
-    vestOpts.scales.x.stacked=true; vestOpts.scales.y.stacked=true;
-    gaCharts.vesting=new Chart(cvV.getContext('2d'),{
-      type:'line',
-      data:{labels:vestLabels,datasets:categories.map(cat=>({label:cat.name,data:Array.from({length:MONTHS},(_,m)=>unlockedAt(cat,m)),borderColor:cat.color,backgroundColor:cat.color.startsWith('rgba')?cat.color:cat.color+'28',fill:true,tension:0.2,pointRadius:0,borderWidth:1.5}))},
-      options:vestOpts,
-    });
-  }
-
-  // Burn events table
-  const rizeBurnEvents=[
-    {date:'2025-12-22',amount:50_000_000,tx:'https://basescan.org/tx/0xf38598cddf8f4a9a222b994748ba00d917a55f2282f92c048b9afee76951dfa3'},
-  ];
-  const now=new Date();
-  const burnRows=rizeBurnEvents.map(ev=>{
-    const d=new Date(ev.date); const dAgo=Math.round((now-d)/86400000);
-    return `<tr>
-      <td style="color:#1a7a4a;white-space:nowrap">${d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})}</td>
-      <td style="color:#666">${dAgo}d ago</td>
-      <td style="font-weight:700;color:#111">${(ev.amount/1e6).toFixed(0)}M RIZE</td>
-      <td><a href="${ev.tx}" target="_blank" rel="noopener" style="color:#0d2d4e;font-size:12px">View on Basescan ↗</a></td>
-    </tr>`;
-  }).join('');
-  const burnEl=document.getElementById('ga-unlock-burn');
-  if (burnEl) burnEl.innerHTML=`<div style="overflow-x:auto"><table class="ga-tok-table" style="margin-top:0">
-    <thead><tr><th>Date</th><th>Ago</th><th>Amount Burned</th><th>Transaction</th></tr></thead>
-    <tbody>${burnRows}</tbody>
-  </table></div>`;
-
-  // Unlock events
-  function fmtDate(d){return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});}
-  function fmtTokens(n){if(n>=1.5e9)return(n/1e9).toFixed(1)+'B';if(n>=1e9)return(n/1e9).toFixed(2)+'B';if(n>=1e6)return Math.round(n/1e6)+'M';return n.toLocaleString();}
-  const pendingEvts=[],ongoingEvts=[],doneEvts=[];
-  categories.forEach(cat=>{
-    const tokens=TOTAL*cat.alloc;
-    if(cat.vest===0){doneEvts.push({date:new Date(TGE),label:cat.name,daily:0,tokens,cliff:'—',vesting:'—',vestEnd:new Date(TGE)});return;}
-    const cliffDate=new Date(TGE); cliffDate.setUTCMonth(cliffDate.getUTCMonth()+cat.cliff);
-    const vestDays=cat.vest*30; const dailyRelease=Math.round(tokens/vestDays);
-    const vestEndDate=new Date(cliffDate); vestEndDate.setUTCDate(vestEndDate.getUTCDate()+vestDays);
-    const ev={date:cliffDate,label:cat.name,daily:dailyRelease,tokens,cliff:cat.cliff===0?'0m':cat.cliff+'m',vesting:cat.vest+'m',vestEnd:vestEndDate};
-    if(vestEndDate<=today)doneEvts.push(ev);
-    else if(cliffDate>today)pendingEvts.push(ev);
-    else ongoingEvts.push(ev);
-  });
-  pendingEvts.sort((a,b)=>a.date-b.date); ongoingEvts.sort((a,b)=>a.vestEnd-b.vestEnd); doneEvts.sort((a,b)=>b.date-a.date);
-  function buildTable(events,type){
-    if(!events.length) return '<p style="color:#888;font-size:13px;padding:12px 0">No events in this category.</p>';
-    const thDate=type==='pending'?'First Release Date':type==='ongoing'?'Vesting Started':'Completed';
-    const thTime=type==='pending'?'Starts In':type==='ongoing'?'Ends In':'Ended';
-    return `<div style="overflow-x:auto"><table class="ga-tok-table" style="margin-top:0">
-      <thead><tr><th>${thDate}</th><th>${thTime}</th><th>Category</th><th>Total RIZE</th><th>Cliff</th><th>Vesting</th><th>Daily Release</th><th>Release End</th></tr></thead>
-      <tbody>${events.map(e=>{
-        let tv; if(type==='pending')tv=Math.round((e.date-today)/86400000)+'d'; else if(type==='ongoing')tv=Math.round((e.vestEnd-today)/86400000)+'d'; else tv=Math.round((today-e.vestEnd)/86400000)+'d ago';
-        const dc=type==='pending'?'#7a5a00':type==='ongoing'?'#1a7a4a':'#888';
-        const ds=(type==='done'||e.daily===0)?'—':e.daily.toLocaleString()+' /day';
-        return `<tr>
-          <td style="color:${dc};white-space:nowrap">${fmtDate(e.date)}</td>
-          <td style="color:#888">${tv}</td>
-          <td style="font-weight:700;color:#111">${e.label}</td>
-          <td style="color:#111">${fmtTokens(e.tokens)}</td>
-          <td style="color:#888">${e.cliff}</td>
-          <td style="color:#888">${e.vesting}</td>
-          <td style="color:#111">${ds}</td>
-          <td style="color:#888;white-space:nowrap">${fmtDate(e.vestEnd)}</td>
-        </tr>`;
-      }).join('')}</tbody>
-    </table></div>`;
-  }
-  const pEl=document.getElementById('ga-unlock-pending');
-  const oEl=document.getElementById('ga-unlock-ongoing');
-  const dEl=document.getElementById('ga-unlock-done');
-  if(pEl)pEl.innerHTML=buildTable(pendingEvts,'pending');
-  if(oEl)oEl.innerHTML=buildTable(ongoingEvts,'ongoing');
-  if(dEl)dEl.innerHTML=buildTable(doneEvts,'done');
-  const tabs=document.querySelectorAll('#ga-unlock-tabs .ga-unlock-tab');
-  if(tabs[1])tabs[1].textContent=`Next Unlocks (${pendingEvts.length})`;
-  if(tabs[2])tabs[2].textContent=`Ongoing Releases (${ongoingEvts.length})`;
-  if(tabs[3])tabs[3].textContent=`Past Unlocks (${doneEvts.length})`;
-}
-
-/* ── Unlock tab switch ── */
-window.gaUnlockSwitch = function(tab, btn) {
-  document.querySelectorAll('#ga-unlock-tabs .ga-unlock-tab').forEach(b=>b.classList.remove('ga-active'));
-  btn.classList.add('ga-active');
-  ['burn','pending','ongoing','done'].forEach(k=>{
-    const el=document.getElementById('ga-unlock-'+k);
-    if(el){el.classList.remove('ga-visible');el.style.display='none';}
-  });
-  const el=document.getElementById('ga-unlock-'+tab);
-  if(el){el.classList.add('ga-visible');el.style.display='block';}
-};
-
-/* ── Sub-module tab switch ── */
-window.gaModSelectChange = function(sel) {
-  const tab = sel.value;
-  document.querySelectorAll('.ga-mod-panel').forEach(p=>{p.classList.remove('ga-mod-visible');p.style.display='none';});
-  const el=document.getElementById('ga-mod-'+tab);
-  if(el){el.classList.add('ga-mod-visible');el.style.display='block';}
-  if(tab==='tokenomics'&&!gaCharts.alloc) gaRenderTokenomics();
-};
-
-/* ── Main init ── */
-async function gaInit() {
-  if (CONV.initialized) return;
-  CONV.initialized=true;
-  try {
-    const [history, lastUnbonding]=await Promise.all([gaFetchHistory(), gaFetchUnbondingQueue()]);
-    const govSeries=gaBuildSeriesFromJSON(history.bondedSeries);
-    const cexSeries=gaBuildSeriesFromJSON(history.cexSeries);
-    const lastBonded=govSeries.data.length?govSeries.data[govSeries.data.length-1]:0;
-    const lastCex=cexSeries.data.length?cexSeries.data[cexSeries.data.length-1]:0;
-    gaRenderMainChart(govSeries,cexSeries);
-    gaRenderFlowChart(govSeries);
-    gaRenderLive(lastBonded,lastUnbonding,lastCex);
-    gaRenderGovDeltas(govSeries);
-    gaRenderCexDeltas(cexSeries);
-    gaRenderWhales(history.whales||[],history.addressLabels||{});
-    gaRenderTokenomics();
-  } catch(err) {
-    console.error('Governance Activity error:', err);
-    const el=document.getElementById('ga-loading-main');
-    if(el){el.textContent='Error loading data. Please refresh.';el.style.color='#a02020';}
-  }
-}
-
-/* ── Mobile grid fix for tokenomics ── */
-function fixTokGrid(){
-  const g=document.getElementById('ga-tok-grid');
-  if(!g)return;
-  if(window.innerWidth<600){g.style.gridTemplateColumns='1fr';}
-  else{g.style.gridTemplateColumns='1fr 1.4fr';}
-}
-
-/* ── Boot ── */
-document.addEventListener('DOMContentLoaded', function() {
-  ripLoad();
-  setInterval(ripLoad, 60000);
-  gaInit();
-  fixTokGrid();
-  window.addEventListener('resize', fixTokGrid);
-  // Set simulator date default to today
-  const dateInput = document.getElementById('bc-sim-date');
-  if (dateInput) dateInput.value = new Date().toISOString().slice(0,10);
-});
-
-/* ══════════════════════════════════════════════════════════════
-   GOV MODULE SWITCH
-══════════════════════════════════════════════════════════════ */
-window.govModSwitch = function(tab) {
-  ['proposals','calculator'].forEach(k => {
-    const el = document.getElementById('gov-mod-'+k);
-    if (el) { el.classList.remove('bc-visible'); el.style.display='none'; }
-  });
-  const el = document.getElementById('gov-mod-'+tab);
-  if (el) { el.classList.add('bc-visible'); el.style.display='block'; }
-};
-
-/* ══════════════════════════════════════════════════════════════
-   BOND POWER CALCULATOR
-══════════════════════════════════════════════════════════════ */
-const BC = {
-  GOV_CONTRACT : '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE',
-  RPC          : 'https://mainnet.base.org',
-  DECIMALS     : 1e18,
-  MAX_MONTHS   : 36,
-  MAX_BOOST    : 3.0,
-  chart        : null,
-};
-
-/* ── Toggle My Bond / Simulator ── */
-window.bcSwitch = function(which, btn) {
-  document.querySelectorAll('.ga-toggle').forEach(b => {
-    if (b.id === 'bc-btn-lookup' || b.id === 'bc-btn-sim') b.classList.remove('active');
-  });
-  btn.classList.add('active');
-  document.getElementById('bc-panel-lookup').style.display = which === 'lookup' ? 'block' : 'none';
-  document.getElementById('bc-panel-sim').style.display    = which === 'sim'    ? 'block' : 'none';
-};
-
-/* ── RPC call helper ── */
-async function bcRpc(method, params) {
-  const res = await fetch(BC.RPC, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ jsonrpc:'2.0', id:1, method, params })
-  });
-  return res.json();
-}
-
-async function bcCall(data) {
-  const res = await bcRpc('eth_call', [{ to: BC.GOV_CONTRACT, data }, 'latest']);
-  return res.result;
-}
-
-/* ── ABI decode uint256 ── */
-function bcDecodeUint(hex) {
-  if (!hex || hex === '0x') return null;
-  try { return BigInt(hex); } catch(e) { return null; }
-}
-
-/* ── ABI decode getBond tuple: (uint256 timeMarker, uint256 amount, uint16 poolId) ── */
-function bcDecodeBond(hex) {
-  if (!hex || hex === '0x' || hex.length < 194) return null;
-  // Remove 0x, split into 64-char chunks
-  const d = hex.slice(2);
-  const timeMarker = BigInt('0x' + d.slice(0,   64));
-  const amount     = BigInt('0x' + d.slice(64,  128));
-  const poolId     = BigInt('0x' + d.slice(128, 192));
-  return { timeMarker, amount, poolId };
-}
-
-/* ── Maturity calculation ── */
-function bcMaturity(timeMarkerSec) {
-  const now        = Date.now() / 1000;
-  const elapsed    = Math.max(0, now - Number(timeMarkerSec));
-  const months     = elapsed / (365.25 / 12 * 86400);
-  const pct        = Math.min(months / BC.MAX_MONTHS, 1);
-  const boost      = 1 + pct * (BC.MAX_BOOST - 1); // 1x → 3x
-  const maxDate    = new Date(Number(timeMarkerSec) * 1000);
-  maxDate.setMonth(maxDate.getMonth() + BC.MAX_MONTHS);
-  const daysToMax  = Math.max(0, Math.round((maxDate - Date.now()) / 86400000));
-  const yearsToMax = (daysToMax / 365.25).toFixed(1);
-  return { months, pct, boost, maxDate, daysToMax, yearsToMax };
-}
-
-/* ── Format helpers ── */
-function bcFmtRize(n) {
-  if (n >= 1e9) return (n/1e9).toFixed(3) + 'B';
-  if (n >= 1e6) return (n/1e6).toFixed(3) + 'M';
-  if (n >= 1e3) return n.toLocaleString('en-US', {maximumFractionDigits:2});
-  return n.toFixed(2);
-}
-function bcFmtDate(d) {
-  return d.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
-}
-
-/* ── Render result cards ── */
-function bcRenderCards(amount, mat, bondDate, bondId, onChainBoost) {
-  const boost = onChainBoost || mat.boost;
-  const vp = onChainBoost ? amount * onChainBoost : amount * mat.boost;
-  // Use on-chain boost for progress if available
-  const displayBoost = onChainBoost || mat.boost;
-  const displayPct   = onChainBoost ? Math.min((onChainBoost - 1) / 2, 1) : mat.pct;
-  return `
-    <div class="bc-result-grid">
-      <div class="bc-card bc-highlight">
-        <span class="bc-card-label">Voting Power</span>
-        <span class="bc-card-value">${bcFmtRize(vp)}</span>
-        <span class="bc-card-sub" style="color:#444">votes</span>
-      </div>
-      <div class="bc-card">
-        <span class="bc-card-label">Bonded Amount</span>
-        <span class="bc-card-value">${bcFmtRize(amount)}</span>
-        <span class="bc-card-sub" style="color:#444">RIZE</span>
-      </div>
-      <div class="bc-card bc-gold">
-        <span class="bc-card-label">Maturity Boost</span>
-        <span class="bc-card-value">${displayBoost.toFixed(3)}×</span>
-        <span class="bc-card-sub">${displayPct < 1 ? (displayPct*100).toFixed(1)+'% of max' : 'fully mature'}</span>
-      </div>
-      <div class="bc-card">
-        <span class="bc-card-label">Bond Created</span>
-        <span class="bc-card-value">${bcFmtDate(bondDate)}</span>
-        <span class="bc-card-sub">${Math.round(mat.months)} months ago</span>
-      </div>
-      <div class="bc-card">
-        <span class="bc-card-label">Max Voting Power Date</span>
-        <span class="bc-card-value">${bcFmtDate(mat.maxDate)}</span>
-        <span class="bc-card-sub">${mat.pct < 1 ? mat.yearsToMax + ' years remaining' : 'Reached ✓'}</span>
-      </div>
-      <div class="bc-card">
-        <span class="bc-card-label">Max Voting Power</span>
-        <span class="bc-card-value">${bcFmtRize(amount * BC.MAX_BOOST)}</span>
-        <span class="bc-card-sub">at 3× boost</span>
-      </div>
-    </div>
-    <div class="bc-progress-wrap">
-      <div class="bc-progress-label">Maturity Progress — ${displayPct < 1 ? (displayPct*100).toFixed(1)+'%' : '100% — Fully Mature'}</div>
-      <div class="bc-progress-bar"><div class="bc-progress-fill" style="width:${(displayPct*100).toFixed(1)}%"></div></div>
-      <div class="bc-progress-sub" style="color:#444">Starts at 1× · reaches 3× at 36 months · linear progression</div>
-    </div>`;
-}
-
-/* ── Lookup by Bond ID ── */
-async function bcLookupById(bondId) {
-  const id64 = bondId.toString(16).padStart(64, '0');
-
-  // getBond(uint256) = 0xd8fe7642 → {timeMarker, amount, poolId}
-  const bondHex = await bcCall('0xd8fe7642' + id64);
-  const bond    = bcDecodeBond(bondHex);
-  if (!bond || bond.amount === 0n) return null;
-
-  // getNormalizedWeight(uint256) = 0x8eab59da → VP in fixed-point (/100 = votes)
-  const nwHex = await bcCall('0x8eab59da' + id64);
-  const nwRaw = bcDecodeUint(nwHex);
-
-  const amount   = Number(bond.amount) / BC.DECIMALS;
-  const bondDate = new Date(Number(bond.timeMarker) * 1000);
-  const mat      = bcMaturity(bond.timeMarker);
-
-  // On-chain voting power: getNormalizedWeight / 100
-  const vp = nwRaw && nwRaw > 0n ? Number(nwRaw) / 100 : amount * mat.boost;
-  // On-chain boost: vp / amount
-  const onChainBoost = vp / amount;
-
-  return { amount, bondDate, mat, vp, onChainBoost, poolId: Number(bond.poolId), bondId };
-}
-
-/* ── Main lookup handler ── */
-window.bcLookup = async function() {
-  const raw = (document.getElementById('bc-input').value || '').trim();
-  const resultEl = document.getElementById('bc-lookup-result');
-  const btn = document.getElementById('bc-search-btn');
-  if (!raw) return;
-
-  btn.disabled = true;
-  resultEl.innerHTML = '<div class="bc-loading">Fetching on-chain data…</div>';
-
-  try {
-    let data = null;
-
-    if (/^\d+$/.test(raw)) {
-      // Bond ID lookup
-      data = await bcLookupById(parseInt(raw));
-      if (!data) {
-        resultEl.innerHTML = '<div class="bc-error">Bond #' + raw + ' not found or has zero balance.</div>';
-        btn.disabled = false; return;
-      }
-      resultEl.innerHTML = `<div style="font-family:'DM Mono',monospace;font-size:11px;color:#111;margin-bottom:12px">Bond #${raw} · Pool ${data.poolId} · on-chain data via Base Mainnet</div>` + bcRenderCards(data.amount, data.mat, data.bondDate, raw, data.onChainBoost)
-        + `<div class="bc-chart-wrap" id="bc-lookup-chart-wrap" style="margin-top:16px"><canvas id="bc-lookup-chart"></canvas></div>`;
-      bcDrawLookupChart(data.amount, data.bondDate);
-
-    } else if (/^0x[0-9a-fA-F]{40}$/.test(raw)) {
-      // Wallet lookup — bonded(address) = 0xc9836074
-      const padded = '000000000000000000000000' + raw.slice(2).toLowerCase();
-      const hex = await bcCall('0xc9836074' + padded);
-      const raw2 = bcDecodeUint(hex);
-      if (!raw2 || raw2 === 0n) {
-        resultEl.innerHTML = '<div class="bc-error">No bonded RIZE found for this address.</div>';
-        btn.disabled = false; return;
-      }
-      const amount = Number(raw2) / BC.DECIMALS;
-      // For wallet lookup we only have total bonded — show simplified view
-      resultEl.innerHTML = `
-        <div style="font-family:'DM Mono',monospace;font-size:11px;color:#888;margin-bottom:12px">${raw.slice(0,6)}…${raw.slice(-4)} · total bonded across all bonds</div>
-        <div class="bc-result-grid" style="grid-template-columns:1fr 1fr">
-          <div class="bc-card bc-highlight">
-            <span class="bc-card-label">Total Bonded</span>
-            <span class="bc-card-value">${bcFmtRize(amount)}</span>
-            <span class="bc-card-sub">RIZE across all bonds</span>
-          </div>
-          <div class="bc-card">
-            <span class="bc-card-label">Max Potential Voting Power</span>
-            <span class="bc-card-value">${bcFmtRize(amount * BC.MAX_BOOST)}</span>
-            <span class="bc-card-sub">at 3× full maturity</span>
+          <!-- Boost curve chart -->
+          <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px;text-align:center">Boost Curve — VP vs Bond Age</div>
+          <div class="ctx-chart-wrap" style="height:240px;">
+            <canvas id="calc-chart"></canvas>
           </div>
         </div>
-        <div style="font-family:'DM Mono',monospace;font-size:12px;color:#111;padding:12px 0">For per-bond breakdown with maturity details, search by Bond #.</div>`;
+      </section>
+    </div>
 
-    } else {
-      resultEl.innerHTML = '<div class="bc-error">Enter a Bond # (number) or a wallet address (0x…).</div>';
+  </div><!-- end hub-wrap -->
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="footer-logo"><img src="/assets/header-footer/tokerize-header-footer.png" alt="Tokerize"/></div>
+    <nav class="footer-nav">
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/hub">Data Hub</a>
+    </nav>
+    <div class="footer-copy">&copy; 2025&ndash;2026 Tokerize &mdash; Community Data Platform</div>
+  </footer>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       JAVASCRIPT
+  ═══════════════════════════════════════════════════════════ -->
+  <script>
+  /* ═══════════════════════════ CONSTANTS ═══════════════════════════ */
+  const DECIMALS        = 1e18;
+  const TOTAL_SUPPLY    = 5_000_000_000;
+  const MAX_BOOST       = 3.0;
+  const MAX_MONTHS      = 36;
+  const GOV_CONTRACT    = '0x5a134098bDBEb05Da9eAc35439c5624547ed26eE';
+  const RIZE_TOKEN      = '0x9818B6c09f5ECc843060927E8587c427C7C93583';
+  const BASE_RPC        = 'https://mainnet.base.org';
+  const WHALE_THRESHOLD = 5_000_000;
+
+  const CEX_MAP = {
+    '0x02ac4617fe004cf8cd9c988ff9c905b2ec676c2d': 'Kraken Hot 1',
+    '0x7dafba1d69f6c01ae7567ffd7b046ca03b706f83': 'Kraken Cold 1',
+    '0xd2dd7b597fd2435b6db61ddf48544fd931e6869f': 'Kraken Cold 2',
+    '0xcc282e2004428939ee5149a9e7872f0b4d5d5ec7': 'Kraken Hot 2',
+    '0x9b0c45d46d386cedd98873168c36efd0dcba8d46': 'Revolut',
+    '0x4e3ae00e8323558fa5cac04b152238924aa31b60': 'MEXC',
+    '0x0d0707963952f2fba59dd06f2b425ace40b492fe': 'Gate',
+  };
+
+  /* ═══════════════════════════ RAW URLS ═══════════════════════════ */
+  const RAW_BASE = 'https://raw.githubusercontent.com/hcftrize/TOKERIZE/main/rize-governance-hub';
+  const URLS = {
+    bondBroken:    `${RAW_BASE}/bond-broken.json`,
+    poolConfig:    `${RAW_BASE}/pool-config.json`,
+    bondLifecycle: `${RAW_BASE}/bond-lifecycle.json`,
+    nftTransfers:  `${RAW_BASE}/nft-transfers.json`,
+    bondCreated:   `${RAW_BASE}/bond-created.json`,
+    bondTimemarker:`${RAW_BASE}/bond-timemarker.json`,
+  };
+
+  /* ═══════════════════════════ DATA CACHE ═══════════════════════════ */
+  const DATA = {};
+  const LOADED = {};
+
+  async function loadJSON(key) {
+    if (LOADED[key]) return DATA[key];
+    try {
+      const r = await fetch(URLS[key]);
+      if (!r.ok) throw new Error(r.status);
+      const j = await r.json();
+      DATA[key] = j.data || j;
+      LOADED[key] = true;
+      return DATA[key];
+    } catch(e) {
+      console.warn(`Failed to load ${key}:`, e);
+      LOADED[key] = false;
+      return null;
     }
-  } catch(e) {
-    console.error(e);
-    resultEl.innerHTML = '<div class="bc-error">RPC error — please try again.</div>';
-  }
-  btn.disabled = false;
-};
-
-/* ── Simulator ── */
-let bcSimChartInst = null;
-
-/* ── Draw chart for My Bond lookup ── */
-let bcLookupChartInst = null;
-function bcDrawLookupChart(amount, bondDate) {
-  const cv = document.getElementById('bc-lookup-chart');
-  if (!cv) return;
-  const timeMarker = bondDate.getTime() / 1000;
-  const mat = bcMaturity(timeMarker);
-  const labels = [], vpData = [], boostData = [];
-  for (let m = 0; m <= 36; m++) {
-    const d = new Date(bondDate);
-    d.setMonth(d.getMonth() + m);
-    labels.push(d.toLocaleDateString('en-US', { month:'short', year:'2-digit' }));
-    const b = Math.min(1 + (m / 36) * 2, 3);
-    vpData.push(+(amount * b).toFixed(0));
-    boostData.push(+b.toFixed(3));
-  }
-  if (bcLookupChartInst) { bcLookupChartInst.destroy(); bcLookupChartInst = null; }
-  bcLookupChartInst = new Chart(cv.getContext('2d'), {
-    type: 'line',
-    data: { labels, datasets: [
-      { label:'Voting Power', data:vpData, borderColor:'#0d2d4e', backgroundColor:'rgba(13,45,78,0.08)', fill:true, tension:0.2, pointRadius:0, borderWidth:2.5, yAxisID:'y' },
-      { label:'Maturity Boost', data:boostData, borderColor:'#c8960a', backgroundColor:'transparent', fill:false, tension:0.2, pointRadius:0, borderWidth:2, borderDash:[5,3], yAxisID:'y2' },
-    ]},
-    options: {
-      responsive:true, maintainAspectRatio:false,
-      interaction:{ mode:'index', intersect:false },
-      plugins:{
-        legend:{ labels:{ color:'#444', font:{family:'Trebuchet MS',size:12}, boxWidth:12, padding:16 } },
-        tooltip:{ backgroundColor:'#0d2d4e', titleColor:'#fff', bodyColor:'#e8f0f7',
-          callbacks:{ label: c => c.datasetIndex===0 ? ' Voting Power: '+bcFmtRize(c.parsed.y)+' votes' : ' Boost: '+c.parsed.y.toFixed(3)+'×' }
-        },
-      },
-      scales:{
-        x:{ ticks:{ color:'#666', font:{size:11}, maxRotation:35, autoSkip:true, maxTicksLimit:12 }, grid:{ color:'rgba(0,0,0,0.05)' } },
-        y:{ ticks:{ color:'#666', font:{size:11}, callback: v=>bcFmtRize(v) }, grid:{ color:'rgba(0,0,0,0.05)' }, title:{ display:true, text:'Voting Power', color:'#666', font:{size:11} } },
-        y2:{ position:'right', ticks:{ color:'#c8960a', font:{size:11}, callback: v=>v.toFixed(1)+'×' }, grid:{display:false}, title:{ display:true, text:'Boost', color:'#c8960a', font:{size:11} }, min:1, max:3 },
-      },
-    },
-  });
-}
-
-window.bcSimCalc = function() {
-  const amountRaw = parseFloat(document.getElementById('bc-sim-amount').value);
-  const dateRaw   = document.getElementById('bc-sim-date').value;
-  const resultEl  = document.getElementById('bc-sim-result');
-  const chartWrap = document.getElementById('bc-sim-chart-wrap');
-
-  if (!amountRaw || amountRaw <= 0 || !dateRaw) {
-    resultEl.innerHTML = '';
-    chartWrap.style.display = 'none';
-    return;
   }
 
-  const bondDate    = new Date(dateRaw + 'T00:00:00Z');
-  const timeMarker  = bondDate.getTime() / 1000;
-  const mat         = bcMaturity(timeMarker);
-  const amount      = amountRaw;
-
-  resultEl.innerHTML = bcRenderCards(amount, mat, bondDate, null);
-  chartWrap.style.display = 'block';
-
-  // Build 36-month curve
-  const labels = [], vpData = [], boostData = [];
-  for (let m = 0; m <= 36; m++) {
-    const d = new Date(bondDate);
-    d.setMonth(d.getMonth() + m);
-    labels.push(d.toLocaleDateString('en-US', { month:'short', year:'2-digit' }));
-    const b  = Math.min(1 + (m / 36) * 2, 3);
-    vpData.push(+(amount * b).toFixed(0));
-    boostData.push(+b.toFixed(3));
+  /* ═══════════════════════════ FORMAT HELPERS ═══════════════════════════ */
+  function fmt(n, decimals=2) {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    if (n >= 1e9) return (n/1e9).toFixed(decimals) + 'B';
+    if (n >= 1e6) return (n/1e6).toFixed(decimals) + 'M';
+    if (n >= 1e3) return (n/1e3).toFixed(decimals) + 'K';
+    return n.toFixed(decimals);
+  }
+  function fmtRize(n) { return fmt(n,2) + ' RIZE'; }
+  function fmtAddr(addr) { return addr ? addr.slice(0,6)+'…'+addr.slice(-4) : '—'; }
+  function fmtPct(n) { return n != null ? n.toFixed(2) + '%' : '—'; }
+  function parseAmt(raw) { return parseFloat(raw) || 0; }
+  function tsToDate(ts) {
+    const d = new Date(parseInt(ts)*1000);
+    return d.toISOString().slice(0,10);
   }
 
-  // Mark current position
-  const nowMonths = Math.min(mat.months, 36);
+  /* ═══════════════════════════ CHART.JS DEFAULTS ═══════════════════════════ */
+  Chart.defaults.color = '#b6c1d8';
+  Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+  Chart.defaults.font.family = "'Rajdhani', sans-serif";
 
-  const cv = document.getElementById('bc-sim-chart');
-  if (bcSimChartInst) { bcSimChartInst.destroy(); bcSimChartInst = null; }
-
-  bcSimChartInst = new Chart(cv.getContext('2d'), {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'Voting Power',
-          data: vpData,
-          borderColor: '#0d2d4e',
-          backgroundColor: 'rgba(13,45,78,0.08)',
-          fill: true, tension: 0.2, pointRadius: 0, borderWidth: 2.5, yAxisID: 'y',
-        },
-        {
-          label: 'Maturity Boost',
-          data: boostData,
-          borderColor: '#c8960a',
-          backgroundColor: 'transparent',
-          fill: false, tension: 0.2, pointRadius: 0, borderWidth: 2, borderDash: [5,3], yAxisID: 'y2',
-        },
-      ],
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
+  function chartDefaults(extra={}) {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 600 },
       plugins: {
-        legend: { labels: { color:'#444', font: { family:'Trebuchet MS', size:12 }, boxWidth:12, padding:16 } },
+        legend: { display: false },
         tooltip: {
-          backgroundColor: '#0d2d4e', titleColor:'#fff', bodyColor:'#e8f0f7',
-          callbacks: {
-            label: c => c.datasetIndex === 0
-              ? ' Voting Power: ' + bcFmtRize(c.parsed.y) + ' votes'
-              : ' Boost: ' + c.parsed.y.toFixed(3) + '×'
-          }
+          backgroundColor: '#060818',
+          borderColor: 'rgba(126,224,255,0.3)',
+          borderWidth: 1,
+          titleColor: '#7ee0ff',
+          bodyColor: '#f7f2e8',
+          padding: 10,
         },
-        annotation: nowMonths > 0 ? {
-          annotations: {
-            now: { type:'line', xMin: Math.floor(nowMonths), xMax: Math.floor(nowMonths), borderColor:'#1a7a4a', borderWidth:2, borderDash:[4,3], label:{content:'Today', display:true, position:'start', color:'#1a7a4a', font:{size:11}} }
-          }
-        } : {},
+        ...extra.plugins
       },
       scales: {
-        x:  { ticks:{ color:'#666', font:{size:11}, maxRotation:35, autoSkip:true, maxTicksLimit:12 }, grid:{color:'rgba(0,0,0,0.05)'} },
-        y:  { ticks:{ color:'#666', font:{size:11}, callback: v=>bcFmtRize(v) }, grid:{color:'rgba(0,0,0,0.05)'}, title:{display:true,text:'Voting Power',color:'#666',font:{size:11}} },
-        y2: { position:'right', ticks:{ color:'#c8960a', font:{size:11}, callback: v=>v.toFixed(1)+'×' }, grid:{display:false}, title:{display:true,text:'Boost',color:'#c8960a',font:{size:11}}, min:1, max:3 },
+        x: { grid:{ color:'rgba(255,255,255,0.04)' }, ticks:{ color:'#b6c1d8', font:{size:11} } },
+        y: { grid:{ color:'rgba(255,255,255,0.06)' }, ticks:{ color:'#b6c1d8', font:{size:11} } },
+        ...(extra.scales || {})
       },
-    },
+      ...extra
+    };
+  }
+
+  /* ═══════════════════════════ NAVIGATION ═══════════════════════════ */
+  const PANELS = ['conviction','tokenomics','leaderboard','heatmap','concentration','calendar','wallet','whale','maturity','momentum','bondage','calculator'];
+
+  function govSwitch(key) {
+    PANELS.forEach(p => {
+      const el = document.getElementById('gov-panel-'+p);
+      if (el) el.classList.toggle('active', p === key);
+    });
+    // Lazy init modules
+    if (key === 'conviction')  initConviction();
+    if (key === 'tokenomics')  initTokenomics();
+    if (key === 'heatmap')     initHeatmap();
+    if (key === 'calendar')    initCalendar();
+    if (key === 'whale')       initWhale();
+    if (key === 'momentum')    initMomentum();
+    if (key === 'calculator')  initCalculator();
+    if (key === 'wallet')      initWalletUI();
+  }
+
+  /* ═══════════════════════════ COLLAPSIBLE SECTIONS ═══════════════════════════ */
+  function toggleSection(titlebarRow) {
+    const section = titlebarRow.closest('.section');
+    const body = section.querySelector('.section-body');
+    if (!body) return;
+    const collapsed = body.classList.toggle('collapsed');
+    section.classList.toggle('hub-collapsed', collapsed);
+  }
+
+  /* ═══════════════════════════ SCREENSHOT ═══════════════════════════ */
+  function takeScreenshot(sectionId, filename) {
+    const el = document.getElementById(sectionId);
+    if (!el) return;
+    el.classList.add('screenshot-mode');
+    html2canvas(el, { backgroundColor:'#000000', scale:2, useCORS:true, logging:false })
+      .then(canvas => {
+        el.classList.remove('screenshot-mode');
+        const a = document.createElement('a');
+        a.download = `tokerize-${filename}-${new Date().toISOString().slice(0,10)}.png`;
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+      })
+      .catch(() => el.classList.remove('screenshot-mode'));
+  }
+
+  /* ═══════════════════════════ LIVE BONDED (Base RPC) ═══════════════════════════ */
+  async function loadLiveBonded() {
+    try {
+      const balanceOfSig = '0x70a08231';
+      const paddedAddr = GOV_CONTRACT.slice(2).padStart(64,'0');
+      const payload = { jsonrpc:'2.0', method:'eth_call', params:[{ to: RIZE_TOKEN, data: balanceOfSig + paddedAddr }, 'latest'], id:1 };
+      const r = await fetch(BASE_RPC, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+      const j = await r.json();
+      const bonded = parseInt(j.result, 16) / DECIMALS;
+      const pct = (bonded / TOTAL_SUPPLY * 100).toFixed(2);
+      document.getElementById('hero-bonded').textContent = fmt(bonded,2) + ' RIZE';
+      document.getElementById('hero-bonded-pct').textContent = pct + '% of total supply';
+      document.getElementById('conv-total-bonded').textContent = fmt(bonded,2);
+      document.getElementById('conv-total-bonded-usd').textContent = pct + '% of 5B supply';
+      document.getElementById('conv-pct-bonded').textContent = pct + '%';
+    } catch(e) {
+      document.getElementById('hero-bonded').textContent = 'RPC error';
+    }
+  }
+
+  /* ═══════════════════════════ MODULE: CONVICTION ═══════════════════════════ */
+  let convLoaded = false;
+  let convChart = null;
+  async function initConviction() {
+    if (convLoaded) return;
+    convLoaded = true;
+    const d = await loadJSON('bondBroken');
+    if (!d) { document.getElementById('conv-total-breaks').textContent = 'Error'; return; }
+
+    const events = d.bondBrokenEvents || [];
+    const totalBreaks = events.length;
+    const totalRize = events.reduce((s,e) => s + parseAmt(e.amount), 0) / DECIMALS;
+
+    document.getElementById('conv-total-breaks').textContent = totalBreaks.toLocaleString();
+    document.getElementById('conv-total-breaks-sub').textContent = 'all time';
+    document.getElementById('conv-total-released').textContent = fmt(totalRize, 2);
+
+    // Time windows
+    const now = Date.now()/1000;
+    const windows = { '1d': 86400, '7d': 86400*7, '30d': 86400*30, '90d': 86400*90 };
+    for (const [key, secs] of Object.entries(windows)) {
+      const cutoff = now - secs;
+      const filtered = events.filter(e => parseInt(e.timestamp) > cutoff);
+      const rize = filtered.reduce((s,e) => s + parseAmt(e.amount), 0) / DECIMALS;
+      document.getElementById('conv-flow-'+key).textContent = filtered.length.toLocaleString();
+      document.getElementById('conv-flow-'+key+'-rize').textContent = fmt(rize,2) + ' RIZE';
+    }
+
+    // Daily chart — last 90 days
+    const daily = {};
+    const cutoff90 = now - 86400*90;
+    events.filter(e => parseInt(e.timestamp) > cutoff90).forEach(e => {
+      const day = tsToDate(e.timestamp);
+      if (!daily[day]) daily[day] = 0;
+      daily[day] += parseAmt(e.amount) / DECIMALS;
+    });
+    const labels = Object.keys(daily).sort();
+    const values = labels.map(d => daily[d]);
+
+    if (convChart) convChart.destroy();
+    const ctx = document.getElementById('conv-chart-daily').getContext('2d');
+    convChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          data: values,
+          backgroundColor: values.map(v => v > WHALE_THRESHOLD ? 'rgba(255,138,216,0.7)' : 'rgba(126,224,255,0.5)'),
+          borderWidth: 0,
+        }]
+      },
+      options: chartDefaults({
+        plugins: { tooltip: { callbacks: { label: ctx => fmt(ctx.raw,2) + ' RIZE' } } },
+        scales: { x: { ticks: { maxTicksLimit: 20 } } }
+      })
+    });
+
+    // Whales
+    const whales = events.filter(e => parseAmt(e.amount)/DECIMALS >= WHALE_THRESHOLD)
+      .sort((a,b) => parseAmt(b.amount) - parseAmt(a.amount))
+      .slice(0,50);
+    const tbody = document.getElementById('conv-whale-tbody');
+    if (whales.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">No whale events found</td></tr>';
+    } else {
+      tbody.innerHTML = whales.map(e => {
+        const amt = parseAmt(e.amount)/DECIMALS;
+        return `<tr>
+          <td class="td-muted">${e.date || tsToDate(e.timestamp)}</td>
+          <td class="td-cyan">#${e.nftId}</td>
+          <td class="td-pink">${fmt(amt,2)} RIZE</td>
+          <td><a href="https://basescan.org/tx/${e.txHash}" target="_blank" rel="noopener" style="color:var(--cyan);font-family:'DM Mono',monospace;font-size:12px;text-decoration:none">${fmtAddr(e.txHash)} ↗</a></td>
+        </tr>`;
+      }).join('');
+    }
+  }
+
+  /* ═══════════════════════════ MODULE: TOKENOMICS ═══════════════════════════ */
+  let tokLoaded = false;
+  async function initTokenomics() {
+    if (tokLoaded) return;
+    tokLoaded = true;
+    const d = await loadJSON('poolConfig');
+    if (!d) return;
+
+    const pools = d.pools || [];
+    const updates = d.poolUpdatedEvents || [];
+
+    if (pools.length) {
+      const p = pools[0];
+      document.getElementById('tok-base-weight').textContent = p.baseWeight || '—';
+      document.getElementById('tok-full-maturity').textContent = p.fullMaturity ? Math.round(parseInt(p.fullMaturity)/2592000) + ' mo' : '—';
+    }
+
+    // Pool table
+    const pTbody = document.getElementById('tok-pool-tbody');
+    if (pools.length === 0) {
+      pTbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">No pool data</td></tr>';
+    } else {
+      pTbody.innerHTML = pools.map(p => {
+        const fm = p.fullMaturity ? Math.round(parseInt(p.fullMaturity)/2592000) : '—';
+        return `<tr>
+          <td><span class="pool-badge">Pool ${p.poolId}</span></td>
+          <td class="td-cyan">${p.baseWeight}</td>
+          <td class="td-gold">${p.maturedWeightBonus}</td>
+          <td>${fm} months</td>
+          <td class="td-muted">${p.updatedAtDate || '—'}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Update history
+    const uTbody = document.getElementById('tok-updates-tbody');
+    const sorted = [...updates].sort((a,b) => parseInt(b.timestamp)-parseInt(a.timestamp));
+    if (sorted.length === 0) {
+      uTbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">No updates</td></tr>';
+    } else {
+      uTbody.innerHTML = sorted.map(u => `<tr>
+        <td class="td-muted">${u.date || tsToDate(u.timestamp)}</td>
+        <td><span class="pool-badge">Pool ${u.poolId}</span></td>
+        <td class="td-cyan">${u.baseWeight}</td>
+        <td class="td-gold">${u.maturedWeightBonus}</td>
+        <td>${u.fullMaturity ? Math.round(parseInt(u.fullMaturity)/2592000) + ' mo' : '—'}</td>
+        <td><a href="https://basescan.org/tx/${u.txHash}" target="_blank" rel="noopener" style="color:var(--cyan);font-family:'DM Mono',monospace;font-size:12px;text-decoration:none">${fmtAddr(u.txHash)} ↗</a></td>
+      </tr>`).join('');
+    }
+  }
+
+  /* ═══════════════════════════ MODULE: HEATMAP ═══════════════════════════ */
+  let hmLoaded = false;
+  async function initHeatmap() {
+    if (hmLoaded) return;
+    hmLoaded = true;
+    document.getElementById('hm-loading').textContent = 'Processing 97,200 bond break events…';
+
+    const d = await loadJSON('bondBroken');
+    if (!d) { document.getElementById('hm-loading').textContent = 'Error loading data'; return; }
+
+    const events = d.bondBrokenEvents || [];
+    const daily = {};
+    events.forEach(e => {
+      const day = e.date || tsToDate(e.timestamp);
+      if (!daily[day]) daily[day] = { count: 0, rize: 0 };
+      daily[day].count++;
+      daily[day].rize += parseAmt(e.amount) / DECIMALS;
+    });
+
+    const days = Object.keys(daily).sort();
+    const rizeValues = days.map(d => daily[d].rize);
+    const maxRize = Math.max(...rizeValues);
+    const totalRize = rizeValues.reduce((a,b)=>a+b,0);
+    const avgRize = totalRize / days.length;
+    const quietDays = rizeValues.filter(v => v === 0).length;
+
+    // Peak
+    const peakIdx = rizeValues.indexOf(maxRize);
+    document.getElementById('hm-peak-day').textContent = days[peakIdx] || '—';
+    document.getElementById('hm-peak-amount').textContent = fmt(maxRize,2) + ' RIZE';
+    document.getElementById('hm-avg-daily').textContent = fmt(avgRize,2);
+    document.getElementById('hm-days-count').textContent = days.length.toLocaleString();
+    document.getElementById('hm-quiet-days').textContent = quietDays.toLocaleString();
+
+    // Build heatmap
+    document.getElementById('hm-loading').style.display = 'none';
+    const container = document.getElementById('heatmap-container');
+
+    // Group by year-month for layout
+    const months = {};
+    days.forEach(day => {
+      const ym = day.slice(0,7);
+      if (!months[ym]) months[ym] = [];
+      months[ym].push(day);
+    });
+
+    let html = '<div style="overflow-x:auto"><div style="min-width:900px">';
+    for (const [ym, ymDays] of Object.entries(months).sort()) {
+      html += `<div style="margin-bottom:10px">`;
+      html += `<div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:4px;letter-spacing:1px">${ym}</div>`;
+      html += `<div style="display:flex;flex-wrap:wrap;gap:2px">`;
+      ymDays.forEach(day => {
+        const v = daily[day].rize;
+        const intensity = maxRize > 0 ? v / maxRize : 0;
+        // Color: dark green (0) → yellow → red (max)
+        let r, g, b;
+        if (intensity < 0.5) {
+          r = Math.round(intensity * 2 * 255);
+          g = Math.round(100 + intensity * 2 * 155);
+          b = 50;
+        } else {
+          r = 255;
+          g = Math.round((1 - (intensity-0.5)*2) * 200);
+          b = 50;
+        }
+        const col = `rgb(${r},${g},${b})`;
+        const opacity = 0.15 + intensity * 0.85;
+        html += `<div title="${day}: ${fmt(v,2)} RIZE (${daily[day].count} breaks)" style="width:14px;height:14px;background:${col};opacity:${opacity};cursor:pointer;flex-shrink:0" onmouseover="this.style.outline='1px solid #fff'" onmouseout="this.style.outline='none'"></div>`;
+      });
+      html += `</div></div>`;
+    }
+    html += '</div></div>';
+
+    html += `<div class="heatmap-legend">
+      <div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:rgba(0,150,50,0.3)"></div>Low breaks</div>
+      <div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:rgba(255,200,0,0.7)"></div>Medium</div>
+      <div class="heatmap-legend-item"><div class="heatmap-legend-swatch" style="background:rgba(255,60,60,0.9)"></div>High breaks</div>
+      <div class="heatmap-legend-item" style="margin-left:auto;color:var(--muted)">Hover cell for details</div>
+    </div>`;
+
+    container.innerHTML = html;
+  }
+
+  /* ═══════════════════════════ MODULE: CALENDAR ═══════════════════════════ */
+  let calLoaded = false;
+  let calChart = null;
+  let calMode = 'monthly';
+  let calData = {};
+
+  async function initCalendar() {
+    if (calLoaded) return;
+    calLoaded = true;
+    const d = await loadJSON('bondBroken');
+    if (!d) return;
+
+    const events = d.bondBrokenEvents || [];
+    const now = new Date();
+    const thisYM = now.toISOString().slice(0,7);
+    const lastYM = new Date(now.getFullYear(), now.getMonth()-1, 1).toISOString().slice(0,7);
+
+    // Daily
+    const daily = {};
+    events.forEach(e => {
+      const day = e.date || tsToDate(e.timestamp);
+      if (!daily[day]) daily[day] = { count:0, rize:0 };
+      daily[day].count++;
+      daily[day].rize += parseAmt(e.amount)/DECIMALS;
+    });
+
+    // Monthly
+    const monthly = {};
+    Object.entries(daily).forEach(([day, v]) => {
+      const ym = day.slice(0,7);
+      if (!monthly[ym]) monthly[ym] = { count:0, rize:0 };
+      monthly[ym].count += v.count;
+      monthly[ym].rize += v.rize;
+    });
+
+    calData = { daily, monthly };
+
+    // KPIs
+    const thisM = monthly[thisYM] || { count:0, rize:0 };
+    const lastM = monthly[lastYM] || { count:0, rize:0 };
+    document.getElementById('cal-this-month').textContent = thisM.count.toLocaleString();
+    document.getElementById('cal-this-month-rize').textContent = fmt(thisM.rize,2) + ' RIZE';
+    document.getElementById('cal-last-month').textContent = lastM.count.toLocaleString();
+    document.getElementById('cal-last-month-rize').textContent = fmt(lastM.rize,2) + ' RIZE';
+    document.getElementById('cal-all-time').textContent = events.length.toLocaleString();
+    const totalRize = events.reduce((s,e) => s + parseAmt(e.amount)/DECIMALS, 0);
+    document.getElementById('cal-all-rize').textContent = fmt(totalRize,2);
+
+    calRender();
+
+    // Monthly table
+    const sortedMonths = Object.keys(monthly).sort().reverse();
+    let prevRize = null;
+    const tbody = document.getElementById('cal-monthly-tbody');
+    tbody.innerHTML = sortedMonths.map(ym => {
+      const m = monthly[ym];
+      const avg = m.count > 0 ? m.rize/m.count : 0;
+      const diff = prevRize !== null ? ((m.rize - prevRize) / prevRize * 100) : null;
+      const diffStr = diff !== null ? `<span style="color:${diff>0?'var(--pink)':'#98ffb6'}">${diff>0?'+':''}${diff.toFixed(1)}%</span>` : '<span style="color:var(--muted)">—</span>';
+      prevRize = m.rize;
+      return `<tr>
+        <td class="td-muted">${ym}</td>
+        <td>${m.count.toLocaleString()}</td>
+        <td class="td-pink">${fmt(m.rize,2)} RIZE</td>
+        <td class="td-muted">${fmt(avg,2)} RIZE</td>
+        <td>${diffStr}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  function calRender() {
+    const { daily, monthly } = calData;
+    let labels, values, colors;
+
+    if (calMode === 'monthly') {
+      const keys = Object.keys(monthly).sort();
+      labels = keys;
+      values = keys.map(k => monthly[k].rize);
+      colors = values.map(() => 'rgba(126,224,255,0.55)');
+    } else {
+      const now = Date.now()/1000;
+      const cutoff = now - 86400*90;
+      const keys = Object.keys(daily).filter(d => {
+        const ts = new Date(d).getTime()/1000;
+        return ts > cutoff;
+      }).sort();
+      labels = keys;
+      values = keys.map(k => daily[k].rize);
+      colors = values.map(v => v > 50_000_000 ? 'rgba(255,138,216,0.7)' : 'rgba(126,224,255,0.5)');
+    }
+
+    if (calChart) calChart.destroy();
+    const ctx = document.getElementById('cal-chart').getContext('2d');
+    calChart = new Chart(ctx, {
+      type: 'bar',
+      data: { labels, datasets: [{ data: values, backgroundColor: colors, borderWidth:0 }] },
+      options: chartDefaults({
+        plugins: { tooltip: { callbacks: { label: ctx => fmt(ctx.raw,2) + ' RIZE' } } },
+        scales: { x: { ticks:{ maxTicksLimit:16 } }, y: { ticks:{ callback: v => fmt(v,0) } } }
+      })
+    });
+  }
+
+  function calSwitch(mode, btn) {
+    calMode = mode;
+    document.querySelectorAll('#gov-panel-calendar .conv-toggle').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (calLoaded) calRender();
+  }
+
+  /* ═══════════════════════════ MODULE: WHALE ═══════════════════════════ */
+  let whaleLoaded = false;
+  let allWhaleEvents = [];
+  let whaleMin = 1_000_000;
+
+  async function initWhale() {
+    if (whaleLoaded) return;
+    whaleLoaded = true;
+    const d = await loadJSON('bondBroken');
+    if (!d) return;
+
+    allWhaleEvents = (d.bondBrokenEvents || [])
+      .map(e => ({ ...e, _rize: parseAmt(e.amount)/DECIMALS }))
+      .sort((a,b) => b._rize - a._rize);
+
+    // KPIs
+    const whales5m = allWhaleEvents.filter(e => e._rize >= 5_000_000);
+    document.getElementById('whale-count-5m').textContent = whales5m.length.toLocaleString();
+    if (allWhaleEvents[0]) {
+      document.getElementById('whale-largest').textContent = fmt(allWhaleEvents[0]._rize,2) + ' RIZE';
+      document.getElementById('whale-largest-date').textContent = allWhaleEvents[0].date || tsToDate(allWhaleEvents[0].timestamp);
+    }
+    const vol5m = whales5m.reduce((s,e) => s+e._rize, 0);
+    document.getElementById('whale-volume').textContent = fmt(vol5m,2);
+    const latest = whales5m.sort((a,b) => parseInt(b.timestamp)-parseInt(a.timestamp))[0];
+    if (latest) {
+      document.getElementById('whale-last-date').textContent = latest.date || tsToDate(latest.timestamp);
+      document.getElementById('whale-last-amount').textContent = fmt(latest._rize,2) + ' RIZE';
+    }
+
+    whaleRender();
+  }
+
+  function whaleRender() {
+    const filtered = allWhaleEvents.filter(e => e._rize >= whaleMin).slice(0, 200);
+    const tbody = document.getElementById('whale-tbody');
+    if (filtered.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">No events at this threshold</td></tr>';
+      return;
+    }
+    tbody.innerHTML = filtered.map((e, i) => `<tr>
+      <td class="td-muted">${i+1}</td>
+      <td class="td-muted">${e.date || tsToDate(e.timestamp)}</td>
+      <td class="td-cyan">#${e.nftId}</td>
+      <td class="td-pink" style="font-weight:700">${fmt(e._rize,2)} RIZE</td>
+      <td><a href="https://basescan.org/tx/${e.txHash}" target="_blank" rel="noopener" style="color:var(--cyan);font-family:'DM Mono',monospace;font-size:12px;text-decoration:none">${fmtAddr(e.txHash)} ↗</a></td>
+    </tr>`).join('');
+  }
+
+  function whaleFilter(min, btn) {
+    whaleMin = min;
+    document.querySelectorAll('#gov-panel-whale .conv-toggle').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (whaleLoaded) whaleRender();
+  }
+
+  /* ═══════════════════════════ MODULE: MOMENTUM ═══════════════════════════ */
+  let momLoaded = false;
+  async function initMomentum() {
+    if (momLoaded) return;
+    momLoaded = true;
+    const d = await loadJSON('bondBroken');
+    if (!d) return;
+
+    const events = d.bondBrokenEvents || [];
+    const now = Date.now()/1000;
+
+    const e30 = events.filter(e => parseInt(e.timestamp) > now - 86400*30);
+    const e90 = events.filter(e => parseInt(e.timestamp) > now - 86400*90);
+
+    const rize30 = e30.reduce((s,e) => s + parseAmt(e.amount)/DECIMALS, 0);
+    const rize90 = e90.reduce((s,e) => s + parseAmt(e.amount)/DECIMALS, 0);
+    const avg30 = rize30 / 30;
+    const avg90 = rize90 / 90;
+
+    const trendRatio = avg90 > 0 ? avg30 / avg90 : 1;
+    const whales5m = events.filter(e => parseAmt(e.amount)/DECIMALS >= 5_000_000);
+    const whalePct = events.length > 0 ? whales5m.length / events.length * 100 : 0;
+
+    // Score: lower breaks = better conviction
+    let score = 100;
+    score -= Math.min(40, (trendRatio - 1) * 40);  // trend penalty
+    score -= Math.min(30, whalePct * 3);             // whale penalty
+    score -= Math.min(20, (avg30 / 10_000_000) * 20); // volume penalty
+    score = Math.max(0, Math.min(100, Math.round(score)));
+
+    document.getElementById('momentum-score-display').textContent = score;
+    const labels = ['', 'CRITICAL', 'WEAK', 'NEUTRAL', 'STRONG', 'CONVICTION'];
+    const colors = ['', '#ff4444', 'var(--pink)', 'var(--gold)', '#98ffb6', 'var(--cyan)'];
+    const tier = score < 20 ? 1 : score < 40 ? 2 : score < 60 ? 3 : score < 80 ? 4 : 5;
+    document.getElementById('momentum-score-display').style.color = colors[tier];
+    document.getElementById('momentum-score-label').textContent = labels[tier];
+
+    const trendStr = trendRatio > 1.1 ? '↑ Accelerating' : trendRatio < 0.9 ? '↓ Decelerating' : '→ Stable';
+    const trendColor = trendRatio > 1.1 ? 'var(--pink)' : trendRatio < 0.9 ? '#98ffb6' : 'var(--gold)';
+    document.getElementById('mom-break-trend').innerHTML = `<span style="color:${trendColor}">${trendStr}</span>`;
+    document.getElementById('mom-whale-pressure').textContent = fmtPct(whalePct);
+    document.getElementById('mom-daily-avg').textContent = fmt(avg30,2);
+    document.getElementById('mom-releases-30d').textContent = fmt(rize30,2);
+  }
+
+  /* ═══════════════════════════ MODULE: WALLET ═══════════════════════════ */
+  let walletDataReady = false;
+  let nftData = null;
+  let breakData = null;
+  let transferData = null;
+
+  function initWalletUI() {
+    // Pre-load data silently
+    Promise.all([
+      loadJSON('nftTransfers'),
+      loadJSON('bondBroken'),
+    ]).then(([nt, bb]) => {
+      nftData = nt;
+      breakData = bb;
+      walletDataReady = true;
+    });
+  }
+
+  async function walletLookup() {
+    const addr = document.getElementById('wallet-input').value.trim().toLowerCase();
+    if (!addr || addr.length < 10) return;
+
+    const results = document.getElementById('wallet-results');
+    results.innerHTML = '<div class="loading-text">Analysing wallet…</div>';
+
+    if (!walletDataReady) {
+      await Promise.all([loadJSON('nftTransfers'), loadJSON('bondBroken')]);
+      nftData = DATA['nftTransfers'];
+      breakData = DATA['bondBroken'];
+      walletDataReady = true;
+    }
+
+    const owners = (nftData?.bondOwners || []).filter(o => o.owner.toLowerCase() === addr);
+    const tokenIds = new Set(owners.map(o => o.tokenId.toString()));
+    const transfers = (nftData?.nftTransferEvents || []).filter(e =>
+      e.from.toLowerCase() === addr || e.to.toLowerCase() === addr
+    );
+    const breaks = (breakData?.bondBrokenEvents || []).filter(e => tokenIds.has(e.nftId.toString()));
+    const totalBroken = breaks.reduce((s,e) => s + parseAmt(e.amount)/DECIMALS, 0);
+    const totalNFTs = owners.length;
+
+    const label = CEX_MAP[addr] ? `<span style="color:var(--gold);font-family:'Rajdhani',sans-serif;font-weight:700;margin-left:8px">[${CEX_MAP[addr]}]</span>` : '';
+
+    let html = `
+      <div style="margin-bottom:20px">
+        <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);margin-bottom:4px">Wallet</div>
+        <div style="font-family:'DM Mono',monospace;font-size:16px;color:var(--cyan)">${addr}${label}</div>
+      </div>
+      <div class="ctx-kpi-row">
+        <div class="ctx-kpi"><span class="ctx-kpi-label">Active NFT Bonds</span><span class="ctx-kpi-value accent-cyan">${totalNFTs}</span></div>
+        <div class="ctx-kpi"><span class="ctx-kpi-label">Bond Breaks</span><span class="ctx-kpi-value accent-pink">${breaks.length}</span></div>
+        <div class="ctx-kpi"><span class="ctx-kpi-label">RIZE Released</span><span class="ctx-kpi-value accent-gold">${fmt(totalBroken,2)}</span></div>
+        <div class="ctx-kpi"><span class="ctx-kpi-label">NFT Transfers</span><span class="ctx-kpi-value">${transfers.length}</span></div>
+      </div>`;
+
+    if (owners.length > 0) {
+      html += `<div class="sep"></div><div class="inner-title">Active Bond NFTs</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Token ID</th><th>Mint Date</th><th>Transfers</th><th>Last Transfer</th></tr></thead>
+        <tbody>${owners.slice(0,20).map(o => `<tr>
+          <td class="td-cyan">#${o.tokenId}</td>
+          <td class="td-muted">${o.mintDate || '—'}</td>
+          <td>${o.transferCount}</td>
+          <td class="td-muted">${o.lastTransferDate || '—'}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;
+    }
+
+    if (breaks.length > 0) {
+      const sortedBreaks = [...breaks].sort((a,b) => parseInt(b.timestamp)-parseInt(a.timestamp));
+      html += `<div class="sep"></div><div class="inner-title">Bond Break History</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Date</th><th>NFT ID</th><th>Amount (RIZE)</th><th>Tx</th></tr></thead>
+        <tbody>${sortedBreaks.slice(0,30).map(e => `<tr>
+          <td class="td-muted">${e.date || tsToDate(e.timestamp)}</td>
+          <td class="td-cyan">#${e.nftId}</td>
+          <td class="td-pink">${fmt(parseAmt(e.amount)/DECIMALS,2)} RIZE</td>
+          <td><a href="https://basescan.org/tx/${e.txHash}" target="_blank" rel="noopener" style="color:var(--cyan);font-family:'DM Mono',monospace;font-size:12px;text-decoration:none">${fmtAddr(e.txHash)} ↗</a></td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;
+    }
+
+    if (totalNFTs === 0 && breaks.length === 0) {
+      html += `<div class="sep"></div><div style="color:var(--muted);font-family:'DM Mono',monospace;font-size:13px;padding:16px 0">No governance activity found for this address in available data.</div>`;
+    }
+
+    results.innerHTML = html;
+  }
+
+  /* ═══════════════════════════ MODULE: CALCULATOR ═══════════════════════════ */
+  let calcChartInst = null;
+
+  function initCalculator() {
+    renderBoostCurve();
+    calcUpdate();
+  }
+
+  function calcFromDate() {
+    const dateVal = document.getElementById('calc-date').value;
+    if (!dateVal) return;
+    const created = new Date(dateVal).getTime();
+    const now = Date.now();
+    const months = (now - created) / (365.25/12 * 86400 * 1000);
+    document.getElementById('calc-months').value = Math.max(0, months.toFixed(1));
+    calcUpdate();
+  }
+
+  function calcUpdate() {
+    const amount = parseFloat(document.getElementById('calc-amount').value) || 0;
+    const months = Math.min(parseFloat(document.getElementById('calc-months').value) || 0, 36);
+    const pct = Math.min(months / MAX_MONTHS, 1);
+    const boost = 1 + pct * 2;
+    const vp = amount * boost;
+    const maxVP = amount * MAX_BOOST;
+    const pctOfMax = maxVP > 0 ? (vp / maxVP * 100) : 0;
+
+    document.getElementById('calc-boost').textContent = boost.toFixed(3) + '×';
+    document.getElementById('calc-vp').textContent = amount > 0 ? fmt(vp, 2) + ' VP' : '—';
+    document.getElementById('calc-pct').textContent = amount > 0 ? fmtPct(pctOfMax) : '—';
+
+    // Update marker on chart
+    if (calcChartInst) {
+      calcChartInst.data.datasets[1] = {
+        data: [{ x: months, y: boost }],
+        pointBackgroundColor: 'var(--gold)',
+        pointBorderColor: '#fff',
+        pointRadius: 8,
+        type: 'scatter',
+        label: 'Your Bond',
+      };
+      calcChartInst.update('none');
+    }
+  }
+
+  function renderBoostCurve() {
+    const ctx = document.getElementById('calc-chart').getContext('2d');
+    const labels = Array.from({length:37}, (_,i) => i);
+    const boostValues = labels.map(m => 1 + Math.min(m/36,1)*2);
+
+    if (calcChartInst) calcChartInst.destroy();
+    calcChartInst = new Chart(ctx, {
+      data: {
+        labels,
+        datasets: [
+          {
+            type: 'line',
+            label: 'Boost',
+            data: boostValues,
+            borderColor: 'rgba(126,224,255,0.8)',
+            backgroundColor: 'rgba(126,224,255,0.06)',
+            fill: true,
+            tension: 0.2,
+            pointRadius: 0,
+            borderWidth: 2,
+          },
+          {
+            type: 'scatter',
+            label: 'Your Bond',
+            data: [],
+            pointBackgroundColor: 'var(--gold)',
+            pointBorderColor: '#fff',
+            pointRadius: 8,
+          }
+        ]
+      },
+      options: chartDefaults({
+        plugins: {
+          legend: { display: true, labels: { color: '#b6c1d8', font: { size: 12 } } },
+          tooltip: { callbacks: { label: ctx => `Boost: ${ctx.raw?.toFixed ? ctx.raw.toFixed(3) : ctx.raw}×` } }
+        },
+        scales: {
+          x: { title: { display: true, text: 'Months', color: 'var(--muted)' }, ticks: { callback: v => v + 'm' } },
+          y: { title: { display: true, text: 'Boost Multiplier', color: 'var(--muted)' }, min: 1, max: 3.1, ticks: { callback: v => v.toFixed(1) + '×' } }
+        }
+      })
+    });
+  }
+
+  /* ═══════════════════════════ INIT ═══════════════════════════ */
+  document.addEventListener('DOMContentLoaded', () => {
+    loadLiveBonded();
+    initConviction();
+    // Refresh live bonded every 60s
+    setInterval(loadLiveBonded, 60000);
   });
-};
-</script>
+  </script>
 </body>
 </html>
