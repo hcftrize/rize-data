@@ -1,10 +1,10 @@
-name: Deploy Bond TimeMarker Subgraph (Ormi)
+name: Deploy Governance Subgraph (Goldsky)
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Subgraph version (e.g. 1.0.0)"
+        description: "Subgraph version tag (e.g. 1.0.0)"
         required: true
         default: "1.0.0"
 
@@ -21,7 +21,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install graph-cli
         run: npm install -g @graphprotocol/graph-cli
@@ -38,13 +38,10 @@ jobs:
         working-directory: goldsky-governance
         run: graph build
 
-      - name: Deploy to Ormi
+      - name: Deploy to Goldsky
         working-directory: goldsky-governance
         env:
-          ORMI_API_KEY: ${{ secrets.ORMI_API_KEY_2 }}
+          GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
         run: |
-          graph deploy tokerize-bond-timemarker \
-            --node https://subgraph.api.ormilabs.com/deploy \
-            --ipfs https://subgraph.api.ormilabs.com/ipfs \
-            --deploy-key $ORMI_API_KEY \
-            --version-label 1.0.0
+          npx goldsky subgraph deploy tokerize-governance-unified/${{ github.event.inputs.version }} \
+            --token $GOLDSKY_API_KEY
