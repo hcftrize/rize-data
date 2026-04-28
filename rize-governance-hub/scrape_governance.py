@@ -27,7 +27,7 @@ ENDPOINTS = {
     "bond-broken":     "https://api.goldsky.com/api/public/project_cmocqkq31mv0m010y19bu6obd/subgraphs/tokerize-bond-broken/1.0.0/gn",
     "nft-transfers":   "https://api.goldsky.com/api/public/project_cmocqwx6tnlbf010yce109jo9/subgraphs/tokerize-nft-transfers/1.0.0/gn",
     "bond-timemarker": "https://api.subgraph.ormilabs.com/api/private/ac2ecb60-44a8-4df2-83cb-08bd1bced775/subgraphs/tokerize-bond-timemarker/scraper/gn",
-    "bond-created":    "https://api.subgraph.ormilabs.com/api/private/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/lasttry/gn",
+    "bond-created":    "https://api.subgraph.ormilabs.com/api/private/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/ormiunusable/gn",
 }
 
 # Clé API par subgraph
@@ -109,8 +109,8 @@ def gql(endpoint, query, subgraph_name=None, is_ormi=False, max_429=999999):
             if e.code == 429:
                 rate_tries += 1
                 # Retry infini — attend 60s fixe à chaque fois
-                print(f"    429 — retry #{rate_tries}, waiting 60s…", flush=True)
-                time.sleep(60)
+                print(f"    429 — retry #{rate_tries}, waiting 120s…", flush=True)
+                time.sleep(120)
             else:
                 net_tries += 1
                 if net_tries > 4:
@@ -133,8 +133,8 @@ def gql(endpoint, query, subgraph_name=None, is_ormi=False, max_429=999999):
 # ── Ormi : confirmer les noms d'entités si possible ──────────────────────────
 
 def ormi_discover(endpoint, subgraph_name):
-    print(f"    [Ormi] pause 60s avant introspection…", flush=True)
-    time.sleep(60)
+    print(f"    [Ormi] pause 120s avant introspection…", flush=True)
+    time.sleep(120)
     q = "{ __schema { queryType { fields { name } } } }"
     # Retry infini sur 429 pour l'introspection aussi
     data = gql(endpoint, q, subgraph_name=subgraph_name, is_ormi=True)
@@ -180,8 +180,8 @@ def fetch_entity(endpoint, entity_name, fields_str, subgraph_name=None, is_ormi=
 
         # Pour Ormi : pause 60s AVANT chaque requête (page 0 incluse)
         if is_ormi:
-            print(f"      [Ormi] pause 60s avant page {page+1}…", flush=True)
-            time.sleep(60)
+            print(f"      [Ormi] pause 120s avant page {page+1}…", flush=True)
+            time.sleep(120)
 
         data = gql(endpoint, q, subgraph_name=subgraph_name, is_ormi=is_ormi)
 
@@ -222,7 +222,7 @@ def fetch_subgraph(name, endpoint, entities):
     confirmed = ormi_discover(endpoint, name) if is_ormi else {}
 
     result_data = {}
-    inter_sleep = 60 if is_ormi else 0.8  # 60s entre entités pour Ormi
+    inter_sleep = 120 if is_ormi else 0.8  # 60s entre entités pour Ormi
 
     for entity_name, fields_str in entities.items():
         real_name = resolve_name(entity_name, confirmed)
