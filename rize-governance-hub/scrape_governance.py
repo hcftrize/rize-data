@@ -69,9 +69,9 @@ HEADERS_BASE = {
 }
 
 # ── Délais Ormi ───────────────────────────────────────────────────────────────
-ORMI_PAUSE_BEFORE_QUERY = 30   # secondes entre chaque requête Ormi
-ORMI_PAUSE_429          = 30   # secondes d'attente sur 429
-ORMI_PAUSE_INTER_ENTITY = 30   # secondes entre entités Ormi
+ORMI_PAUSE_BEFORE_QUERY = 60   # secondes entre chaque requête Ormi
+ORMI_PAUSE_429          = 60   # secondes d'attente sur 429
+ORMI_PAUSE_INTER_ENTITY = 60   # secondes entre entités Ormi
 
 def get_headers(subgraph_name=None):
     h = dict(HEADERS_BASE)
