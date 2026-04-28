@@ -1,5 +1,5 @@
 {
-  "name": "tokerize-nft-transfers",
+  "name": "tokerize-governance-unified",
   "version": "1.0.0",
   "scripts": {
     "codegen": "graph codegen",
