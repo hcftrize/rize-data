@@ -1044,9 +1044,9 @@
     "number": 115,
     "title": "Add Societe Generale as a Super Validator (max weight 8)",
     "type": "Governance",
-    "status": "Proposed",
+    "status": "Approved",
     "created": "2026-04-24",
-    "approved": "",
+    "approved": "2026-04-27",
     "description": "This CIP establishes a milestone-based Super Validator commitment framework for Societe Generale on the Canton Network.\n\nSociete Generale already runs Canton validators, has issued a tokenized bond on Canton, and actively participates in the on-chain U.S. Treasury financing working group. This proposal focuses on Societe Generale Prime Services and Clearing accepting tokenized assets on Canton as eligible collateral, as well as SG Forge deploying EURCV/USDCV on Canton.\n\nSV Weight is earned incrementally as milestones are completed and verified. Rewards accrue to escrow, consistent with existing Super Validator mechanics.\n\nThe total maximum earnable SV Weight under this CIP is 8"
   }
 ]
