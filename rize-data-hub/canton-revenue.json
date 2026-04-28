@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-27T02:00:49.000Z",
+  "updatedAt": "2026-04-28T02:00:49.000Z",
   "validator_rewards": [
     {
       "time": "2024-09-05T00:00:00Z",
@@ -2889,7 +2889,7 @@
     {
       "time": "2026-04-14T00:00:00Z",
       "app_rewards": "63.2256019668",
-      "validator_rewards": "512.0451316126"
+      "validator_rewards": "476.5539338739"
     },
     {
       "time": "2026-04-15T00:00:00Z",
@@ -2954,7 +2954,12 @@
     {
       "time": "2026-04-27T00:00:00Z",
       "app_rewards": "0.0",
-      "validator_rewards": "43.9377706856"
+      "validator_rewards": "503.1574696233"
+    },
+    {
+      "time": "2026-04-28T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "44.7221647241"
     }
   ],
   "score_rewards": [
