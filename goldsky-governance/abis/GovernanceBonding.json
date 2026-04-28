@@ -1,5 +1,16 @@
 [
   {
+    "type": "event",
+    "name": "BondCreated",
+    "inputs": [
+      { "name": "owner",  "type": "address", "indexed": true },
+      { "name": "bondId", "type": "uint256", "indexed": true },
+      { "name": "poolId", "type": "uint16",  "indexed": true },
+      { "name": "amount", "type": "uint256", "indexed": false }
+    ],
+    "anonymous": false
+  },
+  {
     "type": "function",
     "name": "increaseBond",
     "stateMutability": "nonpayable",
