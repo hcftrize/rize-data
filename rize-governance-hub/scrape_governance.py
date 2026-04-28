@@ -27,7 +27,7 @@ ENDPOINTS = {
     "bond-broken":     "https://api.goldsky.com/api/public/project_cmocqkq31mv0m010y19bu6obd/subgraphs/tokerize-bond-broken/1.0.0/gn",
     "nft-transfers":   "https://api.goldsky.com/api/public/project_cmocqwx6tnlbf010yce109jo9/subgraphs/tokerize-nft-transfers/1.0.0/gn",
     "bond-timemarker": "https://api.subgraph.ormilabs.com/api/private/ac2ecb60-44a8-4df2-83cb-08bd1bced775/subgraphs/tokerize-bond-timemarker/scraper/gn",
-    "bond-created":    "https://api.subgraph.ormilabs.com/api/private/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/ormiteamarepussies/gn",
+    "bond-created":    "https://api.subgraph.ormilabs.com/api/private/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/lasttry/gn",
 }
 
 # Clé API par subgraph
@@ -133,10 +133,11 @@ def gql(endpoint, query, subgraph_name=None, is_ormi=False, max_429=999999):
 # ── Ormi : confirmer les noms d'entités si possible ──────────────────────────
 
 def ormi_discover(endpoint, subgraph_name):
-    print(f"    [Ormi] pause 2s avant introspection…", flush=True)
-    time.sleep(2)
+    print(f"    [Ormi] pause 60s avant introspection…", flush=True)
+    time.sleep(60)
     q = "{ __schema { queryType { fields { name } } } }"
-    data = gql(endpoint, q, subgraph_name=subgraph_name, is_ormi=True, max_429=4)
+    # Retry infini sur 429 pour l'introspection aussi
+    data = gql(endpoint, q, subgraph_name=subgraph_name, is_ormi=True)
     if not data:
         print(f"    [Ormi] introspection échouée — noms hardcodés utilisés", flush=True)
         return {}
@@ -177,8 +178,10 @@ def fetch_entity(endpoint, entity_name, fields_str, subgraph_name=None, is_ormi=
             f") {{ {fields_str} }} }}"
         )
 
-        if is_ormi and page > 0:
-            time.sleep(120)
+        # Pour Ormi : pause 60s AVANT chaque requête (page 0 incluse)
+        if is_ormi:
+            print(f"      [Ormi] pause 60s avant page {page+1}…", flush=True)
+            time.sleep(60)
 
         data = gql(endpoint, q, subgraph_name=subgraph_name, is_ormi=is_ormi)
 
@@ -219,7 +222,7 @@ def fetch_subgraph(name, endpoint, entities):
     confirmed = ormi_discover(endpoint, name) if is_ormi else {}
 
     result_data = {}
-    inter_sleep = 1.2 if is_ormi else 0.8
+    inter_sleep = 60 if is_ormi else 0.8  # 60s entre entités pour Ormi
 
     for entity_name, fields_str in entities.items():
         real_name = resolve_name(entity_name, confirmed)
