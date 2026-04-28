@@ -76,14 +76,13 @@
 
     /* ═══ CATEGORY NAV ═══ */
     .cat-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid rgba(255,255,255,0.08);background:var(--black);}
-    .cat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:22px 16px;cursor:pointer;border:none;background:transparent;color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:all 0.2s;border-right:1px solid rgba(255,255,255,0.06);border-bottom:3px solid transparent;position:relative;}
+    .cat-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:26px 16px;cursor:pointer;border:none;background:transparent;color:var(--muted);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:all 0.2s;border-right:1px solid rgba(255,255,255,0.06);border-bottom:3px solid transparent;position:relative;}
     .cat-btn:last-child{border-right:none;}
     .cat-btn:hover{color:#fff;background:rgba(255,255,255,0.03);}
     .cat-btn.active{color:var(--cyan);border-bottom-color:var(--cyan);background:rgba(126,224,255,0.04);}
-    .cat-btn-icon{font-size:24px;line-height:1;}
-    .cat-btn-label{font-size:11px;letter-spacing:2.5px;}
-    .cat-btn-sub{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.5px;color:var(--muted);opacity:0.7;font-weight:400;text-transform:none;}
-    .cat-btn.active .cat-btn-sub{color:rgba(126,224,255,0.7);}
+    .cat-btn-icon{display:none;}
+    .cat-btn-label{font-size:14px;letter-spacing:2px;}
+    .cat-btn-sub{display:none;}
 
     /* ═══ MAIN WRAP ═══ */
     .hub-wrap{max-width:1440px;margin:0 auto;padding:28px 28px;}
@@ -300,19 +299,13 @@
 <!-- ═══ CATEGORY NAV ═══ -->
 <nav class="cat-nav">
   <button class="cat-btn active" onclick="catSwitch('leaderboard',this)">
-    <span class="cat-btn-icon">🏆</span>
     <span class="cat-btn-label">Governance Leaderboard</span>
-    <span class="cat-btn-sub">Top wallets by voting power</span>
   </button>
   <button class="cat-btn" onclick="catSwitch('metrics',this)">
-    <span class="cat-btn-icon">📊</span>
     <span class="cat-btn-label">Key Metrics & Tools</span>
-    <span class="cat-btn-sub">Analytics, heatmaps, calculator</span>
   </button>
   <button class="cat-btn" onclick="catSwitch('explorer',this)">
-    <span class="cat-btn-icon">🔍</span>
     <span class="cat-btn-label">Explorer</span>
-    <span class="cat-btn-sub">Wallet & Bond deep dive</span>
   </button>
 </nav>
 
@@ -332,7 +325,7 @@
         <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
         <button class="screenshot-btn" onclick="event.stopPropagation();takeScreenshot('cat-leaderboard','leaderboard')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
       </div>
-      <p class="section-sub">Top wallets ranked by Voting Power = RIZE bondé × Boost (1× à 3× selon la maturité du timeMarker). Calculé depuis les données onchain depuis genesis.</p>
+      <p class="section-sub">Top wallets ranked by Voting Power = RIZE bonded × Boost (1× to 3× based on timeMarker maturity). Computed from full on-chain history since genesis.</p>
 
       <!-- KPIs -->
       <div class="ctx-kpi-row" id="lb-kpi-row">
@@ -367,15 +360,9 @@
         <button class="search-btn secondary" onclick="document.getElementById('lb-search').value='';lbFilter()">Clear</button>
       </div>
 
-      <!-- Sort info -->
+      <!-- Result info -->
       <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
         <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)" id="lb-result-info">Loading…</span>
-        <div class="conv-toggle-row" style="margin:0">
-          <button class="conv-toggle active" onclick="lbSortBy('vp',this)">Sort: VP</button>
-          <button class="conv-toggle" onclick="lbSortBy('rize',this)">Sort: RIZE</button>
-          <button class="conv-toggle" onclick="lbSortBy('maturity',this)">Sort: Maturity</button>
-          <button class="conv-toggle" onclick="lbSortBy('bonds',this)">Sort: Bonds</button>
-        </div>
       </div>
 
       <!-- Table -->
@@ -383,18 +370,18 @@
         <table id="lb-table">
           <thead>
             <tr>
-              <th style="width:48px">Rank</th>
+              <th style="width:48px" onclick="lbSortBy('rank',this)">Rank <span class="sort-arrow">↕</span></th>
               <th>Wallet</th>
-              <th>Bonds</th>
-              <th>RIZE Bondé</th>
-              <th>Maturity Moy.</th>
-              <th>Boost Moy.</th>
-              <th>Voting Power</th>
-              <th>% Total VP</th>
+              <th onclick="lbSortBy('bonds',this)">Bonds <span class="sort-arrow">↕</span></th>
+              <th onclick="lbSortBy('rize',this)">RIZE Bonded <span class="sort-arrow sort-active">↓</span></th>
+              <th onclick="lbSortBy('maturity',this)">Avg Maturity <span class="sort-arrow">↕</span></th>
+              <th onclick="lbSortBy('boost',this)">Avg Boost <span class="sort-arrow">↕</span></th>
+              <th onclick="lbSortBy('vp',this)">Voting Power <span class="sort-arrow">↕</span></th>
+              <th onclick="lbSortBy('pct',this)">% Total VP <span class="sort-arrow">↕</span></th>
             </tr>
           </thead>
           <tbody id="lb-tbody">
-            <tr><td colspan="8" style="text-align:center;padding:40px"><span class="loading-text">Calcul du leaderboard depuis genesis…</span></td></tr>
+            <tr><td colspan="8" style="text-align:center;padding:40px"><span class="loading-text">Calcul du leaderboard since genesis…</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -547,17 +534,17 @@
           <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
           <button class="screenshot-btn" onclick="takeScreenshot('mp-heatmap','heatmap')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
         </div>
-        <p class="section-sub">Calendrier de l'intensité onchain par jour. En RIZE. Chaque cellule = 1 jour depuis genesis.</p>
+        <p class="section-sub">Daily on-chain activity intensity. Expressed in RIZE. Each cell = one day since genesis.</p>
         <div class="conv-toggle-row">
-          <button class="conv-toggle active" onclick="hmMode('breaks',this)">🔴 Bond Breaks</button>
-          <button class="conv-toggle" onclick="hmMode('created',this)">🟢 Bonds Créés</button>
-          <button class="conv-toggle" onclick="hmMode('net',this)">⚡ Net Score</button>
+          <button class="conv-toggle active" onclick="hmMode('breaks',this)"> Bond Breaks</button>
+          <button class="conv-toggle" onclick="hmMode('created',this)"> Bonds Created</button>
+          <button class="conv-toggle" onclick="hmMode('net',this)"> Net Score</button>
         </div>
         <div class="ctx-kpi-row">
-          <div class="ctx-kpi"><span class="ctx-kpi-label">Pic d'activité</span><span class="ctx-kpi-value accent-pink" id="hm-peak-day">—</span><span class="ctx-kpi-sub" id="hm-peak-amount">&nbsp;</span></div>
-          <div class="ctx-kpi"><span class="ctx-kpi-label">Moy. journalière</span><span class="ctx-kpi-value accent-gold" id="hm-avg-daily">—</span><span class="ctx-kpi-sub">RIZE / jour</span></div>
-          <div class="ctx-kpi"><span class="ctx-kpi-label">Jours analysés</span><span class="ctx-kpi-value" id="hm-days-count">—</span><span class="ctx-kpi-sub">depuis genesis</span></div>
-          <div class="ctx-kpi"><span class="ctx-kpi-label">Jours calmes (0 activité)</span><span class="ctx-kpi-value accent-green" id="hm-quiet-days">—</span><span class="ctx-kpi-sub">haute conviction</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">Peak Activity</span><span class="ctx-kpi-value accent-pink" id="hm-peak-day">—</span><span class="ctx-kpi-sub" id="hm-peak-amount">&nbsp;</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">Daily Average</span><span class="ctx-kpi-value accent-gold" id="hm-avg-daily">—</span><span class="ctx-kpi-sub">RIZE / day</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">Days Analyzed</span><span class="ctx-kpi-value" id="hm-days-count">—</span><span class="ctx-kpi-sub">since genesis</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">Quiet Days (0 activity)</span><span class="ctx-kpi-value accent-green" id="hm-quiet-days">—</span><span class="ctx-kpi-sub">high conviction</span></div>
         </div>
         <div id="heatmap-container"><div class="ctx-loading" id="hm-loading">Building heatmap…</div></div>
       </section>
@@ -571,12 +558,12 @@
           <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
           <button class="screenshot-btn" onclick="takeScreenshot('mp-calendar','calendar')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
         </div>
-        <p class="section-sub">Volume de bond breaks et bonds créés par période. Double série : exits (rouge) + conviction (vert). Toggle mensuel / daily 90j.</p>
+        <p class="section-sub">Bond breaks and bonds created volume per period. Dual series: exits (red) + conviction (green). Toggle monthly / daily 90d.</p>
         <div class="ctx-kpi-row">
           <div class="ctx-kpi"><span class="ctx-kpi-label">Ce mois — Breaks</span><span class="ctx-kpi-value accent-pink" id="cal-this-month">—</span><span class="ctx-kpi-sub" id="cal-this-month-rize">&nbsp;</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">Mois dernier — Breaks</span><span class="ctx-kpi-value" id="cal-last-month">—</span><span class="ctx-kpi-sub" id="cal-last-month-rize">&nbsp;</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">Total all-time breaks</span><span class="ctx-kpi-value accent-gold" id="cal-all-time">—</span><span class="ctx-kpi-sub" id="cal-all-rize">&nbsp;</span></div>
-          <div class="ctx-kpi"><span class="ctx-kpi-label">Total bonds créés</span><span class="ctx-kpi-value accent-green" id="cal-total-created">—</span><span class="ctx-kpi-sub">all time</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">Total Bonds Created</span><span class="ctx-kpi-value accent-green" id="cal-total-created">—</span><span class="ctx-kpi-sub">all time</span></div>
         </div>
         <div class="conv-toggle-row">
           <button class="conv-toggle active" onclick="calSwitch('monthly',this)">Monthly</button>
@@ -586,7 +573,7 @@
         <div class="sep"></div>
         <div class="inner-title" id="cal-table-title">Monthly Breakdown</div>
         <div class="table-wrap" style="max-height:360px;overflow-y:auto">
-          <table><thead><tr id="cal-thead"><th>Mois</th><th>Breaks</th><th>Volume Breaks</th><th>Bonds Créés</th><th>Volume Créés</th><th>Net RIZE</th></tr></thead>
+          <table><thead><tr id="cal-thead"><th>Month</th><th>Breaks</th><th>Breaks Volume</th><th>Bonds Created</th><th>Created Volume</th><th>Net RIZE</th></tr></thead>
           <tbody id="cal-tbody"><tr><td colspan="6" class="loading-text" style="text-align:center;padding:20px">Loading…</td></tr></tbody></table>
         </div>
         <div class="pagination" id="cal-pagination"></div>
@@ -601,7 +588,7 @@
           <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
           <button class="screenshot-btn" onclick="takeScreenshot('mp-whale','whale')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
         </div>
-        <p class="section-sub">Feed chronologique des mouvements whale. Breaks + Bonds + IncreaseBond. Filtre par direction et seuil RIZE.</p>
+        <p class="section-sub">Chronological feed of whale movements. Breaks + Bonds + IncreaseBond. Filter by direction and RIZE threshold.</p>
         <div class="ctx-kpi-row">
           <div class="ctx-kpi"><span class="ctx-kpi-label">Whale Breaks &gt;5M</span><span class="ctx-kpi-value accent-pink" id="whale-count-5m">—</span><span class="ctx-kpi-sub">all time</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">Plus gros break</span><span class="ctx-kpi-value accent-gold" id="whale-largest">—</span><span class="ctx-kpi-sub" id="whale-largest-date">&nbsp;</span></div>
@@ -638,22 +625,22 @@
           <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
           <button class="screenshot-btn" onclick="takeScreenshot('mp-maturity','maturity')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
         </div>
-        <p class="section-sub">Distribution des bonds par tranche de maturité. Calculé depuis les timeMarkers actuels de chaque bond.</p>
+        <p class="section-sub">Distribution of bonds by maturity range. Computed from current timeMarkers of each bond.</p>
         <div class="ctx-kpi-row">
-          <div class="ctx-kpi"><span class="ctx-kpi-label">Maturité moy. pondérée</span><span class="ctx-kpi-value accent-cyan" id="mat-avg">—</span><span class="ctx-kpi-sub">conviction score global</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">Weighted Avg Maturity</span><span class="ctx-kpi-value accent-cyan" id="mat-avg">—</span><span class="ctx-kpi-sub">global conviction score</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">Full Maturity (3× boost)</span><span class="ctx-kpi-value accent-gold" id="mat-full-count">—</span><span class="ctx-kpi-sub">diamond hands count</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">% VP en full maturity</span><span class="ctx-kpi-value accent-green" id="mat-full-vp-pct">—</span><span class="ctx-kpi-sub">of total voting power</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">Boost moyen global</span><span class="ctx-kpi-value accent-pink" id="mat-avg-boost">—</span><span class="ctx-kpi-sub">weighted average</span></div>
         </div>
         <div class="conv-toggle-row">
           <button class="conv-toggle active" onclick="matView('rize',this)">Volume RIZE</button>
-          <button class="conv-toggle" onclick="matView('count',this)">Nombre de bonds</button>
+          <button class="conv-toggle" onclick="matView('count',this)">Bond Count</button>
           <button class="conv-toggle" onclick="matView('vp',this)">Voting Power</button>
         </div>
         <div class="ctx-chart-wrap"><canvas id="mat-chart"></canvas></div>
         <div class="sep"></div>
         <div class="table-wrap"><table>
-          <thead><tr><th>Tranche Maturité</th><th>Bonds</th><th>RIZE</th><th>VP Total</th><th>% du VP total</th><th>Boost moy.</th></tr></thead>
+          <thead><tr><th>Maturity Range</th><th>Bonds</th><th>RIZE</th><th>VP Total</th><th>% of Total VP</th><th>Avg Boost</th></tr></thead>
           <tbody id="mat-tbody"><tr><td colspan="6" class="loading-text" style="text-align:center;padding:20px">Loading…</td></tr></tbody>
         </table></div>
       </section>
@@ -667,12 +654,12 @@
           <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
           <button class="screenshot-btn" onclick="takeScreenshot('mp-momentum','momentum')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
         </div>
-        <p class="section-sub">Score composite 0–10 basé sur le net flow, ratio bonds/breaks, maturité moyenne et nouveaux bonders.</p>
+        <p class="section-sub">Composite score 0–10 based on net flow, bonds/breaks ratio, average maturity and new bonders.</p>
         <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap;margin-bottom:24px">
           <div style="text-align:center">
             <div style="font-family:'Rajdhani',sans-serif;font-size:96px;font-weight:700;line-height:1;color:var(--cyan)" id="momentum-score-display">—</div>
             <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:4px" id="momentum-score-label">Loading…</div>
-            <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:8px">/ 10 — mis à jour quotidiennement</div>
+            <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-top:8px">/ 10 — updated daily</div>
           </div>
           <div style="flex:1;min-width:240px">
             <div class="ctx-kpi-row" style="flex-direction:column;gap:10px">
@@ -685,11 +672,11 @@
                 <span style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#fff" id="mom-ratio-30d">—</span>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)">
-                <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">Maturité moy. trend (20%)</span>
+                <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">Avg Maturity Trend (20%)</span>
                 <span style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#fff" id="mom-mat-trend">—</span>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)">
-                <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">Nouveaux bonders 30j (15%)</span>
+                <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">New Bonders 30d (15%)</span>
                 <span style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#fff" id="mom-new-bonders">—</span>
               </div>
             </div>
@@ -733,7 +720,7 @@
           <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
           <button class="screenshot-btn" onclick="takeScreenshot('mp-bondage','bond-age')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
         </div>
-        <p class="section-sub">Scatter plot : X = ancienneté effective (depuis timeMarker), Y = montant RIZE, taille = Voting Power, couleur = maturité %. Quadrants : Diamond Whales / Early Believers / New Whales / New Retail.</p>
+        <p class="section-sub">Scatter plot: X = effective bond age (from timeMarker), Y = RIZE amount, size = Voting Power, color = maturity %. Quadrants: Diamond Whales / Early Believers / New Whales / New Retail.</p>
         <div class="ctx-kpi-row">
           <div class="ctx-kpi"><span class="ctx-kpi-label">Diamond Whales</span><span class="ctx-kpi-value accent-gold" id="ba-diamond-whale">—</span><span class="ctx-kpi-sub">&gt;6mo + &gt;1M RIZE</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">Early Believers</span><span class="ctx-kpi-value accent-cyan" id="ba-early">—</span><span class="ctx-kpi-sub">&gt;6mo + &lt;1M RIZE</span></div>
@@ -755,38 +742,38 @@
         <p class="section-sub">Simulateur de voting power. Inclut la simulation d'increaseBond avec recalcul exact du timeMarker selon la formule du contrat.</p>
 
         <div style="display:flex;gap:8px;margin-bottom:20px">
-          <input type="text" class="search-input" id="calc-wallet-input" placeholder="Entrer un 0x ou Bond # pour charger votre bond…" style="flex:1"/>
+          <input type="text" class="search-input" id="calc-wallet-input" placeholder="Enter a 0x address or Bond # to load your bond…" style="flex:1"/>
           <button class="search-btn" onclick="calcLoadWallet()">Charger</button>
         </div>
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px" class="calc-grid">
           <div>
-            <div class="inner-title">Paramètres du bond</div>
+            <div class="inner-title">Bond Parameters</div>
             <div style="margin-bottom:12px">
-              <label style="display:block;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px">Montant RIZE</label>
+              <label style="display:block;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px">RIZE Amount</label>
               <input type="number" style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--cyan);font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;outline:none;" id="calc-amount" placeholder="1000000" oninput="calcUpdate()"/>
             </div>
             <div style="margin-bottom:12px">
-              <label style="display:block;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px">Date de création du bond</label>
+              <label style="display:block;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px">Bond Creation Date</label>
               <input type="date" style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--cyan);font-family:'Rajdhani',sans-serif;font-size:16px;outline:none;" id="calc-date" onchange="calcFromDate()"/>
             </div>
             <div style="margin-bottom:12px">
-              <label style="display:block;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px">Âge du bond (mois)</label>
+              <label style="display:block;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px">Bond Age (months)</label>
               <input type="number" style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--cyan);font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;outline:none;" id="calc-months" placeholder="12" min="0" max="36" oninput="calcUpdate()"/>
             </div>
             <div class="sep"></div>
-            <div class="inner-title">Simuler un IncreaseBond</div>
+            <div class="inner-title">Simulate an IncreaseBond</div>
             <div style="margin-bottom:12px">
-              <label style="display:block;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px">Montant à ajouter (RIZE)</label>
+              <label style="display:block;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px">Amount to Add (RIZE)</label>
               <input type="number" style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--gold);font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;outline:none;" id="calc-increase" placeholder="500000" oninput="calcUpdate()"/>
             </div>
             <div style="margin-bottom:12px">
-              <label style="display:block;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px">Date de l'increase (simulée)</label>
+              <label style="display:block;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px">IncreaseBond Date (simulated)</label>
               <input type="date" style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:var(--gold);font-family:'Rajdhani',sans-serif;font-size:16px;outline:none;" id="calc-increase-date" onchange="calcUpdate()"/>
             </div>
           </div>
           <div>
-            <div class="inner-title">Résultats</div>
+            <div class="inner-title">Results</div>
             <div style="display:flex;flex-direction:column;gap:12px">
               <div style="padding:18px;border:1px solid rgba(126,224,255,0.2);background:rgba(126,224,255,0.04)">
                 <div style="font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px">Boost actuel</div>
@@ -802,15 +789,15 @@
               </div>
               <div id="calc-increase-result" style="display:none;padding:18px;border:1px solid rgba(255,211,107,0.3);background:rgba(255,211,107,0.06)">
                 <div style="font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--gold);margin-bottom:8px">Post-IncreaseBond</div>
-                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--muted);font-size:13px;font-family:'DM Mono',monospace">Nouveau timeMarker</span><span style="color:var(--gold);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700" id="calc-new-tm">—</span></div>
-                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--muted);font-size:13px;font-family:'DM Mono',monospace">Nouveau boost</span><span style="color:var(--gold);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700" id="calc-new-boost">—</span></div>
-                <div style="display:flex;justify-content:space-between"><span style="color:var(--muted);font-size:13px;font-family:'DM Mono',monospace">Nouveau VP</span><span style="color:var(--gold);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700" id="calc-new-vp">—</span></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--muted);font-size:13px;font-family:'DM Mono',monospace">New timeMarker</span><span style="color:var(--gold);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700" id="calc-new-tm">—</span></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="color:var(--muted);font-size:13px;font-family:'DM Mono',monospace">New Boost</span><span style="color:var(--gold);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700" id="calc-new-boost">—</span></div>
+                <div style="display:flex;justify-content:space-between"><span style="color:var(--muted);font-size:13px;font-family:'DM Mono',monospace">New VP</span><span style="color:var(--gold);font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700" id="calc-new-vp">—</span></div>
               </div>
             </div>
           </div>
         </div>
         <div class="sep"></div>
-        <div class="inner-title" style="text-align:center">Courbe Boost — VP vs Âge du Bond</div>
+        <div class="inner-title" style="text-align:center">Boost Curve — VP vs Bond Age</div>
         <div class="ctx-chart-wrap" style="height:260px"><canvas id="calc-chart"></canvas></div>
       </section>
     </div>
@@ -829,20 +816,20 @@
         <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
         <button class="screenshot-btn" onclick="takeScreenshot('cat-explorer','explorer')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
       </div>
-      <p class="section-sub">Recherchez un wallet (0x…) ou un Bond # pour obtenir son profil complet — rank, VP, historique d'activité, tous ses bonds, maturité, projections.</p>
+      <p class="section-sub">Search a wallet (0x…) or a Bond # to get its full profile — rank, VP, activity history, all bonds, maturity, projections.</p>
 
       <!-- Search bar centrale -->
       <div style="display:flex;gap:10px;margin-bottom:8px;flex-wrap:wrap">
         <input type="text" class="search-input" id="exp-input" placeholder="0x... ou Bond #1234" style="flex:1;font-size:16px;" onkeydown="if(event.key==='Enter')expSearch()"/>
-        <button class="search-btn" onclick="expSearch()" style="font-size:16px;padding:12px 32px">🔍 Rechercher</button>
+        <button class="search-btn" onclick="expSearch()" style="font-size:16px;padding:12px 32px"> Search</button>
       </div>
-      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:24px">Entrez une adresse wallet complète (0x…) ou un numéro de Bond (ex: 1234 ou #1234)</div>
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:24px">Enter a full wallet address (0x…) or a Bond number (e.g. 1234 or #1234)</div>
 
       <!-- Results area -->
       <div id="exp-results">
         <div style="text-align:center;padding:60px 20px;color:var(--muted);font-family:'DM Mono',monospace;font-size:14px;border:1px dashed rgba(126,224,255,0.1)">
-          <div style="font-size:40px;margin-bottom:16px">🔍</div>
-          <div>Recherchez un wallet ou un Bond # pour explorer son activité on-chain complète depuis genesis.</div>
+          <div style="font-size:40px;margin-bottom:16px"></div>
+          <div>Recherchez un wallet ou un Bond # pour explorer son activité on-chain complète since genesis.</div>
         </div>
       </div>
     </section>
@@ -1084,7 +1071,7 @@ async function initLeaderboard() {
   ]);
 
   if (!bondData || !tmData) {
-    document.getElementById('lb-tbody').innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--pink);padding:20px">Erreur chargement données</td></tr>';
+    document.getElementById('lb-tbody').innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--pink);padding:20px">Error loading data</td></tr>';
     return;
   }
 
@@ -1164,18 +1151,27 @@ async function initLeaderboard() {
 
 function lbSort(key) {
   lbSortKey = key;
-  const keyMap = { vp: 'totalVP', rize: 'totalRize', maturity: 'avgMat', bonds: 'bondCount' };
+  const keyMap = { vp: 'totalVP', rize: 'totalRize', maturity: 'avgMat', bonds: 'bondCount', boost: 'avgBoost', pct: 'totalVPPct', rank: 'totalVP' };
   const field = keyMap[key] || 'totalVP';
   lbFiltered.sort((a,b) => lbSortDir * (b[field] - a[field]));
   lbPage = 1;
   lbRender();
 }
 
-function lbSortBy(key, btn) {
+function lbSortBy(key, th) {
   if (lbSortKey === key) lbSortDir *= -1;
   else { lbSortKey = key; lbSortDir = -1; }
-  document.querySelectorAll('#cat-leaderboard .conv-toggle').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  // Update column header arrows
+  document.querySelectorAll('#lb-table th').forEach(t => {
+    t.classList.remove('sort-asc','sort-desc');
+    const arr = t.querySelector('.sort-arrow');
+    if (arr) arr.textContent = '↕';
+  });
+  if (th && th.tagName === 'TH') {
+    th.classList.add(lbSortDir === -1 ? 'sort-desc' : 'sort-asc');
+    const arr = th.querySelector('.sort-arrow');
+    if (arr) arr.textContent = lbSortDir === -1 ? '↓' : '↑';
+  }
   lbSort(key);
 }
 
@@ -1204,7 +1200,7 @@ function lbRender() {
 
   const tbody = document.getElementById('lb-tbody');
   if (slice.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px">Aucun résultat</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px">No results</td></tr>';
     lbPaginate(totalPages);
     return;
   }
@@ -1214,9 +1210,9 @@ function lbRender() {
     const chipClass = rank === 1 ? 'top1' : rank <= 3 ? 'top3' : rank <= 10 ? 'top10' : '';
     const rankHtml = `<div class="rank-chip ${chipClass}">${rank}</div>`;
     const badges = [];
-    if (w.bonds.some(b => b.ageMonths >= 24)) badges.push('<span class="badge badge-diamond">💎 Diamond</span>');
-    if (w.avgMat >= 0.99) badges.push('<span class="badge badge-full">⭐ Full</span>');
-    if (w.totalRize >= 5_000_000) badges.push('<span class="badge badge-whale">🐋 Whale</span>');
+    if (w.bonds.some(b => b.ageMonths >= 24)) badges.push('<span class="badge badge-diamond"> Diamond</span>');
+    if (w.avgMat >= 0.99) badges.push('<span class="badge badge-full"> Full</span>');
+    if (w.totalRize >= 5_000_000) badges.push('<span class="badge badge-whale"> Whale</span>');
     const cex = CEX_MAP[w.owner] ? `<span style="color:var(--gold);font-size:12px"> [${CEX_MAP[w.owner]}]</span>` : '';
     const matPct = w.avgMat * 100;
     const matBar = `<div class="mat-bar"><div class="mat-bar-track"><div class="mat-bar-fill" style="width:${matPct.toFixed(0)}%;background:${matPct>75?'var(--gold)':matPct>50?'var(--cyan)':'#98ffb6'}"></div></div><span style="font-size:13px;color:var(--muted)">${matPct.toFixed(1)}%</span></div>`;
@@ -1350,7 +1346,7 @@ async function initConviction() {
       tbody.innerHTML = whales.slice(0,50).map(w => `<tr>
         <td class="td-muted">${w.date || '—'}</td>
         <td class="td-gold">${fmt(parseAmt(w.amount||w.value),2)} RIZE</td>
-        <td>${w.direction === 'in' ? '<span style="color:#98ffb6">↑ Bond</span>' : '<span style="color:var(--pink)">↓ Unbond</span>'}</td>
+        <td>${w.direction === 'in' ? '<span style="color:#98ffb6">Bond</span>' : '<span style="color:var(--pink)">↓ Unbond</span>'}</td>
         <td class="td-mono">${fmtAddr(w.from)}</td>
         <td class="td-mono">${fmtAddr(w.to)}</td>
         <td>${basescanTx(w.txHash||w.tx)}</td>
@@ -1535,7 +1531,7 @@ let hmDailyCreated = {};
 async function initHeatmap() {
   if (hmLoaded) return;
   hmLoaded = true;
-  document.getElementById('hm-loading').textContent = 'Chargement des données…';
+  document.getElementById('hm-loading').textContent = 'Loading data…';
 
   const [bbData, bcData] = await Promise.all([loadJSON('bondBroken'), loadJSON('bondCreated')]);
   if (!bbData) { document.getElementById('hm-loading').textContent = 'Erreur'; return; }
@@ -1628,7 +1624,7 @@ function hmRender() {
         col = `rgba(152,255,182,${0.15+intensity*0.85})`;
       }
       const tooltip = `${day}: ${fmt(Math.abs(v),2)} RIZE (${cnt} events)`;
-      html += `<div title="${tooltip}" style="width:14px;height:14px;background:${col};cursor:pointer;flex-shrink:0;transition:outline 0.1s" onmouseover="this.style.outline='1px solid #fff'" onmouseout="this.style.outline='none'"></div>`;
+      html += `<div data-tip="${tooltip}" style="width:14px;height:14px;background:${col};cursor:pointer;flex-shrink:0;transition:outline 0.1s" onmouseover="hmShowTip(event,this)" onmouseout="hmHideTip()"></div>`;
     });
     html += `</div></div>`;
   }
@@ -1637,7 +1633,7 @@ function hmRender() {
     <div style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)"><div style="width:14px;height:14px;background:rgba(152,255,182,0.3)"></div>Low</div>
     <div style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)"><div style="width:14px;height:14px;background:rgba(255,200,0,0.7)"></div>Medium</div>
     <div style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)"><div style="width:14px;height:14px;background:rgba(255,60,60,0.9)"></div>High</div>
-    <div style="margin-left:auto;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">Hover cell for details</div>
+
   </div>`;
   container.innerHTML = html;
 }
@@ -1733,7 +1729,7 @@ function calRender() {
     type:'bar',
     data:{ labels, datasets:[
       { label:'Bond Breaks', data:breaksVals, backgroundColor:'rgba(255,138,216,0.55)', borderWidth:0 },
-      { label:'Bonds Créés', data:createdVals, backgroundColor:'rgba(152,255,182,0.45)', borderWidth:0 },
+      { label:'Bonds Created', data:createdVals, backgroundColor:'rgba(152,255,182,0.45)', borderWidth:0 },
     ]},
     options:{...opts, scales:{...opts.scales, x:{...opts.scales.x, stacked:false}, y:{...opts.scales.y, stacked:false}}}
   });
@@ -1854,14 +1850,14 @@ function whaleRender() {
   filtered = filtered.slice(0,200);
 
   const tbody = document.getElementById('whale-tbody');
-  if (!filtered.length) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">Aucun event à ce seuil</td></tr>'; return; }
+  if (!filtered.length) { tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">No events at this threshold</td></tr>'; return; }
 
   tbody.innerHTML = filtered.map((e,i) => {
     const dirHtml = e._dir==='break'
-      ? '<span style="color:var(--pink);font-weight:700">↓ Break</span>'
+      ? '<span style="color:var(--pink);font-weight:700">Break</span>'
       : e._dir==='increase'
-      ? '<span style="color:var(--gold);font-weight:700">↑↑ Increase</span>'
-      : '<span style="color:#98ffb6;font-weight:700">↑ Bond</span>';
+      ? '<span style="color:var(--gold);font-weight:700">IncreaseBond</span>'
+      : '<span style="color:#98ffb6;font-weight:700">Bond</span>';
     const wallet = e.owner || e.from || '—';
     const cex = wallet !== '—' && CEX_MAP[wallet.toLowerCase()] ? ` <span style="color:var(--gold);font-size:11px">[${CEX_MAP[wallet.toLowerCase()]}]</span>` : '';
     return `<tr>
@@ -2061,7 +2057,7 @@ async function initHHI() {
   const top50pct = shares.slice(0,50).reduce((s,p)=>s+p,0)*100;
 
   document.getElementById('hhi-score').textContent = hhi.toFixed(0);
-  document.getElementById('hhi-level').textContent = hhi < 1500 ? '✅ Sain (< 1500)' : hhi < 2500 ? '⚠️ Modéré (1500–2500)' : '🔴 Concentré (> 2500)';
+  document.getElementById('hhi-level').textContent = hhi < 1500 ? ' Sain (< 1500)' : hhi < 2500 ? ' Modéré (1500–2500)' : ' Concentré (> 2500)';
   document.getElementById('hhi-gini').textContent = gini.toFixed(3);
   document.getElementById('hhi-top10').textContent = fmtPct(top10pct);
   document.getElementById('hhi-top50').textContent = fmtPct(top50pct);
@@ -2149,8 +2145,8 @@ async function initBondAge() {
       return [`Bond #${p.nftId||'—'}`, `${fmt(p.y,2)} RIZE`, `Maturity: ${fmtPct(p.mat*100)}`, `VP: ${fmt(p.vp,2)}`];
     }
   };
-  opts.scales.x = { ...opts.scales.x, title:{ display:true, text:'Ancienneté effective (mois depuis timeMarker)', color:'var(--muted)', font:{size:11} } };
-  opts.scales.y = { ...opts.scales.y, type:'logarithmic', title:{ display:true, text:'Montant RIZE (log scale)', color:'var(--muted)', font:{size:11} }, ticks:{ callback: v => fmt(v,0) } };
+  opts.scales.x = { ...opts.scales.x, title:{ display:true, text:'Effective Age (months from timeMarker)', color:'var(--muted)', font:{size:11} } };
+  opts.scales.y = { ...opts.scales.y, type:'logarithmic', title:{ display:true, text:'RIZE Amount (log scale)', color:'var(--muted)', font:{size:11} }, ticks:{ callback: v => fmt(v,0) } };
 
   rzCharts.ba = new Chart(ctx, {
     type:'bubble',
@@ -2255,8 +2251,8 @@ function renderBoostCurve() {
   opts.scales.y = { ...opts.scales.y, min:1, max:3.1, title:{ display:true, text:'Boost Multiplier', color:'var(--muted)', font:{size:11} }, ticks:{ callback: v=>v.toFixed(1)+'×' } };
   calcChart = new Chart(ctx, {
     data:{ labels, datasets:[
-      { type:'line', label:'Courbe Boost', data:boostVals, borderColor:'rgba(126,224,255,0.8)', backgroundColor:'rgba(126,224,255,0.06)', fill:true, tension:0.2, pointRadius:0, borderWidth:2 },
-      { type:'scatter', label:'Votre Bond', data:[], pointBackgroundColor:'var(--gold)', pointBorderColor:'#fff', pointRadius:8 }
+      { type:'line', label:'Boost Curve', data:boostVals, borderColor:'rgba(126,224,255,0.8)', backgroundColor:'rgba(126,224,255,0.06)', fill:true, tension:0.2, pointRadius:0, borderWidth:2 },
+      { type:'scatter', label:'Your Bond', data:[], pointBackgroundColor:'var(--gold)', pointBorderColor:'#fff', pointRadius:8 }
     ]},
     options:opts
   });
@@ -2271,7 +2267,7 @@ async function expSearch() {
   if (!q) return;
 
   const results = document.getElementById('exp-results');
-  results.innerHTML = '<div class="ctx-loading">Analyse en cours…</div>';
+  results.innerHTML = '<div class="ctx-loading">Loading…</div>';
 
   const isAddr = q.startsWith('0x') && q.length >= 10;
   const isBondNum = !isAddr && /^\#?\d+$/.test(q);
@@ -2327,11 +2323,11 @@ function expRenderBond(nftId, bondData, bbData, ntData, tmData, lcData, latestSn
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
         <div style="font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:var(--cyan)">Bond #${nftId}</div>
         ${cex?`<span style="color:var(--gold);font-family:'Rajdhani',sans-serif;font-weight:700">[${cex}]</span>`:''}
-        ${mat>=0.99?'<span class="badge badge-full">⭐ Full Maturity</span>':''}
+        ${mat>=0.99?'<span class="badge badge-full"> Full Maturity</span>':''}
       </div>
       <div class="ctx-kpi-row">
         <div class="ctx-kpi"><span class="ctx-kpi-label">Owner</span><span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--cyan)">${basescanAddr(owner)}</span></div>
-        <div class="ctx-kpi"><span class="ctx-kpi-label">RIZE Bondé</span><span class="ctx-kpi-value accent-gold">${fmt(amount,2)}</span></div>
+        <div class="ctx-kpi"><span class="ctx-kpi-label">RIZE Bonded</span><span class="ctx-kpi-value accent-gold">${fmt(amount,2)}</span></div>
         <div class="ctx-kpi"><span class="ctx-kpi-label">Maturity</span><span class="ctx-kpi-value accent-cyan">${fmtPct(mat*100)}</span></div>
         <div class="ctx-kpi"><span class="ctx-kpi-label">Boost</span><span class="ctx-kpi-value">${boost.toFixed(3)}×</span></div>
         <div class="ctx-kpi"><span class="ctx-kpi-label">Voting Power</span><span class="ctx-kpi-value accent-green">${fmt(vp,2)}</span></div>
@@ -2340,9 +2336,9 @@ function expRenderBond(nftId, bondData, bbData, ntData, tmData, lcData, latestSn
     </div>
 
     ${created.length?`
-    <div class="inner-title">Création</div>
+    <div class="inner-title">Bond Creation</div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Date</th><th>Pool</th><th>Montant</th><th>Tx</th></tr></thead>
+      <thead><tr><th>Date</th><th>Pool</th><th>Amount</th><th>Tx</th></tr></thead>
       <tbody>${created.map(e=>`<tr>
         <td class="td-muted">${e.date||tsToDate(e.timestamp)}</td>
         <td><span class="pool-badge">Pool ${e.poolId}</span></td>
@@ -2352,9 +2348,9 @@ function expRenderBond(nftId, bondData, bbData, ntData, tmData, lcData, latestSn
     </table></div><div class="sep"></div>`:''}
 
     ${increases.length?`
-    <div class="inner-title">IncreaseBond (${increases.length})</div>
+    <div class="inner-title">IncreaseBond Events (${increases.length})</div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Date</th><th>Montant ajouté</th><th>Tx</th></tr></thead>
+      <thead><tr><th>Date</th><th>Amount Added</th><th>Tx</th></tr></thead>
       <tbody>${increases.sort((a,b)=>parseInt(a.timestamp)-parseInt(b.timestamp)).map(e=>`<tr>
         <td class="td-muted">${e.date||tsToDate(e.timestamp)}</td>
         <td class="td-green">+${fmt(parseAmt(e.amount),2)} RIZE</td>
@@ -2365,7 +2361,7 @@ function expRenderBond(nftId, bondData, bbData, ntData, tmData, lcData, latestSn
     ${snaps.length?`
     <div class="inner-title">TimeMarker Snapshots (${snaps.length})</div>
     <div class="table-wrap" style="max-height:240px;overflow-y:auto"><table>
-      <thead><tr><th>Block</th><th>Date</th><th>TimeMarker</th><th>Montant</th><th>Maturity à ce moment</th></tr></thead>
+      <thead><tr><th>Block</th><th>Date</th><th>TimeMarker</th><th>Amount</th><th>Maturity at Block</th></tr></thead>
       <tbody>${snaps.map(s=>`<tr>
         <td class="td-muted">${s.blockNumber}</td>
         <td class="td-muted">${tsToDate(s.timestamp)}</td>
@@ -2378,7 +2374,7 @@ function expRenderBond(nftId, bondData, bbData, ntData, tmData, lcData, latestSn
     ${breaks.length?`
     <div class="inner-title">Bond Breaks (${breaks.length})</div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Date</th><th>Montant</th><th>Tx</th></tr></thead>
+      <thead><tr><th>Date</th><th>Amount</th><th>Tx</th></tr></thead>
       <tbody>${breaks.map(e=>`<tr>
         <td class="td-muted">${e.date||tsToDate(e.timestamp)}</td>
         <td class="td-pink">${fmt(parseAmt(e.amount),2)} RIZE</td>
@@ -2389,7 +2385,7 @@ function expRenderBond(nftId, bondData, bbData, ntData, tmData, lcData, latestSn
     ${releases.length?`
     <div class="inner-title">Tokens Released (${releases.length})</div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Date</th><th>Montant</th><th>Vers</th><th>Tx</th></tr></thead>
+      <thead><tr><th>Date</th><th>Amount</th><th>To</th><th>Tx</th></tr></thead>
       <tbody>${releases.map(e=>`<tr>
         <td class="td-muted">${e.date||tsToDate(e.timestamp)}</td>
         <td class="td-green">${fmt(parseAmt(e.amount),2)} RIZE</td>
@@ -2450,7 +2446,7 @@ function expRenderWallet(addr, bondData, bbData, ntData, tmData, lcData, latestS
   };
 
   if (!bonds.length && !allBondCreated.length) {
-    results.innerHTML = `<div class="error-box">Aucune activité de gouvernance trouvée pour ${fmtAddr(addr)}. Vérifiez l'adresse.</div>`;
+    results.innerHTML = `<div class="error-box">No governance activity found for ${fmtAddr(addr)}. Please verify the address.</div>`;
     return;
   }
 
@@ -2465,32 +2461,33 @@ function expRenderWallet(addr, bondData, bbData, ntData, tmData, lcData, latestS
       </div>
       <div class="ctx-kpi-row">
         <div class="ctx-kpi"><span class="ctx-kpi-label">Voting Power Total</span><span class="ctx-kpi-value accent-cyan">${fmt(totalVP,2)}</span><span class="ctx-kpi-sub">${totalAllVP>0?fmtPct(totalVP/totalAllVP*100)+' du total':''}</span></div>
-        <div class="ctx-kpi"><span class="ctx-kpi-label">RIZE Bondé</span><span class="ctx-kpi-value accent-gold">${fmt(totalRize,2)}</span></div>
-        <div class="ctx-kpi"><span class="ctx-kpi-label">Bonds Actifs</span><span class="ctx-kpi-value">${bonds.length}</span></div>
-        <div class="ctx-kpi"><span class="ctx-kpi-label">Maturity Moy.</span><span class="ctx-kpi-value accent-green">${fmtPct(avgMat*100)}</span></div>
-        <div class="ctx-kpi"><span class="ctx-kpi-label">Loyalty Score</span><span class="ctx-kpi-value accent-gold">${loyaltyScore}/10</span><span class="ctx-kpi-sub">${hasNeverBroken?'✅ Never broken':'⚠️ Has broken'}</span></div>
+        <div class="ctx-kpi"><span class="ctx-kpi-label">RIZE Bonded</span><span class="ctx-kpi-value accent-gold">${fmt(totalRize,2)}</span></div>
+        <div class="ctx-kpi"><span class="ctx-kpi-label">Active Bonds</span><span class="ctx-kpi-value">${bonds.length}</span></div>
+        <div class="ctx-kpi"><span class="ctx-kpi-label">Avg Maturity</span><span class="ctx-kpi-value accent-green">${fmtPct(avgMat*100)}</span></div>
+        <div class="ctx-kpi"><span class="ctx-kpi-label">Loyalty Score</span><span class="ctx-kpi-value accent-gold">${loyaltyScore}/10</span><span class="ctx-kpi-sub">${hasNeverBroken?' Never broken':' Has broken'}</span></div>
         <div class="ctx-kpi"><span class="ctx-kpi-label">Premier Bond</span><span class="ctx-kpi-value" style="font-size:16px">${bonds.length>0?bonds.reduce((m,b)=>parseInt(b.createdAtTimestamp)<parseInt(m.createdAtTimestamp)?b:m).createdAtDate||'—':'—'}</span></div>
       </div>
     </div>
 
     <!-- VP PROJECTIONS -->
     <div style="margin-bottom:20px">
-      <div class="inner-title">Projection Voting Power</div>
-      <div class="ctx-kpi-row">
-        <div class="ctx-kpi"><span class="ctx-kpi-label">Aujourd'hui</span><span class="ctx-kpi-value accent-cyan">${fmt(totalVP,2)}</span></div>
-        <div class="ctx-kpi"><span class="ctx-kpi-label">Dans 6 mois</span><span class="ctx-kpi-value accent-green">${fmt(proj(6),2)}</span></div>
-        <div class="ctx-kpi"><span class="ctx-kpi-label">Dans 12 mois</span><span class="ctx-kpi-value accent-gold">${fmt(proj(12),2)}</span></div>
-        <div class="ctx-kpi"><span class="ctx-kpi-label">Dans 24 mois</span><span class="ctx-kpi-value">${fmt(proj(24),2)}</span></div>
+      <div class="inner-title">Voting Power Projection</div>
+      <div class="ctx-kpi-row" style="margin-bottom:16px">
+        <div class="ctx-kpi"><span class="ctx-kpi-label">Today</span><span class="ctx-kpi-value accent-cyan">${fmt(totalVP,2)}</span></div>
+        <div class="ctx-kpi"><span class="ctx-kpi-label">In 6 months</span><span class="ctx-kpi-value accent-green">${fmt(proj(6),2)}</span></div>
+        <div class="ctx-kpi"><span class="ctx-kpi-label">In 12 months</span><span class="ctx-kpi-value accent-gold">${fmt(proj(12),2)}</span></div>
+        <div class="ctx-kpi"><span class="ctx-kpi-label">In 24 months</span><span class="ctx-kpi-value">${fmt(proj(24),2)}</span></div>
       </div>
+      <div style="position:relative;width:100%;height:220px"><canvas id="exp-vp-chart"></canvas></div>
     </div>
 
     <div class="sep"></div>
 
     <!-- BONDS ACTIFS -->
     ${bondRows.length?`
-    <div class="inner-title">Bonds Actifs (${bondRows.length})</div>
+    <div class="inner-title">Active Bonds (${bondRows.length})</div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Bond #</th><th>Pool</th><th>RIZE</th><th>Increases</th><th>Maturity</th><th>Boost</th><th>Voting Power</th><th>Créé le</th></tr></thead>
+      <thead><tr><th>Bond #</th><th>Pool</th><th>RIZE</th><th>Increases</th><th>Maturity</th><th>Boost</th><th>Voting Power</th><th>Created</th></tr></thead>
       <tbody>${bondRows.sort((a,b)=>b.vp-a.vp).map(b=>`<tr onclick="document.getElementById('exp-input').value='${b.nftId}';expSearch()" style="cursor:pointer">
         <td class="td-cyan">#${b.nftId}</td>
         <td><span class="pool-badge">Pool ${b.poolId}</span></td>
@@ -2509,15 +2506,15 @@ function expRenderWallet(addr, bondData, bbData, ntData, tmData, lcData, latestS
     </table></div><div class="sep"></div>`:''}
 
     <!-- TIMELINE ACTIVITE -->
-    <div class="inner-title">Timeline d'activité complète</div>
+    <div class="inner-title">Full Activity Timeline</div>
     <div class="table-wrap" style="max-height:400px;overflow-y:auto"><table>
-      <thead><tr><th>Date</th><th>Type</th><th>Bond #</th><th>Montant</th><th>Détails</th><th>Tx</th></tr></thead>
+      <thead><tr><th>Date</th><th>Type</th><th>Bond #</th><th>Amount</th><th>Détails</th><th>Tx</th></tr></thead>
       <tbody>${[
-        ...allBondCreated.map(e=>({...e,type:'🟢 BondCreated',color:'#98ffb6',amt:parseAmt(e.amount),detail:`Pool ${e.poolId}`})),
-        ...myIncreases.map(e=>({...e,type:'↑↑ Increase',color:'var(--gold)',amt:parseAmt(e.amount),detail:''})),
-        ...breaks.map(e=>({...e,type:'🔴 Break',color:'var(--pink)',amt:parseAmt(e.amount),detail:''})),
-        ...releases.map(e=>({...e,type:'💸 Released',color:'var(--cyan)',amt:parseAmt(e.amount),detail:fmtAddr(e.to)})),
-        ...transfers.map(e=>({...e,type:e.isMint?'🔑 Mint':'↔ Transfer',color:e.isMint?'var(--gold)':'var(--muted)',amt:0,detail:`${fmtAddr(e.from)} → ${fmtAddr(e.to)}`})),
+        ...allBondCreated.map(e=>({...e,type:' BondCreated',color:'#98ffb6',amt:parseAmt(e.amount),detail:`Pool ${e.poolId}`})),
+        ...myIncreases.map(e=>({...e,type:'IncreaseBond',color:'var(--gold)',amt:parseAmt(e.amount),detail:''})),
+        ...breaks.map(e=>({...e,type:' Break',color:'var(--pink)',amt:parseAmt(e.amount),detail:''})),
+        ...releases.map(e=>({...e,type:' Released',color:'var(--cyan)',amt:parseAmt(e.amount),detail:fmtAddr(e.to)})),
+        ...transfers.map(e=>({...e,type:e.isMint?' Mint':' Transfer',color:e.isMint?'var(--gold)':'var(--muted)',amt:0,detail:`${fmtAddr(e.from)} → ${fmtAddr(e.to)}`})),
       ].sort((a,b)=>parseInt(b.timestamp)-parseInt(a.timestamp)).map(e=>`<tr>
         <td class="td-muted">${e.date||tsToDate(e.timestamp)}</td>
         <td style="color:${e.color};font-weight:700">${e.type}</td>
@@ -2529,9 +2526,9 @@ function expRenderWallet(addr, bondData, bbData, ntData, tmData, lcData, latestS
     </table></div>
 
     ${breaks.length>0?`<div class="sep"></div>
-    <div class="inner-title">Détail des Breaks</div>
+    <div class="inner-title">Bond Breaks Detail</div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Date</th><th>Bond #</th><th>Montant</th><th>Tx</th></tr></thead>
+      <thead><tr><th>Date</th><th>Bond #</th><th>Amount</th><th>Tx</th></tr></thead>
       <tbody>${breaks.sort((a,b)=>parseInt(b.timestamp)-parseInt(a.timestamp)).map(e=>`<tr>
         <td class="td-muted">${e.date||tsToDate(e.timestamp)}</td>
         <td class="td-cyan">#${e.nftId}</td>
@@ -2540,6 +2537,8 @@ function expRenderWallet(addr, bondData, bbData, ntData, tmData, lcData, latestS
       </tr>`).join('')}</tbody>
     </table></div>`:''}
   `;
+  // Render VP chart after DOM update
+  setTimeout(() => expRenderVPChart(bondRows, allBondCreated, myIncreases, breaks, fullMatS), 50);
 }
 
 /* ═══════════════════════════ SCREENSHOT ═══════════════════════════ */
@@ -2556,6 +2555,109 @@ function takeScreenshot(sectionId, filename) {
       a.click();
     }).catch(()=>el.classList.remove('screenshot-mode'));
 }
+
+
+
+/* ═══════════════════════════ EXPLORER VP CHART ═══════════════════════════ */
+function expRenderVPChart(bondRows, created, increases, breaks, fullMatS) {
+  const canvas = document.getElementById('exp-vp-chart');
+  if (!canvas) return;
+
+  // Build timeline of events sorted by timestamp
+  const allEvents = [
+    ...created.map(e => ({ ts: parseInt(e.timestamp), type: 'created', amount: parseAmt(e.amount) })),
+    ...increases.map(e => ({ ts: parseInt(e.timestamp), type: 'increase', amount: parseAmt(e.amount) })),
+    ...breaks.map(e => ({ ts: parseInt(e.timestamp), type: 'break', amount: parseAmt(e.amount) })),
+  ].sort((a,b) => a.ts - b.ts);
+
+  if (!allEvents.length) return;
+
+  // Build cumulative RIZE over time (simplified: track running total)
+  const labels = [];
+  const rizeData = [];
+  const vpData = [];
+  let running = 0;
+
+  allEvents.forEach(ev => {
+    const date = tsToDate(ev.ts.toString());
+    if (ev.type === 'break') running = Math.max(0, running - ev.amount);
+    else running += ev.amount;
+    labels.push(date);
+    // Estimate VP: use current avg maturity as proxy for historical
+    const mat = Math.min(1, (Date.now()/1000 - ev.ts) / fullMatS);
+    rizeData.push(running);
+    vpData.push(running * (1 + mat * 2));
+  });
+
+  // Add future projection points
+  const now = Date.now()/1000;
+  const nowDate = tsToDate(now.toString());
+  const todayVP = bondRows.reduce((s,b) => s + b.vp, 0);
+  labels.push(nowDate);
+  rizeData.push(rizeData[rizeData.length-1] || 0);
+  vpData.push(todayVP);
+
+  // +6, +12, +24 months projection
+  [[6,'6m'],[12,'12m'],[24,'24m']].forEach(([m, lbl]) => {
+    const futureVP = bondRows.reduce((s,b) => {
+      const snap = Object.values(window._latestSnapCache||{}).find(sn=>sn.nftId===b.nftId);
+      const tm = snap ? parseInt(snap.timeMarker) : parseInt(b.createdAtTimestamp||now);
+      const futureMat = Math.min(1, (now + m*2592000 - tm) / fullMatS);
+      return s + b.amount * (1 + futureMat * 2);
+    }, 0);
+    labels.push('+'+lbl);
+    rizeData.push(rizeData[rizeData.length-1]||0);
+    vpData.push(futureVP);
+  });
+
+  if (rzCharts.expVP) { rzCharts.expVP.destroy(); rzCharts.expVP = null; }
+
+  const opts = baseOpts();
+  opts.plugins.legend = { display:true, labels:{ color:'#b6c1d8', font:{size:12}, boxWidth:12, padding:16 } };
+  opts.scales.y.ticks.callback = v => fmt(v,0);
+  opts.plugins.tooltip.callbacks.label = c => ` ${c.dataset.label}: ${fmt(c.parsed.y,2)}`;
+
+  rzCharts.expVP = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'RIZE Bonded', data: rizeData, borderColor: '#ffd36b', backgroundColor: 'rgba(255,211,107,0.08)', fill: true, tension: 0.3, pointRadius: 3, borderWidth: 2 },
+        { label: 'Voting Power', data: vpData, borderColor: '#7ee0ff', backgroundColor: 'rgba(126,224,255,0.08)', fill: true, tension: 0.3, pointRadius: 3, borderWidth: 2 },
+      ]
+    },
+    options: opts
+  });
+}
+
+/* ═══════════════════════════ HEATMAP TOOLTIP ═══════════════════════════ */
+function hmShowTip(e, el) {
+  el.style.outline = '1px solid rgba(255,255,255,0.8)';
+  el.style.zIndex = '10';
+  let tip = document.getElementById('hm-tooltip');
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.id = 'hm-tooltip';
+    tip.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;background:#060818;border:1px solid rgba(126,224,255,0.4);color:#f7f2e8;font-family:"DM Mono",monospace;font-size:12px;padding:8px 12px;line-height:1.5;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.5);';
+    document.body.appendChild(tip);
+  }
+  tip.textContent = el.dataset.tip || '';
+  tip.style.display = 'block';
+  tip.style.left = (e.clientX + 12) + 'px';
+  tip.style.top = (e.clientY - 32) + 'px';
+}
+function hmHideTip() {
+  const tip = document.getElementById('hm-tooltip');
+  if (tip) tip.style.display = 'none';
+  document.querySelectorAll('[data-tip]').forEach(el => { el.style.outline='none'; el.style.zIndex=''; });
+}
+document.addEventListener('mousemove', e => {
+  const tip = document.getElementById('hm-tooltip');
+  if (tip && tip.style.display === 'block') {
+    tip.style.left = (e.clientX + 12) + 'px';
+    tip.style.top = (e.clientY - 32) + 'px';
+  }
+});
 
 /* ═══════════════════════════ INIT ═══════════════════════════ */
 document.addEventListener('DOMContentLoaded', () => {
