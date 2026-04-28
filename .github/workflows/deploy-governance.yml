@@ -38,10 +38,13 @@ jobs:
         working-directory: goldsky-governance
         run: graph build
 
+      - name: Install Goldsky CLI
+        run: curl https://goldsky.com/install | sh
+
       - name: Deploy to Goldsky
         working-directory: goldsky-governance
         env:
           GOLDSKY_API_KEY: ${{ secrets.GOLDSKY_API_KEY }}
         run: |
-          npx goldsky subgraph deploy tokerize-governance-unified/${{ github.event.inputs.version }} \
+          goldsky subgraph deploy tokerize-governance-unified/${{ github.event.inputs.version }} \
             --token $GOLDSKY_API_KEY
