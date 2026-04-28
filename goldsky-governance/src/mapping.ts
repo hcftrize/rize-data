@@ -249,8 +249,8 @@ export function handlePoolUpdated(event: PoolUpdated): void {
 
   let ev                = new PoolUpdatedEvent(event.transaction.hash.toHex() + "-" + event.logIndex.toString());
   ev.poolId             = event.params.poolId as i32;
-  ev.baseWeight         = BigInt.fromU32(event.params.baseWeight);
-  ev.maturedWeightBonus = BigInt.fromU32(event.params.maturedWeightBonus);
+  ev.baseWeight         = BigInt.fromString(event.params.baseWeight.toString());
+  ev.maturedWeightBonus = BigInt.fromString(event.params.maturedWeightBonus.toString());
   ev.fullMaturity       = event.params.fullMaturity;
   ev.date               = date;
   ev.blockNumber        = event.block.number;
@@ -265,8 +265,8 @@ export function handlePoolUpdated(event: PoolUpdated): void {
     pool        = new Pool(poolId);
     pool.poolId = event.params.poolId as i32;
   }
-  pool.baseWeight         = BigInt.fromU32(event.params.baseWeight);
-  pool.maturedWeightBonus = BigInt.fromU32(event.params.maturedWeightBonus);
+  pool.baseWeight         = BigInt.fromString(event.params.baseWeight.toString());
+  pool.maturedWeightBonus = BigInt.fromString(event.params.maturedWeightBonus.toString());
   pool.fullMaturity       = event.params.fullMaturity;
   pool.updatedAtDate      = date;
   pool.updatedAtTimestamp = event.block.timestamp;
