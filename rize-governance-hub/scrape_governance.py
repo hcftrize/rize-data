@@ -217,7 +217,7 @@ def main():
         }
         path = os.path.join(out_dir, f"{name}.json")
         with open(path, "w") as f:
-            json.dump(out, f, separators=(",", ":"))
+            json.dump(out, f, indent=2, ensure_ascii=False)
         size_kb = os.path.getsize(path) // 1024
         print(f"\n  ✓ {path} — {size_kb} KB | {out['counts']}", flush=True)
     print(f"\nDone — {datetime.now(timezone.utc).isoformat()}", flush=True)
