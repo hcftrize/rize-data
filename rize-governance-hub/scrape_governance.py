@@ -5,7 +5,7 @@ Full erasure + rewrite on each run.
 Usage:
   python3 scrape_governance.py                  # all 6
   python3 scrape_governance.py bond-broken      # single
-v6 — 30s entre chaque query Ormi (au lieu de 120s)
+v7 — bond-timemarker: URL publique /v2/gn (fix tag scraper→v2 + no auth)
 """
 import json, time, sys, os, urllib.request, urllib.error
 from datetime import datetime, timezone
@@ -18,13 +18,14 @@ ENDPOINTS = {
     "bond-lifecycle":  "https://api.goldsky.com/api/public/project_cmocnm0h8gx3n01y7hpoe4kxv/subgraphs/tokerize-bond-lifecycle/1.0.0/gn",
     "bond-broken":     "https://api.goldsky.com/api/public/project_cmocqkq31mv0m010y19bu6obd/subgraphs/tokerize-bond-broken/1.0.0/gn",
     "nft-transfers":   "https://api.goldsky.com/api/public/project_cmocqwx6tnlbf010yce109jo9/subgraphs/tokerize-nft-transfers/1.0.0/gn",
-    "bond-timemarker": "https://api.subgraph.ormilabs.com/api/private/ac2ecb60-44a8-4df2-83cb-08bd1bced775/subgraphs/tokerize-bond-timemarker/scraper/gn",
+    # FIX v7: URL publique + tag v2 (était: /private/…/scraper/gn — tag inexistant)
+    "bond-timemarker": "https://api.subgraph.ormilabs.com/api/public/ac2ecb60-44a8-4df2-83cb-08bd1bced775/subgraphs/tokerize-bond-timemarker/v2/gn",
     "bond-created":    "https://api.subgraph.ormilabs.com/api/private/a9ede79c-2a5c-4bb8-9208-ac30662368b5/subgraphs/tokerize-bond-created/ormiunusable/gn",
 }
 
 ORMI_KEYS = {
-    "bond-timemarker": ORMI_API_KEY_2,
-    "bond-created":    ORMI_API_KEY,
+    # bond-timemarker retiré : endpoint public, pas d'auth nécessaire
+    "bond-created": ORMI_API_KEY,
 }
 
 ENTITIES = {
@@ -199,7 +200,7 @@ def main():
     out_dir = "rize-governance-hub"
     os.makedirs(out_dir, exist_ok=True)
     ts = datetime.now(timezone.utc).isoformat()
-    print(f"Governance bootstrap v6 — {ts}", flush=True)
+    print(f"Governance bootstrap v7 — {ts}", flush=True)
     print(f"Targets: {targets}", flush=True)
     print(f"Ormi delays: {ORMI_PAUSE_BEFORE_QUERY}s/query, {ORMI_PAUSE_429}s/429, {ORMI_PAUSE_INTER_ENTITY}s/entity", flush=True)
     for name in targets:
