@@ -63,7 +63,7 @@
     .live-badge-pink{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--pink);}
 
     /* ── CATEGORY NAV ── */
-    .cat-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid rgba(255,255,255,0.08);background:var(--black);}
+    .cat-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid rgba(255,255,255,0.08);background:var(--black);}
     .cat-btn{display:flex;align-items:center;justify-content:center;padding:28px 20px;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,0.55);font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;transition:all 0.2s;border-right:1px solid rgba(255,255,255,0.06);border-bottom:3px solid transparent;}
     .cat-btn:last-child{border-right:none;}
     .cat-btn:hover{color:#fff;background:rgba(255,255,255,0.03);}
@@ -72,7 +72,7 @@
     #lb-table tbody tr:hover .lb-wallet-addr { color: var(--cyan) !important; }
     #hhi-tbody tr:hover .hhi-wallet-addr { color: var(--cyan) !important; }
     #whale-tbody tr:hover .hhi-wallet-addr { color: var(--cyan) !important; }
-    tbody tr:hover .atx-wallet-link { color: var(--cyan) !important; }
+    #atx-tbody tr:hover .atx-wallet-link { color: var(--cyan) !important; }
 
     .cat-btn.active{color:#fff;border-bottom-color:var(--cyan);background:rgba(126,224,255,0.04);}
 
@@ -100,7 +100,7 @@
     .ctx-kpi{flex:1;min-width:140px;padding:16px 18px;border:1px solid rgba(255,255,255,0.07);background:linear-gradient(180deg,rgba(126,224,255,0.03),transparent 60%),rgba(255,255,255,0.015);}
     .ctx-kpi-label{display:block;font-family:"Trebuchet MS",sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px;}
     .ctx-kpi-value{display:block;font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;line-height:1.05;color:#fff;letter-spacing:0.5px;}
-    .ctx-kpi-sub{display:block;font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--muted);margin-top:4px;}
+    .ctx-kpi-sub{display:block;font-family:'Rajdhani',sans-serif;font-size:15px;color:var(--muted);margin-top:4px;}
     .accent-cyan{color:var(--cyan)!important;}
     .accent-gold{color:var(--gold)!important;}
     .accent-green{color:#98ffb6!important;}
@@ -243,7 +243,7 @@
       .hub-right{display:none;}
       .hub-title{font-size:clamp(22px,6vw,36px);}
       .hub-sub{font-size:13px;}
-      .cat-nav{grid-template-columns:1fr 1fr 1fr;}
+      .cat-nav{grid-template-columns:1fr 1fr;}
       .cat-btn{padding:16px 6px;font-size:11px;letter-spacing:1.5px;}
       .hub-wrap{padding:16px 12px;}
       .section{padding:16px 14px;}
@@ -589,7 +589,7 @@
           <div class="ctx-kpi"><span class="ctx-kpi-label">This Month — Created + Increased</span><span class="ctx-kpi-value accent-green" id="cal-this-month-c">—</span><span class="ctx-kpi-sub" id="cal-this-month-c-rize">&nbsp;</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">Last Month — Created + Increased</span><span class="ctx-kpi-value" id="cal-last-month-c">—</span><span class="ctx-kpi-sub" id="cal-last-month-c-rize">&nbsp;</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">All Time Created</span><span class="ctx-kpi-value accent-cyan" id="cal-all-c">—</span><span class="ctx-kpi-sub">&nbsp;</span></div>
-          <div class="ctx-kpi"><span class="ctx-kpi-label">90d Created</span><span class="ctx-kpi-value" id="cal-90d-c">—</span><span class="ctx-kpi-sub" id="cal-90d-c-rize">&nbsp;</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">90d Created + Increased</span><span class="ctx-kpi-value" id="cal-90d-c">—</span><span class="ctx-kpi-sub" id="cal-90d-c-rize">&nbsp;</span></div>
         </div>
         <div class="conv-toggle-row">
           <button class="conv-toggle active" onclick="calSwitch('monthly',this)">Monthly</button>
@@ -692,13 +692,17 @@
           </div>
           <div>
             <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">Net Flow 7d (40%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-netflow-7d">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">Bonds/Breaks Ratio 30d (25%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-ratio-30d">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">Avg Maturity Trend (20%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-mat-trend">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">New Bonders 30d (15%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-new-bonders">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted);cursor:pointer;text-decoration:underline dotted" onclick="momLearn('netflow')">Net Flow 7d — click to learn</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-netflow-7d">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted);cursor:pointer;text-decoration:underline dotted" onclick="momLearn('ratio')">Conviction/Exit Ratio 30d — click to learn</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-ratio-30d">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)" onclick="momLearn('maturity')" style="cursor:pointer;text-decoration:underline dotted;user-select:none">Avg Maturity — click to learn</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-mat-trend">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)" onclick="momLearn('internal')" style="cursor:pointer;text-decoration:underline dotted;user-select:none">Internal Conviction 30d — click to learn</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-new-bonders">—</span></div>
             </div>
           </div>
           <div style="width:300px;height:300px;min-width:300px"><canvas id="mom-donut"></canvas></div>
+        </div>
+        <div style="margin:16px 0;padding:14px 16px;border:1px solid rgba(126,224,255,0.10);background:rgba(126,224,255,0.02)">
+          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Learn — click a component above to understand how it is built</div>
+          <div style="font-family:'DM Mono',monospace;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.7" id="mom-learn-text">Click on Net Flow, Conviction/Exit Ratio, Internal Conviction or Avg Maturity to understand how each component is built and what signal it captures.</div>
         </div>
         <div class="sep"></div>
         <div class="inner-title">Historical Score</div>
@@ -773,7 +777,7 @@
         </div>
         <div class="conv-toggle-row" style="margin-bottom:12px" id="ba-filter-row">
           <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);align-self:center">Threshold:</span>
-          <button class="conv-toggle active" onclick="baSetThreshold(0,this)">All</button>
+          <button class="conv-toggle active" id="ba-btn-all" onclick="baSetThreshold(0,this)">All</button>
           <button class="conv-toggle" onclick="baSetThreshold(1_000_000,this)">1M+ RIZE</button>
           <button class="conv-toggle" onclick="baSetThreshold(5_000_000,this)">5M+ RIZE</button>
           <button class="conv-toggle" onclick="baSetThreshold(10_000_000,this)">10M+ RIZE</button>
@@ -1123,13 +1127,13 @@ function metricsSwitch(val) {
   document.querySelectorAll('.metrics-panel').forEach(p=>{p.style.display='none';p.classList.remove('active');});
   const p=document.getElementById('mp-'+val);
   if(p){p.style.display='block';p.classList.add('active');}
-  const map={conviction:initConviction,tokenomics:initTokenomics,heatmap:initHeatmap,
+  const map={conviction:()=>{initConviction();setTimeout(()=>{if(!momLoaded)initMomentum();},4000);},tokenomics:initTokenomics,heatmap:initHeatmap,
     calendar:initCalendar,whale:initWhale,maturity:initMaturity,
     momentum:initMomentum,hhi:initHHI,bondage:initBondAge,calculator:initCalculator};
   if(map[val]) map[val]();
 }
 
-let _expReturnModule=null;
+let _expReturnModule=null, _expReturnCatBtn=null;
 function expGo(query,fromModule) {
   _expReturnModule=fromModule||null;
   if(fromModule==='leaderboard'){_lbCameFrom=true;}
@@ -1640,6 +1644,15 @@ function hmMode(mode,btn){
   if(hmLoaded)hmRender();
 }
 
+function hmCellColor(mode,v,intensity){
+  const a=0.1+intensity*0.9;
+  if(mode==='net')return v>=0?`rgba(152,255,182,${a})`:`rgba(255,138,216,${a})`;
+  if(mode==='breaks'){const r=Math.round(150+intensity*105),g=Math.round((1-intensity)*80);return `rgba(${r},${g},50,${a})`;}
+  if(mode==='created')return `rgba(${Math.round(60+intensity*80)},${Math.round(180+intensity*60)},${Math.round(80+intensity*30)},${a})`;
+  if(mode==='releases')return `rgba(${Math.round(30+intensity*80)},${Math.round(140+intensity*80)},${Math.round(200+intensity*55)},${a})`;
+  if(mode==='increase')return `rgba(${Math.round(200+intensity*55)},${Math.round(150+intensity*60)},50,${a})`;
+  return `rgba(152,255,182,${a})`;
+}
 function hmRender(){
   const days=Object.keys(hmDailyData).sort().reverse();
   const hmLoadEl=document.getElementById('hm-loading');
@@ -1676,10 +1689,7 @@ function hmRender(){
     ymDays.forEach(day=>{
       const v=getValue(day);
       const intensity=Math.abs(v)/maxVal;
-      let col;
-      if(hmMode_==='net')col=v>=0?`rgba(152,255,182,${0.1+intensity*0.9})`:`rgba(255,138,216,${0.1+intensity*0.9})`;
-      else if(hmMode_==='breaks'){const r2=Math.round(150+intensity*105);const g2=Math.round((1-intensity)*80);col=`rgba(${r2},${g2},50,${0.1+intensity*0.9})`;}
-      else col=`rgba(126,224,255,${0.1+intensity*0.9})`;
+      const col=hmCellColor(hmMode_,v,intensity);
       const dd=hmDailyData[day];
       const cnt=(dd.breakEvents.length+dd.createdEvents.length+dd.increaseEvents.length+dd.releaseEvents.length);
       const tip=`${day}: ${fmt(Math.abs(v),2)} RIZE (${cnt} events)`;
@@ -1689,9 +1699,9 @@ function hmRender(){
   }
   html+=`</div></div>`;
   // Dynamic legend based on mode
-  const hmLowCol=hmMode_==='breaks'?'rgba(200,80,50,0.2)':hmMode_==='created'?'rgba(152,255,182,0.2)':hmMode_==='releases'?'rgba(126,224,255,0.2)':hmMode_==='increase'?'rgba(255,211,107,0.2)':'rgba(152,255,182,0.2)';
-  const hmMidCol=hmMode_==='breaks'?'rgba(220,100,50,0.55)':hmMode_==='created'?'rgba(100,220,130,0.55)':hmMode_==='releases'?'rgba(80,180,255,0.55)':hmMode_==='increase'?'rgba(255,180,50,0.55)':'rgba(100,220,130,0.55)';
-  const hmHiCol=hmMode_==='breaks'?'rgba(255,60,60,0.95)':hmMode_==='created'?'rgba(60,220,80,0.95)':hmMode_==='releases'?'rgba(30,170,255,0.95)':hmMode_==='increase'?'rgba(255,200,50,0.95)':'rgba(60,220,80,0.95)';
+  const hmLowCol=hmCellColor(hmMode_,1,0.10);
+  const hmMidCol=hmCellColor(hmMode_,1,0.50);
+  const hmHiCol=hmCellColor(hmMode_,1,0.95);
   html+=`<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:10px">
     <div style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)"><div style="width:14px;height:14px;background:${hmLowCol}"></div>Low</div>
     <div style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)"><div style="width:14px;height:14px;background:${hmMidCol}"></div>Medium</div>
@@ -1791,14 +1801,16 @@ async function initCalendar(){
   document.getElementById('cal-last-month-b-rize').textContent=fmt(lastB.rize,2)+' RIZE';
   document.getElementById('cal-all-b').textContent=allB.reduce((s,v)=>s+v.count,0).toLocaleString();
   document.getElementById('cal-all-b-rize').textContent=fmt(allB.reduce((s,v)=>s+v.rize,0),2)+' RIZE';
-  document.getElementById('cal-90d-b').textContent=all90kB.length+' days';
+  const _cnt90b=all90kB.reduce((s,d)=>s+(calDailyB[d]?.count||0),0);
+  document.getElementById('cal-90d-b').textContent=_cnt90b.toLocaleString();
   document.getElementById('cal-90d-b-rize').textContent=fmt(rize90B,2)+' RIZE';
   document.getElementById('cal-this-month-c').textContent=thisC.count.toLocaleString();
   document.getElementById('cal-this-month-c-rize').textContent=fmt(thisC.rize,2)+' RIZE';
   document.getElementById('cal-last-month-c').textContent=lastC.count.toLocaleString();
   document.getElementById('cal-last-month-c-rize').textContent=fmt(lastC.rize,2)+' RIZE';
   document.getElementById('cal-all-c').textContent=allC.reduce((s,v)=>s+v.count,0).toLocaleString();
-  document.getElementById('cal-90d-c').textContent=all90kC.length+' days';
+  const _cnt90c=all90kC.reduce((s,d)=>s+(calDailyC[d]?.count||0),0);
+  document.getElementById('cal-90d-c').textContent=_cnt90c.toLocaleString();
   document.getElementById('cal-90d-c-rize').textContent=fmt(rize90C,2)+' RIZE';
   calRender();calRenderTable();
 }
@@ -2057,9 +2069,9 @@ async function initMomentum(){
   const score=Math.min(10,Math.max(0,s1+s2+s3+s4));
   const scoreEl=document.getElementById('momentum-score-display');
   scoreEl.textContent=score.toFixed(1);
-  const col=score>=8?'#98ffb6':score>=6?'var(--cyan)':score>=4?'var(--gold)':score>=2?'var(--pink)':'#ff4444';
+  const col=score>=5?'#98ffb6':score>=3?'var(--gold)':'var(--pink)';
   scoreEl.style.color=col;
-  document.getElementById('momentum-score-label').textContent=score>=8?'STRONG CONVICTION':score>=6?'ACCUMULATION':score>=4?'NEUTRAL':score>=2?'DISTRIBUTION':'CRITICAL';
+  document.getElementById('momentum-score-label').textContent=score>=5?'CONVICTION':'NEUTRAL / DISTRIBUTION';
   document.getElementById('mom-netflow-7d').textContent=(netFlow7>=0?'+':'')+fmt(netFlow7,2)+' RIZE (bonds+increases-breaks)';
   document.getElementById('mom-netflow-7d').style.color=netFlow7>=0?'#98ffb6':'var(--pink)';
   document.getElementById('mom-ratio-30d').textContent=ratio30.toFixed(2)+'× (RIZE weighted)';
@@ -2107,6 +2119,16 @@ async function momBuildHistory(breaks,bonds,increases,latestSnap,fullMatS){
   window._momHistDays=days;window._momHistScores=scoresByDay;
 }
 
+function momLearn(key){
+  const T={
+    netflow:'<strong style="color:var(--cyan)">Net Flow RIZE — 7 days (40%)</strong><br>Net RIZE entering governance: (Bonds + IncreaseBonds) - Breaks over 7 days. Fully RIZE-weighted — 1000 micro-bonds = noise; one 10M RIZE bond = strong signal. Short 7-day window captures current momentum.',
+    ratio:'<strong style="color:var(--gold)">Conviction / Exit Ratio — 30 days (30%)</strong><br>RIZE entering (bonds + 70% of increases) vs RIZE leaving (breaks) over 30 days. Ratio > 1 = more conviction than exits. IncreaseBonds count 70% — strong signal, not new capital. RIZE-weighted, manipulation-resistant.',
+    internal:'<strong style="color:#98ffb6">Internal Conviction — 30 days (20%)</strong><br>IncreaseBond RIZE 30d divided by total RIZE bonded. Even without new wallets, existing holders deepening commitment is bullish. Cannot be gamed with small transactions.',
+    maturity:'<strong style="color:var(--muted)">Avg Maturity Anchor (10%)</strong><br>Average maturity of all active bonds. Slow structural anchor — high maturity means holders have been committed for a long time. Grows ~2.8%/month maximum. Completely manipulation-resistant.'
+  };
+  const box=document.getElementById('mom-learn-text');
+  if(box){box.innerHTML=T[key]||'';box.style.display='block';}
+}
 function momHistView(view,btn){
   momHistView_=view;
   document.querySelectorAll('#mp-momentum .conv-toggle').forEach(b=>b.classList.remove('active'));
@@ -2215,6 +2237,15 @@ async function initBondAge(){
   // Default: show All
   const allBtn=document.querySelector('#ba-filter-row .conv-toggle');
   if(allBtn){document.querySelectorAll('#ba-filter-row .conv-toggle').forEach(b=>b.classList.remove('active'));allBtn.classList.add('active');}
+  // Extra KPIs
+  const _sortA=[...points].sort((a,b)=>a.x-b.x);
+  const _medA=_sortA.length?_sortA[Math.floor(_sortA.length/2)].x:0;
+  const _tvpBA=points.reduce((s,p)=>s+p.vp,0);
+  const _vp6=points.filter(p=>p.x>=6).reduce((s,p)=>s+p.vp,0);
+  const _vp12=points.filter(p=>p.x>=12).reduce((s,p)=>s+p.vp,0);
+  const _eMed=document.getElementById('ba-median-age');if(_eMed)_eMed.textContent=_medA.toFixed(1)+' mo';
+  const _e6=document.getElementById('ba-vp6mo');if(_e6)_e6.textContent=_tvpBA>0?fmtPct(_vp6/_tvpBA*100):'—';
+  const _e12=document.getElementById('ba-vp12mo');if(_e12)_e12.textContent=_tvpBA>0?fmtPct(_vp12/_tvpBA*100):'—';
   document.getElementById('ba-diamond-whale').textContent=dw.toLocaleString();
   document.getElementById('ba-early').textContent=eb.toLocaleString();
   document.getElementById('ba-new-whale').textContent=nw.toLocaleString();
@@ -2261,11 +2292,9 @@ function baSetThreshold(thresh, btn){
   opts.plugins.tooltip.callbacks={label:c=>{const p=c.raw;return[`Bond #${p.nftId||'—'}`,`${fmt(p.y,2)} RIZE`,`Maturity: ${fmtPct(p.mat*100)}`,`VP: ${fmt(p.vp,2)}`];}};
   opts.scales.x={...opts.scales.x,title:{display:true,text:'Effective Age (months from timeMarker)',color:'#b6c1d8',font:{size:13}}};
   opts.scales.y={...opts.scales.y,type:'logarithmic',title:{display:true,text:'RIZE Amount (log scale)',color:'#b6c1d8',font:{size:13}},ticks:{color:'#b6c1d8',callback:v=>fmt(v,0)}};
-  rzCharts.ba=new Chart(document.getElementById('ba-chart').getContext('2d'),{type:'bubble',data:{datasets:[{
-    data:filtered.slice(0,3000),
-    backgroundColor:filtered.slice(0,3000).map(p=>p.mat>0.75?'rgba(255,211,107,0.7)':p.mat>0.5?'rgba(126,224,255,0.7)':p.mat>0.25?'rgba(152,255,182,0.6)':'rgba(255,138,216,0.5)'),
-    borderWidth:0,
-  }]},options:opts});
+  // Delegate to baSetThreshold so active button matches chart
+  const _abb=document.getElementById('ba-btn-all');
+  baSetThreshold(0, _abb||{classList:{add:function(){},remove:function(){}}});
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -2570,7 +2599,9 @@ function expRenderWallet(addr,bdData,bbData,ntData,tmData,lcData,latestSnap,full
   if(!bonds.length&&!allBondCreated.length){results.innerHTML=`<div class="error-box">No governance activity found for ${fmtAddr(addr)}. Please verify the address.</div>`;return;}
 
   // Back to leaderboard button if arrived from there
-  const backBtn=(_lbCameFrom||_expReturnModule)?`<button class="search-btn secondary" style="margin-bottom:12px" onclick="if(_lbCameFrom){document.getElementById('cat-btn-leaderboard').click();setTimeout(()=>{lbPage=${_lbFromPage};lbRender();window.scrollTo(0,${_lbScrollY});_lbCameFrom=false;},120);}else{document.getElementById('cat-btn-metrics').click();}">Back${_expReturnModule?' to '+_expReturnModule:' to Leaderboard'}</button>`:'';
+  const _retBtn=_lbCameFrom?'cat-btn-leaderboard':(_expReturnCatBtn||'cat-btn-metrics');
+const _retLbl=_lbCameFrom?`Back to Leaderboard (p.${_lbFromPage})`:`Back to ${_expReturnModule||'previous'}`;
+const backBtn=(_lbCameFrom||_expReturnModule)?`<button class="search-btn secondary" style="margin-bottom:12px" onclick="if(_lbCameFrom){document.getElementById('cat-btn-leaderboard').click();setTimeout(()=>{lbPage=${_lbFromPage};lbRender();window.scrollTo(0,${_lbScrollY});_lbCameFrom=false;},120);}else{document.getElementById('${_retBtn}').click();_expReturnCatBtn=null;_expReturnModule=null;}">${_retLbl}</button>`:'';
 
   const timeline=[
     ...allBondCreated.map(e=>({...e,_type:'Bond Created',_color:'#98ffb6',_amt:parseAmt(e.amount)})),
@@ -2919,7 +2950,7 @@ function atxRender(){
 }
 
 function atxGoWallet(addr){
-  _lbCameFrom=false; _expReturnModule='Explorer';
+  _lbCameFrom=false; _expReturnModule='Explorer'; _expReturnCatBtn='cat-btn-alltx';
   document.getElementById('cat-btn-explorer').click();
   setTimeout(()=>{document.getElementById('exp-input').value=addr;expSearch();},80);
 }
