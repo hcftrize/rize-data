@@ -71,8 +71,6 @@
     /* Wallet link hover — any table */
     #lb-table tbody tr:hover .lb-wallet-addr { color: var(--cyan) !important; }
     #hhi-tbody tr:hover .hhi-wallet-addr { color: var(--cyan) !important; }
-    #atx-tbody tr:hover .atx-wallet-link { color: var(--cyan) !important; }
-    #hhi-tbody tr:hover .hhi-wallet-addr { color: var(--cyan) !important; }
     #whale-tbody tr:hover .hhi-wallet-addr { color: var(--cyan) !important; }
     tbody tr:hover .atx-wallet-link { color: var(--cyan) !important; }
 
@@ -102,7 +100,7 @@
     .ctx-kpi{flex:1;min-width:140px;padding:16px 18px;border:1px solid rgba(255,255,255,0.07);background:linear-gradient(180deg,rgba(126,224,255,0.03),transparent 60%),rgba(255,255,255,0.015);}
     .ctx-kpi-label{display:block;font-family:"Trebuchet MS",sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px;}
     .ctx-kpi-value{display:block;font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;line-height:1.05;color:#fff;letter-spacing:0.5px;}
-    .ctx-kpi-sub{display:block;font-family:'Rajdhani',sans-serif;font-size:15px;color:var(--muted);margin-top:4px;}
+    .ctx-kpi-sub{display:block;font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--muted);margin-top:4px;}
     .accent-cyan{color:var(--cyan)!important;}
     .accent-gold{color:var(--gold)!important;}
     .accent-green{color:#98ffb6!important;}
@@ -694,18 +692,17 @@
           </div>
           <div>
             <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)";cursor:pointer;text-decoration:underline dotted" onclick="momLearn('netflow')">Net Flow RIZE — 7 days</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-netflow-7d">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)";cursor:pointer;text-decoration:underline dotted" onclick="momLearn('ratio')">Conviction/Exit Ratio — 30 days</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-ratio-30d">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted);cursor:pointer;text-decoration:underline dotted" onclick="momLearn('maturity')">Avg Maturity Anchor</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-mat-trend">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)";cursor:pointer;text-decoration:underline dotted" onclick="momLearn('internal')">Internal Conviction — 30 days</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-new-bonders">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)" onclick="momLearn('netflow')" style="cursor:pointer;text-decoration:underline dotted">Net Flow RIZE — 7 days</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-netflow-7d">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)" onclick="momLearn('ratio')" style="cursor:pointer;text-decoration:underline dotted">Conviction / Exit Ratio — 30 days</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-ratio-30d">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)" onclick="momLearn('maturity')" style="cursor:pointer;text-decoration:underline dotted">Avg Maturity Anchor</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-mat-trend">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)" onclick="momLearn('internal')" style="cursor:pointer;text-decoration:underline dotted">Internal Conviction — 30 days</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-new-bonders">—</span></div>
             </div>
           </div>
           <div style="width:300px;height:300px;min-width:300px"><canvas id="mom-donut"></canvas></div>
         </div>
-        <div class="sep"></div>
-        <div style="margin:16px 0;padding:14px 16px;border:1px solid rgba(126,224,255,0.10);background:rgba(126,224,255,0.02)">
-          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Learn — click a component above</div>
-          <div style="font-family:'DM Mono',monospace;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.7" id="mom-learn-text">Click on Net Flow, Conviction/Exit Ratio, Internal Conviction or Avg Maturity to understand how each component is built and what signal it captures.</div>
+        <div style="margin:16px 0;padding:14px 18px;border:1px solid rgba(126,224,255,0.1);background:rgba(126,224,255,0.025);border-radius:2px">
+          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px">↑ Click a component to learn how it's built</div>
+          <div id="mom-learn-text" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted);line-height:1.75">Click on <em>Net Flow</em>, <em>Conviction/Exit Ratio</em>, <em>Internal Conviction</em> or <em>Avg Maturity</em> above to understand what each component measures and why its construction makes the score manipulation-resistant.</div>
         </div>
         <div class="sep"></div>
         <div class="inner-title">Historical Score</div>
@@ -777,11 +774,6 @@
           <div class="ctx-kpi"><span class="ctx-kpi-label">Median Bond Age</span><span class="ctx-kpi-value accent-cyan" id="ba-median-age">—</span><span class="ctx-kpi-sub">effective months</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">VP Controlled >6mo</span><span class="ctx-kpi-value accent-gold" id="ba-vp6mo">—</span><span class="ctx-kpi-sub">% of total VP</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">VP Controlled >12mo</span><span class="ctx-kpi-value accent-green" id="ba-vp12mo">—</span><span class="ctx-kpi-sub">grows as contract matures</span></div>
-        </div>
-        <div class="ctx-kpi-row" style="margin:12px 0">
-          <div class="ctx-kpi"><span class="ctx-kpi-label">Median Bond Age</span><span class="ctx-kpi-value accent-cyan" id="ba-median-age">—</span><span class="ctx-kpi-sub">effective months</span></div>
-          <div class="ctx-kpi"><span class="ctx-kpi-label">VP Controlled &gt;6 months</span><span class="ctx-kpi-value accent-gold" id="ba-vp6mo">—</span><span class="ctx-kpi-sub">% of total VP</span></div>
-          <div class="ctx-kpi"><span class="ctx-kpi-label">VP Controlled &gt;12 months</span><span class="ctx-kpi-value accent-green" id="ba-vp12mo">—</span><span class="ctx-kpi-sub">grows as contract matures</span></div>
         </div>
         <div class="conv-toggle-row" style="margin-bottom:12px" id="ba-filter-row">
           <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);align-self:center">Threshold:</span>
@@ -1135,13 +1127,13 @@ function metricsSwitch(val) {
   document.querySelectorAll('.metrics-panel').forEach(p=>{p.style.display='none';p.classList.remove('active');});
   const p=document.getElementById('mp-'+val);
   if(p){p.style.display='block';p.classList.add('active');}
-  const map={conviction:()=>{initConviction();setTimeout(()=>{if(!momLoaded)initMomentum();},4000);},tokenomics:initTokenomics,heatmap:initHeatmap,
+  const map={conviction:initConviction,tokenomics:initTokenomics,heatmap:initHeatmap,
     calendar:initCalendar,whale:initWhale,maturity:initMaturity,
     momentum:initMomentum,hhi:initHHI,bondage:initBondAge,calculator:initCalculator};
   if(map[val]) map[val]();
 }
 
-let _expReturnModule=null, _expReturnCatBtn=null;
+let _expReturnModule=null;
 function expGo(query,fromModule) {
   _expReturnModule=fromModule||null;
   if(fromModule==='leaderboard'){_lbCameFrom=true;}
@@ -1198,32 +1190,63 @@ function getLatestSnaps(snapshots) {
 /* ═══════════════════════════════════════════════════════
    SCREENSHOT (clipboard desktop / download mobile)
 ═══════════════════════════════════════════════════════ */
-async function govScreenshot(sectionId, filename) {
+function govScreenshot(sectionId, filename) {
   const el=document.getElementById(sectionId);
-  if(!el||!window.html2canvas) return;
-  el.classList.add('screenshot-mode');
-  try {
-    const canvas=await html2canvas(el,{backgroundColor:'#000000',scale:2,useCORS:true,logging:false});
-    el.classList.remove('screenshot-mode');
-    const isMobile=/Mobi|Android/i.test(navigator.userAgent);
-    if(!isMobile&&navigator.clipboard?.write) {
-      canvas.toBlob(async blob=>{
-        try {
-          await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-          showToast('Screenshot copied to clipboard');
-        } catch(e) { _downloadScreenshot(canvas,filename); }
-      },'image/png');
-    } else {
-      _downloadScreenshot(canvas,filename);
-    }
-  } catch(e){ el.classList.remove('screenshot-mode'); }
+  if(!el) return;
+  if(typeof html2canvas==='undefined'){
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload=()=>_doGovScreenshot(el,filename);
+    document.head.appendChild(s);
+  } else { _doGovScreenshot(el,filename); }
 }
-function _downloadScreenshot(canvas,filename) {
+async function _doGovScreenshot(el, filename) {
+  el.classList.add('screenshot-mode');
+  // watermark
+  const _wm=document.createElement('div');
+  _wm.dataset.govwm='1';
+  _wm.style.cssText='position:absolute;bottom:10px;right:14px;font-family:Rajdhani,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.35);z-index:10;pointer-events:none;text-transform:uppercase';
+  _wm.textContent='TOKERIZE.TOP';
+  el.style.position='relative';
+  el.appendChild(_wm);
+  // Remove overflow constraints
+  const tableWraps=el.querySelectorAll('.table-wrap');
+  const savedStyles=[];
+  tableWraps.forEach(tw=>{savedStyles.push({el:tw,ox:tw.style.overflowX,w:tw.style.width});tw.style.overflowX='visible';tw.style.width='max-content';});
+  const hasCharts=el.querySelectorAll('canvas').length>0;
+  const savedW=el.style.width, savedOv=el.style.overflow;
+  const captureW=hasCharts?el.offsetWidth:el.scrollWidth;
+  el.style.width=hasCharts?captureW+'px':'max-content';
+  el.style.overflow='visible';
+  const stickyThs=el.querySelectorAll('th');
+  const savedThPos=[];
+  stickyThs.forEach(th=>{savedThPos.push(th.style.position);th.style.position='relative';});
+  await new Promise(r=>setTimeout(r,60));
+  try {
+    const canvas=await html2canvas(el,{backgroundColor:'#060818',scale:2,useCORS:true,logging:false,windowWidth:captureW,width:captureW});
+    const isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    canvas.toBlob(async blob=>{
+      if(!isMobile&&navigator.clipboard?.write){
+        try{
+          await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
+          showToast('📋 Screenshot copied to clipboard!');
+        } catch(e){_downloadGovSS(canvas,filename);}
+      } else { _downloadGovSS(canvas,filename); }
+    },'image/png');
+  } catch(e){ showToast('⚠ Screenshot failed.'); }
+  finally {
+    stickyThs.forEach((th,i)=>{th.style.position=savedThPos[i];});
+    tableWraps.forEach((tw,i)=>{tw.style.overflowX=savedStyles[i].ox;tw.style.width=savedStyles[i].w;});
+    el.style.width=savedW; el.style.overflow=savedOv;
+    const wme=el.querySelector('[data-govwm]');if(wme)el.removeChild(wme);
+    el.classList.remove('screenshot-mode');
+  }
+}
+function _downloadGovSS(canvas,filename){
   const a=document.createElement('a');
   a.download=`tokerize-${filename}-${new Date().toISOString().slice(0,10)}.png`;
-  a.href=canvas.toDataURL('image/png');
-  a.click();
-  showToast('Screenshot saved!');
+  a.href=canvas.toDataURL('image/png');a.click();
+  showToast('💾 Screenshot downloaded!');
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -1511,11 +1534,11 @@ function convRenderWhalesGov(whales,addressLabels) {
     else if(fromIsCex&&!toIsCex){dir='Outflow';dirColor='#98ffb6';}
     else{dir='Transfer';dirColor='#ffd36b';}
     return `<tr>
-      <td style="color:var(--muted);white-space:nowrap;font-size:15px">${dateStr}</td>
-      <td style="color:#fff;font-weight:700;font-size:16px">${fmt(val,2)} RIZE</td>
-      <td style="color:${dirColor};font-size:15px">${dir}</td>
-      <td style="color:var(--muted);font-size:14px">${resolveAddr(w.from,w.from_label)}</td>
-      <td style="color:var(--muted);font-size:14px">${resolveAddr(w.to,w.to_label)}</td>
+      <td style="color:var(--muted);white-space:nowrap">${dateStr}</td>
+      <td style="color:#fff;font-weight:700">${fmt(val,2)} RIZE</td>
+      <td style="color:${dirColor}">${dir}</td>
+      <td style="color:var(--muted)">${(w.from&&!fromIsCex)?`<span class="hhi-wallet-addr" onclick="expGo('${w.from}','Key Metrics')" style="cursor:pointer;font-family:'DM Mono',monospace;font-size:13px;transition:color 0.15s">${fmtAddr(w.from)}</span>`:resolveAddr(w.from,w.from_label)}</td>
+      <td style="color:var(--muted)">${(w.to&&!toIsCex)?`<span class="hhi-wallet-addr" onclick="expGo('${w.to}','Key Metrics')" style="cursor:pointer;font-family:'DM Mono',monospace;font-size:13px;transition:color 0.15s">${fmtAddr(w.to)}</span>`:resolveAddr(w.to,w.to_label)}</td>
       <td><a href="https://basescan.org/tx/${w.tx||''}" target="_blank" rel="noopener" style="color:#fff;text-decoration:none;font-family:'DM Mono',monospace;font-size:12px">${fmtAddr(w.tx||'')} ↗</a></td>
     </tr>`;
   }).join('');
@@ -1653,13 +1676,12 @@ function hmMode(mode,btn){
 }
 
 function hmCellColor(mode,v,intensity){
-  const a=0.1+intensity*0.9;
-  if(mode==='net')return v>=0?`rgba(152,255,182,${a})`:`rgba(255,138,216,${a})`;
-  if(mode==='breaks'){const r=Math.round(150+intensity*105),g=Math.round((1-intensity)*80);return `rgba(${r},${g},50,${a})`;}
-  if(mode==='created')return `rgba(${Math.round(60+intensity*80)},${Math.round(180+intensity*60)},${Math.round(80+intensity*30)},${a})`;
-  if(mode==='releases')return `rgba(${Math.round(30+intensity*80)},${Math.round(140+intensity*80)},${Math.round(200+intensity*55)},${a})`;
-  if(mode==='increase')return `rgba(${Math.round(200+intensity*55)},${Math.round(150+intensity*60)},50,${a})`;
-  return `rgba(152,255,182,${a})`;
+  if(mode==='net')return v>=0?`rgba(152,255,182,${0.1+intensity*0.9})`:`rgba(255,138,216,${0.1+intensity*0.9})`;
+  if(mode==='breaks'){const r2=Math.round(150+intensity*105),g2=Math.round((1-intensity)*80);return`rgba(${r2},${g2},50,${0.1+intensity*0.9})`;}
+  if(mode==='created')return`rgba(${Math.round(60+intensity*80)},${Math.round(180+intensity*60)},${Math.round(80+intensity*30)},${0.1+intensity*0.9})`;
+  if(mode==='releases')return`rgba(${Math.round(30+intensity*80)},${Math.round(140+intensity*80)},${Math.round(200+intensity*55)},${0.1+intensity*0.9})`;
+  if(mode==='increase')return`rgba(${Math.round(200+intensity*55)},${Math.round(150+intensity*60)},50,${0.1+intensity*0.9})`;
+  return`rgba(152,255,182,${0.1+intensity*0.9})`;
 }
 function hmRender(){
   const days=Object.keys(hmDailyData).sort().reverse();
@@ -1707,8 +1729,8 @@ function hmRender(){
   }
   html+=`</div></div>`;
   // Dynamic legend based on mode
-  const hmLowCol=hmCellColor(hmMode_,1,0.10);
-  const hmMidCol=hmCellColor(hmMode_,1,0.50);
+  const hmLowCol=hmCellColor(hmMode_,1,0.1);
+  const hmMidCol=hmCellColor(hmMode_,1,0.5);
   const hmHiCol=hmCellColor(hmMode_,1,0.95);
   html+=`<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:10px">
     <div style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)"><div style="width:14px;height:14px;background:${hmLowCol}"></div>Low</div>
@@ -1809,16 +1831,16 @@ async function initCalendar(){
   document.getElementById('cal-last-month-b-rize').textContent=fmt(lastB.rize,2)+' RIZE';
   document.getElementById('cal-all-b').textContent=allB.reduce((s,v)=>s+v.count,0).toLocaleString();
   document.getElementById('cal-all-b-rize').textContent=fmt(allB.reduce((s,v)=>s+v.rize,0),2)+' RIZE';
-  const _cnt90b=all90kB.reduce((s,d)=>s+(calDailyB[d]?.count||0),0);
-  document.getElementById('cal-90d-b').textContent=_cnt90b.toLocaleString();
+  const _b90cnt=all90kB.reduce((s,d)=>s+(calDailyB[d]?.count||0),0);
+  document.getElementById('cal-90d-b').textContent=_b90cnt.toLocaleString();
   document.getElementById('cal-90d-b-rize').textContent=fmt(rize90B,2)+' RIZE';
   document.getElementById('cal-this-month-c').textContent=thisC.count.toLocaleString();
   document.getElementById('cal-this-month-c-rize').textContent=fmt(thisC.rize,2)+' RIZE';
   document.getElementById('cal-last-month-c').textContent=lastC.count.toLocaleString();
   document.getElementById('cal-last-month-c-rize').textContent=fmt(lastC.rize,2)+' RIZE';
   document.getElementById('cal-all-c').textContent=allC.reduce((s,v)=>s+v.count,0).toLocaleString();
-  const _cnt90c=all90kC.reduce((s,d)=>s+(calDailyC[d]?.count||0),0);
-  document.getElementById('cal-90d-c').textContent=_cnt90c.toLocaleString();
+  const _c90cnt=all90kC.reduce((s,d)=>s+(calDailyC[d]?.count||0),0);
+  document.getElementById('cal-90d-c').textContent=_c90cnt.toLocaleString();
   document.getElementById('cal-90d-c-rize').textContent=fmt(rize90C,2)+' RIZE';
   calRender();calRenderTable();
 }
@@ -1989,8 +2011,8 @@ async function initMaturity(){
     // Real balance = totalDeposited minus all partial breaks
     const deposited=parseAmt(b.totalDeposited);if(deposited<1)return;
     const brokenAmt=brokenTotals[b.nftId]||0;
-    const amt=Math.max(0, deposited-brokenAmt);
-    if(amt<0.01)return;
+    const amt=Math.max(0, deposited-brokenAmt); // actual current balance
+    if(amt<0.01)return; // exclude dust (fully broken)
     const snap=latestSnap[b.nftId];const tm=snap?snap.timeMarker:b.createdAtTimestamp;
     const mat=calcMaturity(tm,fullMatS);const boost=calcBoost(mat);const vp=amt*boost;
     totalVP+=vp;totalRize+=amt;totalWMat+=mat*amt;
@@ -2129,13 +2151,13 @@ async function momBuildHistory(breaks,bonds,increases,latestSnap,fullMatS){
 
 function momLearn(key){
   const T={
-    netflow:'<strong style="color:var(--cyan)">Net Flow RIZE — 7 days (40%)</strong><br>Net RIZE entering governance: (Bonds + IncreaseBonds) - Breaks. Fully RIZE-weighted — 1000 micro-bonds = noise; one 10M RIZE bond = strong signal. Short 7-day window captures current momentum.',
-    ratio:'<strong style="color:var(--gold)">Conviction / Exit Ratio — 30 days (30%)</strong><br>RIZE entering (bonds + 70% of increases) vs RIZE leaving (breaks) over 30 days. Ratio > 1 = more conviction than exits. RIZE-weighted, manipulation-resistant.',
-    internal:'<strong style="color:#98ffb6">Internal Conviction — 30 days (20%)</strong><br>IncreaseBond RIZE 30d / total RIZE bonded. Existing holders deepening commitment. Cannot be gamed with small transactions.',
-    maturity:'<strong style="color:var(--muted)">Avg Maturity Anchor (10%)</strong><br>Average maturity of all active bonds. Slow structural anchor — grows ~2.8%/month max. Completely manipulation-resistant.'
+    netflow:'<b style="color:var(--cyan)">Net Flow RIZE — 7 days (40%)</b><br>Net RIZE entering governance = (Bonds + IncreaseBonds) − Breaks over 7 days. Fully RIZE-weighted: 1,000 bonds of 1 RIZE each = negligible. One 10M RIZE bond = strong signal. Short window captures what is happening right now.',
+    ratio:'<b style="color:var(--gold)">Conviction / Exit Ratio — 30 days (30%)</b><br>RIZE entering (bonds + 70% of increases) vs RIZE leaving (breaks). Ratio &gt;1 = more conviction than exits. IncreaseBonds count at 70% — strong signal but not new capital. Completely manipulation-resistant via RIZE weighting.',
+    internal:'<b style="color:#98ffb6">Internal Conviction — 30 days (20%)</b><br>IncreaseBond RIZE 30d ÷ total RIZE bonded. Measures how deeply existing holders are doubling down — even with no new wallets, strong internal conviction is a bullish structural signal.',
+    maturity:'<b style="color:var(--muted)">Avg Maturity Anchor (10%)</b><br>Average maturity (0→1 = 0→3×) of all active bonds. Slow-moving structural anchor. High = long-committed holders. Grows ~2.8%/month max — cannot be gamed short-term.'
   };
   const box=document.getElementById('mom-learn-text');
-  if(box){box.innerHTML=T[key]||'';box.style.display='block';}
+  if(box){box.innerHTML=T[key]||'';box.style.color='rgba(255,255,255,0.85)';}
 }
 function momHistView(view,btn){
   momHistView_=view;
@@ -2152,7 +2174,7 @@ function momHistDraw(allDays,allScores,view){
   opts.scales.y.ticks.callback=v=>v.toFixed(1);
   opts.plugins.tooltip.callbacks.label=c=>` Score: ${c.parsed.y.toFixed(2)}/10`;
   opts.plugins.tooltip.callbacks.label=c=>{const s=c.parsed.y;return ` Score: ${s.toFixed(2)}/10 - ${s>=8?'Strong Conviction':s>=5?'Accumulation':s>=3?'Neutral':'Distribution'}`;};
-  momHistChart=new Chart(document.getElementById('mom-hist-chart').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'Governance Momentum',data,segment:{borderColor:ctx=>{const v=ctx.p1.parsed.y;return v>=5?'#98ffb6':v>=3?'var(--gold)':'var(--pink)';}},backgroundColor:'rgba(126,224,255,0.05)',fill:true,tension:0.3,pointRadius:0,borderWidth:2.5}]},options:opts});
+  momHistChart=new Chart(document.getElementById('mom-hist-chart').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'Governance Momentum',data,segment:{borderColor:ctx=>{const v=ctx.p1.parsed.y;return v>=5?'#98ffb6':v>=3?'#ffd36b':'#ff8ad8';}},backgroundColor:'rgba(126,224,255,0.05)',fill:true,tension:0.3,pointRadius:0,borderWidth:2.5}]},options:opts});
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -2195,7 +2217,7 @@ async function initHHI(){
 
   document.getElementById('hhi-tbody').innerHTML=sorted.slice(0,20).map((w,i)=>`<tr>
     <td style="color:var(--muted)">${i+1}</td>
-    <td><span style="color:#fff;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;transition:color 0.15s" class="hhi-wallet-addr" onclick="expGo('${w.owner}','Key Metrics')">${fmtAddr(w.owner)}</span>${CEX_MAP[w.owner]?` <span style="color:var(--gold);font-size:11px">[${CEX_MAP[w.owner]}]</span>`:''}</td>
+    <td><span style="color:#fff;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer" onclick="expGo('${w.owner}','Key Metrics')">${fmtAddr(w.owner)}</span>${CEX_MAP[w.owner]?` <span style="color:var(--gold);font-size:11px">[${CEX_MAP[w.owner]}]</span>`:''}</td>
     <td style="color:var(--cyan)">${fmt(w.totalVP,2)}</td>
     <td style="color:var(--muted)">${fmtPct(totalVP>0?w.totalVP/totalVP*100:0)}</td>
   </tr>`).join('');
@@ -2245,15 +2267,6 @@ async function initBondAge(){
   // Default: show All
   const allBtn=document.querySelector('#ba-filter-row .conv-toggle');
   if(allBtn){document.querySelectorAll('#ba-filter-row .conv-toggle').forEach(b=>b.classList.remove('active'));allBtn.classList.add('active');}
-  // Extra KPIs
-  const _sA=[...points].sort((a,b)=>a.x-b.x);
-  const _med=_sA.length?_sA[Math.floor(_sA.length/2)].x:0;
-  const _tvpBA=points.reduce((s,p)=>s+p.vp,0);
-  const _vp6=points.filter(p=>p.x>=6).reduce((s,p)=>s+p.vp,0);
-  const _vp12=points.filter(p=>p.x>=12).reduce((s,p)=>s+p.vp,0);
-  const _eM=document.getElementById('ba-median-age');if(_eM)_eM.textContent=_med.toFixed(1)+' mo';
-  const _e6=document.getElementById('ba-vp6mo');if(_e6)_e6.textContent=_tvpBA>0?fmtPct(_vp6/_tvpBA*100):'—';
-  const _e12=document.getElementById('ba-vp12mo');if(_e12)_e12.textContent=_tvpBA>0?fmtPct(_vp12/_tvpBA*100):'—';
   document.getElementById('ba-diamond-whale').textContent=dw.toLocaleString();
   document.getElementById('ba-early').textContent=eb.toLocaleString();
   document.getElementById('ba-new-whale').textContent=nw.toLocaleString();
@@ -2271,11 +2284,8 @@ async function initBondAge(){
   opts.plugins.tooltip.callbacks={label:c=>{const p=c.raw;return[`Bond #${p.nftId||'—'}`,`${fmt(p.y,2)} RIZE`,`Maturity: ${fmtPct(p.mat*100)}`,`VP: ${fmt(p.vp,2)}`];}};
   opts.scales.x={...opts.scales.x,title:{display:true,text:'Effective Age (months from timeMarker)',color:'#b6c1d8',font:{size:12}}};
   opts.scales.y={...opts.scales.y,type:'logarithmic',title:{display:true,text:'RIZE Amount (log scale)',color:'#b6c1d8',font:{size:12}},ticks:{color:'#b6c1d8',callback:v=>fmt(v,0)}};
-  rzCharts.ba=new Chart(document.getElementById('ba-chart').getContext('2d'),{type:'bubble',data:{datasets:[{
-    data:points.slice(0,2000),
-    backgroundColor:points.slice(0,2000).map(p=>p.mat>0.75?'rgba(255,211,107,0.6)':p.mat>0.5?'rgba(126,224,255,0.6)':p.mat>0.25?'rgba(152,255,182,0.5)':'rgba(255,138,216,0.4)'),
-    borderWidth:0,
-  }]},options:opts});
+    const _abba=document.getElementById('ba-btn-all');
+  if(_abba){baSetThreshold(0,_abba);}
 }
 
 let _baAllPoints=[], _baFullMatS=FULL_MATURITY_S;
@@ -2300,8 +2310,11 @@ function baSetThreshold(thresh, btn){
   opts.plugins.tooltip.callbacks={label:c=>{const p=c.raw;return[`Bond #${p.nftId||'—'}`,`${fmt(p.y,2)} RIZE`,`Maturity: ${fmtPct(p.mat*100)}`,`VP: ${fmt(p.vp,2)}`];}};
   opts.scales.x={...opts.scales.x,title:{display:true,text:'Effective Age (months from timeMarker)',color:'#b6c1d8',font:{size:13}}};
   opts.scales.y={...opts.scales.y,type:'logarithmic',title:{display:true,text:'RIZE Amount (log scale)',color:'#b6c1d8',font:{size:13}},ticks:{color:'#b6c1d8',callback:v=>fmt(v,0)}};
-    const _abb=document.getElementById('ba-btn-all');
-  if(_abb)baSetThreshold(0,_abb);
+  rzCharts.ba=new Chart(document.getElementById('ba-chart').getContext('2d'),{type:'bubble',data:{datasets:[{
+    data:filtered.slice(0,3000),
+    backgroundColor:filtered.slice(0,3000).map(p=>p.mat>0.75?'rgba(255,211,107,0.7)':p.mat>0.5?'rgba(126,224,255,0.7)':p.mat>0.25?'rgba(152,255,182,0.6)':'rgba(255,138,216,0.5)'),
+    borderWidth:0,
+  }]},options:opts});
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -2606,9 +2619,9 @@ function expRenderWallet(addr,bdData,bbData,ntData,tmData,lcData,latestSnap,full
   if(!bonds.length&&!allBondCreated.length){results.innerHTML=`<div class="error-box">No governance activity found for ${fmtAddr(addr)}. Please verify the address.</div>`;return;}
 
   // Back to leaderboard button if arrived from there
-  const _retBtn=_lbCameFrom?'cat-btn-leaderboard':(_expReturnCatBtn||'cat-btn-metrics');
-const _retLbl=_lbCameFrom?`Back to Leaderboard (p.${_lbFromPage})`:`Back to ${_expReturnModule||'previous'}`;
-const backBtn=(_lbCameFrom||_expReturnModule)?`<button class="search-btn secondary" style="margin-bottom:12px" onclick="if(_lbCameFrom){document.getElementById('cat-btn-leaderboard').click();setTimeout(()=>{lbPage=${_lbFromPage};lbRender();window.scrollTo(0,${_lbScrollY});_lbCameFrom=false;},120);}else{document.getElementById('${_retBtn}').click();_expReturnCatBtn=null;_expReturnModule=null;}">${_retLbl}</button>`:'';
+  const _retBtn=_lbCameFrom?'cat-btn-leaderboard':(window._expReturnCatBtn||'cat-btn-metrics');
+const _retLbl=_lbCameFrom?`Back to Leaderboard (p.${_lbFromPage})`:'Back to '+(_expReturnModule||'previous');
+const backBtn=(_lbCameFrom||_expReturnModule)?`<button class="search-btn secondary" style="margin-bottom:12px" onclick="if(_lbCameFrom){document.getElementById('cat-btn-leaderboard').click();setTimeout(()=>{lbPage=${_lbFromPage};lbRender();window.scrollTo(0,${_lbScrollY});_lbCameFrom=false;},120);}else{document.getElementById('${_retBtn}').click();window._expReturnCatBtn=null;_expReturnModule=null;}">${_retLbl}</button>`:'';
 
   const timeline=[
     ...allBondCreated.map(e=>({...e,_type:'Bond Created',_color:'#98ffb6',_amt:parseAmt(e.amount)})),
@@ -2957,7 +2970,7 @@ function atxRender(){
 }
 
 function atxGoWallet(addr){
-  _lbCameFrom=false; _expReturnModule='Explorer'; _expReturnCatBtn='cat-btn-alltx';
+  _lbCameFrom=false; _expReturnModule='Explorer';window._expReturnCatBtn='cat-btn-alltx';
   document.getElementById('cat-btn-explorer').click();
   setTimeout(()=>{document.getElementById('exp-input').value=addr;expSearch();},80);
 }
