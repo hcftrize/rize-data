@@ -50,9 +50,9 @@
     .eco-eyebrow{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:14px;display:block;}
     .hub-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:clamp(28px,4vw,56px);line-height:1.0;text-transform:uppercase;letter-spacing:2px;color:#ffffff;margin-bottom:12px;}
     .hub-grid{display:grid;grid-template-columns:1.3fr 0.7fr;gap:26px;align-items:end;}
-    .hub-right{display:flex;justify-content:flex-end;align-items:flex-end;gap:12px;}
+    .hub-right{display:flex;justify-content:flex-end;align-items:stretch;gap:12px;}
     .hub-sub{font-family:'DM Mono',monospace;font-size:14px;color:rgba(255,255,255,0.65);line-height:1.7;max-width:640px;}
-    .live-box{min-width:180px;padding:14px 16px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);text-align:right;}
+    .live-box{min-width:180px;padding:14px 16px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);text-align:right;display:flex;flex-direction:column;justify-content:space-between;}
     .live-box.pink-box{border-color:rgba(255,138,216,0.35);background:rgba(255,138,216,0.05);}
     .live-label{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;color:rgba(255,255,255,0.5);margin-bottom:6px;font-family:'DM Mono',monospace;}
     .live-value{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;line-height:1;color:#fff;}
@@ -1621,10 +1621,6 @@ function hmDrillDown(day){
   const ab=document.querySelector('#hm-day-detail .conv-toggle');if(ab)ab.classList.add('active');
   hmRenderDayTable(day,'all');
   document.getElementById('hm-day-detail').scrollIntoView({behavior:'smooth',block:'nearest'});
-}`;
-  document.getElementById('hm-day-detail').style.display='block';
-  hmRenderDayTable(day,'all');
-  document.getElementById('hm-day-detail').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function hmDayFilter(type,btn){
   hmDayFilter_=type;
