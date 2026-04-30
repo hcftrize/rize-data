@@ -63,7 +63,7 @@
     .live-badge-pink{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--pink);}
 
     /* ── CATEGORY NAV ── */
-    .cat-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid rgba(255,255,255,0.08);background:var(--black);}
+    .cat-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid rgba(255,255,255,0.08);background:var(--black);}
     .cat-btn{display:flex;align-items:center;justify-content:center;padding:28px 20px;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,0.55);font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;transition:all 0.2s;border-right:1px solid rgba(255,255,255,0.06);border-bottom:3px solid transparent;}
     .cat-btn:last-child{border-right:none;}
     .cat-btn:hover{color:#fff;background:rgba(255,255,255,0.03);}
@@ -71,8 +71,10 @@
     /* Wallet link hover — any table */
     #lb-table tbody tr:hover .lb-wallet-addr { color: var(--cyan) !important; }
     #hhi-tbody tr:hover .hhi-wallet-addr { color: var(--cyan) !important; }
-    #whale-tbody tr:hover .hhi-wallet-addr { color: var(--cyan) !important; }
     #atx-tbody tr:hover .atx-wallet-link { color: var(--cyan) !important; }
+    #hhi-tbody tr:hover .hhi-wallet-addr { color: var(--cyan) !important; }
+    #whale-tbody tr:hover .hhi-wallet-addr { color: var(--cyan) !important; }
+    tbody tr:hover .atx-wallet-link { color: var(--cyan) !important; }
 
     .cat-btn.active{color:#fff;border-bottom-color:var(--cyan);background:rgba(126,224,255,0.04);}
 
@@ -243,7 +245,7 @@
       .hub-right{display:none;}
       .hub-title{font-size:clamp(22px,6vw,36px);}
       .hub-sub{font-size:13px;}
-      .cat-nav{grid-template-columns:1fr 1fr;}
+      .cat-nav{grid-template-columns:1fr 1fr 1fr;}
       .cat-btn{padding:16px 6px;font-size:11px;letter-spacing:1.5px;}
       .hub-wrap{padding:16px 12px;}
       .section{padding:16px 14px;}
@@ -692,16 +694,17 @@
           </div>
           <div>
             <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted);cursor:pointer;text-decoration:underline dotted" onclick="momLearn('netflow')">Net Flow 7d — click to learn</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-netflow-7d">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted);cursor:pointer;text-decoration:underline dotted" onclick="momLearn('ratio')">Conviction/Exit Ratio 30d — click to learn</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-ratio-30d">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)" onclick="momLearn('maturity')" style="cursor:pointer;text-decoration:underline dotted;user-select:none">Avg Maturity — click to learn</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-mat-trend">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)" onclick="momLearn('internal')" style="cursor:pointer;text-decoration:underline dotted;user-select:none">Internal Conviction 30d — click to learn</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-new-bonders">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)";cursor:pointer;text-decoration:underline dotted" onclick="momLearn('netflow')">Net Flow RIZE — 7 days</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-netflow-7d">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)";cursor:pointer;text-decoration:underline dotted" onclick="momLearn('ratio')">Conviction/Exit Ratio — 30 days</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-ratio-30d">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted);cursor:pointer;text-decoration:underline dotted" onclick="momLearn('maturity')">Avg Maturity Anchor</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-mat-trend">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)";cursor:pointer;text-decoration:underline dotted" onclick="momLearn('internal')">Internal Conviction — 30 days</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-new-bonders">—</span></div>
             </div>
           </div>
           <div style="width:300px;height:300px;min-width:300px"><canvas id="mom-donut"></canvas></div>
         </div>
+        <div class="sep"></div>
         <div style="margin:16px 0;padding:14px 16px;border:1px solid rgba(126,224,255,0.10);background:rgba(126,224,255,0.02)">
-          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Learn — click a component above to understand how it is built</div>
+          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Learn — click a component above</div>
           <div style="font-family:'DM Mono',monospace;font-size:13px;color:rgba(255,255,255,0.7);line-height:1.7" id="mom-learn-text">Click on Net Flow, Conviction/Exit Ratio, Internal Conviction or Avg Maturity to understand how each component is built and what signal it captures.</div>
         </div>
         <div class="sep"></div>
@@ -774,6 +777,11 @@
           <div class="ctx-kpi"><span class="ctx-kpi-label">Median Bond Age</span><span class="ctx-kpi-value accent-cyan" id="ba-median-age">—</span><span class="ctx-kpi-sub">effective months</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">VP Controlled >6mo</span><span class="ctx-kpi-value accent-gold" id="ba-vp6mo">—</span><span class="ctx-kpi-sub">% of total VP</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">VP Controlled >12mo</span><span class="ctx-kpi-value accent-green" id="ba-vp12mo">—</span><span class="ctx-kpi-sub">grows as contract matures</span></div>
+        </div>
+        <div class="ctx-kpi-row" style="margin:12px 0">
+          <div class="ctx-kpi"><span class="ctx-kpi-label">Median Bond Age</span><span class="ctx-kpi-value accent-cyan" id="ba-median-age">—</span><span class="ctx-kpi-sub">effective months</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">VP Controlled &gt;6 months</span><span class="ctx-kpi-value accent-gold" id="ba-vp6mo">—</span><span class="ctx-kpi-sub">% of total VP</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">VP Controlled &gt;12 months</span><span class="ctx-kpi-value accent-green" id="ba-vp12mo">—</span><span class="ctx-kpi-sub">grows as contract matures</span></div>
         </div>
         <div class="conv-toggle-row" style="margin-bottom:12px" id="ba-filter-row">
           <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);align-self:center">Threshold:</span>
@@ -1981,8 +1989,8 @@ async function initMaturity(){
     // Real balance = totalDeposited minus all partial breaks
     const deposited=parseAmt(b.totalDeposited);if(deposited<1)return;
     const brokenAmt=brokenTotals[b.nftId]||0;
-    const amt=Math.max(0, deposited-brokenAmt); // actual current balance
-    if(amt<1)return; // fully or nearly broken
+    const amt=Math.max(0, deposited-brokenAmt);
+    if(amt<0.01)return;
     const snap=latestSnap[b.nftId];const tm=snap?snap.timeMarker:b.createdAtTimestamp;
     const mat=calcMaturity(tm,fullMatS);const boost=calcBoost(mat);const vp=amt*boost;
     totalVP+=vp;totalRize+=amt;totalWMat+=mat*amt;
@@ -2121,10 +2129,10 @@ async function momBuildHistory(breaks,bonds,increases,latestSnap,fullMatS){
 
 function momLearn(key){
   const T={
-    netflow:'<strong style="color:var(--cyan)">Net Flow RIZE — 7 days (40%)</strong><br>Net RIZE entering governance: (Bonds + IncreaseBonds) - Breaks over 7 days. Fully RIZE-weighted — 1000 micro-bonds = noise; one 10M RIZE bond = strong signal. Short 7-day window captures current momentum.',
-    ratio:'<strong style="color:var(--gold)">Conviction / Exit Ratio — 30 days (30%)</strong><br>RIZE entering (bonds + 70% of increases) vs RIZE leaving (breaks) over 30 days. Ratio > 1 = more conviction than exits. IncreaseBonds count 70% — strong signal, not new capital. RIZE-weighted, manipulation-resistant.',
-    internal:'<strong style="color:#98ffb6">Internal Conviction — 30 days (20%)</strong><br>IncreaseBond RIZE 30d divided by total RIZE bonded. Even without new wallets, existing holders deepening commitment is bullish. Cannot be gamed with small transactions.',
-    maturity:'<strong style="color:var(--muted)">Avg Maturity Anchor (10%)</strong><br>Average maturity of all active bonds. Slow structural anchor — high maturity means holders have been committed for a long time. Grows ~2.8%/month maximum. Completely manipulation-resistant.'
+    netflow:'<strong style="color:var(--cyan)">Net Flow RIZE — 7 days (40%)</strong><br>Net RIZE entering governance: (Bonds + IncreaseBonds) - Breaks. Fully RIZE-weighted — 1000 micro-bonds = noise; one 10M RIZE bond = strong signal. Short 7-day window captures current momentum.',
+    ratio:'<strong style="color:var(--gold)">Conviction / Exit Ratio — 30 days (30%)</strong><br>RIZE entering (bonds + 70% of increases) vs RIZE leaving (breaks) over 30 days. Ratio > 1 = more conviction than exits. RIZE-weighted, manipulation-resistant.',
+    internal:'<strong style="color:#98ffb6">Internal Conviction — 30 days (20%)</strong><br>IncreaseBond RIZE 30d / total RIZE bonded. Existing holders deepening commitment. Cannot be gamed with small transactions.',
+    maturity:'<strong style="color:var(--muted)">Avg Maturity Anchor (10%)</strong><br>Average maturity of all active bonds. Slow structural anchor — grows ~2.8%/month max. Completely manipulation-resistant.'
   };
   const box=document.getElementById('mom-learn-text');
   if(box){box.innerHTML=T[key]||'';box.style.display='block';}
@@ -2144,7 +2152,7 @@ function momHistDraw(allDays,allScores,view){
   opts.scales.y.ticks.callback=v=>v.toFixed(1);
   opts.plugins.tooltip.callbacks.label=c=>` Score: ${c.parsed.y.toFixed(2)}/10`;
   opts.plugins.tooltip.callbacks.label=c=>{const s=c.parsed.y;return ` Score: ${s.toFixed(2)}/10 - ${s>=8?'Strong Conviction':s>=5?'Accumulation':s>=3?'Neutral':'Distribution'}`;};
-  momHistChart=new Chart(document.getElementById('mom-hist-chart').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'Governance Momentum',data,segment:{borderColor:ctx=>{const v=ctx.p1.parsed.y;return v>=5?'#98ffb6':v>=3?'#ffd36b':'#ff8ad8';}},backgroundColor:'rgba(126,224,255,0.05)',fill:true,tension:0.3,pointRadius:0,borderWidth:2.5}]},options:opts});
+  momHistChart=new Chart(document.getElementById('mom-hist-chart').getContext('2d'),{type:'line',data:{labels,datasets:[{label:'Governance Momentum',data,segment:{borderColor:ctx=>{const v=ctx.p1.parsed.y;return v>=5?'#98ffb6':v>=3?'var(--gold)':'var(--pink)';}},backgroundColor:'rgba(126,224,255,0.05)',fill:true,tension:0.3,pointRadius:0,borderWidth:2.5}]},options:opts});
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -2187,7 +2195,7 @@ async function initHHI(){
 
   document.getElementById('hhi-tbody').innerHTML=sorted.slice(0,20).map((w,i)=>`<tr>
     <td style="color:var(--muted)">${i+1}</td>
-    <td><span style="color:#fff;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer" onclick="expGo('${w.owner}','Key Metrics')">${fmtAddr(w.owner)}</span>${CEX_MAP[w.owner]?` <span style="color:var(--gold);font-size:11px">[${CEX_MAP[w.owner]}]</span>`:''}</td>
+    <td><span style="color:#fff;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;transition:color 0.15s" class="hhi-wallet-addr" onclick="expGo('${w.owner}','Key Metrics')">${fmtAddr(w.owner)}</span>${CEX_MAP[w.owner]?` <span style="color:var(--gold);font-size:11px">[${CEX_MAP[w.owner]}]</span>`:''}</td>
     <td style="color:var(--cyan)">${fmt(w.totalVP,2)}</td>
     <td style="color:var(--muted)">${fmtPct(totalVP>0?w.totalVP/totalVP*100:0)}</td>
   </tr>`).join('');
@@ -2238,12 +2246,12 @@ async function initBondAge(){
   const allBtn=document.querySelector('#ba-filter-row .conv-toggle');
   if(allBtn){document.querySelectorAll('#ba-filter-row .conv-toggle').forEach(b=>b.classList.remove('active'));allBtn.classList.add('active');}
   // Extra KPIs
-  const _sortA=[...points].sort((a,b)=>a.x-b.x);
-  const _medA=_sortA.length?_sortA[Math.floor(_sortA.length/2)].x:0;
+  const _sA=[...points].sort((a,b)=>a.x-b.x);
+  const _med=_sA.length?_sA[Math.floor(_sA.length/2)].x:0;
   const _tvpBA=points.reduce((s,p)=>s+p.vp,0);
   const _vp6=points.filter(p=>p.x>=6).reduce((s,p)=>s+p.vp,0);
   const _vp12=points.filter(p=>p.x>=12).reduce((s,p)=>s+p.vp,0);
-  const _eMed=document.getElementById('ba-median-age');if(_eMed)_eMed.textContent=_medA.toFixed(1)+' mo';
+  const _eM=document.getElementById('ba-median-age');if(_eM)_eM.textContent=_med.toFixed(1)+' mo';
   const _e6=document.getElementById('ba-vp6mo');if(_e6)_e6.textContent=_tvpBA>0?fmtPct(_vp6/_tvpBA*100):'—';
   const _e12=document.getElementById('ba-vp12mo');if(_e12)_e12.textContent=_tvpBA>0?fmtPct(_vp12/_tvpBA*100):'—';
   document.getElementById('ba-diamond-whale').textContent=dw.toLocaleString();
@@ -2292,9 +2300,8 @@ function baSetThreshold(thresh, btn){
   opts.plugins.tooltip.callbacks={label:c=>{const p=c.raw;return[`Bond #${p.nftId||'—'}`,`${fmt(p.y,2)} RIZE`,`Maturity: ${fmtPct(p.mat*100)}`,`VP: ${fmt(p.vp,2)}`];}};
   opts.scales.x={...opts.scales.x,title:{display:true,text:'Effective Age (months from timeMarker)',color:'#b6c1d8',font:{size:13}}};
   opts.scales.y={...opts.scales.y,type:'logarithmic',title:{display:true,text:'RIZE Amount (log scale)',color:'#b6c1d8',font:{size:13}},ticks:{color:'#b6c1d8',callback:v=>fmt(v,0)}};
-  // Delegate to baSetThreshold so active button matches chart
-  const _abb=document.getElementById('ba-btn-all');
-  baSetThreshold(0, _abb||{classList:{add:function(){},remove:function(){}}});
+    const _abb=document.getElementById('ba-btn-all');
+  if(_abb)baSetThreshold(0,_abb);
 }
 
 /* ═══════════════════════════════════════════════════════
