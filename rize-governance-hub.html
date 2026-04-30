@@ -90,7 +90,7 @@
 
     /* ── KPI ── */
     .ctx-kpi-row{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;}
-    .ctx-kpi{flex:1;min-width:140px;padding:14px 16px;border:1px solid rgba(255,255,255,0.07);background:linear-gradient(180deg,rgba(126,224,255,0.03),transparent 60%),rgba(255,255,255,0.015);}
+    .ctx-kpi{flex:1;min-width:140px;padding:16px 18px;border:1px solid rgba(255,255,255,0.07);background:linear-gradient(180deg,rgba(126,224,255,0.03),transparent 60%),rgba(255,255,255,0.015);}
     .ctx-kpi-label{display:block;font-family:"Trebuchet MS",sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px;}
     .ctx-kpi-value{display:block;font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;line-height:1.05;color:#fff;letter-spacing:0.5px;}
     .ctx-kpi-sub{display:block;font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--muted);margin-top:4px;}
@@ -104,18 +104,18 @@
     .table-wrap{overflow-x:auto;border:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.005);}
     table{width:100%;border-collapse:collapse;min-width:600px;}
     th,td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.06);text-align:left;vertical-align:middle;font-family:'Rajdhani',sans-serif;}
-    th{position:sticky;top:0;background:rgba(6,8,24,0.99);color:rgba(255,255,255,0.85);font-size:13px;text-transform:uppercase;letter-spacing:1.5px;z-index:1;font-weight:700;cursor:pointer;user-select:none;white-space:nowrap;}
+    th{position:sticky;top:0;background:rgba(6,8,24,0.99);color:rgba(255,255,255,0.85);font-size:14px;text-transform:uppercase;letter-spacing:1.5px;z-index:1;font-weight:700;cursor:pointer;user-select:none;white-space:nowrap;}
     th:hover{color:var(--cyan);}
     th .sort-arrow{display:inline-block;margin-left:4px;opacity:0.4;font-size:10px;}
     th.sort-asc .sort-arrow,th.sort-desc .sort-arrow{opacity:1;color:var(--cyan);}
-    td{color:white;font-size:17px;font-weight:600;}
+    td{color:white;font-size:20px;font-weight:600;}
     tbody tr:hover td{background:rgba(126,224,255,0.03);}
     .td-cyan{color:var(--cyan)!important;}
     .td-gold{color:var(--gold)!important;}
     .td-green{color:#98ffb6!important;font-weight:700;}
     .td-pink{color:var(--pink)!important;font-weight:700;}
-    .td-muted{color:var(--muted)!important;font-size:15px!important;}
-    .td-mono{font-family:'DM Mono',monospace!important;font-size:13px!important;}
+    .td-muted{color:var(--muted)!important;font-size:16px!important;}
+    .td-mono{font-family:'DM Mono',monospace!important;font-size:14px!important;}
     .td-white{color:#ffffff!important;}
 
     /* ── CONV WHALE TABLE (data hub style) ── */
@@ -1201,8 +1201,8 @@ async function initLeaderboard() {
   document.getElementById('lb-avg-mat').textContent=fmtPct(avgMat*100);
 
   lbFiltered=[...lbData];
-  lbSortDir=-1;
-  lbSort(lbSortKey,true);
+  lbSortDir=-1; // -1 = descending (highest VP first)
+  lbSort('vp',true);
 }
 
 function lbSort(key, init=false) {
@@ -1272,7 +1272,7 @@ function lbRender() {
       ?`<span style="color:#fff">${primaryNum}</span> <span style="color:var(--muted);font-size:12px;cursor:help" title="${allBondNums.join(', ')}">+${allBondNums.length-1}</span>`
       :`<span style="color:#fff">${primaryNum}</span>`;
     const matPct=w.avgMat*100;
-    const matBar=`<div class="mat-bar"><div class="mat-bar-track"><div class="mat-bar-fill" style="width:${matPct.toFixed(0)}%;background:${matPct>75?'var(--gold)':matPct>50?'var(--cyan)':'#98ffb6'}"></div></div><span style="font-size:17px;color:#fff;font-weight:600"}>${matPct.toFixed(1)}%</span></div>`;
+    const matBar=`<div class="mat-bar"><div class="mat-bar-track"><div class="mat-bar-fill" style="width:${matPct.toFixed(0)}%;background:${matPct>75?'var(--gold)':matPct>50?'var(--cyan)':'#98ffb6'}"></div></div><span style="font-size:18px;color:#fff;font-weight:600"}>${matPct.toFixed(1)}%</span></div>`;
     return `<tr onclick="expFromLeaderboard('${w.owner}')" style="cursor:pointer">
       <td>${rankHtml}</td>
       <td>
@@ -1281,12 +1281,12 @@ function lbRender() {
         <div style="margin-top:2px">${badges.join('')}</div>
       </td>
       <td>${bondNumHtml}</td>
-      <td style="color:#fff;font-size:17px">${w.bondCount}</td>
+      <td style="color:#fff;font-size:20px">${w.bondCount}</td>
       <td style="color:var(--gold);font-size:17px">${fmt(w.totalRize,2)}</td>
       <td>${matBar}</td>
       <td style="color:var(--cyan);font-size:17px">${w.avgBoost.toFixed(3)}×</td>
       <td style="font-weight:700;color:#fff;font-size:17px">${fmt(w.totalVP,2)}</td>
-      <td style="color:#fff;font-size:17px">${fmtPct(w.totalVPPct)}</td>
+      <td style="color:#fff;font-size:20px">${fmtPct(w.totalVPPct)}</td>
     </tr>`;
   }).join('');
   lbPaginate(total);
@@ -1560,8 +1560,9 @@ function hmMode(mode,btn){
 
 function hmRender(){
   const days=Object.keys(hmDailyData).sort().reverse();
-  if(!days.length){document.getElementById('hm-loading').textContent='No data';return;}
-  document.getElementById('hm-loading').style.display='none';
+  const hmLoadEl=document.getElementById('hm-loading');
+  if(!days.length){if(hmLoadEl)hmLoadEl.textContent='No data';return;}
+  if(hmLoadEl)hmLoadEl.style.display='none';
   const getValue=d=>{
     const dd=hmDailyData[d];
     if(hmMode_==='breaks')return dd.breaks;
@@ -2079,17 +2080,19 @@ function hhiHistDraw(view){
 let baLoaded=false;
 async function initBondAge(){
   if(baLoaded)return;baLoaded=true;
-  const [bdData,tmData,pcData]=await Promise.all([loadJSON('bondCreated'),loadJSON('bondTimemarker'),loadJSON('poolConfig')]);
+  const [bdData,tmData,pcData,bbDataBA]=await Promise.all([loadJSON('bondCreated'),loadJSON('bondTimemarker'),loadJSON('poolConfig'),loadJSON('bondBroken')]);
   if(!bdData||!tmData)return;
   const bonds=bdData.bonds||[];
   const fullMatS=getFullMatS(pcData);
   const latestSnap=getLatestSnaps(tmData.bondTimeMarkerSnapshots);
   const now=Date.now()/1000;
+  // Build broken totals for this function scope
+  const baTotals={};(bbDataBA?.bondBrokenEvents||[]).forEach(e=>{baTotals[e.nftId]=(baTotals[e.nftId]||0)+parseAmt(e.amount);});
   const points=[];
   let dw=0,eb=0,nw=0,nr=0;
   bonds.forEach(b=>{
     const amt=parseAmt(b.totalDeposited);if(amt<1)return;
-    if((brokenTotals[b.nftId]||0)>=amt*0.99)return;
+    if((baTotals[b.nftId]||0)>=amt*0.99)return;
     const snap=latestSnap[b.nftId];const tm=snap?parseInt(snap.timeMarker):parseInt(b.createdAtTimestamp);
     const ageMonths=(now-tm)/2592000;const mat=calcMaturity(tm,fullMatS);const vp=amt*calcBoost(mat);
     const isWhale=amt>=1_000_000,isOld=ageMonths>=6;
@@ -2544,6 +2547,8 @@ function expSortBonds(key,th){
 
 function expRenderVPChart(bondRows,created,increases,breaks,fullMatS){
   const canvas=document.getElementById('exp-vp-chart');if(!canvas)return;
+  // Build timeline: each bond creation event = one data point
+  // At creation: maturity=0, boost=1x → VP = amount * 1
   const allEvents=[
     ...created.map(e=>({ts:parseInt(e.timestamp),type:'created',amount:parseAmt(e.amount)})),
     ...increases.map(e=>({ts:parseInt(e.timestamp),type:'increase',amount:parseAmt(e.amount)})),
@@ -2555,8 +2560,9 @@ function expRenderVPChart(bondRows,created,increases,breaks,fullMatS){
   allEvents.forEach(ev=>{
     const date=tsToDate(ev.ts.toString());
     if(ev.type==='break')running=Math.max(0,running-ev.amount);else running+=ev.amount;
-    const mat=Math.min(1,(Date.now()/1000-ev.ts)/fullMatS);
-    labels.push(date);rizeData.push(running);vpData.push(running*(1+mat*2));
+    // At the time of creation: maturity was 0 → boost=1x
+    // This is the correct historical VP at that moment
+    labels.push(date);rizeData.push(running);vpData.push(running*1);
   });
   const now=Date.now()/1000;
   labels.push('Today');rizeData.push(rizeData[rizeData.length-1]||0);vpData.push(bondRows.reduce((s,b)=>s+b.vp,0));
