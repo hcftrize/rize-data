@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-30T07:06:37Z",
+  "updatedAt": "2026-04-30T09:24:17Z",
   "source": "DefiLlama \u2014 FDV = price \u00d7 totalSupply",
   "series": [
     {
@@ -2968,11 +2968,11 @@
     },
     {
       "date": "2026-04-30",
-      "mcap": 5069681.12,
-      "fdv": 18087512.08,
+      "mcap": 5051488.59,
+      "fdv": 18022605.15,
       "tvl": 23000000.0,
-      "mcap_tvl": 0.2204,
-      "fdv_tvl": 0.7864
+      "mcap_tvl": 0.2196,
+      "fdv_tvl": 0.7836
     }
   ]
 }
