@@ -67,6 +67,13 @@
     .cat-btn{display:flex;align-items:center;justify-content:center;padding:28px 20px;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,0.55);font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;transition:all 0.2s;border-right:1px solid rgba(255,255,255,0.06);border-bottom:3px solid transparent;}
     .cat-btn:last-child{border-right:none;}
     .cat-btn:hover{color:#fff;background:rgba(255,255,255,0.03);}
+
+    /* Wallet link hover — any table */
+    #lb-table tbody tr:hover .lb-wallet-addr { color: var(--cyan) !important; }
+    #hhi-tbody tr:hover .hhi-wallet-addr { color: var(--cyan) !important; }
+    #whale-tbody tr:hover .hhi-wallet-addr { color: var(--cyan) !important; }
+    tbody tr:hover .atx-wallet-link { color: var(--cyan) !important; }
+
     .cat-btn.active{color:#fff;border-bottom-color:var(--cyan);background:rgba(126,224,255,0.04);}
 
     /* ── MAIN WRAP ── */
@@ -318,7 +325,8 @@
 <nav class="cat-nav">
   <button class="cat-btn active" id="cat-btn-leaderboard" onclick="catSwitch('leaderboard',this)">Governance Leaderboard</button>
   <button class="cat-btn" id="cat-btn-metrics" onclick="catSwitch('metrics',this)">Key Metrics &amp; Tools</button>
-  <button class="cat-btn" id="cat-btn-explorer" onclick="catSwitch('explorer',this)">Explorer</button>
+  <button class="cat-btn" id="cat-btn-explorer" onclick="catSwitch('explorer',this)">Wallet Explorer</button>
+  <button class="cat-btn" id="cat-btn-alltx" onclick="catSwitch('alltx',this)">Explorer</button>
 </nav>
 
 <!-- ═══ MAIN CONTENT ═══ -->
@@ -578,8 +586,8 @@
           <div class="ctx-kpi"><span class="ctx-kpi-label">90d Breaks</span><span class="ctx-kpi-value" id="cal-90d-b">—</span><span class="ctx-kpi-sub" id="cal-90d-b-rize">&nbsp;</span></div>
         </div>
         <div class="ctx-kpi-row">
-          <div class="ctx-kpi"><span class="ctx-kpi-label">This Month — Created</span><span class="ctx-kpi-value accent-green" id="cal-this-month-c">—</span><span class="ctx-kpi-sub" id="cal-this-month-c-rize">&nbsp;</span></div>
-          <div class="ctx-kpi"><span class="ctx-kpi-label">Last Month — Created</span><span class="ctx-kpi-value" id="cal-last-month-c">—</span><span class="ctx-kpi-sub" id="cal-last-month-c-rize">&nbsp;</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">This Month — Created + Increased</span><span class="ctx-kpi-value accent-green" id="cal-this-month-c">—</span><span class="ctx-kpi-sub" id="cal-this-month-c-rize">&nbsp;</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">Last Month — Created + Increased</span><span class="ctx-kpi-value" id="cal-last-month-c">—</span><span class="ctx-kpi-sub" id="cal-last-month-c-rize">&nbsp;</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">All Time Created</span><span class="ctx-kpi-value accent-cyan" id="cal-all-c">—</span><span class="ctx-kpi-sub">&nbsp;</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">90d Created</span><span class="ctx-kpi-value" id="cal-90d-c">—</span><span class="ctx-kpi-sub" id="cal-90d-c-rize">&nbsp;</span></div>
         </div>
@@ -758,12 +766,17 @@
           <div class="ctx-kpi"><span class="ctx-kpi-label">New +1M Holders</span><span class="ctx-kpi-value accent-pink" id="ba-new-whale">—</span><span class="ctx-kpi-sub">&lt;6mo + &gt;1M RIZE</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">New Retails</span><span class="ctx-kpi-value" id="ba-new-retail">—</span><span class="ctx-kpi-sub">&lt;6mo + &lt;1M RIZE</span></div>
         </div>
+        <div class="ctx-kpi-row" style="margin-top:12px">
+          <div class="ctx-kpi"><span class="ctx-kpi-label">Median Bond Age</span><span class="ctx-kpi-value accent-cyan" id="ba-median-age">—</span><span class="ctx-kpi-sub">effective months</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">VP Controlled >6mo</span><span class="ctx-kpi-value accent-gold" id="ba-vp6mo">—</span><span class="ctx-kpi-sub">% of total VP</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">VP Controlled >12mo</span><span class="ctx-kpi-value accent-green" id="ba-vp12mo">—</span><span class="ctx-kpi-sub">grows as contract matures</span></div>
+        </div>
         <div class="conv-toggle-row" style="margin-bottom:12px" id="ba-filter-row">
           <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);align-self:center">Threshold:</span>
-          <button class="conv-toggle active" onclick="baSetThreshold(1_000_000,this)">1M+ RIZE</button>
+          <button class="conv-toggle active" onclick="baSetThreshold(0,this)">All</button>
+          <button class="conv-toggle" onclick="baSetThreshold(1_000_000,this)">1M+ RIZE</button>
           <button class="conv-toggle" onclick="baSetThreshold(5_000_000,this)">5M+ RIZE</button>
           <button class="conv-toggle" onclick="baSetThreshold(10_000_000,this)">10M+ RIZE</button>
-          <button class="conv-toggle" onclick="baSetThreshold(0,this)">All</button>
         </div>
         <div class="ctx-chart-wrap" style="height:400px"><canvas id="ba-chart"></canvas></div>
       </section>
@@ -789,32 +802,32 @@
         </div>
 
         <!-- Manual Calculator -->
-        <div class="inner-title" style="margin-bottom:14px">Manual Calculator</div>
+        <div style="font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#fff;margin-bottom:16px;border-left:4px solid var(--cyan);padding-left:12px">Manual Calculator</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px" class="calc-grid">
           <div>
-            <div class="inner-title" style="font-size:13px;color:var(--cyan)">Initial Bond Parameters</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--cyan);margin-bottom:12px">Initial Bond Parameters</div>
             <div style="margin-bottom:12px">
               <label style="display:block;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px">RIZE Amount</label>
               <input type="number" style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:#fff;font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;outline:none;" id="calc-amount" placeholder="1000000" oninput="calcUpdate()"/>
             </div>
             <div style="margin-bottom:12px">
               <label style="display:block;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px">Bond Creation Date</label>
-              <input type="date" style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:#fff;font-family:'Rajdhani',sans-serif;font-size:16px;outline:none;" id="calc-date" onchange="calcFromDate()" style="color-scheme:dark"/>
+              <input type="date" style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:#fff;font-family:'Rajdhani',sans-serif;font-size:16px;outline:none;" id="calc-date" onchange="calcFromDate()" style="color-scheme:dark;color:#fff;"/>
             </div>
             <div style="margin-bottom:16px">
               <label style="display:block;font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px">Bond Age (months)</label>
               <input type="number" style="width:100%;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(126,224,255,0.28);color:#fff;font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;outline:none;" id="calc-months" placeholder="12" min="0" max="36" oninput="calcUpdate()"/>
             </div>
             <div class="sep"></div>
-            <div class="inner-title" style="font-size:13px;color:var(--gold)">Simulate an IncreaseBond <button onclick="calcAddIncrease()" class="conv-toggle" style="margin-left:8px;padding:4px 10px;font-size:11px">+ Add</button></div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);margin-bottom:10px">Simulate an IncreaseBond <button onclick="calcAddIncrease()" class="conv-toggle" style="margin-left:8px;padding:5px 14px;font-size:13px">+ Add</button></div>
             <div id="calc-increase-inputs"></div>
             <div class="sep"></div>
-            <div class="inner-title" style="font-size:13px;color:var(--pink)">Simulate a BreakBond <button onclick="calcAddBreak()" class="conv-toggle" style="margin-left:8px;padding:4px 10px;font-size:11px">+ Add</button></div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--pink);margin-bottom:10px">Simulate a BreakBond <button onclick="calcAddBreak()" class="conv-toggle" style="margin-left:8px;padding:5px 14px;font-size:13px">+ Add</button></div>
             <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:8px"></div>
             <div id="calc-break-inputs"></div>
           </div>
           <div>
-            <div class="inner-title" style="font-size:13px">Results</div>
+            <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#fff;margin-bottom:12px">Results</div>
             <div style="display:flex;flex-direction:column;gap:12px">
               <div style="padding:18px;border:1px solid rgba(126,224,255,0.2);background:rgba(126,224,255,0.04)">
                 <div style="font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px">Current Boost</div>
@@ -851,6 +864,56 @@
 
   </div>
   <!-- END CAT 2 -->
+
+  <!-- ══════════════════════════════════
+       CAT 4 — ALL GOVERNANCE TRANSACTIONS
+  ══════════════════════════════════ -->
+  <div class="cat-panel" id="cat-alltx">
+    <section class="section">
+      <div class="section-titlebar-row">
+        <div class="section-titlebar" style="margin:0"><span class="section-title">All Governance Transactions</span></div>
+        <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
+        <button class="screenshot-btn" onclick="govScreenshot('cat-alltx','all-tx')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
+      </div>
+      <p class="section-sub">Complete on-chain history of all governance interactions since genesis — every bond, break, increase, release and transfer. 50 rows per page.</p>
+
+      <!-- Search + Filters -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <input type="text" class="search-input" id="atx-search" placeholder="0x wallet or Bond #..." style="flex:1;max-width:400px" oninput="atxApply()"/>
+        <input type="number" class="search-input" id="atx-min-rize" placeholder="Min RIZE..." style="width:140px" oninput="atxApply()"/>
+        <input type="date" id="atx-date-from" onchange="atxApply()" style="padding:10px 12px;background:rgba(5,14,34,0.9);border:1px solid rgba(126,224,255,0.3);color:#fff;font-family:'DM Mono',monospace;font-size:13px;outline:none;color-scheme:dark"/>
+        <input type="date" id="atx-date-to" onchange="atxApply()" style="padding:10px 12px;background:rgba(5,14,34,0.9);border:1px solid rgba(126,224,255,0.3);color:#fff;font-family:'DM Mono',monospace;font-size:13px;outline:none;color-scheme:dark"/>
+        <button class="search-btn secondary" onclick="atxReset()">Reset</button>
+      </div>
+      <div class="conv-toggle-row" id="atx-type-row" style="margin-bottom:10px">
+        <button class="conv-toggle active" onclick="atxType('all',this)">All</button>
+        <button class="conv-toggle" onclick="atxType('BondCreated',this)">Bond Created</button>
+        <button class="conv-toggle" onclick="atxType('IncreaseBond',this)">IncreaseBond</button>
+        <button class="conv-toggle" onclick="atxType('Break',this)">Bond Break</button>
+        <button class="conv-toggle" onclick="atxType('Released',this)">Released</button>
+        <button class="conv-toggle" onclick="atxType('Transfer',this)">Transfer</button>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+        <span style="font-family:'DM Mono',monospace;font-size:13px;color:var(--muted)" id="atx-info">Loading…</span>
+        <div id="atx-filter-badge" style="padding:4px 14px;border:1px solid rgba(126,224,255,0.3);background:rgba(126,224,255,0.06);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--cyan)">Date ↓</div>
+      </div>
+      <div class="table-wrap" style="overflow-x:auto">
+        <table id="atx-table">
+          <thead><tr>
+            <th onclick="atxSort('date',this)" style="cursor:pointer">Date <span class="sort-arrow sort-active">↓</span></th>
+            <th onclick="atxSort('type',this)" style="cursor:pointer">Type <span class="sort-arrow">↕</span></th>
+            <th onclick="atxSort('bond',this)" style="cursor:pointer">Bond # <span class="sort-arrow">↕</span></th>
+            <th onclick="atxSort('amount',this)" style="cursor:pointer">Amount <span class="sort-arrow">↕</span></th>
+            <th>Wallet</th>
+            <th>Tx</th>
+          </tr></thead>
+          <tbody id="atx-tbody"><tr><td colspan="6" style="text-align:center;padding:40px"><span class="loading-text">Loading all transactions…</span></td></tr></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="atx-pagination"></div>
+    </section>
+  </div>
+  <!-- END CAT 4 -->
 
   <!-- ══════════════════════════════════
        CAT 3 — EXPLORER
@@ -1002,10 +1065,16 @@ function txLink(h) {
   return h?`<a href="https://basescan.org/tx/${h}" target="_blank" rel="noopener" style="color:#fff;font-family:'DM Mono',monospace;font-size:12px;text-decoration:none">${fmtAddr(h)} ↗</a>`:'—';
 }
 function showToast(msg) {
-  const t=document.getElementById('gov-toast');
-  if(!t) return;
-  t.textContent=msg; t.style.opacity='1';
-  setTimeout(()=>{ t.style.opacity='0'; }, 2800);
+  let t=document.getElementById('gov-toast');
+  if(!t){
+    t=document.createElement('div');t.id='gov-toast';
+    t.style.cssText='position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:#060818;border:1px solid rgba(126,224,255,0.4);color:#7ee0ff;font-family:"Rajdhani",sans-serif;font-size:16px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:14px 32px;z-index:9999;pointer-events:none;transition:opacity 0.35s,transform 0.35s;opacity:0;';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg;
+  t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';
+  clearTimeout(t._to);
+  t._to=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(80px)';},2800);
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -1042,6 +1111,7 @@ function baseOpts(extra={}){
 function catSwitch(cat, btn) {
   document.querySelectorAll('.cat-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  if(cat==='alltx')initAllTx();
   document.getElementById('cat-'+cat).classList.add('active');
   btn.classList.add('active');
   if(cat==='leaderboard') initLeaderboard();
@@ -1128,7 +1198,7 @@ async function govScreenshot(sectionId, filename) {
       canvas.toBlob(async blob=>{
         try {
           await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-          showToast('Screenshot copied to clipboard!');
+          showToast('Screenshot copied to clipboard');
         } catch(e) { _downloadScreenshot(canvas,filename); }
       },'image/png');
     } else {
@@ -1288,7 +1358,7 @@ function lbRender() {
     return `<tr onclick="expFromLeaderboard('${w.owner}')" style="cursor:pointer">
       <td>${rankHtml}</td>
       <td>
-        <span style="color:#ffffff;font-family:'DM Mono',monospace;font-size:14px;font-weight:400;cursor:pointer" onclick="event.stopPropagation();expFromLeaderboard('${w.owner}')">${fmtAddr(w.owner)}</span>
+        <span class="lb-wallet-addr" style="color:#fff;font-family:'DM Mono',monospace;font-size:14px;font-weight:400;cursor:pointer;transition:color 0.15s" onclick="event.stopPropagation();expFromLeaderboard('${w.owner}')">${fmtAddr(w.owner)}</span>
         ${cex}${percHtml}
         <div style="margin-top:2px">${badges.join('')}</div>
       </td>
@@ -1868,7 +1938,7 @@ function whaleRender(){
       <td>${dirHtml}</td>
       <td style="color:#fff">${e.nftId?'#'+e.nftId:'—'}</td>
       <td style="color:${e._dir==='break'?'var(--pink)':e._dir==='increase'?'var(--gold)':'#98ffb6'};font-weight:700">${fmt(e._rize,2)} RIZE</td>
-      <td><span style="color:#fff;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer" onclick="expGo('${wallet}','Key Metrics')">${fmtAddr(wallet)}</span>${cex}</td>
+      <td><span class="hhi-wallet-addr" style="color:#fff;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;transition:color 0.15s" onclick="expGo('${wallet}','Key Metrics')">${fmtAddr(wallet)}</span>${cex}</td>
       <td>${txLink(e.txHash)}</td>
     </tr>`;
   }).join('');
@@ -1896,8 +1966,11 @@ async function initMaturity(){
   matBuckets=ranges.map(r=>({...r,count:0,rize:0,vp:0}));
   let totalVP=0,totalRize=0,totalWMat=0,count2x=0,vp2x=0,count15x=0,vp15x=0;
   bonds.forEach(b=>{
-    const amt=parseAmt(b.totalDeposited);if(amt<1)return;
-    if((brokenTotals[b.nftId]||0)>=amt*0.99)return;
+    // Real balance = totalDeposited minus all partial breaks
+    const deposited=parseAmt(b.totalDeposited);if(deposited<1)return;
+    const brokenAmt=brokenTotals[b.nftId]||0;
+    const amt=Math.max(0, deposited-brokenAmt); // actual current balance
+    if(amt<1)return; // fully or nearly broken
     const snap=latestSnap[b.nftId];const tm=snap?snap.timeMarker:b.createdAtTimestamp;
     const mat=calcMaturity(tm,fullMatS);const boost=calcBoost(mat);const vp=amt*boost;
     totalVP+=vp;totalRize+=amt;totalWMat+=mat*amt;
@@ -1954,34 +2027,48 @@ async function initMomentum(){
   const increases=bcData.increaseBondEvents||[];
   const latestSnap=getLatestSnaps(tmData?.bondTimeMarkerSnapshots);
   const c7=now-7*86400,c30=now-30*86400;
+  // C1: Net Flow RIZE 7d (40%) — bonds + increases - breaks in RIZE
   const breaksRize7=breaks.filter(e=>parseInt(e.timestamp)>c7).reduce((s,e)=>s+parseAmt(e.amount),0);
-  const bondsRize7=[...bonds,...increases].filter(e=>parseInt(e.timestamp)>c7).reduce((s,e)=>s+parseAmt(e.amount),0);
-  const netFlow7=bondsRize7-breaksRize7;
-  const breaks30=breaks.filter(e=>parseInt(e.timestamp)>c30).length;
-  const bonds30=bonds.filter(e=>parseInt(e.timestamp)>c30).length;
-  const ratio30=breaks30>0?bonds30/breaks30:bonds30>0?10:1;
+  const bondsRize7=bonds.filter(e=>parseInt(e.timestamp)>c7).reduce((s,e)=>s+parseAmt(e.amount),0);
+  const incrRize7=increases.filter(e=>parseInt(e.timestamp)>c7).reduce((s,e)=>s+parseAmt(e.amount),0);
+  const netFlow7=(bondsRize7+incrRize7)-breaksRize7;
+  // Normalize: 10M RIZE net = ~mid score. Use historical median if available, else fixed ref.
+  const REF_FLOW=10_000_000; // 10M RIZE = reference unit
+  const s1=Math.min(4,Math.max(0,2+(netFlow7/REF_FLOW)*2));
+
+  // C2: Ratio conviction/exit RIZE 30d (30%) — (bondRize + increaseRize*0.7) / breakRize
+  const breaksRize30=breaks.filter(e=>parseInt(e.timestamp)>c30).reduce((s,e)=>s+parseAmt(e.amount),0);
+  const bondsRize30=bonds.filter(e=>parseInt(e.timestamp)>c30).reduce((s,e)=>s+parseAmt(e.amount),0);
+  const incrRize30=increases.filter(e=>parseInt(e.timestamp)>c30).reduce((s,e)=>s+parseAmt(e.amount),0);
+  const numerator30=bondsRize30+(incrRize30*0.7);
+  const ratio30=breaksRize30>0?numerator30/breaksRize30:(numerator30>0?10:1);
+  const s2=Math.min(3,Math.max(0,ratio30>=2?3:ratio30>=1?1.5+(ratio30-1)*1.5:ratio30*1.5));
+
+  // C3: Internal Conviction RIZE 30d (20%) — increaseBond RIZE / total bonded RIZE
+  const totalBonded=lbData.length>0?lbData.reduce((s,w)=>s+w.totalRize,0):1;
+  const internalConv=incrRize30/Math.max(totalBonded,1);
+  const s3=Math.min(2,internalConv*200); // 1% of bonded increased = mid score
+
+  // C4: Avg Maturity (10%) — structural anchor, not manipulable
   const mats=Object.values(latestSnap).map(s=>calcMaturity(s.timeMarker,fullMatS));
   const avgMat=mats.length>0?mats.reduce((a,b)=>a+b,0)/mats.length:0;
-  const newBonders30=new Set(bonds.filter(e=>parseInt(e.timestamp)>c30).map(e=>e.owner?.toLowerCase())).size;
-  const s1=Math.min(4,Math.max(0,(netFlow7/1e7)*2+2));
-  const s2=Math.min(2.5,Math.max(0,(ratio30-1)*0.5+1.25));
-  const s3=Math.min(2,avgMat*2);
-  const s4=Math.min(1.5,newBonders30/20);
+  const s4=Math.min(1,avgMat);
+
   const score=Math.min(10,Math.max(0,s1+s2+s3+s4));
   const scoreEl=document.getElementById('momentum-score-display');
   scoreEl.textContent=score.toFixed(1);
   const col=score>=8?'#98ffb6':score>=6?'var(--cyan)':score>=4?'var(--gold)':score>=2?'var(--pink)':'#ff4444';
   scoreEl.style.color=col;
   document.getElementById('momentum-score-label').textContent=score>=8?'STRONG CONVICTION':score>=6?'ACCUMULATION':score>=4?'NEUTRAL':score>=2?'DISTRIBUTION':'CRITICAL';
-  document.getElementById('mom-netflow-7d').textContent=(netFlow7>=0?'+':'')+fmt(netFlow7,2)+' RIZE';
+  document.getElementById('mom-netflow-7d').textContent=(netFlow7>=0?'+':'')+fmt(netFlow7,2)+' RIZE (bonds+increases-breaks)';
   document.getElementById('mom-netflow-7d').style.color=netFlow7>=0?'#98ffb6':'var(--pink)';
-  document.getElementById('mom-ratio-30d').textContent=ratio30.toFixed(2)+'×';
+  document.getElementById('mom-ratio-30d').textContent=ratio30.toFixed(2)+'× (RIZE weighted)';
   document.getElementById('mom-ratio-30d').style.color=ratio30>=1?'#98ffb6':'var(--pink)';
-  document.getElementById('mom-mat-trend').textContent=fmtPct(avgMat*100);
-  document.getElementById('mom-new-bonders').textContent=newBonders30.toLocaleString();
+  document.getElementById('mom-mat-trend').textContent=fmtPct(internalConv*100)+' of bonded increased 30d';
+  document.getElementById('mom-new-bonders').textContent=fmtPct(avgMat*100)+' avg maturity';
   if(rzCharts.momDonut)rzCharts.momDonut.destroy();
   rzCharts.momDonut=new Chart(document.getElementById('mom-donut').getContext('2d'),{type:'doughnut',data:{
-    labels:['Net Flow 7d (40%)','Bonds/Breaks 30d (25%)','Avg Maturity (20%)','New Bonders 30d (15%)'],
+    labels:['Net Flow RIZE 7d (40%)','Conviction/Exit RIZE 30d (30%)','Internal Conviction RIZE 30d (20%)','Avg Maturity (10%)'],
     datasets:[{data:[s1,s2,s3,s4],backgroundColor:['rgba(126,224,255,0.7)','rgba(255,211,107,0.7)','rgba(152,255,182,0.7)','rgba(199,125,255,0.7)'],borderColor:'#060818',borderWidth:2}]
   },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#060818',borderColor:'rgba(126,224,255,0.3)',borderWidth:1,titleColor:'#7ee0ff',bodyColor:'#f7f2e8',padding:12,callbacks:{label:c=>` ${c.label}: ${c.parsed.toFixed(2)}`}}}}});
   await momBuildHistory(breaks,bonds,increases,latestSnap,fullMatS);
@@ -1996,16 +2083,22 @@ async function momBuildHistory(breaks,bonds,increases,latestSnap,fullMatS){
   const scoresByDay=days.map(day=>{
     const dayTs=new Date(day+'T00:00:00Z').getTime()/1000;
     const w7s=dayTs-7*86400,w30s=dayTs-30*86400;
-    const br7=breaks.filter(e=>{const t=parseInt(e.timestamp);return t>=w7s&&t<dayTs;}).reduce((s,e)=>s+parseAmt(e.amount),0);
-    const bo7=[...bonds,...increases].filter(e=>{const t=parseInt(e.timestamp);return t>=w7s&&t<dayTs;}).reduce((s,e)=>s+parseAmt(e.amount),0);
-    const netF7=bo7-br7;
-    const br30=breaks.filter(e=>{const t=parseInt(e.timestamp);return t>=w30s&&t<dayTs;}).length;
-    const bo30=bonds.filter(e=>{const t=parseInt(e.timestamp);return t>=w30s&&t<dayTs;}).length;
-    const r30=br30>0?bo30/br30:bo30>0?10:1;
-    const mats2=Object.values(latestSnap).map(s=>calcMaturity(s.timeMarker,fullMatS));
-    const am=mats2.length>0?mats2.reduce((a,b)=>a+b,0)/mats2.length:0;
-    const nb30=new Set(bonds.filter(e=>{const t=parseInt(e.timestamp);return t>=w30s&&t<dayTs;}).map(e=>e.owner?.toLowerCase())).size;
-    return Math.min(10,Math.max(0,Math.min(4,Math.max(0,(netF7/1e7)*2+2))+Math.min(2.5,Math.max(0,(r30-1)*0.5+1.25))+Math.min(2,am*2)+Math.min(1.5,nb30/20)));
+    const hBr7=breaks.filter(e=>{const t=parseInt(e.timestamp);return t>=w7s&&t<dayTs;}).reduce((s,e)=>s+parseAmt(e.amount),0);
+    const hBo7=bonds.filter(e=>{const t=parseInt(e.timestamp);return t>=w7s&&t<dayTs;}).reduce((s,e)=>s+parseAmt(e.amount),0);
+    const hIn7=increases.filter(e=>{const t=parseInt(e.timestamp);return t>=w7s&&t<dayTs;}).reduce((s,e)=>s+parseAmt(e.amount),0);
+    const hNet7=(hBo7+hIn7)-hBr7;
+    const hBr30=breaks.filter(e=>{const t=parseInt(e.timestamp);return t>=w30s&&t<dayTs;}).reduce((s,e)=>s+parseAmt(e.amount),0);
+    const hBo30=bonds.filter(e=>{const t=parseInt(e.timestamp);return t>=w30s&&t<dayTs;}).reduce((s,e)=>s+parseAmt(e.amount),0);
+    const hIn30=increases.filter(e=>{const t=parseInt(e.timestamp);return t>=w30s&&t<dayTs;}).reduce((s,e)=>s+parseAmt(e.amount),0);
+    const hNum30=hBo30+(hIn30*0.7);
+    const hRat30=hBr30>0?hNum30/hBr30:(hNum30>0?10:1);
+    const hRatS=Math.min(3,Math.max(0,hRat30>=2?3:hRat30>=1?1.5+(hRat30-1)*1.5:hRat30*1.5));
+    const hTotB=Math.max(Object.values(latestSnap).length,1);
+    const hIConv=hIn30/Math.max(hTotB*1e6,1); // rough proxy
+    const hS3=Math.min(2,hIConv*200);
+    const hMats=Object.values(latestSnap).map(s=>calcMaturity(s.timeMarker,fullMatS));
+    const hAm=hMats.length>0?hMats.reduce((a,b)=>a+b,0)/hMats.length:0;
+    return Math.min(10,Math.max(0,Math.min(4,Math.max(0,2+(hNet7/10000000)*2))+hRatS+hS3+Math.min(1,hAm)));
   });
   const el=document.getElementById('mom-hist-loading');if(el)el.style.display='none';
   const cv=document.getElementById('mom-hist-chart');if(cv)cv.style.display='block';
@@ -2060,11 +2153,14 @@ async function initHHI(){
   document.getElementById('hhi-explain').textContent=
     `Note: Gini ${gini.toFixed(3)} vs HHI ${hhi.toFixed(0)} are not contradictory. Gini measures inequality across ALL wallets (many small holders drive it high). HHI measures concentration among top players. High Gini + moderate HHI = many small holders with no single dominant player.`;
 
-  const top10w=sorted.slice(0,10);const restVP=sorted.slice(10).reduce((s,w)=>s+w.totalVP,0);
+  const top10w=sorted.slice(0,10);
+  window._hhiWalletList=[...top10w.map(w=>w.owner),null];const restVP=sorted.slice(10).reduce((s,w)=>s+w.totalVP,0);
   if(rzCharts.hhi)rzCharts.hhi.destroy();
-  rzCharts.hhi=new Chart(document.getElementById('hhi-chart').getContext('2d'),{type:'doughnut',data:{
+  rzCharts.hhi=new Chart(document.getElementById('hhi-chart').getContext('2d'),{type:'doughnut',
+  onClick:(evt,els)=>{if(els.length){const idx=els[0].index;const wList=window._hhiWalletList||[];const w=wList[idx];if(w)expGo(w,'Key Metrics');}},
+  data:{
     labels:[...top10w.map(w=>fmtAddr(w.owner)),'Others'],
-    datasets:[{data:[...top10w.map(w=>w.totalVP),restVP],backgroundColor:['#7ee0ff','#ffd36b','#98ffb6','#ff8ad8','#c77dff','#7ee0ff','#ffd36b','#98ffb6','#ff8ad8','#c77dff','rgba(255,255,255,0.12)'],borderColor:'#060818',borderWidth:2}]
+    datasets:[{data:[...top10w.map(w=>w.totalVP),restVP],backgroundColor:['#7ee0ff','#ffd36b','#98ffb6','#ff8ad8','#c77dff','#7ee0ff','#ffd36b','#98ffb6','#ff8ad8','#c77dff','rgba(255,255,255,0.12)'],borderColor:'#060818',borderWidth:2,hoverOffset:14}]
   },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#060818',borderColor:'rgba(126,224,255,0.3)',borderWidth:1,titleColor:'#7ee0ff',bodyColor:'#f7f2e8',padding:12,callbacks:{label:c=>` ${c.label}: ${fmt(c.parsed,2)} VP (${totalVP>0?fmtPct(c.parsed/totalVP*100):'—'})`}}}}});
 
   document.getElementById('hhi-tbody').innerHTML=sorted.slice(0,20).map((w,i)=>`<tr>
@@ -2116,10 +2212,21 @@ async function initBondAge(){
     points.push({x:ageMonths,y:amt,r:Math.max(3,Math.min(22,Math.sqrt(vp/100000))),mat,vp,nftId:b.nftId,owner:b.owner});
   });
   _baAllPoints=points; _baDW=dw; _baEB=eb; _baNW=nw; _baNR=nr; _baFullMatS=fullMatS;
+  // Default: show All
+  const allBtn=document.querySelector('#ba-filter-row .conv-toggle');
+  if(allBtn){document.querySelectorAll('#ba-filter-row .conv-toggle').forEach(b=>b.classList.remove('active'));allBtn.classList.add('active');}
   document.getElementById('ba-diamond-whale').textContent=dw.toLocaleString();
   document.getElementById('ba-early').textContent=eb.toLocaleString();
   document.getElementById('ba-new-whale').textContent=nw.toLocaleString();
   document.getElementById('ba-new-retail').textContent=nr.toLocaleString();
+  // Compute additional KPIs
+  const medianAge=points.length>0?[...points].sort((a,b)=>a.x-b.x)[Math.floor(points.length/2)]?.x||0:0;
+  const vp6mo=points.filter(p=>p.x>=6).reduce((s,p)=>s+p.vp,0);
+  const vp12mo=points.filter(p=>p.x>=12).reduce((s,p)=>s+p.vp,0);
+  const totalVPba=points.reduce((s,p)=>s+p.vp,0);
+  const elM=document.getElementById('ba-median-age');if(elM)elM.textContent=medianAge.toFixed(1)+' mo';
+  const el6=document.getElementById('ba-vp6mo');if(el6)el6.textContent=totalVPba>0?fmtPct(vp6mo/totalVPba*100):'—';
+  const el12=document.getElementById('ba-vp12mo');if(el12)el12.textContent=totalVPba>0?fmtPct(vp12mo/totalVPba*100)+' (0 eligible)':'—';
   if(rzCharts.ba)rzCharts.ba.destroy();
   const opts=baseOpts();
   opts.plugins.tooltip.callbacks={label:c=>{const p=c.raw;return[`Bond #${p.nftId||'—'}`,`${fmt(p.y,2)} RIZE`,`Maturity: ${fmtPct(p.mat*100)}`,`VP: ${fmt(p.vp,2)}`];}};
@@ -2179,18 +2286,16 @@ function calcAddIncrease(){
   const id=++calcEventCounter;
   const wrap=document.getElementById('calc-increase-inputs');
   const div=document.createElement('div');div.className='calc-event-row';div.id='calc-ev-'+id;
-  div.innerHTML=`<input type="number" placeholder="Amount RIZE" id="calc-ev-amt-${id}" oninput="calcUpdate()"/>
-    <input type="date" id="calc-ev-date-${id}" onchange="calcUpdate()"/>
-    <button class="calc-rm-btn" onclick="calcRemoveEvent(${id})">×</button>`;
+  div.style.cssText='display:flex;gap:8px;margin-bottom:8px;align-items:center';
+  div.innerHTML=`<input type="number" placeholder="Amount RIZE" id="calc-ev-amt-${id}" oninput="calcUpdate()" style="flex:1;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(255,211,107,0.4);color:#fff;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;outline:none;"/><input type="date" id="calc-ev-date-${id}" onchange="calcUpdate()" style="width:160px;padding:10px 12px;background:rgba(5,14,34,0.8);border:1px solid rgba(255,211,107,0.4);color:#fff;font-family:'DM Mono',monospace;font-size:14px;outline:none;color-scheme:dark"/><button onclick="calcRemoveEvent(${id})" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;font-weight:700;flex-shrink:0;transition:all 0.15s" onmouseover="this.style.background='rgba(255,60,60,0.25)';this.style.color='var(--pink)'" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.7)'">&times;</button>`;
   wrap.appendChild(div);calcUpdate();
 }
 function calcAddBreak(){
   const id=++calcEventCounter;
   const wrap=document.getElementById('calc-break-inputs');
   const div=document.createElement('div');div.className='calc-event-row';div.id='calc-ev-'+id;
-  div.innerHTML=`<input type="number" placeholder="Amount RIZE" id="calc-ev-amt-${id}" oninput="calcUpdate()"/>
-    <input type="date" id="calc-ev-date-${id}" onchange="calcUpdate()"/>
-    <button class="calc-rm-btn" onclick="calcRemoveEvent(${id})">×</button>`;
+  div.style.cssText='display:flex;gap:8px;margin-bottom:8px;align-items:center';
+  div.innerHTML=`<input type="number" placeholder="Amount RIZE to break" id="calc-ev-amt-${id}" oninput="calcUpdate()" style="flex:1;padding:10px 14px;background:rgba(5,14,34,0.8);border:1px solid rgba(255,138,216,0.4);color:#fff;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;outline:none;"/><input type="date" id="calc-ev-date-${id}" onchange="calcUpdate()" style="width:160px;padding:10px 12px;background:rgba(5,14,34,0.8);border:1px solid rgba(255,138,216,0.4);color:#fff;font-family:'DM Mono',monospace;font-size:14px;outline:none;color-scheme:dark"/><button onclick="calcRemoveEvent(${id})" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;font-weight:700;flex-shrink:0;transition:all 0.15s" onmouseover="this.style.background='rgba(255,60,60,0.25)';this.style.color='var(--pink)'" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.7)'">&times;</button>`;
   wrap.appendChild(div);calcUpdate();
 }
 function calcRemoveEvent(id){const el=document.getElementById('calc-ev-'+id);if(el)el.remove();calcUpdate();}
@@ -2249,8 +2354,20 @@ function calcUpdate(){
 
   const tableWrap=document.getElementById('calc-events-table-wrap');
   tableWrap.style.display='block';
-  if(tableRows.length){
-    document.getElementById('calc-events-tbody').innerHTML=tableRows.map(r=>`<tr>
+  // Auto row: Initial Bond Created (always shown if amount > 0)
+  const calcDate=document.getElementById('calc-date').value;
+  const initBondRow=amount>0?`<tr style="background:rgba(152,255,182,0.04)">
+    <td style="color:var(--muted)">0</td>
+    <td style="color:#98ffb6;font-weight:700">Bond Created</td>
+    <td style="color:var(--muted);font-family:'DM Mono',monospace;font-size:13px">${calcDate||'—'}</td>
+    <td style="color:#98ffb6">+${fmt(amount,2)} RIZE</td>
+    <td style="color:var(--muted);font-family:'DM Mono',monospace;font-size:13px">${calcDate||'creation date'}</td>
+    <td style="color:var(--cyan)">${boost.toFixed(3)}×</td>
+    <td style="color:#fff;font-weight:700">${fmt(vp,2)} VP</td>
+    <td></td>
+  </tr>`:'';
+  if(tableRows.length||amount>0){
+    document.getElementById('calc-events-tbody').innerHTML=initBondRow+tableRows.map(r=>`<tr>
       <td style="color:var(--muted)">${r.idx}</td>
       <td style="color:${r.type==='break'?'var(--pink)':'var(--gold)'}">${r.type==='break'?'BreakBond':'IncreaseBond'}</td>
       <td style="color:var(--muted)">${r.date||'—'}</td>
@@ -2675,6 +2792,172 @@ function expRenderVPChart(bondRows,created,increases,breaks,fullMatS,allSnapshot
     {label:'Voting Power',data:vpData,borderColor:'#7ee0ff',backgroundColor:'rgba(126,224,255,0.08)',fill:true,tension:0.3,pointRadius:3,borderWidth:2},
   ]},options:opts});
 }
+
+
+/* ═══════════════════════════════════════════════════════
+   ALL GOVERNANCE TRANSACTIONS (Cat 4)
+═══════════════════════════════════════════════════════ */
+let atxLoaded=false, atxAll=[], atxFiltered=[], atxPage=1;
+const ATX_PER_PAGE=50;
+let atxSortKey='date', atxSortDir=-1, atxTypeFilter='all';
+
+async function initAllTx(){
+  if(atxLoaded)return; atxLoaded=true;
+  document.getElementById('atx-info').textContent='Loading all data…';
+  const [bbData,bcData,lcData,ntData]=await Promise.all([
+    loadJSON('bondBroken'),loadJSON('bondCreated'),loadJSON('bondLifecycle'),loadJSON('nftTransfers')
+  ]);
+  // Build nftId->owner map
+  const nftOwner={};
+  (bcData?.bonds||[]).forEach(b=>{if(b.nftId&&b.owner)nftOwner[b.nftId.toString()]=b.owner;});
+  (ntData?.bondOwners||[]).forEach(o=>{if(o.tokenId&&o.owner)nftOwner[o.tokenId.toString()]=o.owner;});
+
+  const rows=[];
+  const addRows=(evts,type,colorFn,amtFn,ownerFn,nftFn)=>{
+    (evts||[]).forEach(e=>{
+      rows.push({
+        ts:parseInt(e.timestamp)||0,
+        date:e.date||tsToDate(e.timestamp),
+        type,
+        nftId:nftFn(e),
+        amount:amtFn(e),
+        wallet:ownerFn(e)||nftOwner[(nftFn(e)||'').toString()]||'',
+        txHash:e.txHash||'',
+        color:colorFn,
+      });
+    });
+  };
+
+  addRows(bcData?.bondCreatedEvents,'BondCreated','#98ffb6',
+    e=>parseAmt(e.amount), e=>e.owner, e=>e.nftId);
+  addRows(bcData?.increaseBondEvents,'IncreaseBond','var(--gold)',
+    e=>parseAmt(e.amount), e=>nftOwner[e.nftId?.toString()]||'', e=>e.nftId);
+  addRows(bbData?.bondBrokenEvents,'Break','var(--pink)',
+    e=>parseAmt(e.amount), e=>nftOwner[e.nftId?.toString()]||'', e=>e.nftId);
+  addRows(lcData?.tokensReleasedEvents,'Released','var(--cyan)',
+    e=>parseAmt(e.amount), e=>e.to, e=>e.nftId);
+  addRows(ntData?.nftTransferEvents,'Transfer','var(--muted)',
+    e=>0, e=>e.from, e=>e.tokenId);
+
+  atxAll=rows;
+  atxApply();
+}
+
+function atxType(t,btn){
+  atxTypeFilter=t;
+  document.querySelectorAll('#atx-type-row .conv-toggle').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  atxApply();
+}
+
+function atxApply(){
+  const q=(document.getElementById('atx-search')?.value||'').trim().toLowerCase();
+  const minR=parseFloat(document.getElementById('atx-min-rize')?.value||0)||0;
+  const df=document.getElementById('atx-date-from')?.value;
+  const dt=document.getElementById('atx-date-to')?.value;
+  const fromTs=df?new Date(df+'T00:00:00Z').getTime()/1000:0;
+  const toTs=dt?new Date(dt+'T23:59:59Z').getTime()/1000:Infinity;
+
+  atxFiltered=atxAll.filter(r=>{
+    if(atxTypeFilter!=='all'&&r.type!==atxTypeFilter)return false;
+    if(minR>0&&r.amount<minR)return false;
+    if(r.ts<fromTs||r.ts>toTs)return false;
+    if(q){
+      const walletMatch=r.wallet.toLowerCase().includes(q);
+      const bondMatch=r.nftId?.toString()===q.replace('#','');
+      if(!walletMatch&&!bondMatch)return false;
+    }
+    return true;
+  });
+  atxSortApply();
+}
+
+function atxSort(key,th){
+  if(atxSortKey===key)atxSortDir*=-1;
+  else{atxSortKey=key;atxSortDir=-1;}
+  document.querySelectorAll('#atx-table th .sort-arrow').forEach(a=>{a.textContent='↕';a.parentElement.classList.remove('sort-asc','sort-desc');});
+  if(th){th.classList.add(atxSortDir===-1?'sort-desc':'sort-asc');const a=th.querySelector('.sort-arrow');if(a)a.textContent=atxSortDir===-1?'↓':'↑';}
+  const labels={date:'Date',type:'Type',bond:'Bond #',amount:'Amount'};
+  const badge=document.getElementById('atx-filter-badge');
+  if(badge)badge.textContent=(labels[key]||key)+(atxSortDir===-1?' ↓':' ↑');
+  atxSortApply();
+}
+
+function atxSortApply(){
+  const km={date:'ts',type:'type',bond:'nftId',amount:'amount'};
+  const f=km[atxSortKey]||'ts';
+  atxFiltered.sort((a,b)=>{
+    const av=a[f]||0, bv=b[f]||0;
+    if(typeof av==='string')return atxSortDir===-1?bv.localeCompare(av):av.localeCompare(bv);
+    return atxSortDir===-1?(bv-av):(av-bv);
+  });
+  atxPage=1; atxRender();
+}
+
+function atxRender(){
+  const total=Math.max(1,Math.ceil(atxFiltered.length/ATX_PER_PAGE));
+  const start=(atxPage-1)*ATX_PER_PAGE;
+  const slice=atxFiltered.slice(start,start+ATX_PER_PAGE);
+  document.getElementById('atx-info').textContent=`${atxFiltered.length.toLocaleString()} transactions — Page ${atxPage}/${total}`;
+  const tbody=document.getElementById('atx-tbody');
+  if(!slice.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">No results</td></tr>';atxPaginate(total);return;}
+  tbody.innerHTML=slice.map(r=>{
+    const walletHtml=r.wallet
+      ?`<span class="atx-wallet-link" onclick="atxGoWallet('${r.wallet}')" style="color:#fff;font-family:'DM Mono',monospace;font-size:13px;cursor:pointer;transition:color 0.15s">${fmtAddr(r.wallet)}${CEX_MAP[r.wallet.toLowerCase()]?` <span style="color:var(--gold);font-size:11px">[${CEX_MAP[r.wallet.toLowerCase()]}]</span>`:''}</span>`
+      :'—';
+    const amtHtml=r.amount>0?`<span style="color:${r.color};font-weight:700">${fmt(r.amount,2)} RIZE</span>`:'—';
+    return `<tr>
+      <td style="color:var(--muted);white-space:nowrap">${r.date}</td>
+      <td style="color:${r.color};font-weight:700">${r.type}</td>
+      <td style="color:#fff">${r.nftId?'#'+r.nftId:'—'}</td>
+      <td>${amtHtml}</td>
+      <td>${walletHtml}</td>
+      <td>${txLink(r.txHash)}</td>
+    </tr>`;
+  }).join('');
+  atxPaginate(total);
+}
+
+function atxGoWallet(addr){
+  _lbCameFrom=false; _expReturnModule='Explorer';
+  document.getElementById('cat-btn-explorer').click();
+  setTimeout(()=>{document.getElementById('exp-input').value=addr;expSearch();},80);
+}
+
+function atxReset(){
+  document.getElementById('atx-search').value='';
+  document.getElementById('atx-min-rize').value='';
+  document.getElementById('atx-date-from').value='';
+  document.getElementById('atx-date-to').value='';
+  atxTypeFilter='all';
+  document.querySelectorAll('#atx-type-row .conv-toggle').forEach(b=>b.classList.remove('active'));
+  document.querySelector('#atx-type-row .conv-toggle').classList.add('active');
+  atxApply();
+}
+
+function atxPaginate(total){
+  const pag=document.getElementById('atx-pagination');
+  if(total<=1){pag.innerHTML='';return;}
+  let h=`<button class="page-btn" onclick="atxGo(1)" ${atxPage===1?'disabled':''}>First</button>`;
+  h+=`<button class="page-btn" onclick="atxGo(${atxPage-1})" ${atxPage===1?'disabled':''}>Prev</button>`;
+  for(let p=Math.max(1,atxPage-3);p<=Math.min(total,atxPage+3);p++)
+    h+=`<button class="page-btn ${p===atxPage?'active':''}" onclick="atxGo(${p})">${p}</button>`;
+  h+=`<button class="page-btn" onclick="atxGo(${atxPage+1})" ${atxPage===total?'disabled':''}>Next</button>`;
+  h+=`<button class="page-btn" onclick="atxGo(${total})" ${atxPage===total?'disabled':''}>Last</button>`;
+  h+=`<input type="number" class="page-input" min="1" max="${total}" value="${atxPage}" onchange="atxGo(Math.max(1,Math.min(${total},parseInt(this.value)||1)))" title="Go to page"/>`;
+  h+=`<span class="page-info">${atxPage}/${total}</span>`;
+  pag.innerHTML=h;
+}
+function atxGo(p){atxPage=p;atxRender();}
+
+/* hover style for atx wallet links */
+document.addEventListener('mouseover',e=>{
+  if(e.target.classList.contains('atx-wallet-link'))e.target.style.color='var(--cyan)';
+});
+document.addEventListener('mouseout',e=>{
+  if(e.target.classList.contains('atx-wallet-link'))e.target.style.color='#fff';
+});
+
 
 /* ═══════════════════════════════════════════════════════
    INIT
