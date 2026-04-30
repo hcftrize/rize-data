@@ -373,7 +373,7 @@
               <th onclick="lbSortBy('rize',this)">RIZE Bonded <span class="sort-arrow">↕</span></th>
               <th onclick="lbSortBy('maturity',this)">Avg Maturity <span class="sort-arrow">↕</span></th>
               <th onclick="lbSortBy('boost',this)">Avg Boost <span class="sort-arrow">↕</span></th>
-              <th onclick="lbSortBy('vp',this)">Voting Power <span class="sort-arrow sort-active">↓</span></th>
+              <th onclick="lbSortBy('vp',this)" id="lb-th-vp">Voting Power <span class="sort-arrow sort-active">↓</span></th>
               <th onclick="lbSortBy('pct',this)">% Total VP <span class="sort-arrow">↕</span></th>
             </tr>
           </thead>
@@ -684,13 +684,13 @@
           </div>
           <div>
             <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">Net Flow 7d (40%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#fff" id="mom-netflow-7d">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">Bonds/Breaks Ratio 30d (25%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#fff" id="mom-ratio-30d">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">Avg Maturity Trend (20%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#fff" id="mom-mat-trend">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">New Bonders 30d (15%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:#fff" id="mom-new-bonders">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">Net Flow 7d (40%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-netflow-7d">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">Bonds/Breaks Ratio 30d (25%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-ratio-30d">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">Avg Maturity Trend (20%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-mat-trend">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">New Bonders 30d (15%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-new-bonders">—</span></div>
             </div>
           </div>
-          <div style="width:200px;height:200px"><canvas id="mom-donut"></canvas></div>
+          <div style="width:300px;height:300px;min-width:300px"><canvas id="mom-donut"></canvas></div>
         </div>
         <div class="sep"></div>
         <div class="inner-title">Historical Score</div>
@@ -753,10 +753,17 @@
         </div>
         <p class="section-sub">Scatter plot: X = effective bond age (from timeMarker), Y = RIZE amount (log scale), size = Voting Power, color = maturity %. Quadrant labels based on age (&gt;6mo) and amount (&gt;1M RIZE).</p>
         <div class="ctx-kpi-row">
-          <div class="ctx-kpi"><span class="ctx-kpi-label">Diamond +1M Holders</span><span class="ctx-kpi-value accent-gold" id="ba-diamond-whale">—</span><span class="ctx-kpi-sub">&gt;6mo + &gt;1M RIZE</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">Early +1M Holders</span><span class="ctx-kpi-value accent-gold" id="ba-diamond-whale">—</span><span class="ctx-kpi-sub">&gt;6mo + &gt;1M RIZE</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">Early Retails</span><span class="ctx-kpi-value accent-cyan" id="ba-early">—</span><span class="ctx-kpi-sub">&gt;6mo + &lt;1M RIZE</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">New +1M Holders</span><span class="ctx-kpi-value accent-pink" id="ba-new-whale">—</span><span class="ctx-kpi-sub">&lt;6mo + &gt;1M RIZE</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">New Retails</span><span class="ctx-kpi-value" id="ba-new-retail">—</span><span class="ctx-kpi-sub">&lt;6mo + &lt;1M RIZE</span></div>
+        </div>
+        <div class="conv-toggle-row" style="margin-bottom:12px" id="ba-filter-row">
+          <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);align-self:center">Threshold:</span>
+          <button class="conv-toggle active" onclick="baSetThreshold(1_000_000,this)">1M+ RIZE</button>
+          <button class="conv-toggle" onclick="baSetThreshold(5_000_000,this)">5M+ RIZE</button>
+          <button class="conv-toggle" onclick="baSetThreshold(10_000_000,this)">10M+ RIZE</button>
+          <button class="conv-toggle" onclick="baSetThreshold(0,this)">All</button>
         </div>
         <div class="ctx-chart-wrap" style="height:400px"><canvas id="ba-chart"></canvas></div>
       </section>
@@ -803,7 +810,7 @@
             <div id="calc-increase-inputs"></div>
             <div class="sep"></div>
             <div class="inner-title" style="font-size:13px;color:var(--pink)">Simulate a BreakBond <button onclick="calcAddBreak()" class="conv-toggle" style="margin-left:8px;padding:4px 10px;font-size:11px">+ Add</button></div>
-            <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:8px">Note: BreakBond removes RIZE from the bond but does NOT recalculate the timeMarker. Only the bonded amount changes.</div>
+            <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:8px"></div>
             <div id="calc-break-inputs"></div>
           </div>
           <div>
@@ -1201,7 +1208,12 @@ async function initLeaderboard() {
   document.getElementById('lb-avg-mat').textContent=fmtPct(avgMat*100);
 
   lbFiltered=[...lbData];
-  lbSortDir=-1; // -1 = descending (highest VP first)
+  lbSortDir=-1;
+  // Set initial arrow on VP column
+  document.querySelectorAll('#lb-table th').forEach(t=>{t.classList.remove('sort-asc','sort-desc');const a=t.querySelector('.sort-arrow');if(a)a.textContent='↕';});
+  const vpTh=document.getElementById('lb-th-vp');
+  if(vpTh){vpTh.classList.add('sort-desc');const a=vpTh.querySelector('.sort-arrow');if(a)a.textContent='↓';}
+  const badge=document.getElementById('lb-filter-badge');if(badge)badge.textContent='Voting Power ↓';
   lbSort('vp',true);
 }
 
@@ -1606,10 +1618,14 @@ function hmRender(){
     html+=`</div></div>`;
   }
   html+=`</div></div>`;
-  html+=`<div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:10px">
-    <div style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)"><div style="width:14px;height:14px;background:rgba(152,255,182,0.2)"></div>Low</div>
-    <div style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)"><div style="width:14px;height:14px;background:rgba(255,200,0,0.6)"></div>Medium</div>
-    <div style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)"><div style="width:14px;height:14px;background:rgba(255,60,60,0.9)"></div>High</div>
+  // Dynamic legend based on mode
+  const hmLowCol=hmMode_==='breaks'?'rgba(200,80,50,0.2)':hmMode_==='created'?'rgba(152,255,182,0.2)':hmMode_==='releases'?'rgba(126,224,255,0.2)':hmMode_==='increase'?'rgba(255,211,107,0.2)':'rgba(152,255,182,0.2)';
+  const hmMidCol=hmMode_==='breaks'?'rgba(220,100,50,0.55)':hmMode_==='created'?'rgba(100,220,130,0.55)':hmMode_==='releases'?'rgba(80,180,255,0.55)':hmMode_==='increase'?'rgba(255,180,50,0.55)':'rgba(100,220,130,0.55)';
+  const hmHiCol=hmMode_==='breaks'?'rgba(255,60,60,0.95)':hmMode_==='created'?'rgba(60,220,80,0.95)':hmMode_==='releases'?'rgba(30,170,255,0.95)':hmMode_==='increase'?'rgba(255,200,50,0.95)':'rgba(60,220,80,0.95)';
+  html+=`<div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:10px">
+    <div style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)"><div style="width:14px;height:14px;background:${hmLowCol}"></div>Low</div>
+    <div style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)"><div style="width:14px;height:14px;background:${hmMidCol}"></div>Medium</div>
+    <div style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)"><div style="width:14px;height:14px;background:${hmHiCol}"></div>High</div>
   </div>`;
   document.getElementById('heatmap-container').innerHTML=html;
 }
@@ -2099,6 +2115,7 @@ async function initBondAge(){
     if(isOld&&isWhale)dw++;else if(isOld&&!isWhale)eb++;else if(!isOld&&isWhale)nw++;else nr++;
     points.push({x:ageMonths,y:amt,r:Math.max(3,Math.min(22,Math.sqrt(vp/100000))),mat,vp,nftId:b.nftId,owner:b.owner});
   });
+  _baAllPoints=points; _baDW=dw; _baEB=eb; _baNW=nw; _baNR=nr; _baFullMatS=fullMatS;
   document.getElementById('ba-diamond-whale').textContent=dw.toLocaleString();
   document.getElementById('ba-early').textContent=eb.toLocaleString();
   document.getElementById('ba-new-whale').textContent=nw.toLocaleString();
@@ -2111,6 +2128,35 @@ async function initBondAge(){
   rzCharts.ba=new Chart(document.getElementById('ba-chart').getContext('2d'),{type:'bubble',data:{datasets:[{
     data:points.slice(0,2000),
     backgroundColor:points.slice(0,2000).map(p=>p.mat>0.75?'rgba(255,211,107,0.6)':p.mat>0.5?'rgba(126,224,255,0.6)':p.mat>0.25?'rgba(152,255,182,0.5)':'rgba(255,138,216,0.4)'),
+    borderWidth:0,
+  }]},options:opts});
+}
+
+let _baAllPoints=[], _baFullMatS=FULL_MATURITY_S;
+let _baDW=0,_baEB=0,_baNW=0,_baNR=0;
+function baSetThreshold(thresh, btn){
+  document.querySelectorAll('#ba-filter-row .conv-toggle').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered=thresh>0?_baAllPoints.filter(p=>p.y>=thresh):_baAllPoints;
+  // Recompute quadrant counts with this threshold
+  const now=Date.now()/1000;
+  let dw=0,eb=0,nw=0,nr=0;
+  filtered.forEach(p=>{
+    const isOld=p.x>=6, isWhale=p.y>=1_000_000;
+    if(isOld&&isWhale)dw++;else if(isOld&&!isWhale)eb++;else if(!isOld&&isWhale)nw++;else nr++;
+  });
+  document.getElementById('ba-diamond-whale').textContent=dw.toLocaleString();
+  document.getElementById('ba-early').textContent=eb.toLocaleString();
+  document.getElementById('ba-new-whale').textContent=nw.toLocaleString();
+  document.getElementById('ba-new-retail').textContent=nr.toLocaleString();
+  if(rzCharts.ba){rzCharts.ba.destroy();}
+  const opts=baseOpts();
+  opts.plugins.tooltip.callbacks={label:c=>{const p=c.raw;return[`Bond #${p.nftId||'—'}`,`${fmt(p.y,2)} RIZE`,`Maturity: ${fmtPct(p.mat*100)}`,`VP: ${fmt(p.vp,2)}`];}};
+  opts.scales.x={...opts.scales.x,title:{display:true,text:'Effective Age (months from timeMarker)',color:'#b6c1d8',font:{size:13}}};
+  opts.scales.y={...opts.scales.y,type:'logarithmic',title:{display:true,text:'RIZE Amount (log scale)',color:'#b6c1d8',font:{size:13}},ticks:{color:'#b6c1d8',callback:v=>fmt(v,0)}};
+  rzCharts.ba=new Chart(document.getElementById('ba-chart').getContext('2d'),{type:'bubble',data:{datasets:[{
+    data:filtered.slice(0,3000),
+    backgroundColor:filtered.slice(0,3000).map(p=>p.mat>0.75?'rgba(255,211,107,0.7)':p.mat>0.5?'rgba(126,224,255,0.7)':p.mat>0.25?'rgba(152,255,182,0.6)':'rgba(255,138,216,0.5)'),
     borderWidth:0,
   }]},options:opts});
 }
@@ -2495,7 +2541,7 @@ function expRenderWallet(addr,bdData,bbData,ntData,tmData,lcData,latestSnap,full
   window._expWalletTimeline=timeline;
   window._expWalletFilterType='all';
   window._expWalletFilterBond='all';
-  setTimeout(()=>expRenderVPChart(bondRows,allBondCreated,myIncreases,breaks,fullMatS),50);
+  setTimeout(()=>expRenderVPChart(bondRows,allBondCreated,myIncreases,breaks,fullMatS,tmData?.bondTimeMarkerSnapshots||[]),50);
 }
 
 function expBuildWalletTimelineRows(timeline,typeFilter,bondFilter){
@@ -2545,24 +2591,67 @@ function expSortBonds(key,th){
   rows.forEach(r=>tbody.appendChild(r));
 }
 
-function expRenderVPChart(bondRows,created,increases,breaks,fullMatS){
+function expRenderVPChart(bondRows,created,increases,breaks,fullMatS,allSnapshots){
   const canvas=document.getElementById('exp-vp-chart');if(!canvas)return;
-  // Build timeline: each bond creation event = one data point
-  // At creation: maturity=0, boost=1x → VP = amount * 1
+  // Build timeline using all events, compute VP at each point using
+  // the snapshot closest to that timestamp for each bond's timeMarker
   const allEvents=[
-    ...created.map(e=>({ts:parseInt(e.timestamp),type:'created',amount:parseAmt(e.amount)})),
-    ...increases.map(e=>({ts:parseInt(e.timestamp),type:'increase',amount:parseAmt(e.amount)})),
-    ...breaks.map(e=>({ts:parseInt(e.timestamp),type:'break',amount:parseAmt(e.amount)})),
+    ...created.map(e=>({ts:parseInt(e.timestamp),type:'created',nftId:e.nftId,amount:parseAmt(e.amount)})),
+    ...increases.map(e=>({ts:parseInt(e.timestamp),type:'increase',nftId:e.nftId,amount:parseAmt(e.amount)})),
+    ...breaks.map(e=>({ts:parseInt(e.timestamp),type:'break',nftId:e.nftId,amount:parseAmt(e.amount)})),
   ].sort((a,b)=>a.ts-b.ts);
   if(!allEvents.length)return;
+
+  // Group snapshots by nftId sorted by blockNumber
+  const snapsByNft={};
+  (allSnapshots||[]).forEach(s=>{
+    if(!snapsByNft[s.nftId])snapsByNft[s.nftId]=[];
+    snapsByNft[s.nftId].push({ts:parseInt(s.timestamp||s.blockNumber),tm:parseInt(s.timeMarker),amt:parseAmt(s.amount)});
+  });
+  Object.values(snapsByNft).forEach(arr=>arr.sort((a,b)=>a.ts-b.ts));
+
+  // Helper: get timeMarker for a bond at a given timestamp
+  // Use the snapshot just before or at that time, fallback to creation ts
+  const getTmAt=(nftId,atTs,fallbackTm)=>{
+    const snaps=snapsByNft[nftId]||[];
+    let best=null;
+    for(const s of snaps){if(s.ts<=atTs)best=s;}
+    return best?best.tm:(fallbackTm||atTs);
+  };
+
+  // Track per-bond state: {amount, timeMarker}
+  const bondState={};
   const labels=[],rizeData=[],vpData=[];
-  let running=0;
+
   allEvents.forEach(ev=>{
+    if(ev.type==='created'){
+      // At creation: timeMarker = creation timestamp, maturity = 0
+      bondState[ev.nftId]={amount:ev.amount,tm:ev.ts};
+    } else if(ev.type==='increase'){
+      const prev=bondState[ev.nftId]||{amount:0,tm:ev.ts};
+      // Get actual timeMarker from snapshot at this point
+      const newTm=getTmAt(ev.nftId,ev.ts,prev.tm);
+      bondState[ev.nftId]={amount:prev.amount+ev.amount,tm:newTm};
+    } else if(ev.type==='break'){
+      const prev=bondState[ev.nftId]||{amount:ev.amount,tm:ev.ts};
+      bondState[ev.nftId]={amount:Math.max(0,prev.amount-ev.amount),tm:prev.tm};
+    }
+    // Compute total VP at this moment using current bond states
+    let totalRize=0,totalVP=0;
+    Object.values(bondState).forEach(b=>{
+      if(b.amount<=0)return;
+      const mat=Math.min(1,Math.max(0,(ev.ts-b.tm)/fullMatS));
+      totalRize+=b.amount;
+      totalVP+=b.amount*(1+mat*2);
+    });
     const date=tsToDate(ev.ts.toString());
-    if(ev.type==='break')running=Math.max(0,running-ev.amount);else running+=ev.amount;
-    // At the time of creation: maturity was 0 → boost=1x
-    // This is the correct historical VP at that moment
-    labels.push(date);rizeData.push(running);vpData.push(running*1);
+    // Avoid duplicate dates — if same date, update last point
+    if(labels.length>0&&labels[labels.length-1]===date){
+      rizeData[rizeData.length-1]=totalRize;
+      vpData[vpData.length-1]=totalVP;
+    } else {
+      labels.push(date);rizeData.push(totalRize);vpData.push(totalVP);
+    }
   });
   const now=Date.now()/1000;
   labels.push('Today');rizeData.push(rizeData[rizeData.length-1]||0);vpData.push(bondRows.reduce((s,b)=>s+b.vp,0));
