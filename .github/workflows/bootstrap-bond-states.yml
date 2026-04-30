@@ -1,0 +1,46 @@
+name: Bootstrap bond-states.json (One-Time)
+
+# Run this ONCE manually after deploying the 6 bootstrapped JSONs.
+# It generates bond-states.json from all historical data since genesis.
+# After this, update-bond-states.yml maintains it daily.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run bootstrap
+        run: |
+          python3 rize-governance-hub/bootstrap_bond_states.py
+
+      - name: Commit bond-states.json to dev
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add rize-governance-hub/bond-states.json
+          git diff --cached --quiet || git commit -m "chore: bootstrap bond-states.json from genesis $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push origin dev
+
+      - name: Merge to main
+        run: |
+          git checkout main
+          git checkout dev -- rize-governance-hub/bond-states.json
+          git add -f rize-governance-hub/bond-states.json
+          git diff --cached --quiet || git commit -m "chore: bootstrap bond-states.json (main sync) $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push origin main
