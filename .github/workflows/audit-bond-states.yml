@@ -1,0 +1,25 @@
+name: Audit bond-states.json
+
+# Run manually to diagnose RIZE balance discrepancies.
+# Output is visible in the GitHub Actions logs.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run audit
+        run: |
+          python3 rize-governance-hub/audit_bond_states.py
