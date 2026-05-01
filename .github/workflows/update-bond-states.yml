@@ -1,0 +1,55 @@
+name: Update bond-states.json
+
+# Triggered by cron-job.org via workflow_dispatch (no GitHub schedule).
+# Run 1 hour after update-governance.yml to ensure 6 source JSONs are updated.
+#
+# cron-job.org setup:
+#   URL: https://api.github.com/repos/hcftrize/TOKERIZE/actions/workflows/update-bond-states.yml/dispatches
+#   Method: POST
+#   Headers: Authorization: Bearer <GITHUB_PAT>, Content-Type: application/json
+#   Body: {"ref":"dev"}
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-bond-states:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout dev
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+
+      - name: Pull latest dev
+        run: git pull origin dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Recompute bond-states.json
+        run: |
+          python3 rize-governance-hub/compute_bond_states.py
+
+      - name: Commit bond-states.json to dev
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add rize-governance-hub/bond-states.json
+          git diff --cached --quiet || git commit -m "chore: bond-states update $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push origin dev
+
+      - name: Merge to main
+        run: |
+          git checkout main
+          git pull origin main
+          git checkout dev -- rize-governance-hub/bond-states.json
+          git add -f rize-governance-hub/bond-states.json
+          git diff --cached --quiet || git commit -m "chore: bond-states update (main sync) $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push origin main
