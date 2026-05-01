@@ -245,7 +245,7 @@ def compute_bond_states():
                 "vp":          round(vp_now, 4),
                 "fullMatDate": full_mat_date,
                 "vpAtFullMat": round(balance * 3.0, 4),
-                "isActive":    balance > 0.01,
+                "isActive":    balance > 0,
             },
         }
 
