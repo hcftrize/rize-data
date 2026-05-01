@@ -153,5 +153,79 @@ print(f"   Orphan breaks (no creation) : {orphan_total:>16,.2f}")
 print(f"   Bonds without event         : {total_missing:>16,.2f} (totalDeposited)")
 sep()
 
+# ── 9. Recalculate from raw events only (ignore bonds[].totalDeposited) ──
+sep()
+print("9. RECALC FROM RAW EVENTS ONLY (bondCreatedEvents + increases - breaks)")
+print("   This bypasses bonds[].totalDeposited entirely.")
+event_balance = {}
+for e in created_events:
+    nid = str(e["nftId"])
+    event_balance[nid] = event_balance.get(nid, 0) + pf(e.get("amount", 0))
+for e in increase_events:
+    nid = str(e["nftId"])
+    event_balance[nid] = event_balance.get(nid, 0) + pf(e.get("amount", 0))
+for e in break_events:
+    nid = str(e["nftId"])
+    event_balance[nid] = event_balance.get(nid, 0) - pf(e.get("amount", 0))
+
+event_total  = sum(max(0.0, v) for v in event_balance.values())
+event_active = sum(1 for v in event_balance.values() if v > 0)
+print(f"   Active bonds (event-based)  : {event_active:>8,}")
+print(f"   Total RIZE (event-based)    : {event_total:>16,.2f} RIZE")
+print(f"   bonds[].totalDeposited total: {total_deposited:>16,.2f} RIZE")
+print(f"   DELTA                       : {event_total - total_deposited:>+16,.2f} RIZE")
+print()
+
+if abs(event_total - 927_000_000) < abs(total_deposited - 232_841_695 - 927_000_000 + 232_841_695):
+    print("   → Event-based total closer to 927M RPC value.")
+    print("   → bonds[].totalDeposited is STALE/INCOMPLETE for some bonds.")
+    print("   → Fix: compute_bond_states.py already uses events — bonds[] only used for owner/pool.")
+    print("   → The 66M gap is in bonds[] not reflecting latest IncreaseBond additions.")
+else:
+    print("   → Both event-based and bonds[] give similar totals.")
+    print("   → The source data (subgraph) itself may be missing events.")
+
+# ── 10. Find bonds where events sum ≠ bonds[].totalDeposited ──
+sep()
+print("10. BONDS WHERE events sum ≠ bonds[].totalDeposited")
+print("    (these bonds have stale totalDeposited in bonds[])")
+mismatches = []
+bonds_by_nid = {str(b.get("nftId") or b.get("id","")): b for b in bonds_list}
+for nid, ev_bal_gross in event_balance.items():
+    # Gross = created + increases (before breaks)
+    gross_ev = pf(bonds_by_nid.get(nid, {}).get("totalDeposited", 0))
+    created_amt = sum(pf(e["amount"]) for e in created_events if str(e["nftId"]) == nid)
+    increase_amt = sum(pf(e["amount"]) for e in increase_events if str(e["nftId"]) == nid)
+    ev_gross = created_amt + increase_amt
+    td = pf(bonds_by_nid.get(nid, {}).get("totalDeposited", 0))
+    diff = ev_gross - td
+    if abs(diff) > 0.01:
+        mismatches.append((nid, td, ev_gross, diff))
+
+mismatches.sort(key=lambda x: -abs(x[3]))
+total_mismatch_rize = sum(x[3] for x in mismatches)
+print(f"   Bonds with mismatch: {len(mismatches):,}")
+print(f"   Total RIZE difference: {total_mismatch_rize:>16,.2f} RIZE")
+if mismatches:
+    print("   Top 10 mismatches (nftId, totalDeposited, event_gross, diff):")
+    for nid, td, ev, diff in mismatches[:10]:
+        print(f"     nftId={nid:>6}  bonds[]={td:>14,.2f}  events={ev:>14,.2f}  diff={diff:>+12,.2f}")
+
+sep()
+print("CONCLUSION")
+if len(mismatches) > 0 and total_mismatch_rize > 1_000_000:
+    print(f"  bonds[].totalDeposited is STALE for {len(mismatches)} bonds.")
+    print(f"  These bonds have IncreaseBond amounts NOT reflected in totalDeposited.")
+    print(f"  Total missing RIZE: {total_mismatch_rize:,.2f}")
+    print(f"  Fix: compute_bond_states.py correctly uses events (not totalDeposited).")
+    print(f"  The HTML maturity distribution should sum to ~{event_total:,.0f} RIZE")
+    print(f"  not {total_deposited - sum(pf(e['amount']) for e in break_events):,.0f} RIZE.")
+elif event_total > total_deposited + 1_000_000:
+    print("  Raw events contain MORE RIZE than bonds[].totalDeposited.")
+    print("  bonds[] is stale — re-bootstrap bond-created with fresh subgraph data.")
+else:
+    print("  Data appears consistent. Gap may be from bonds created after bootstrap.")
+sep()
+
 if __name__ == "__main__":
     pass
