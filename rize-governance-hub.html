@@ -652,7 +652,7 @@
           <div class="wm-badge"><span class="wm-text-tokerize">TOKERIZE.TOP</span></div>
           <button class="screenshot-btn" onclick="govScreenshot('mp-maturity','maturity')">&#128247;<span class="screenshot-label"> Screenshot</span></button>
         </div>
-        <p class="section-sub">Distribution of bonds by maturity range. Computed from current timeMarkers. Only active bonds with RIZE &gt; 0 are included.</p>
+        <p class="section-sub">Distribution of bonds by maturity range. Combines bond-states.json (pre-computed) with any bonds created since last daily update. Only bonds with RIZE &gt; 0 included.</p>
         <div class="ctx-kpi-row">
           <div class="ctx-kpi"><span class="ctx-kpi-label">Weighted Avg Maturity</span><span class="ctx-kpi-value accent-cyan" id="mat-avg">—</span><span class="ctx-kpi-sub">global conviction score</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">Full Maturity 3× Boost</span><span class="ctx-kpi-value accent-gold" id="mat-full-count">—</span><span class="ctx-kpi-sub">diamond hands count</span></div>
@@ -660,6 +660,23 @@
           <div class="ctx-kpi"><span class="ctx-kpi-label">1.5× Boost</span><span class="ctx-kpi-value" id="mat-15x-count">—</span><span class="ctx-kpi-sub" id="mat-15x-vp">&nbsp;</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">% VP at Full Maturity</span><span class="ctx-kpi-value accent-pink" id="mat-full-vp-pct">—</span><span class="ctx-kpi-sub">of total voting power</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">Avg Boost</span><span class="ctx-kpi-value" id="mat-avg-boost">—</span><span class="ctx-kpi-sub">weighted average</span></div>
+        </div>
+        <div class="ctx-kpi-row" style="margin-top:4px">
+          <div class="ctx-kpi" style="border-color:rgba(255,211,107,0.2);background:rgba(255,211,107,0.04)">
+            <span class="ctx-kpi-label">Active RIZE (with VP)</span>
+            <span class="ctx-kpi-value accent-cyan" id="mat-active-rize">—</span>
+            <span class="ctx-kpi-sub">bonded with voting power</span>
+          </div>
+          <div class="ctx-kpi" style="border-color:rgba(255,138,216,0.2);background:rgba(255,138,216,0.04)">
+            <span class="ctx-kpi-label">Pending Release Queue</span>
+            <span class="ctx-kpi-value accent-pink" id="mat-queue-rize">—</span>
+            <span class="ctx-kpi-sub">broken but not yet withdrawn</span>
+          </div>
+          <div class="ctx-kpi" style="border-color:rgba(255,255,255,0.08)">
+            <span class="ctx-kpi-label">Total in Contract</span>
+            <span class="ctx-kpi-value" id="mat-total-rize">—</span>
+            <span class="ctx-kpi-sub">active + queue = RPC live</span>
+          </div>
         </div>
         <div class="conv-toggle-row">
           <button class="conv-toggle active" onclick="matView('rize',this)">RIZE Volume</button>
@@ -1972,12 +1989,42 @@ let matLoaded=false, matViewMode='rize', matChart=null, matBuckets=[];
 
 async function initMaturity(){
   if(matLoaded)return;matLoaded=true;
-  const bs=await loadBondStates();
+  const [bs,bdData,bbData,tmData,lcData]=await Promise.all([loadBondStates(),loadJSON('bondCreated'),loadJSON('bondBroken'),loadJSON('bondTimemarker'),loadJSON('bondLifecycle')]);
   if(!bs)return;
-  // Use bondStates directly — balance and maturity are exact
-  // Include all bonds with any positive balance (isActive threshold was too aggressive)
-  const bonds=Object.entries(bs).map(([nftId,state])=>({nftId,state})).filter(({state})=>state.current?.balance>0);
-  const fullMatS=_bsFull;
+  const fullMatS=_bsFull||94608000;
+  const now=Date.now()/1000;
+
+  // Start with bondStates (pre-computed, exact)
+  const bonds=Object.entries(bs).map(([nftId,state])=>({
+    nftId, balance:state.current.balance, maturity:state.current.maturity,
+    boost:state.current.boost, vp:state.current.vp, fromBS:true
+  })).filter(b=>b.balance>0);
+
+  // Supplement: add bonds from bond-created.json NOT yet in bondStates
+  // (created after last bond-states.json generation)
+  if(bdData&&bbData){
+    const bsNftIds=new Set(Object.keys(bs));
+    const latestSnap=getLatestSnaps(tmData?.bondTimeMarkerSnapshots||[]);
+    // Build broken totals for supplementary bonds only
+    const brokenTotals={};
+    (bbData.bondBrokenEvents||[]).forEach(e=>{
+      if(!bsNftIds.has(String(e.nftId)))
+        brokenTotals[e.nftId]=(brokenTotals[e.nftId]||0)+parseAmt(e.amount);
+    });
+    (bdData.bonds||[]).forEach(b=>{
+      if(bsNftIds.has(String(b.nftId)))return; // already in bondStates
+      const deposited=parseAmt(b.totalDeposited);
+      if(deposited<=0)return;
+      const broken=brokenTotals[b.nftId]||0;
+      const balance=Math.max(0,deposited-broken);
+      if(balance<=0)return;
+      const snap=latestSnap[b.nftId];
+      const tm=snap?parseInt(snap.timeMarker):parseInt(b.createdAtTimestamp||0);
+      const maturity=tm?Math.min(1,Math.max(0,(now-tm)/fullMatS)):0;
+      const boost=1+2*maturity;
+      bonds.push({nftId:b.nftId,balance,maturity,boost,vp:balance*boost,fromBS:false});
+    });
+  }
   const ranges=[
     {label:'0–10%',min:0,max:0.10},{label:'10–25%',min:0.10,max:0.25},
     {label:'25–50%',min:0.25,max:0.50},{label:'50–75%',min:0.50,max:0.75},
@@ -1985,12 +2032,11 @@ async function initMaturity(){
   ];
   matBuckets=ranges.map(r=>({...r,count:0,rize:0,vp:0}));
   let totalVP=0,totalRize=0,totalWMat=0,count2x=0,vp2x=0,count15x=0,vp15x=0;
-  bonds.forEach(({nftId,state})=>{
-    const cur=state.current;
-    const amt=cur.balance;
-    const mat=cur.maturity;
-    const boost=cur.boost;
-    const vp=cur.vp;
+  bonds.forEach(b=>{
+    const amt=b.balance;
+    const mat=b.maturity;
+    const boost=b.boost;
+    const vp=b.vp;
     totalVP+=vp;totalRize+=amt;totalWMat+=mat*amt;
     const bucket=matBuckets.find(r=>mat>=r.min&&mat<r.max)||matBuckets[matBuckets.length-1];
     bucket.count++;bucket.rize+=amt;bucket.vp+=vp;
@@ -2007,6 +2053,15 @@ async function initMaturity(){
   document.getElementById('mat-2x-vp').textContent=totalVP>0?fmtPct(vp2x/totalVP*100)+' of VP':'—';
   document.getElementById('mat-15x-count').textContent=count15x.toLocaleString();
   document.getElementById('mat-15x-vp').textContent=totalVP>0?fmtPct(vp15x/totalVP*100)+' of VP':'—';
+
+  // Release queue KPIs — RIZE broken but not yet withdrawn
+  const _totalReleased=(lcData?.tokensReleasedEvents||[]).reduce((s,e)=>s+parseAmt(e.amount),0);
+  const _totalBroken=(bbData?.bondBrokenEvents||[]).reduce((s,e)=>s+parseAmt(e.amount),0);
+  const _queueRize=Math.max(0,_totalBroken-_totalReleased);
+  const elAct=document.getElementById('mat-active-rize');if(elAct)elAct.textContent=fmt(totalRize,2)+' RIZE';
+  const elQ=document.getElementById('mat-queue-rize');if(elQ)elQ.textContent=fmt(_queueRize,2)+' RIZE';
+  const elTot=document.getElementById('mat-total-rize');if(elTot)elTot.textContent=fmt(totalRize+_queueRize,2)+' RIZE';
+
   document.getElementById('mat-tbody').innerHTML=matBuckets.map(b=>`<tr>
     <td style="font-family:'Rajdhani',sans-serif;font-weight:700">${b.label}</td>
     <td>${b.count.toLocaleString()}</td>
@@ -2275,7 +2330,7 @@ function baSetThreshold(thresh, btn){
   const opts=baseOpts();
   opts.plugins.tooltip.callbacks={label:c=>{const p=c.raw;return[`Bond #${p.nftId||'—'}`,`${fmt(p.y,2)} RIZE`,`Maturity: ${fmtPct(p.mat*100)}`,`VP: ${fmt(p.vp,2)}`];}};
   opts.scales.x={...opts.scales.x,title:{display:true,text:'Effective Age (months from timeMarker)',color:'#b6c1d8',font:{size:13}}};
-  opts.scales.y={...opts.scales.y,type:'logarithmic',title:{display:true,text:'RIZE Amount (log scale)',color:'#b6c1d8',font:{size:13}},ticks:{color:'#b6c1d8',callback:v=>fmt(v,0)}};
+  opts.scales.y={type:'logarithmic',min:1,title:{display:true,text:'RIZE Amount (log scale)',color:'#b6c1d8',font:{size:13}},grid:{color:'rgba(255,255,255,0.06)'},ticks:{color:'#b6c1d8',font:{size:11},callback:v=>fmt(v,0)}};
   rzCharts.ba=new Chart(document.getElementById('ba-chart').getContext('2d'),{type:'bubble',data:{datasets:[{
     data:filtered.slice(0,3000),
     backgroundColor:filtered.slice(0,3000).map(p=>p.mat>0.75?'rgba(255,211,107,0.7)':p.mat>0.5?'rgba(126,224,255,0.7)':p.mat>0.25?'rgba(152,255,182,0.6)':'rgba(255,138,216,0.5)'),
@@ -2561,7 +2616,7 @@ function expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS){
   const bondRows=uniqueNftIds.map(nftId=>{
     const state=bs?bs[String(nftId)]:null;
     const cur=state?.current;
-    if(!cur||!cur.isActive)return null;
+    if(!cur||cur.balance<=0)return null;
     const amount=cur.balance,mat=cur.maturity,boost=cur.boost,vp=cur.vp,tm=cur.timeMarker;
     if(amount>0){totalVP+=vp;totalRize+=amount;matWeight+=mat*amount;}
     return{nftId,owner:state.owner,mat,boost,vp,amount,tm,
@@ -2589,7 +2644,7 @@ function expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS){
   const c7=Date.now()/1000-7*86400;
   const unbQueue=breaks.filter(e=>parseInt(e.timestamp)>c7).reduce((s,e)=>s+parseAmt(e.amount),0);
 
-  if(!bonds.length&&!allBondCreated.length){results.innerHTML=`<div class="error-box">No governance activity found for ${fmtAddr(addr)}. Please verify the address.</div>`;return;}
+  if(!bondRows.length&&!allBondCreated.length){results.innerHTML=`<div class="error-box">No governance activity found for ${fmtAddr(addr)}. Please verify the address.</div>`;return;}
 
   // Back to leaderboard button if arrived from there
   const backBtn=(_lbCameFrom||_expReturnModule)?`<button class="search-btn secondary" style="margin-bottom:12px" onclick="if(_lbCameFrom){document.getElementById('cat-btn-leaderboard').click();setTimeout(()=>{lbPage=${_lbFromPage};lbRender();window.scrollTo(0,${_lbScrollY});_lbCameFrom=false;},120);}else{document.getElementById('cat-btn-metrics').click();}">Back${_expReturnModule?' to '+_expReturnModule:' to Leaderboard'}</button>`:'';
