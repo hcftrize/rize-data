@@ -1253,7 +1253,7 @@ async function initLeaderboard() {
   const bondEntries=[];
   Object.entries(bs).forEach(([nftId,state])=>{
     const cur=state.current;
-    if(!cur||!cur.isActive||cur.balance<0.01)return;
+    if(!cur||cur.balance<=0)return;
     const createdEv=state.events?.find(e=>e.type==='BondCreated');
     bondEntries.push({
       nftId,
@@ -1975,7 +1975,8 @@ async function initMaturity(){
   const bs=await loadBondStates();
   if(!bs)return;
   // Use bondStates directly — balance and maturity are exact
-  const bonds=Object.entries(bs).map(([nftId,state])=>({nftId,state})).filter(({state})=>state.current?.isActive&&state.current.balance>0.01);
+  // Include all bonds with any positive balance (isActive threshold was too aggressive)
+  const bonds=Object.entries(bs).map(([nftId,state])=>({nftId,state})).filter(({state})=>state.current?.balance>0);
   const fullMatS=_bsFull;
   const ranges=[
     {label:'0–10%',min:0,max:0.10},{label:'10–25%',min:0.10,max:0.25},
@@ -2215,7 +2216,7 @@ async function initBondAge(){
   let dw=0,eb=0,nw=0,nr=0;
   Object.entries(bs).forEach(([nftId,state])=>{
     const cur=state.current;
-    if(!cur||!cur.isActive||cur.balance<0.01)return;
+    if(!cur||cur.balance<=0)return;
     const tm=cur.timeMarker||0;
     const amt=cur.balance;
     const mat=cur.maturity;
@@ -2223,9 +2224,9 @@ async function initBondAge(){
     const ageMonths=tm?(now-tm)/2592000:0;
     const isWhale=amt>=1_000_000,isOld=ageMonths>=6;
     if(isOld&&isWhale)dw++;else if(isOld&&!isWhale)eb++;else if(!isOld&&isWhale)nw++;else nr++;
-    points.push({x:ageMonths,y:amt,r:Math.max(3,Math.min(22,Math.sqrt(vp/100000))),mat,vp,nftId:b.nftId,owner:b.owner});
+    points.push({x:ageMonths,y:amt,r:Math.max(3,Math.min(22,Math.sqrt(vp/100000))),mat,vp,nftId,owner:state.owner});
   });
-  _baAllPoints=points; _baDW=dw; _baEB=eb; _baNW=nw; _baNR=nr; _baFullMatS=fullMatS;
+  _baAllPoints=points; _baDW=dw; _baEB=eb; _baNW=nw; _baNR=nr; _baFullMatS=_bsFull;
   // Default: show All
   const allBtn=document.querySelector('#ba-filter-row .conv-toggle');
   if(allBtn){document.querySelectorAll('#ba-filter-row .conv-toggle').forEach(b=>b.classList.remove('active'));allBtn.classList.add('active');}
@@ -2573,8 +2574,10 @@ function expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS){
   const totalAllVP=lbData.reduce((s,w)=>s+w.totalVP,0);
   const avgMat=totalRize>0?matWeight/totalRize:0;
   const hasNeverBroken=breaks.length===0;
-  const ageMonths=bonds.length>0?(Date.now()/1000-Math.min(...bonds.map(b=>parseInt(b.createdAtTimestamp))))/2592000:0;
-  const loyaltyScore=Math.min(10,(hasNeverBroken?3:0)+Math.min(3,ageMonths/6)+Math.min(2,myIncreases.length/3)+Math.min(2,bonds.length/2)).toFixed(1);
+  // ageMonths = time since earliest bond creation for this wallet
+  const _minTs=bondRows.length>0?Math.min(...bondRows.map(b=>b.tm||Date.now()/1000)):Date.now()/1000;
+  const ageMonths=(Date.now()/1000-_minTs)/2592000;
+  const loyaltyScore=Math.min(10,(hasNeverBroken?3:0)+Math.min(3,ageMonths/6)+Math.min(2,myIncreases.length/3)+Math.min(2,bondRows.length/2)).toFixed(1);
 
   const proj=months=>bondRows.reduce((s,b)=>{
     const tm=parseInt(b.tm)||parseInt(b.createdAtTimestamp);
@@ -2599,7 +2602,7 @@ function expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS){
     ...transfers.map(e=>({...e,_type:e.isMint?'Mint':'Transfer',_color:e.isMint?'var(--gold)':'var(--muted)',_amt:0})),
   ].sort((a,b)=>parseInt(b.timestamp)-parseInt(a.timestamp));
 
-  const firstBond=bonds.length>0?bonds.reduce((m,b)=>parseInt(b.createdAtTimestamp)<parseInt(m.createdAtTimestamp)?b:m).createdAtDate||tsToDate(bonds.reduce((m,b)=>parseInt(b.createdAtTimestamp)<parseInt(m.createdAtTimestamp)?b:m).createdAtTimestamp):'—';
+  const firstBond=bondRows.length>0?bondRows.reduce((m,b)=>(b.tm||Infinity)<(m.tm||Infinity)?b:m).createdAtDate||'—':'—';
 
   results.innerHTML=`
     ${backBtn}
@@ -2613,7 +2616,7 @@ function expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS){
       <div class="ctx-kpi-row">
         <div class="ctx-kpi"><span class="ctx-kpi-label">Total Voting Power</span><span class="ctx-kpi-value accent-cyan">${fmt(totalVP,2)}</span><span class="ctx-kpi-sub">${totalAllVP>0?fmtPct(totalVP/totalAllVP*100)+' of total':''}</span></div>
         <div class="ctx-kpi"><span class="ctx-kpi-label">RIZE Bonded</span><span class="ctx-kpi-value accent-gold">${fmt(totalRize,2)}</span></div>
-        <div class="ctx-kpi"><span class="ctx-kpi-label">Active Bonds</span><span class="ctx-kpi-value">${bonds.length}</span></div>
+        <div class="ctx-kpi"><span class="ctx-kpi-label">Active Bonds</span><span class="ctx-kpi-value">${bondRows.length}</span></div>
         <div class="ctx-kpi"><span class="ctx-kpi-label">Avg Maturity</span><span class="ctx-kpi-value accent-green">${fmtPct(avgMat*100)}</span></div>
         <div class="ctx-kpi"><span class="ctx-kpi-label">Loyalty Score</span><span class="ctx-kpi-value accent-gold">${loyaltyScore}/10</span><span class="ctx-kpi-sub">${hasNeverBroken?'Never broken':'Has broken'}</span></div>
         <div class="ctx-kpi"><span class="ctx-kpi-label">First Bond</span><span class="ctx-kpi-value" style="font-size:18px;font-family:'Rajdhani',sans-serif;font-weight:700">${firstBond}</span></div>
