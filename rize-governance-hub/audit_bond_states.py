@@ -173,6 +173,33 @@ print(f"   Excess breaks (brk > dep)   : {total_excess:>16,.2f} RIZE")
 print(f"   Stale totalDeposited delta  : {total_mismatch:>+16,.2f} RIZE")
 sep()
 
+# ── 11. Breaks vs Releases — queue non retirée ──
+sep()
+print("11. BREAKS vs RELEASES — RIZE cassé mais pas encore sorti du contrat")
+print("    Théorie: le RPC totalBonded inclut le RIZE en queue de release")
+print("    Nous on le soustrait dès le break → on under-count de ce montant")
+lc = load("bond-lifecycle.json").get("data", {})
+release_events = lc.get("tokensReleasedEvents", [])
+total_released = sum(pf(e.get("amount", 0)) for e in release_events)
+queue_rize = total_breaks - total_released
+print(f"   Sum all breaks         : {total_breaks:>16,.2f} RIZE")
+print(f"   Sum all releases       : {total_released:>16,.2f} RIZE")
+print(f"   En queue (non releasé) : {queue_rize:>16,.2f} RIZE  ← clé")
+print(f"   Notre net balance      : {event_total:>16,.2f} RIZE")
+print(f"   Notre net + queue      : {event_total + queue_rize:>16,.2f} RIZE")
+print(f"   RPC live               :    ~927,000,000.00 RIZE")
+print(f"   Delta net+queue vs RPC : {event_total + queue_rize - 927_000_000:>+16,.2f} RIZE")
+if abs(event_total + queue_rize - 927_000_000) < 5_000_000:
+    print()
+    print("   ✓ THÉORIE CONFIRMÉE: le RPC compte le RIZE en queue de release")
+    print("     comme encore 'bondé'. Notre calcul est correct pour le VP")
+    print("     (RIZE cassé n'a plus de VP), mais le total affiché doit")
+    print("     inclure la queue pour matcher le RPC.")
+else:
+    print()
+    print("   Théorie non confirmée par les chiffres.")
+sep()
+
 # ── 10. Conclusion ──
 print("10. CONCLUSION")
 if total_excess > 1_000_000:
