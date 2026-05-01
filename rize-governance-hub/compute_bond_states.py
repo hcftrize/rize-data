@@ -289,11 +289,13 @@ def compute_bond_states():
     }
 
     out_path = os.path.join(SCRIPT_DIR, "bond-states.json")
-    with open(out_path, "w", encoding="utf-8") as f:
+    tmp_path = out_path + ".tmp"
+    with open(tmp_path, "w", encoding="utf-8") as f:
         json.dump(output, f, separators=(",", ":"), ensure_ascii=False)
+    os.replace(tmp_path, out_path)  # atomic: old file intact if write fails
 
     size_kb = os.path.getsize(out_path) // 1024
-    print(f"\n  ✓ bond-states.json written — {size_kb:,} KB", flush=True)
+    print(f"\n  ✓ bond-states.json written atomically — {size_kb:,} KB", flush=True)
     return output
 
 
