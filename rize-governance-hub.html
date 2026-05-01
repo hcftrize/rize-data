@@ -1021,6 +1021,7 @@ const URLS = {
   nftTransfers:  `${RAW}/nft-transfers.json`,
   bondCreated:   `${RAW}/bond-created.json`,
   bondTimemarker:`${RAW}/bond-timemarker.json`,
+  bondStates:   `${RAW}/bond-states.json`,
 };
 
 /* ═══════════════════════════════════════════════════════
@@ -1217,6 +1218,25 @@ function _downloadScreenshot(canvas,filename) {
 /* ═══════════════════════════════════════════════════════
    LEADERBOARD
 ═══════════════════════════════════════════════════════ */
+// ── 7th JSON: bond-states global ──────────────────────────────────
+let _bs=null; // bondStates object from bond-states.json
+let _bsOwner=null; // ownerIndex: owner→[nftId,...]
+let _bsFull=94608000; // fullMaturity in seconds
+
+async function loadBondStates(){
+  if(_bs)return _bs;
+  const d=await loadJSON('bondStates');
+  if(!d)return null;
+  _bs=d.bondStates||d;
+  _bsOwner=d.ownerIndex||{};
+  _bsFull=d.fullMaturity||94608000;
+  return _bs;
+}
+
+// Helpers using bond-states
+function bsCurrent(nftId){return (_bs||{})[String(nftId)]?.current||null;}
+function bsOwnerNfts(addr){return (_bsOwner||{})[addr.toLowerCase()]||[];}
+
 let lbData=[], lbFiltered=[], lbPage=1, lbSortKey='vp', lbSortDir=-1, lbLoaded=false;
 const LB_PER_PAGE=50;
 let vpRankMap={};
@@ -1226,27 +1246,27 @@ let _lbScrollY=0, _lbFromPage=1, _lbCameFrom=false;
 async function initLeaderboard() {
   if(lbLoaded) return;
   lbLoaded=true;
-  const [bdData,tmData,pcData]=await Promise.all([loadJSON('bondCreated'),loadJSON('bondTimemarker'),loadJSON('poolConfig')]);
-  if(!bdData||!tmData){document.getElementById('lb-tbody').innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--pink);padding:20px">Error loading data</td></tr>';return;}
+  const bs=await loadBondStates();
+  if(!bs){document.getElementById('lb-tbody').innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--pink);padding:20px">Error loading bond-states.json</td></tr>';return;}
 
-  const bonds=bdData.bonds||[];
-  const snaps=tmData.bondTimeMarkerSnapshots||[];
-  const fullMatS=getFullMatS(pcData);
-  const latestSnap=getLatestSnaps(snaps);
-
+  // Build bond entries directly from bond-states — exact balance + VP from JSON
   const bondEntries=[];
-  bonds.forEach(b=>{
-    const amt=parseAmt(b.totalDeposited);
-    if(amt<1) return;
-    const snap=latestSnap[b.nftId];
-    const tm=snap?snap.timeMarker:b.createdAtTimestamp;
-    const mat=calcMaturity(tm,fullMatS);
-    const boost=calcBoost(mat);
-    const vp=amt*boost;
-    const ageMonths=(Date.now()/1000-parseInt(b.createdAtTimestamp))/2592000;
-    bondEntries.push({nftId:b.nftId,owner:b.owner?.toLowerCase()||'0x',poolId:b.poolId,
-      amount:amt,mat,boost,vp,createdAtDate:b.createdAtDate||tsToDate(b.createdAtTimestamp),
-      ageMonths,increaseCount:parseInt(b.increaseCount)||0});
+  Object.entries(bs).forEach(([nftId,state])=>{
+    const cur=state.current;
+    if(!cur||!cur.isActive||cur.balance<0.01)return;
+    const createdEv=state.events?.find(e=>e.type==='BondCreated');
+    bondEntries.push({
+      nftId,
+      owner:state.owner?.toLowerCase()||'0x',
+      poolId:state.poolId||2,
+      amount:cur.balance,        // REAL balance after all breaks
+      mat:cur.maturity,          // from JSON
+      boost:cur.boost,           // from JSON
+      vp:cur.vp,                 // from JSON
+      createdAtDate:createdEv?createdEv.date:'—',
+      ageMonths:(Date.now()/1000-(cur.timeMarker||0))/2592000,
+      increaseCount:state.events?.filter(e=>e.type==='IncreaseBond').length||0,
+    });
   });
 
   const walletMap={};
@@ -1274,6 +1294,7 @@ async function initLeaderboard() {
   document.getElementById('lb-wallet-count').textContent=lbData.length.toLocaleString();
   document.getElementById('lb-bond-count').textContent=bondEntries.length.toLocaleString();
   const hbc=document.getElementById('hero-bond-count');if(hbc)hbc.textContent=bondEntries.length.toLocaleString();
+  const hbcActive=document.getElementById('hero-bond-count-active');if(hbcActive)hbcActive.textContent=bondEntries.length.toLocaleString();
   const avgMat=totalVP>0?lbData.reduce((s,w)=>s+w.avgMat*w.totalVP,0)/totalVP:0;
   document.getElementById('lb-avg-mat').textContent=fmtPct(avgMat*100);
 
@@ -1951,13 +1972,11 @@ let matLoaded=false, matViewMode='rize', matChart=null, matBuckets=[];
 
 async function initMaturity(){
   if(matLoaded)return;matLoaded=true;
-  const [bdData,tmData,pcData,bbData2]=await Promise.all([loadJSON('bondCreated'),loadJSON('bondTimemarker'),loadJSON('poolConfig'),loadJSON('bondBroken')]);
-  if(!bdData||!tmData)return;
-  const bonds=bdData.bonds||[];
-  const brokenTotals={};(bbData2?.bondBrokenEvents||[]).forEach(e=>{brokenTotals[e.nftId]=(brokenTotals[e.nftId]||0)+parseAmt(e.amount);});
-  const snaps=tmData.bondTimeMarkerSnapshots||[];
-  const fullMatS=getFullMatS(pcData);
-  const latestSnap=getLatestSnaps(snaps);
+  const bs=await loadBondStates();
+  if(!bs)return;
+  // Use bondStates directly — balance and maturity are exact
+  const bonds=Object.entries(bs).map(([nftId,state])=>({nftId,state})).filter(({state})=>state.current?.isActive&&state.current.balance>0.01);
+  const fullMatS=_bsFull;
   const ranges=[
     {label:'0–10%',min:0,max:0.10},{label:'10–25%',min:0.10,max:0.25},
     {label:'25–50%',min:0.25,max:0.50},{label:'50–75%',min:0.50,max:0.75},
@@ -1965,14 +1984,12 @@ async function initMaturity(){
   ];
   matBuckets=ranges.map(r=>({...r,count:0,rize:0,vp:0}));
   let totalVP=0,totalRize=0,totalWMat=0,count2x=0,vp2x=0,count15x=0,vp15x=0;
-  bonds.forEach(b=>{
-    // Real balance = totalDeposited minus all partial breaks
-    const deposited=parseAmt(b.totalDeposited);if(deposited<1)return;
-    const brokenAmt=brokenTotals[b.nftId]||0;
-    const amt=Math.max(0, deposited-brokenAmt); // actual current balance
-    if(amt<1)return; // fully or nearly broken
-    const snap=latestSnap[b.nftId];const tm=snap?snap.timeMarker:b.createdAtTimestamp;
-    const mat=calcMaturity(tm,fullMatS);const boost=calcBoost(mat);const vp=amt*boost;
+  bonds.forEach(({nftId,state})=>{
+    const cur=state.current;
+    const amt=cur.balance;
+    const mat=cur.maturity;
+    const boost=cur.boost;
+    const vp=cur.vp;
     totalVP+=vp;totalRize+=amt;totalWMat+=mat*amt;
     const bucket=matBuckets.find(r=>mat>=r.min&&mat<r.max)||matBuckets[matBuckets.length-1];
     bucket.count++;bucket.rize+=amt;bucket.vp+=vp;
@@ -2045,13 +2062,12 @@ async function initMomentum(){
   const s2=Math.min(3,Math.max(0,ratio30>=2?3:ratio30>=1?1.5+(ratio30-1)*1.5:ratio30*1.5));
 
   // C3: Internal Conviction RIZE 30d (20%) — increaseBond RIZE / total bonded RIZE
-  const totalBonded=lbData.length>0?lbData.reduce((s,w)=>s+w.totalRize,0):1;
+  const totalBonded=_bs?Object.values(_bs).filter(s=>s.current?.isActive).reduce((s,b)=>s+b.current.balance,0):lbData.reduce((s,w)=>s+w.totalRize,0)||1;
   const internalConv=incrRize30/Math.max(totalBonded,1);
   const s3=Math.min(2,internalConv*200); // 1% of bonded increased = mid score
 
   // C4: Avg Maturity (10%) — structural anchor, not manipulable
-  const mats=Object.values(latestSnap).map(s=>calcMaturity(s.timeMarker,fullMatS));
-  const avgMat=mats.length>0?mats.reduce((a,b)=>a+b,0)/mats.length:0;
+  const avgMat=_bs?Object.values(_bs).filter(s=>s.current?.isActive).reduce((s,b)=>s+(b.current.maturity*b.current.balance),0)/Math.max(totalBonded,1):0;
   const s4=Math.min(1,avgMat);
 
   const score=Math.min(10,Math.max(0,s1+s2+s3+s4));
@@ -2192,21 +2208,19 @@ function hhiHistDraw(view){
 let baLoaded=false;
 async function initBondAge(){
   if(baLoaded)return;baLoaded=true;
-  const [bdData,tmData,pcData,bbDataBA]=await Promise.all([loadJSON('bondCreated'),loadJSON('bondTimemarker'),loadJSON('poolConfig'),loadJSON('bondBroken')]);
-  if(!bdData||!tmData)return;
-  const bonds=bdData.bonds||[];
-  const fullMatS=getFullMatS(pcData);
-  const latestSnap=getLatestSnaps(tmData.bondTimeMarkerSnapshots);
+  const bs=await loadBondStates();
+  if(!bs)return;
   const now=Date.now()/1000;
-  // Build broken totals for this function scope
-  const baTotals={};(bbDataBA?.bondBrokenEvents||[]).forEach(e=>{baTotals[e.nftId]=(baTotals[e.nftId]||0)+parseAmt(e.amount);});
   const points=[];
   let dw=0,eb=0,nw=0,nr=0;
-  bonds.forEach(b=>{
-    const amt=parseAmt(b.totalDeposited);if(amt<1)return;
-    if((baTotals[b.nftId]||0)>=amt*0.99)return;
-    const snap=latestSnap[b.nftId];const tm=snap?parseInt(snap.timeMarker):parseInt(b.createdAtTimestamp);
-    const ageMonths=(now-tm)/2592000;const mat=calcMaturity(tm,fullMatS);const vp=amt*calcBoost(mat);
+  Object.entries(bs).forEach(([nftId,state])=>{
+    const cur=state.current;
+    if(!cur||!cur.isActive||cur.balance<0.01)return;
+    const tm=cur.timeMarker||0;
+    const amt=cur.balance;
+    const mat=cur.maturity;
+    const vp=cur.vp;
+    const ageMonths=tm?(now-tm)/2592000:0;
     const isWhale=amt>=1_000_000,isOld=ageMonths>=6;
     if(isOld&&isWhale)dw++;else if(isOld&&!isWhale)eb++;else if(!isOld&&isWhale)nw++;else nr++;
     points.push({x:ageMonths,y:amt,r:Math.max(3,Math.min(22,Math.sqrt(vp/100000))),mat,vp,nftId:b.nftId,owner:b.owner});
@@ -2419,37 +2433,34 @@ async function expSearch(){
   const isBond=/^\#?\d+$/.test(q);
   const bondNum=isBond?q.replace('#',''):null;
   const addr=isAddr?q.toLowerCase():null;
-  const [bdData,bbData,ntData,tmData,pcData,lcData]=await Promise.all([
+  const [bdData,bbData,ntData,lcData,bs]=await Promise.all([
     loadJSON('bondCreated'),loadJSON('bondBroken'),loadJSON('nftTransfers'),
-    loadJSON('bondTimemarker'),loadJSON('poolConfig'),loadJSON('bondLifecycle')
+    loadJSON('bondLifecycle'),loadBondStates()
   ]);
-  const fullMatS=getFullMatS(pcData);
-  const latestSnap=getLatestSnaps(tmData?.bondTimeMarkerSnapshots);
-  window._latestSnapCache=latestSnap;
-  if(isBond){expRenderBond(bondNum,bdData,bbData,ntData,tmData,lcData,latestSnap,fullMatS);}
-  else if(isAddr){expRenderWallet(addr,bdData,bbData,ntData,tmData,lcData,latestSnap,fullMatS);}
+  const fullMatS=_bsFull;
+  if(isBond){expRenderBond(bondNum,bdData,bbData,ntData,lcData,bs,fullMatS);}
+  else if(isAddr){expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS);}
   else{results.innerHTML='<div class="error-box">Format not recognized. Enter a full 0x address or a Bond number (e.g. 1234).</div>';}
 }
 
-function expRenderBond(nftId,bdData,bbData,ntData,tmData,lcData,latestSnap,fullMatS){
+function expRenderBond(nftId,bdData,bbData,ntData,lcData,bs,fullMatS){
   const results=document.getElementById('exp-results');
-  const bond=(bdData?.bonds||[]).find(b=>b.nftId.toString()===nftId);
-  const snap=latestSnap[nftId];
+  const state=bs?bs[String(nftId)]:null;
+  const cur=state?.current||null;
   const created=(bdData?.bondCreatedEvents||[]).filter(e=>e.nftId.toString()===nftId);
   const increases=(bdData?.increaseBondEvents||[]).filter(e=>e.nftId.toString()===nftId);
   const breaks=(bbData?.bondBrokenEvents||[]).filter(e=>e.nftId.toString()===nftId);
-  const snaps=(tmData?.bondTimeMarkerSnapshots||[]).filter(s=>s.nftId.toString()===nftId).sort((a,b)=>parseInt(a.blockNumber)-parseInt(b.blockNumber));
   const transfers=(ntData?.nftTransferEvents||[]).filter(e=>e.tokenId.toString()===nftId);
   const releases=(lcData?.tokensReleasedEvents||[]).filter(e=>e.nftId.toString()===nftId);
-  if(!bond&&!created.length){results.innerHTML=`<div class="error-box">Bond #${nftId} not found in data.</div>`;return;}
-  const tm=snap?snap.timeMarker:bond?.createdAtTimestamp||0;
-  const mat=tm?calcMaturity(tm,fullMatS):0;
-  const boost=calcBoost(mat);
-  const amount=bond?parseAmt(bond.totalDeposited):0;
-  const vp=amount*boost;
-  const owner=bond?.owner||created[0]?.owner||'—';
-  const vpFull=amount*3;
-  const fullMatDate=tm?new Date((parseInt(tm)+fullMatS)*1000).toISOString().slice(0,10):'—';
+  if(!cur&&!created.length){results.innerHTML=`<div class="error-box">Bond #${nftId} not found in data.</div>`;return;}
+  // All values from bond-states — exact, pre-computed
+  const amount=cur?cur.balance:0;
+  const mat=cur?cur.maturity:0;
+  const boost=cur?cur.boost:1;
+  const vp=cur?cur.vp:0;
+  const owner=(state?.owner||created[0]?.owner||'—');
+  const vpFull=cur?cur.vpAtFullMat:amount*3;
+  const fullMatDate=cur?cur.fullMatDate:'—';
   const rank=vpRankMap[owner?.toLowerCase()]||'—';
 
   // Build unified timeline (same as wallet view)
@@ -2531,24 +2542,32 @@ function expFilterTimeline(filter,btn){
   if(tbody&&window._expTimeline)tbody.innerHTML=expBuildTimelineRows(window._expTimeline,filter);
 }
 
-function expRenderWallet(addr,bdData,bbData,ntData,tmData,lcData,latestSnap,fullMatS){
+function expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS){
   const results=document.getElementById('exp-results');
-  const bonds=(bdData?.bonds||[]).filter(b=>b.owner?.toLowerCase()===addr);
+  // Get nftIds for this wallet from bondStates ownerIndex
+  const walletNftIds=bsOwnerNfts(addr);
+  const bondIds=new Set(walletNftIds);
+  // Also check bondCreatedEvents for any bonds not in ownerIndex
   const allBondCreated=(bdData?.bondCreatedEvents||[]).filter(e=>e.owner?.toLowerCase()===addr);
-  const bondIds=new Set(bonds.map(b=>b.nftId.toString()));
+  allBondCreated.forEach(e=>{bondIds.add(e.nftId.toString());walletNftIds.push(e.nftId.toString());});
+  const uniqueNftIds=[...new Set(walletNftIds)];
   const myIncreases=(bdData?.increaseBondEvents||[]).filter(e=>bondIds.has(e.nftId.toString()));
   const breaks=(bbData?.bondBrokenEvents||[]).filter(e=>bondIds.has(e.nftId.toString()));
   const transfers=(ntData?.nftTransferEvents||[]).filter(e=>e.from?.toLowerCase()===addr||e.to?.toLowerCase()===addr);
   const releases=(lcData?.tokensReleasedEvents||[]).filter(e=>bondIds.has(e.nftId.toString()));
 
   let totalVP=0,totalRize=0,matWeight=0;
-  const bondRows=bonds.map(b=>{
-    const snap=latestSnap[b.nftId];const tm=snap?snap.timeMarker:b.createdAtTimestamp;
-    const mat=calcMaturity(tm,fullMatS);const amount=parseAmt(b.totalDeposited);
-    const boost=calcBoost(mat);const vp=amount*boost;
+  const bondRows=uniqueNftIds.map(nftId=>{
+    const state=bs?bs[String(nftId)]:null;
+    const cur=state?.current;
+    if(!cur||!cur.isActive)return null;
+    const amount=cur.balance,mat=cur.maturity,boost=cur.boost,vp=cur.vp,tm=cur.timeMarker;
     if(amount>0){totalVP+=vp;totalRize+=amount;matWeight+=mat*amount;}
-    return{...b,mat,boost,vp,amount,tm};
-  });
+    return{nftId,owner:state.owner,mat,boost,vp,amount,tm,
+      createdAtDate:state.events?.find(e=>e.type==='BondCreated')?.date||'—',
+      increaseCount:state.events?.filter(e=>e.type==='IncreaseBond').length||0,
+      fullMatDate:cur.fullMatDate,vpAtFullMat:cur.vpAtFullMat,isActive:cur.isActive};
+  }).filter(Boolean);
 
   const rank=vpRankMap[addr]||null;
   const totalAllVP=lbData.reduce((s,w)=>s+w.totalVP,0);
@@ -2658,7 +2677,7 @@ function expRenderWallet(addr,bdData,bbData,ntData,tmData,lcData,latestSnap,full
   window._expWalletTimeline=timeline;
   window._expWalletFilterType='all';
   window._expWalletFilterBond='all';
-  setTimeout(()=>expRenderVPChart(bondRows,allBondCreated,myIncreases,breaks,fullMatS,tmData?.bondTimeMarkerSnapshots||[]),50);
+  setTimeout(()=>expRenderVPChart(bondRows,uniqueNftIds,bs,fullMatS),50);
 }
 
 function expBuildWalletTimelineRows(timeline,typeFilter,bondFilter){
@@ -2708,83 +2727,78 @@ function expSortBonds(key,th){
   rows.forEach(r=>tbody.appendChild(r));
 }
 
-function expRenderVPChart(bondRows,created,increases,breaks,fullMatS,allSnapshots){
+function expRenderVPChart(bondRows,nftIds,bs,fullMatS){
   const canvas=document.getElementById('exp-vp-chart');if(!canvas)return;
-  // Build timeline using all events, compute VP at each point using
-  // the snapshot closest to that timestamp for each bond's timeMarker
-  const allEvents=[
-    ...created.map(e=>({ts:parseInt(e.timestamp),type:'created',nftId:e.nftId,amount:parseAmt(e.amount)})),
-    ...increases.map(e=>({ts:parseInt(e.timestamp),type:'increase',nftId:e.nftId,amount:parseAmt(e.amount)})),
-    ...breaks.map(e=>({ts:parseInt(e.timestamp),type:'break',nftId:e.nftId,amount:parseAmt(e.amount)})),
-  ].sort((a,b)=>a.ts-b.ts);
+  if(!bondRows.length||!bs)return;
+
+  // Merge all events from all bonds of this wallet, sorted by timestamp
+  const allEvents=[];
+  nftIds.forEach(nftId=>{
+    const state=bs[String(nftId)];
+    if(!state?.events)return;
+    state.events.forEach(ev=>allEvents.push({...ev,nftId}));
+  });
+  allEvents.sort((a,b)=>a.ts-b.ts);
   if(!allEvents.length)return;
 
-  // Group snapshots by nftId sorted by blockNumber
-  const snapsByNft={};
-  (allSnapshots||[]).forEach(s=>{
-    if(!snapsByNft[s.nftId])snapsByNft[s.nftId]=[];
-    snapsByNft[s.nftId].push({ts:parseInt(s.timestamp||s.blockNumber),tm:parseInt(s.timeMarker),amt:parseAmt(s.amount)});
-  });
-  Object.values(snapsByNft).forEach(arr=>arr.sort((a,b)=>a.ts-b.ts));
+  // Build cumulative wallet VP at each event point
+  // For each event, recompute total VP across all bonds using their state AT that timestamp
+  // We use the bondStates events as checkpoints
+  const bondCurState={}; // nftId → {balance, timeMarker} at current point in iteration
 
-  // Helper: get timeMarker for a bond at a given timestamp
-  // Use the snapshot just before or at that time, fallback to creation ts
-  const getTmAt=(nftId,atTs,fallbackTm)=>{
-    const snaps=snapsByNft[nftId]||[];
-    let best=null;
-    for(const s of snaps){if(s.ts<=atTs)best=s;}
-    return best?best.tm:(fallbackTm||atTs);
-  };
-
-  // Track per-bond state: {amount, timeMarker}
-  const bondState={};
   const labels=[],rizeData=[],vpData=[];
+  const seenDates=new Set();
 
   allEvents.forEach(ev=>{
-    if(ev.type==='created'){
-      // At creation: timeMarker = creation timestamp, maturity = 0
-      bondState[ev.nftId]={amount:ev.amount,tm:ev.ts};
-    } else if(ev.type==='increase'){
-      const prev=bondState[ev.nftId]||{amount:0,tm:ev.ts};
-      // Get actual timeMarker from snapshot at this point
-      const newTm=getTmAt(ev.nftId,ev.ts,prev.tm);
-      bondState[ev.nftId]={amount:prev.amount+ev.amount,tm:newTm};
-    } else if(ev.type==='break'){
-      const prev=bondState[ev.nftId]||{amount:ev.amount,tm:ev.ts};
-      bondState[ev.nftId]={amount:Math.max(0,prev.amount-ev.amount),tm:prev.tm};
-    }
-    // Compute total VP at this moment using current bond states
+    const nid=String(ev.nftId);
+    if(!bondCurState[nid])bondCurState[nid]={balance:0,timeMarker:null};
+    const s=bondCurState[nid];
+    s.balance=ev.balance;
+    if(ev.timeMarker)s.timeMarker=ev.timeMarker;
+
+    // Total across all bonds at this moment: use pre-computed vp from event
+    // For other bonds not yet seen, their state is already in bondCurState
     let totalRize=0,totalVP=0;
-    Object.values(bondState).forEach(b=>{
-      if(b.amount<=0)return;
-      const mat=Math.min(1,Math.max(0,(ev.ts-b.tm)/fullMatS));
-      totalRize+=b.amount;
-      totalVP+=b.amount*(1+mat*2);
+    Object.entries(bondCurState).forEach(([nid2,st])=>{
+      if(st.balance<=0)return;
+      totalRize+=st.balance;
+      // VP at this event timestamp using that bond's timeMarker
+      const mat=st.timeMarker?Math.min(1,Math.max(0,(ev.ts-st.timeMarker)/fullMatS)):0;
+      totalVP+=st.balance*(1+2*mat);
     });
-    const date=tsToDate(ev.ts.toString());
-    // Avoid duplicate dates — if same date, update last point
-    if(labels.length>0&&labels[labels.length-1]===date){
+
+    const date=ev.date;
+    if(seenDates.has(date)){
+      // Update last point for same date
       rizeData[rizeData.length-1]=totalRize;
       vpData[vpData.length-1]=totalVP;
     } else {
+      seenDates.add(date);
       labels.push(date);rizeData.push(totalRize);vpData.push(totalVP);
     }
   });
+
+  // Add today
+  const todayVP=bondRows.filter(b=>b.amount>0).reduce((s,b)=>s+b.vp,0);
+  const todayRize=bondRows.filter(b=>b.amount>0).reduce((s,b)=>s+b.amount,0);
+  const today=new Date().toISOString().slice(0,10);
+  if(labels[labels.length-1]!==today){labels.push('Today');rizeData.push(todayRize);vpData.push(todayVP);}
+
+  // Projections from current state
   const now=Date.now()/1000;
-  labels.push('Today');rizeData.push(rizeData[rizeData.length-1]||0);vpData.push(bondRows.reduce((s,b)=>s+b.vp,0));
-  [[6,'6m'],[12,'12m'],[24,'+24m'],[null,'Full Maturity Projected']].forEach(([m,lbl])=>{
-    const futureVP=bondRows.reduce((s,b)=>{
-      const snap=(window._latestSnapCache||{})[b.nftId];
-      const tm=snap?parseInt(snap.timeMarker):parseInt(b.createdAtTimestamp||now);
-      const months=m!==null?m:36;
-      const futureMat=Math.min(1,(now+months*2592000-tm)/fullMatS);
-      return s+b.amount*(1+futureMat*2);
+  [[6,'+6M'],[12,'+12M'],[24,'+24M']].forEach(([m,lbl])=>{
+    const fvp=bondRows.reduce((s,b)=>{
+      if(!b.amount||b.amount<=0)return s;
+      const tm=b.tm||0;
+      const fm=tm?Math.min(1,Math.max(0,(now+m*2592000-tm)/fullMatS)):0;
+      return s+b.amount*(1+fm*2);
     },0);
-    labels.push(lbl);rizeData.push(rizeData[rizeData.length-1]||0);vpData.push(futureVP);
+    labels.push(lbl);rizeData.push(todayRize);vpData.push(fvp);
   });
+
   if(rzCharts.expVP){rzCharts.expVP.destroy();rzCharts.expVP=null;}
   const opts=baseOpts();
-  opts.plugins.legend={display:true,labels:{color:'#b6c1d8',font:{size:12},boxWidth:12,padding:16}};
+  opts.plugins.legend={display:true,labels:{color:'#b6c1d8',font:{size:13},boxWidth:12,padding:16}};
   opts.scales.y.ticks.callback=v=>fmt(v,0);
   opts.plugins.tooltip.callbacks.label=c=>` ${c.dataset.label}: ${fmt(c.parsed.y,2)}`;
   rzCharts.expVP=new Chart(canvas.getContext('2d'),{type:'line',data:{labels,datasets:[
@@ -2792,7 +2806,6 @@ function expRenderVPChart(bondRows,created,increases,breaks,fullMatS,allSnapshot
     {label:'Voting Power',data:vpData,borderColor:'#7ee0ff',backgroundColor:'rgba(126,224,255,0.08)',fill:true,tension:0.3,pointRadius:3,borderWidth:2},
   ]},options:opts});
 }
-
 
 /* ═══════════════════════════════════════════════════════
    ALL GOVERNANCE TRANSACTIONS (Cat 4)
