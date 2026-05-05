@@ -100,7 +100,7 @@
     .ctx-kpi{flex:1;min-width:140px;padding:16px 18px;border:1px solid rgba(255,255,255,0.07);background:linear-gradient(180deg,rgba(126,224,255,0.03),transparent 60%),rgba(255,255,255,0.015);}
     .ctx-kpi-label{display:block;font-family:"Trebuchet MS",sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:8px;}
     .ctx-kpi-value{display:block;font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;line-height:1.05;color:#fff;letter-spacing:0.5px;}
-    .ctx-kpi-sub{display:block;font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--muted);margin-top:4px;}
+    .ctx-kpi-sub{display:block;font-family:'Rajdhani',sans-serif;font-size:16px;color:var(--muted);margin-top:4px;}
     .accent-cyan{color:var(--cyan)!important;}
     .accent-gold{color:var(--gold)!important;}
     .accent-green{color:#98ffb6!important;}
@@ -325,8 +325,8 @@
 <nav class="cat-nav">
   <button class="cat-btn active" id="cat-btn-leaderboard" onclick="catSwitch('leaderboard',this)">Governance Leaderboard</button>
   <button class="cat-btn" id="cat-btn-metrics" onclick="catSwitch('metrics',this)">Key Metrics &amp; Tools</button>
-  <button class="cat-btn" id="cat-btn-explorer" onclick="catSwitch('explorer',this)">Wallet Explorer</button>
   <button class="cat-btn" id="cat-btn-alltx" onclick="catSwitch('alltx',this)">Explorer</button>
+  <button class="cat-btn" id="cat-btn-explorer" onclick="catSwitch('explorer',this)">Wallet Explorer</button>
 </nav>
 
 <!-- ═══ MAIN CONTENT ═══ -->
@@ -583,13 +583,14 @@
           <div class="ctx-kpi"><span class="ctx-kpi-label">This Month — Breaks</span><span class="ctx-kpi-value accent-pink" id="cal-this-month-b">—</span><span class="ctx-kpi-sub" id="cal-this-month-b-rize">&nbsp;</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">Last Month — Breaks</span><span class="ctx-kpi-value" id="cal-last-month-b">—</span><span class="ctx-kpi-sub" id="cal-last-month-b-rize">&nbsp;</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">All Time Breaks</span><span class="ctx-kpi-value accent-gold" id="cal-all-b">—</span><span class="ctx-kpi-sub" id="cal-all-b-rize">&nbsp;</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">All Time IncreaseBonds</span><span class="ctx-kpi-value accent-cyan" id="cal-all-inc">—</span><span class="ctx-kpi-sub" id="cal-all-inc-rize">&nbsp;</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">90d Breaks</span><span class="ctx-kpi-value" id="cal-90d-b">—</span><span class="ctx-kpi-sub" id="cal-90d-b-rize">&nbsp;</span></div>
         </div>
         <div class="ctx-kpi-row">
           <div class="ctx-kpi"><span class="ctx-kpi-label">This Month — Created + Increased</span><span class="ctx-kpi-value accent-green" id="cal-this-month-c">—</span><span class="ctx-kpi-sub" id="cal-this-month-c-rize">&nbsp;</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">Last Month — Created + Increased</span><span class="ctx-kpi-value" id="cal-last-month-c">—</span><span class="ctx-kpi-sub" id="cal-last-month-c-rize">&nbsp;</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">All Time Created</span><span class="ctx-kpi-value accent-cyan" id="cal-all-c">—</span><span class="ctx-kpi-sub">&nbsp;</span></div>
-          <div class="ctx-kpi"><span class="ctx-kpi-label">90d Created</span><span class="ctx-kpi-value" id="cal-90d-c">—</span><span class="ctx-kpi-sub" id="cal-90d-c-rize">&nbsp;</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label">90d Created + Increased</span><span class="ctx-kpi-value" id="cal-90d-c">—</span><span class="ctx-kpi-sub" id="cal-90d-c-rize">&nbsp;</span></div>
         </div>
         <div class="conv-toggle-row">
           <button class="conv-toggle active" onclick="calSwitch('monthly',this)">Monthly</button>
@@ -668,9 +669,9 @@
             <span class="ctx-kpi-sub">bonded with voting power</span>
           </div>
           <div class="ctx-kpi" style="border-color:rgba(255,138,216,0.2);background:rgba(255,138,216,0.04)">
-            <span class="ctx-kpi-label">Pending Release Queue</span>
+            <span class="ctx-kpi-label">Unclaimed Tokens Post Unbonding</span>
             <span class="ctx-kpi-value accent-pink" id="mat-queue-rize">—</span>
-            <span class="ctx-kpi-sub">broken but not yet withdrawn</span>
+            <span class="ctx-kpi-sub">broken & warmup elapsed, not yet claimed</span>
           </div>
           <div class="ctx-kpi" style="border-color:rgba(255,255,255,0.08)">
             <span class="ctx-kpi-label">Total in Contract</span>
@@ -709,16 +710,20 @@
           </div>
           <div>
             <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">Net Flow 7d (40%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-netflow-7d">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">Bonds/Breaks Ratio 30d (25%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-ratio-30d">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">Avg Maturity Trend (20%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-mat-trend">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">New Bonders 30d (15%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" id="mom-new-bonders">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">Net Flow 7d (40%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-netflow-7d">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">Bonds/Breaks Ratio 30d (25%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-ratio-30d">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">Avg Maturity Trend (20%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-mat-trend">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">New Bonders 30d (15%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-new-bonders">—</span></div>
             </div>
           </div>
           <div style="width:300px;height:300px;min-width:300px"><canvas id="mom-donut"></canvas></div>
         </div>
         <div class="sep"></div>
         <div class="inner-title">Historical Score</div>
+        <div id="mom-learn-box" style="margin:12px 0;padding:14px 16px;border:1px solid rgba(126,224,255,0.1);background:rgba(126,224,255,0.02);min-height:52px">
+          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">How is this score built?</div>
+          <div id="mom-learn-text" style="font-family:'DM Mono',monospace;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.65">Click on Net Flow, Conviction/Exit Ratio, Internal Conviction or Avg Maturity above to understand how each component is built.</div>
+        </div>
         <div class="conv-toggle-row">
           <button class="conv-toggle active" onclick="momHistView('90d',this)">Last 90d</button>
           <button class="conv-toggle" onclick="momHistView('all',this)">All Time</button>
@@ -790,7 +795,7 @@
         </div>
         <div class="conv-toggle-row" style="margin-bottom:12px" id="ba-filter-row">
           <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);align-self:center">Threshold:</span>
-          <button class="conv-toggle active" onclick="baSetThreshold(0,this)">All</button>
+          <button class="conv-toggle active" id="ba-btn-all" onclick="baSetThreshold(0,this)">All</button>
           <button class="conv-toggle" onclick="baSetThreshold(1_000_000,this)">1M+ RIZE</button>
           <button class="conv-toggle" onclick="baSetThreshold(5_000_000,this)">5M+ RIZE</button>
           <button class="conv-toggle" onclick="baSetThreshold(10_000_000,this)">10M+ RIZE</button>
@@ -1141,7 +1146,7 @@ function metricsSwitch(val) {
   document.querySelectorAll('.metrics-panel').forEach(p=>{p.style.display='none';p.classList.remove('active');});
   const p=document.getElementById('mp-'+val);
   if(p){p.style.display='block';p.classList.add('active');}
-  const map={conviction:initConviction,tokenomics:initTokenomics,heatmap:initHeatmap,
+  const map={conviction:()=>{initConviction();setTimeout(()=>{if(!momLoaded)initMomentum();},3500);},tokenomics:initTokenomics,heatmap:initHeatmap,
     calendar:initCalendar,whale:initWhale,maturity:initMaturity,
     momentum:initMomentum,hhi:initHHI,bondage:initBondAge,calculator:initCalculator};
   if(map[val]) map[val]();
@@ -1829,14 +1834,17 @@ async function initCalendar(){
   document.getElementById('cal-last-month-b-rize').textContent=fmt(lastB.rize,2)+' RIZE';
   document.getElementById('cal-all-b').textContent=allB.reduce((s,v)=>s+v.count,0).toLocaleString();
   document.getElementById('cal-all-b-rize').textContent=fmt(allB.reduce((s,v)=>s+v.rize,0),2)+' RIZE';
-  document.getElementById('cal-90d-b').textContent=all90kB.length+' days';
+  const allInc=increases||[];
+  const elAllInc=document.getElementById('cal-all-inc');if(elAllInc)elAllInc.textContent=allInc.length.toLocaleString();
+  const elAllIncR=document.getElementById('cal-all-inc-rize');if(elAllIncR)elAllIncR.textContent=fmt(allInc.reduce((s,e)=>s+parseAmt(e.amount),0),2)+' RIZE';
+  document.getElementById('cal-90d-b').textContent=all90kB.reduce((s,d)=>s+(calDailyB[d]?.count||0),0).toLocaleString();
   document.getElementById('cal-90d-b-rize').textContent=fmt(rize90B,2)+' RIZE';
   document.getElementById('cal-this-month-c').textContent=thisC.count.toLocaleString();
   document.getElementById('cal-this-month-c-rize').textContent=fmt(thisC.rize,2)+' RIZE';
   document.getElementById('cal-last-month-c').textContent=lastC.count.toLocaleString();
   document.getElementById('cal-last-month-c-rize').textContent=fmt(lastC.rize,2)+' RIZE';
   document.getElementById('cal-all-c').textContent=allC.reduce((s,v)=>s+v.count,0).toLocaleString();
-  document.getElementById('cal-90d-c').textContent=all90kC.length+' days';
+  document.getElementById('cal-90d-c').textContent=all90kC.reduce((s,d)=>s+(calDailyC[d]?.count||0),0).toLocaleString();
   document.getElementById('cal-90d-c-rize').textContent=fmt(rize90C,2)+' RIZE';
   calRender();calRenderTable();
 }
@@ -2054,7 +2062,7 @@ async function initMaturity(){
   document.getElementById('mat-15x-count').textContent=count15x.toLocaleString();
   document.getElementById('mat-15x-vp').textContent=totalVP>0?fmtPct(vp15x/totalVP*100)+' of VP':'—';
 
-  // Release queue KPIs — RIZE broken but not yet withdrawn
+  // Release queue KPIs — RIZE broken & warmup elapsed, not yet claimed
   const _totalReleased=(lcData?.tokensReleasedEvents||[]).reduce((s,e)=>s+parseAmt(e.amount),0);
   const _totalBroken=(bbData?.bondBrokenEvents||[]).reduce((s,e)=>s+parseAmt(e.amount),0);
   const _queueRize=Math.max(0,_totalBroken-_totalReleased);
@@ -2129,9 +2137,9 @@ async function initMomentum(){
   const score=Math.min(10,Math.max(0,s1+s2+s3+s4));
   const scoreEl=document.getElementById('momentum-score-display');
   scoreEl.textContent=score.toFixed(1);
-  const col=score>=8?'#98ffb6':score>=6?'var(--cyan)':score>=4?'var(--gold)':score>=2?'var(--pink)':'#ff4444';
+  const col=score>=5?'#98ffb6':score>=3?'var(--gold)':'var(--pink)';
   scoreEl.style.color=col;
-  document.getElementById('momentum-score-label').textContent=score>=8?'STRONG CONVICTION':score>=6?'ACCUMULATION':score>=4?'NEUTRAL':score>=2?'DISTRIBUTION':'CRITICAL';
+  document.getElementById('momentum-score-label').textContent=score>=5?'CONVICTION':score>=3?'NEUTRAL':'DISTRIBUTION';
   document.getElementById('mom-netflow-7d').textContent=(netFlow7>=0?'+':'')+fmt(netFlow7,2)+' RIZE (bonds+increases-breaks)';
   document.getElementById('mom-netflow-7d').style.color=netFlow7>=0?'#98ffb6':'var(--pink)';
   document.getElementById('mom-ratio-30d').textContent=ratio30.toFixed(2)+'× (RIZE weighted)';
@@ -2179,6 +2187,16 @@ async function momBuildHistory(breaks,bonds,increases,latestSnap,fullMatS){
   window._momHistDays=days;window._momHistScores=scoresByDay;
 }
 
+function momLearn(key){
+  const T={
+    'netflow':'<strong style="color:var(--cyan)">Net Flow RIZE — 7 days (40%)</strong><br>Net RIZE entering governance: (Bonds + IncreaseBonds) minus Breaks over 7 days. Fully RIZE-weighted — 1000 small bonds = nothing. One 10M RIZE bond = strong signal. Captures what is happening RIGHT NOW.',
+    'ratio':'<strong style="color:var(--gold)">Conviction/Exit Ratio — 30 days (30%)</strong><br>RIZE entering (bonds + 70% of increases) vs RIZE leaving (breaks) over 30 days. Ratio above 1 = more conviction than exits. IncreaseBonds count 70% — strong signal, not new capital. RIZE-weighted, manipulation-resistant.',
+    'internal':'<strong style="color:#98ffb6">Internal Conviction — 30 days (20%)</strong><br>IncreaseBond RIZE 30d divided by total RIZE bonded. Existing holders deepening commitment. Cannot be faked with small transactions.',
+    'maturity':'<strong style="color:var(--muted)">Avg Maturity Anchor (10%)</strong><br>Average maturity of all active bonds. Slow structural anchor. High = long-committed holders. Grows ~2.8%/month max — completely manipulation-resistant.'
+  };
+  const box=document.getElementById('mom-learn-text');
+  if(box){box.innerHTML=T[key]||'';}
+}
 function momHistView(view,btn){
   momHistView_=view;
   document.querySelectorAll('#mp-momentum .conv-toggle').forEach(b=>b.classList.remove('active'));
@@ -2272,11 +2290,11 @@ async function initBondAge(){
   Object.entries(bs).forEach(([nftId,state])=>{
     const cur=state.current;
     if(!cur||cur.balance<=0)return;
-    const tm=cur.timeMarker||0;
+    const createdTs=state.events?.find(e=>e.type==='BondCreated')?.ts||cur.timeMarker||0;
     const amt=cur.balance;
     const mat=cur.maturity;
     const vp=cur.vp;
-    const ageMonths=tm?(now-tm)/2592000:0;
+    const ageMonths=createdTs?(now-createdTs)/2592000:0;
     const isWhale=amt>=1_000_000,isOld=ageMonths>=6;
     if(isOld&&isWhale)dw++;else if(isOld&&!isWhale)eb++;else if(!isOld&&isWhale)nw++;else nr++;
     points.push({x:ageMonths,y:amt,r:Math.max(3,Math.min(22,Math.sqrt(vp/100000))),mat,vp,nftId,owner:state.owner});
@@ -2300,7 +2318,7 @@ async function initBondAge(){
   if(rzCharts.ba)rzCharts.ba.destroy();
   const opts=baseOpts();
   opts.plugins.tooltip.callbacks={label:c=>{const p=c.raw;return[`Bond #${p.nftId||'—'}`,`${fmt(p.y,2)} RIZE`,`Maturity: ${fmtPct(p.mat*100)}`,`VP: ${fmt(p.vp,2)}`];}};
-  opts.scales.x={...opts.scales.x,title:{display:true,text:'Effective Age (months from timeMarker)',color:'#b6c1d8',font:{size:12}}};
+  opts.scales.x={...opts.scales.x,title:{display:true,text:'Bond Age (months from creation)',color:'#b6c1d8',font:{size:12}}};
   opts.scales.y={...opts.scales.y,type:'logarithmic',title:{display:true,text:'RIZE Amount (log scale)',color:'#b6c1d8',font:{size:12}},ticks:{color:'#b6c1d8',callback:v=>fmt(v,0)}};
   rzCharts.ba=new Chart(document.getElementById('ba-chart').getContext('2d'),{type:'bubble',data:{datasets:[{
     data:points.slice(0,2000),
@@ -2329,8 +2347,8 @@ function baSetThreshold(thresh, btn){
   if(rzCharts.ba){rzCharts.ba.destroy();}
   const opts=baseOpts();
   opts.plugins.tooltip.callbacks={label:c=>{const p=c.raw;return[`Bond #${p.nftId||'—'}`,`${fmt(p.y,2)} RIZE`,`Maturity: ${fmtPct(p.mat*100)}`,`VP: ${fmt(p.vp,2)}`];}};
-  opts.scales.x={...opts.scales.x,title:{display:true,text:'Effective Age (months from timeMarker)',color:'#b6c1d8',font:{size:13}}};
-  opts.scales.y={type:'logarithmic',min:1,title:{display:true,text:'RIZE Amount (log scale)',color:'#b6c1d8',font:{size:13}},grid:{color:'rgba(255,255,255,0.06)'},ticks:{color:'#b6c1d8',font:{size:11},callback:v=>fmt(v,0)}};
+  opts.scales.x={...opts.scales.x,title:{display:true,text:'Bond Age (months from creation)',color:'#b6c1d8',font:{size:13}}};
+  opts.scales.y={type:'logarithmic',min:0.01,title:{display:true,text:'RIZE Amount (log scale)',color:'#b6c1d8',font:{size:13}},grid:{color:'rgba(255,255,255,0.06)'},ticks:{color:'#b6c1d8',font:{size:11},callback:v=>fmt(v,0)}};
   rzCharts.ba=new Chart(document.getElementById('ba-chart').getContext('2d'),{type:'bubble',data:{datasets:[{
     data:filtered.slice(0,3000),
     backgroundColor:filtered.slice(0,3000).map(p=>p.mat>0.75?'rgba(255,211,107,0.7)':p.mat>0.5?'rgba(126,224,255,0.7)':p.mat>0.25?'rgba(152,255,182,0.6)':'rgba(255,138,216,0.5)'),
@@ -2632,7 +2650,41 @@ function expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS){
   // ageMonths = time since earliest bond creation for this wallet
   const _minTs=bondRows.length>0?Math.min(...bondRows.map(b=>b.tm||Date.now()/1000)):Date.now()/1000;
   const ageMonths=(Date.now()/1000-_minTs)/2592000;
-  const loyaltyScore=Math.min(10,(hasNeverBroken?3:0)+Math.min(3,ageMonths/6)+Math.min(2,myIncreases.length/3)+Math.min(2,bondRows.length/2)).toFixed(1);
+  // Loyalty score — RIZE-weighted, release-penalized, conviction-rewarded
+  // Events needed: bondRows (with amount/tm), breaks, myIncreases, release events
+  const walletReleases=(lcData?.tokensReleasedEvents||[]).filter(e=>bondIds.has(e.nftId?.toString()));
+  // Peak bonded = max total balance this wallet ever had
+  let _runBal=0, _peakBal=0;
+  const _allWalletEvs=[];
+  uniqueNftIds.forEach(nid=>{
+    const st=bs?bs[String(nid)]:null;
+    if(st?.events) st.events.forEach(ev=>_allWalletEvs.push({...ev,nid}));
+  });
+  walletReleases.forEach(ev=>_allWalletEvs.push({ts:parseInt(ev.timestamp),type:'Release',delta:-parseAmt(ev.amount),nid:ev.nftId}));
+  _allWalletEvs.sort((a,b)=>a.ts-b.ts);
+  const _balByNft={};
+  _allWalletEvs.forEach(ev=>{
+    _balByNft[ev.nid]=(_balByNft[ev.nid]||0)+(ev.delta||0);
+    _runBal=Math.max(0,Object.values(_balByNft).reduce((s,v)=>s+Math.max(0,v),0));
+    if(_runBal>_peakBal)_peakBal=_runBal;
+  });
+  // Penalty: releases as % of peak
+  const _totalReleased=walletReleases.reduce((s,e)=>s+parseAmt(e.amount),0);
+  const _releasePct=_peakBal>0?_totalReleased/_peakBal:0;
+  const _penalty=Math.min(5,_releasePct*5); // 100% released = -5pts
+  // Bonus 1: fidelity — oldest bond age
+  const _oldestTs=bondRows.length>0?Math.min(...bondRows.map(b=>b.tm||Date.now()/1000)):Date.now()/1000;
+  const _oldestMonths=(Date.now()/1000-_oldestTs)/2592000;
+  const _bonusFidelity=Math.min(2,_oldestMonths/18);
+  // Bonus 2: IncreaseBonds RIZE-weighted
+  const _totalIncreased=myIncreases.reduce((s,e)=>s+parseAmt(e.amount),0);
+  const _totalEverBonded=bondRows.reduce((s,b)=>s+(parseAmt(b.amount)||0),0)+_totalReleased;
+  const _incPct=_totalEverBonded>0?_totalIncreased/_totalEverBonded:0;
+  const _bonusIncrease=Math.min(2,_incPct*4); // 25% increased = +1pt
+  // Bonus 3: significant bond count (>1% of total balance)
+  const _sigBonds=bondRows.filter(b=>_peakBal>0&&b.amount>_peakBal*0.01).length;
+  const _bonusBonds=Math.min(1,Math.max(0,(_sigBonds-1)*0.5));
+  const loyaltyScore=Math.max(0,Math.min(10,5-_penalty+_bonusFidelity+_bonusIncrease+_bonusBonds)).toFixed(1);
 
   const proj=months=>bondRows.reduce((s,b)=>{
     const tm=parseInt(b.tm)||parseInt(b.createdAtTimestamp);
@@ -2674,7 +2726,7 @@ function expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS){
         <div class="ctx-kpi"><span class="ctx-kpi-label">Active Bonds</span><span class="ctx-kpi-value">${bondRows.length}</span></div>
         <div class="ctx-kpi"><span class="ctx-kpi-label">Avg Maturity</span><span class="ctx-kpi-value accent-green">${fmtPct(avgMat*100)}</span></div>
         <div class="ctx-kpi"><span class="ctx-kpi-label">Loyalty Score</span><span class="ctx-kpi-value accent-gold">${loyaltyScore}/10</span><span class="ctx-kpi-sub">${hasNeverBroken?'Never broken':'Has broken'}</span></div>
-        <div class="ctx-kpi"><span class="ctx-kpi-label">First Bond</span><span class="ctx-kpi-value" style="font-size:18px;font-family:'Rajdhani',sans-serif;font-weight:700">${firstBond}</span></div>
+        <div class="ctx-kpi"><span class="ctx-kpi-label">First Bond</span><span class="ctx-kpi-value" style="font-size:26px;font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--cyan)">${firstBond}</span></div>
         ${unbQueue>0?`<div class="ctx-kpi"><span class="ctx-kpi-label">Unbonding Queue</span><span class="ctx-kpi-value accent-pink">${fmt(unbQueue,2)} RIZE</span><span class="ctx-kpi-sub">last 7 days</span></div>`:''}
       </div>
     </div>
@@ -2706,7 +2758,7 @@ function expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS){
       </tr></thead>
       <tbody id="exp-bonds-tbody">${bondRows.sort((a,b)=>b.vp-a.vp).map(b=>`<tr onclick="expGo('${b.nftId}')" style="cursor:pointer">
         <td style="color:var(--cyan)">#${b.nftId}</td>
-        <td><span class="pool-badge">Pool ${b.poolId}</span></td>
+        <td><span class="pool-badge">Pool ${b.poolId||2}</span></td>
         <td style="color:var(--gold)">${fmt(b.amount,2)}</td>
         <td style="color:var(--muted)">${b.increaseCount||0}</td>
         <td><div class="mat-bar"><div class="mat-bar-track"><div class="mat-bar-fill" style="width:${(b.mat*100).toFixed(0)}%;background:${b.mat>0.75?'var(--gold)':b.mat>0.5?'var(--cyan)':'#98ffb6'}"></div></div><span style="font-size:14px;color:#fff">${fmtPct(b.mat*100)}</span></div></td>
@@ -2736,6 +2788,7 @@ function expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS){
   window._expWalletFilterType='all';
   window._expWalletFilterBond='all';
   setTimeout(()=>expRenderVPChart(bondRows,uniqueNftIds,bs,fullMatS),50);
+  setTimeout(()=>expRenderLoyaltyChart(uniqueNftIds,bs,walletReleases,myIncreases,bondIds,lcData,fullMatS),80);
 }
 
 function expBuildWalletTimelineRows(timeline,typeFilter,bondFilter){
@@ -2783,6 +2836,70 @@ function expSortBonds(key,th){
     return dir*(parseFloat(bv)-parseFloat(av));
   });
   rows.forEach(r=>tbody.appendChild(r));
+}
+
+function expRenderLoyaltyChart(nftIds,bs,walletReleases,myIncreases,bondIds,lcData,fullMatS){
+  const canvas=document.getElementById('exp-loyalty-chart');
+  if(!canvas||!bs)return;
+  // Build chronological events affecting loyalty
+  const allEvs=[];
+  nftIds.forEach(nid=>{
+    const st=bs[String(nid)];
+    if(st?.events)st.events.forEach(ev=>allEvs.push({ts:ev.ts,date:ev.date,type:ev.type,amount:Math.abs(ev.delta||0),nid}));
+  });
+  (walletReleases||[]).forEach(ev=>allEvs.push({ts:parseInt(ev.timestamp),date:ev.date||tsToDate(ev.timestamp),type:'Release',amount:parseAmt(ev.amount),nid:ev.nftId}));
+  allEvs.sort((a,b)=>a.ts-b.ts);
+  if(!allEvs.length)return;
+
+  const labels=[],scores=[];
+  const balByNft={};
+  let peakBal=0,totalReleased=0,totalIncreased=0,totalEverBonded=0;
+
+  allEvs.forEach(ev=>{
+    if(ev.type==='BondCreated'){balByNft[ev.nid]=(balByNft[ev.nid]||0)+ev.amount;totalEverBonded+=ev.amount;}
+    else if(ev.type==='IncreaseBond'){balByNft[ev.nid]=(balByNft[ev.nid]||0)+ev.amount;totalIncreased+=ev.amount;totalEverBonded+=ev.amount;}
+    else if(ev.type==='Break'){balByNft[ev.nid]=Math.max(0,(balByNft[ev.nid]||0)-ev.amount);}
+    else if(ev.type==='Release'){totalReleased+=ev.amount;}
+    const curTotal=Object.values(balByNft).reduce((s,v)=>s+Math.max(0,v),0);
+    if(curTotal>peakBal)peakBal=curTotal;
+    // Compute score at this moment
+    const releasePct=peakBal>0?totalReleased/peakBal:0;
+    const penalty=Math.min(5,releasePct*5);
+    const oldestTs=Math.min(...nftIds.map(nid=>{
+      const st=bs[String(nid)];
+      return st?.events?.find(e=>e.type==='BondCreated')?.ts||Infinity;
+    }));
+    const ageMonths=oldestTs<Infinity?(ev.ts-oldestTs)/2592000:0;
+    const bonusFidelity=Math.min(2,Math.max(0,ageMonths/18));
+    const incPct=totalEverBonded>0?totalIncreased/totalEverBonded:0;
+    const bonusIncrease=Math.min(2,incPct*4);
+    const score=Math.max(0,Math.min(10,5-penalty+bonusFidelity+bonusIncrease));
+    labels.push(ev.date);
+    scores.push(parseFloat(score.toFixed(2)));
+  });
+  // Add today
+  const lastScore=scores[scores.length-1]||5;
+  labels.push('Today');scores.push(lastScore);
+
+  if(rzCharts.loyalty){rzCharts.loyalty.destroy();rzCharts.loyalty=null;}
+  const opts=baseOpts();
+  opts.scales.y={min:0,max:10,ticks:{color:'#b6c1d8',stepSize:2},grid:{color:'rgba(255,255,255,0.06)'}};
+  opts.plugins.tooltip.callbacks={label:c=>`Loyalty: ${c.parsed.y}/10`};
+  // Color: >=7 green, >=4 gold, else pink
+  const pointColors=scores.map(s=>s>=7?'#98ffb6':s>=4?'var(--gold)':'var(--pink)');
+  rzCharts.loyalty=new Chart(canvas.getContext('2d'),{
+    type:'line',
+    data:{labels,datasets:[{
+      label:'Loyalty Score',
+      data:scores,
+      borderColor:'var(--cyan)',
+      backgroundColor:'rgba(126,224,255,0.06)',
+      fill:true,tension:0.3,
+      pointRadius:4,pointBackgroundColor:pointColors,borderWidth:2,
+      segment:{borderColor:ctx=>{const v=ctx.p1.parsed.y;return v>=7?'#98ffb6':v>=4?'var(--gold)':'var(--pink)';}},
+    }]},
+    options:opts
+  });
 }
 
 function expRenderVPChart(bondRows,nftIds,bs,fullMatS){
