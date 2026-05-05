@@ -3719,6 +3719,21 @@
     "logo_local": "logos\\stakecraft.svg"
   },
   {
+    "name": "Sync Insights",
+    "slug": "sync-insights",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69f12ea67b2c998dad672a6f_bbdd9092-0166-4f80-a28d-dd067ea68c6a.png",
+    "short_desc": "24/7 monitoring and real-time analytics app for the Canton Network.",
+    "tags": [
+      "APPS (ALL)",
+      "APPS (FEATURED)",
+      "DATA & ANALYTICS",
+      "Network Utilities\nDATA & ANALYTICS",
+      "Roles\nAPPS (ALL)APPS (FEATURED)\nAPPS (ALL)APPS (FEATURED)"
+    ],
+    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nSync Insights\nhttps://syncinsights.io/\nSync Insights is a proactive analytics platform on the Canton Network built for non-technical users. Anyone can ask questions in natural language and quickly uncover insights across rounds, rewards, fees, transfers, and app or validator activity. Sync Insights enables teams to: - Automate monitoring and set proactive alerts to detect KPis changes in real time. - Create custom dashboards to track metrics and visualize trends. - Explore network relationships to see how entities interact and value flows. Built with Chata.ai. Deterministic, auditable, transparent, and reliable for institutional use.\nNetwork Utilities\nDATA & ANALYTICS\nRoles\nAPPS (ALL)APPS (FEATURED)\nAPPS (ALL)APPS (FEATURED)",
+    "logo_local": "logos\\sync-insights.png"
+  },
+  {
     "name": "T-RIZE",
     "slug": "t-rize",
     "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69a515d93d5e541267d4b331_logo_t_rize.png",
