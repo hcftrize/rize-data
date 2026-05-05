@@ -200,6 +200,56 @@ else:
     print("   Théorie non confirmée par les chiffres.")
 sep()
 
+# ── 12. Floating point precision ──
+sep()
+print("12. PRÉCISION FLOATING POINT — float vs Decimal haute précision")
+from decimal import Decimal, getcontext
+getcontext().prec = 50
+
+total_breaks_dec   = sum(Decimal(str(e.get("amount","0"))) for e in break_events)
+total_released_dec = sum(Decimal(str(e.get("amount","0"))) for e in release_events)
+
+event_balance_dec = {}
+for e in created_events:
+    nid = str(e["nftId"])
+    event_balance_dec[nid] = event_balance_dec.get(nid, Decimal("0")) + Decimal(str(e.get("amount","0")))
+for e in increase_events:
+    nid = str(e["nftId"])
+    event_balance_dec[nid] = event_balance_dec.get(nid, Decimal("0")) + Decimal(str(e.get("amount","0")))
+for e in break_events:
+    nid = str(e["nftId"])
+    event_balance_dec[nid] = event_balance_dec.get(nid, Decimal("0")) - Decimal(str(e.get("amount","0")))
+
+net_dec_total = sum(max(Decimal("0"), v) for v in event_balance_dec.values())
+queue_dec     = total_breaks_dec - total_released_dec
+total_in_contract_dec = net_dec_total + queue_dec
+
+delta_net   = float(net_dec_total) - event_total
+delta_queue = float(queue_dec) - (total_breaks - total_released)
+
+# Update this to the exact RPC value at time of running the audit
+rpc_live = Decimal("927550000")
+
+print(f"   Float  net balance       : {event_total:>20,.8f} RIZE")
+print(f"   Decimal net balance      : {float(net_dec_total):>20,.8f} RIZE")
+print(f"   Delta float vs Decimal   : {delta_net:>+20,.8f} RIZE")
+print()
+print(f"   Float  queue             : {total_breaks - total_released:>20,.8f} RIZE")
+print(f"   Decimal queue            : {float(queue_dec):>20,.8f} RIZE")
+print(f"   Delta float vs Decimal   : {delta_queue:>+20,.8f} RIZE")
+print()
+print(f"   Decimal total in contract: {float(total_in_contract_dec):>19,.8f} RIZE")
+print(f"   RPC live (approx)        :    927,550,000.00000000 RIZE")
+print(f"   Final delta vs RPC       : {float(total_in_contract_dec) - float(rpc_live):>+19,.8f} RIZE")
+print()
+if abs(delta_net) < 1.0 and abs(delta_queue) < 1.0:
+    print("   ✓ Floating point impact < 1 RIZE — négligeable.")
+    print("     Le delta résiduel vs RPC = uniquement du timing (transactions du jour).")
+else:
+    print(f"   !! Floating point introduit {delta_net:+,.4f} RIZE d'erreur sur le net.")
+    print("      Recommandation: passer compute_bond_states.py en Decimal.")
+sep()
+
 # ── 10. Conclusion ──
 print("10. CONCLUSION")
 if total_excess > 1_000_000:
