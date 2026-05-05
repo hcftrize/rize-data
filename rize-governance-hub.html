@@ -541,6 +541,7 @@
           <button class="conv-toggle" id="hm-btn-increase" onclick="hmMode('increase',this)">IncreaseBond</button>
         </div>
         <!-- Heatmap container (descending, newest month first) -->
+        <div id="heatmap-legend" style="margin:8px 0 4px;display:flex;align-items:center;min-height:22px"></div>
         <div id="heatmap-container"><div class="ctx-loading" id="hm-loading">Building activity heatmap…</div></div>
         <!-- KPIs below -->
         <div class="ctx-kpi-row" style="margin-top:16px">
@@ -710,10 +711,10 @@
           </div>
           <div>
             <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">Net Flow 7d (40%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-netflow-7d">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">Bonds/Breaks Ratio 30d (25%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-ratio-30d">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">Avg Maturity Trend (20%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-mat-trend">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)">New Bonders 30d (15%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-new-bonders">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)" onclick="momLearn('netflow')" style="cursor:pointer;text-decoration:underline dotted 1px">Net Flow 7d (40%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-netflow-7d">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted);cursor:pointer;text-decoration:underline dotted 1px" onclick="momLearn('ratio')">Bonds/Breaks Ratio 30d (25%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-ratio-30d">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted);cursor:pointer;text-decoration:underline dotted 1px" onclick="momLearn('maturity')">Avg Maturity Trend (20%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-mat-trend">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted);cursor:pointer;text-decoration:underline dotted 1px" onclick="momLearn('internal')">New Bonders 30d (15%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-new-bonders">—</span></div>
             </div>
           </div>
           <div style="width:300px;height:300px;min-width:300px"><canvas id="mom-donut"></canvas></div>
@@ -1683,6 +1684,14 @@ function hmMode(mode,btn){
   if(hmLoaded)hmRender();
 }
 
+function hmCellColor(mode,v,intensity){
+  if(mode==='net')return v>=0?`rgba(152,255,182,${0.1+intensity*0.9})`:`rgba(255,138,216,${0.1+intensity*0.9})`;
+  if(mode==='breaks'){const r2=Math.round(150+intensity*105),g2=Math.round((1-intensity)*80);return `rgba(${r2},${g2},50,${0.1+intensity*0.9})`;}
+  if(mode==='created')return `rgba(${Math.round(60+intensity*80)},${Math.round(180+intensity*60)},${Math.round(80+intensity*30)},${0.1+intensity*0.9})`;
+  if(mode==='releases')return `rgba(${Math.round(30+intensity*80)},${Math.round(140+intensity*80)},${Math.round(200+intensity*55)},${0.1+intensity*0.9})`;
+  if(mode==='increase')return `rgba(${Math.round(200+intensity*55)},${Math.round(150+intensity*60)},50,${0.1+intensity*0.9})`;
+  return `rgba(152,255,182,${0.1+intensity*0.9})`;
+}
 function hmRender(){
   const days=Object.keys(hmDailyData).sort().reverse();
   const hmLoadEl=document.getElementById('hm-loading');
@@ -1741,6 +1750,8 @@ function hmRender(){
     <div style="display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)"><div style="width:14px;height:14px;background:${hmHiCol}"></div>High</div>
   </div>`;
   document.getElementById('heatmap-container').innerHTML=html;
+  const _hmLgEl=document.getElementById('heatmap-legend');
+  if(_hmLgEl){const _lm={'breaks':'Breaks','created':'Created+Increased','releases':'Releases','increase':'IncreaseBond','net':'Net Flow'};_hmLgEl.innerHTML=`<span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);margin-right:8px">Low</span><span style="display:inline-block;width:90px;height:10px;background:linear-gradient(to right,${hmLowCol},${hmMidCol},${hmHiCol});border-radius:2px;vertical-align:middle"></span><span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);margin-left:8px">High — ${_lm[hmMode_]||hmMode_}</span>`;}
 }
 
 let hmDayFilter_='all';
@@ -1834,7 +1845,7 @@ async function initCalendar(){
   document.getElementById('cal-last-month-b-rize').textContent=fmt(lastB.rize,2)+' RIZE';
   document.getElementById('cal-all-b').textContent=allB.reduce((s,v)=>s+v.count,0).toLocaleString();
   document.getElementById('cal-all-b-rize').textContent=fmt(allB.reduce((s,v)=>s+v.rize,0),2)+' RIZE';
-  const allInc=increases||[];
+  const allInc=bcData?.increaseBondEvents||[];
   const elAllInc=document.getElementById('cal-all-inc');if(elAllInc)elAllInc.textContent=allInc.length.toLocaleString();
   const elAllIncR=document.getElementById('cal-all-inc-rize');if(elAllIncR)elAllIncR.textContent=fmt(allInc.reduce((s,e)=>s+parseAmt(e.amount),0),2)+' RIZE';
   document.getElementById('cal-90d-b').textContent=all90kB.reduce((s,d)=>s+(calDailyB[d]?.count||0),0).toLocaleString();
@@ -2511,6 +2522,7 @@ async function expSearch(){
     loadJSON('bondCreated'),loadJSON('bondBroken'),loadJSON('nftTransfers'),
     loadJSON('bondLifecycle'),loadBondStates()
   ]);
+  // vestingUpdatedEvents available via lcData
   const fullMatS=_bsFull;
   if(isBond){expRenderBond(bondNum,bdData,bbData,ntData,lcData,bs,fullMatS);}
   else if(isAddr){expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS);}
@@ -2789,6 +2801,8 @@ function expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS){
   window._expWalletFilterBond='all';
   setTimeout(()=>expRenderVPChart(bondRows,uniqueNftIds,bs,fullMatS),50);
   setTimeout(()=>expRenderLoyaltyChart(uniqueNftIds,bs,walletReleases,myIncreases,bondIds,lcData,fullMatS),80);
+  const _vestEvts=(lcData?.vestingUpdatedEvents||[]).filter(e=>bondIds.has(String(e.nftId)));
+  if(_vestEvts.length)setTimeout(()=>expRenderVesting(_vestEvts,bondIds),100);
 }
 
 function expBuildWalletTimelineRows(timeline,typeFilter,bondFilter){
@@ -2836,6 +2850,38 @@ function expSortBonds(key,th){
     return dir*(parseFloat(bv)-parseFloat(av));
   });
   rows.forEach(r=>tbody.appendChild(r));
+}
+
+function expRenderVesting(vestingEvents,bondIds){
+  const container=document.getElementById('exp-vesting-section');
+  if(!container)return;
+  const now=Date.now()/1000;
+  let html='<div style="margin-top:24px"><div style="font-family:\'Rajdhani\',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);margin-bottom:12px">Vesting Schedule</div>';
+  html+='<div class="table-wrap"><table><thead><tr><th>Bond #</th><th>Total Vested</th><th>Cliff</th><th>Duration</th><th>Start</th><th>Unlocked</th><th>Remaining</th></tr></thead><tbody>';
+  vestingEvents.forEach(e=>{
+    const start=parseInt(e.start||0);
+    const cliff=parseInt(e.cliff||0);
+    const vesting=parseInt(e.vesting||0);
+    const amount=parseAmt(e.amount);
+    const cliffEnd=start+cliff;
+    const vestEnd=start+vesting;
+    const cliffPassed=now>=cliffEnd;
+    const elapsed=Math.max(0,now-start);
+    const pct=vesting>0?Math.min(1,elapsed/vesting):0;
+    const unlocked=cliffPassed?amount*pct:0;
+    const remaining=amount-unlocked;
+    html+=`<tr>
+      <td style="color:var(--cyan)">#${e.nftId}</td>
+      <td style="color:var(--gold);font-weight:700">${fmt(amount,2)} RIZE</td>
+      <td style="color:var(--muted)">${Math.round(cliff/86400)}d</td>
+      <td style="color:var(--muted)">${Math.round(vesting/86400)}d</td>
+      <td style="color:var(--muted)">${tsToDate(start)}</td>
+      <td style="color:#98ffb6;font-weight:700">${fmt(unlocked,2)} RIZE (${fmtPct(pct*100)})</td>
+      <td style="color:var(--pink)">${fmt(remaining,2)} RIZE</td>
+    </tr>`;
+  });
+  html+='</tbody></table></div></div>';
+  container.innerHTML=html;container.style.display='block';
 }
 
 function expRenderLoyaltyChart(nftIds,bs,walletReleases,myIncreases,bondIds,lcData,fullMatS){
@@ -3107,7 +3153,7 @@ function atxRender(){
 }
 
 function atxGoWallet(addr){
-  _lbCameFrom=false; _expReturnModule='Explorer';
+  _lbCameFrom=false; _expReturnModule='Explorer'; window._expReturnCatBtn='cat-btn-alltx';
   document.getElementById('cat-btn-explorer').click();
   setTimeout(()=>{document.getElementById('exp-input').value=addr;expSearch();},80);
 }
