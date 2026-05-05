@@ -1,15 +1,23 @@
 #!/usr/bin/env python3
 """
-audit_bond_states.py v2
+audit_bond_states.py v3
 =======================
 Diagnoses discrepancies between bond-states.json total RIZE
 and the expected total from the 6 source JSONs.
 
 Run from the rize-governance-hub/ directory:
   python3 audit_bond_states.py
+
+Update RPC_LIVE below to the exact value shown on your dashboard
+at the moment you run this script.
 """
 
 import json, os
+from decimal import Decimal, getcontext
+getcontext().prec = 50
+
+# ── Update this to exact RPC value at time of running ──
+RPC_LIVE = Decimal("927701491")
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -29,76 +37,92 @@ def sep():
     print("─" * 64)
 
 print("=" * 64)
-print("  BOND STATES AUDIT v2")
+print("  BOND STATES AUDIT v3")
 print("=" * 64)
 
 # ── Load ──
 bc  = load("bond-created.json").get("data", {})
 bb  = load("bond-broken.json").get("data", {})
+lc  = load("bond-lifecycle.json").get("data", {})
 bs  = load("bond-states.json")
 bss = bs.get("bondStates", bs) if bs else {}
 
 created_events  = bc.get("bondCreatedEvents", [])
 increase_events = bc.get("increaseBondEvents", [])
 break_events    = bb.get("bondBrokenEvents", [])
+release_events  = lc.get("tokensReleasedEvents", [])
 bonds_list      = bc.get("bonds", [])
 
 # ── 1. Counts ──
 sep()
 print("1. EVENT COUNTS")
-print(f"   bondCreatedEvents : {len(created_events):>8,}")
-print(f"   increaseBondEvents: {len(increase_events):>8,}")
-print(f"   bondBrokenEvents  : {len(break_events):>8,}")
-print(f"   bonds[]           : {len(bonds_list):>8,}")
-print(f"   bondStates nftIds : {len(bss):>8,}")
+print(f"   bondCreatedEvents  : {len(created_events):>8,}")
+print(f"   increaseBondEvents : {len(increase_events):>8,}")
+print(f"   bondBrokenEvents   : {len(break_events):>8,}")
+print(f"   tokensReleasedEvents:{len(release_events):>8,}")
+print(f"   bonds[]            : {len(bonds_list):>8,}")
+print(f"   bondStates nftIds  : {len(bss):>8,}")
 
-# ── 2. totalDeposited sum ──
+# ── 2. Duplicate check — KEY ──
 sep()
-print("2. TOTAL FROM bonds[].totalDeposited (cumulative deposits, no breaks)")
+print("2. DUPLICATE CHECK — doublons dans chaque event array")
+break_ids    = [e["id"] for e in break_events]
+created_ids  = [e["id"] for e in created_events]
+increase_ids = [e["id"] for e in increase_events]
+release_ids  = [e["id"] for e in release_events]
+
+dupes_break    = len(break_ids)    - len(set(break_ids))
+dupes_created  = len(created_ids)  - len(set(created_ids))
+dupes_increase = len(increase_ids) - len(set(increase_ids))
+dupes_release  = len(release_ids)  - len(set(release_ids))
+
+print(f"   bondBrokenEvents doublons   : {dupes_break:>6,}")
+print(f"   bondCreatedEvents doublons  : {dupes_created:>6,}")
+print(f"   increaseBondEvents doublons : {dupes_increase:>6,}")
+print(f"   tokensReleasedEvents doublons:{dupes_release:>6,}")
+
+# Show duplicate break amounts
+if dupes_break > 0:
+    from collections import Counter
+    id_counts = Counter(break_ids)
+    dupe_ids = {bid: cnt for bid, cnt in id_counts.items() if cnt > 1}
+    dupe_events = [e for e in break_events if e["id"] in dupe_ids]
+    dupe_rize = sum(pf(e.get("amount",0)) * (dupe_ids[e["id"]]-1) for e in dupe_events) / 2
+    print(f"\n   !! {dupes_break} BREAK DOUBLONS TROUVÉS")
+    print(f"      RIZE sur-compté (breaks en double): {dupe_rize:>14,.2f} RIZE")
+    print(f"      Top 10 IDs en doublon:")
+    for bid, cnt in sorted(dupe_ids.items(), key=lambda x:-x[1])[:10]:
+        ev = next(e for e in break_events if e["id"]==bid)
+        print(f"        nftId={ev['nftId']:>6}  amount={pf(ev.get('amount',0)):>14,.4f}  count={cnt}")
+
+# ── 3. totalDeposited sum ──
+sep()
+print("3. TOTAL FROM bonds[].totalDeposited (cumulative, no breaks)")
 total_deposited = sum(pf(b.get("totalDeposited", 0)) for b in bonds_list)
-print(f"   Sum totalDeposited: {total_deposited:>16,.2f} RIZE")
+print(f"   Sum totalDeposited : {total_deposited:>16,.2f} RIZE")
 
-# ── 3. Breaks sum ──
+# ── 4. Breaks and releases sums ──
 sep()
-print("3. TOTAL BREAKS")
-total_breaks = sum(pf(e.get("amount", 0)) for e in break_events)
-print(f"   Sum all breaks    : {total_breaks:>16,.2f} RIZE")
-print(f"   Expected balance  : {total_deposited - total_breaks:>16,.2f} RIZE  (deposited - breaks)")
+print("4. BREAKS AND RELEASES")
+total_breaks   = sum(pf(e.get("amount", 0)) for e in break_events)
+total_released = sum(pf(e.get("amount", 0)) for e in release_events)
+queue_rize     = total_breaks - total_released
+print(f"   Sum all breaks     : {total_breaks:>16,.2f} RIZE")
+print(f"   Sum all releases   : {total_released:>16,.2f} RIZE")
+print(f"   Queue (brk-rel)    : {queue_rize:>16,.2f} RIZE")
+print(f"   Net (dep-breaks)   : {total_deposited - total_breaks:>16,.2f} RIZE")
 
-# ── 4. bond-states.json total ──
+# ── 5. bond-states.json total ──
 sep()
-print("4. BOND-STATES.JSON COMPUTED TOTAL")
-bs_total  = sum(s.get("current", {}).get("balance", 0) for s in bss.values() if s.get("current", {}).get("balance", 0) > 0)
-bs_active = sum(1 for s in bss.values() if s.get("current", {}).get("balance", 0) > 0)
-print(f"   Active bonds      : {bs_active:>8,}")
-print(f"   Total RIZE        : {bs_total:>16,.2f} RIZE")
-print(f"   DIFFERENCE vs expected: {(total_deposited - total_breaks) - bs_total:>+16,.2f} RIZE")
-
-# ── Build break totals per nftId ──
-break_by_nft = {}
-for e in break_events:
-    nid = str(e["nftId"])
-    break_by_nft[nid] = break_by_nft.get(nid, 0) + pf(e.get("amount", 0))
-
-# ── Build bonds dict ──
-bonds_by_nid = {str(b.get("nftId") or b.get("id", "")): b for b in bonds_list}
-
-# ── 5. Orphan breaks ──
-sep()
-print("5. BREAKS FOR BONDS WITHOUT bondCreatedEvent")
-created_nftids = {str(e["nftId"]) for e in created_events}
-orphan_breaks = {}
-for e in break_events:
-    nid = str(e["nftId"])
-    if nid not in created_nftids:
-        orphan_breaks[nid] = orphan_breaks.get(nid, 0) + pf(e.get("amount", 0))
-orphan_total = sum(orphan_breaks.values())
-print(f"   NftIds with orphan breaks: {len(orphan_breaks):,}")
-print(f"   Total orphan break RIZE  : {orphan_total:>16,.2f} RIZE")
+print("5. BOND-STATES.JSON COMPUTED TOTAL")
+bs_total  = sum(s.get("current",{}).get("balance",0) for s in bss.values() if s.get("current",{}).get("balance",0)>0)
+bs_active = sum(1 for s in bss.values() if s.get("current",{}).get("balance",0)>0)
+print(f"   Active bonds       : {bs_active:>8,}")
+print(f"   Total RIZE         : {bs_total:>16,.2f} RIZE")
 
 # ── 6. Event-based recalc ──
 sep()
-print("6. RECALC FROM RAW EVENTS ONLY (created + increases - breaks)")
+print("6. RECALC FROM RAW EVENTS (created + increases - breaks)")
 event_balance = {}
 for e in created_events:
     nid = str(e["nftId"])
@@ -112,159 +136,138 @@ for e in break_events:
 
 event_total  = sum(max(0.0, v) for v in event_balance.values())
 event_active = sum(1 for v in event_balance.values() if v > 0)
-print(f"   Active bonds (event-based): {event_active:>8,}")
-print(f"   Total RIZE (event-based)  : {event_total:>16,.2f} RIZE")
-print(f"   bond-states.json total    : {bs_total:>16,.2f} RIZE")
-print(f"   DELTA                     : {event_total - bs_total:>+16,.2f} RIZE")
+print(f"   Active bonds       : {event_active:>8,}")
+print(f"   Total RIZE         : {event_total:>16,.2f} RIZE")
+print(f"   bond-states total  : {bs_total:>16,.2f} RIZE")
+print(f"   DELTA              : {event_total - bs_total:>+16,.2f} RIZE")
 
-# ── 7. KEY: Bonds where breaks > totalDeposited ──
+# ── 7. Orphan breaks ──
 sep()
-print("7. BONDS WHERE TOTAL BREAKS > totalDeposited  ← KEY CHECK")
+print("7. ORPHAN BREAKS (nftId sans bondCreatedEvent)")
+created_nftids = {str(e["nftId"]) for e in created_events}
+orphan_breaks = {}
+for e in break_events:
+    nid = str(e["nftId"])
+    if nid not in created_nftids:
+        orphan_breaks[nid] = orphan_breaks.get(nid, 0) + pf(e.get("amount", 0))
+orphan_total = sum(orphan_breaks.values())
+print(f"   NftIds orphelins   : {len(orphan_breaks):,}")
+print(f"   Total RIZE orphelin: {orphan_total:>16,.2f} RIZE")
+
+# ── 8. Bonds where breaks > totalDeposited ──
+sep()
+print("8. BONDS WHERE TOTAL BREAKS > totalDeposited")
+bonds_by_nid = {str(b.get("nftId") or b.get("id","")): b for b in bonds_list}
+break_by_nft = {}
+for e in break_events:
+    nid = str(e["nftId"])
+    break_by_nft[nid] = break_by_nft.get(nid, 0) + pf(e.get("amount", 0))
+
 overbroken = []
 for nid, brk in break_by_nft.items():
     b = bonds_by_nid.get(nid)
-    if not b:
-        continue
+    if not b: continue
     td = pf(b.get("totalDeposited", 0))
     if brk > td + 0.01:
         overbroken.append((nid, td, brk, brk - td))
 overbroken.sort(key=lambda x: -x[3])
 total_excess = sum(x[3] for x in overbroken)
-print(f"   Bonds with breaks > deposited: {len(overbroken):,}")
-print(f"   Total excess breaks          : {total_excess:>16,.2f} RIZE")
+print(f"   Bonds overbroken   : {len(overbroken):,}")
+print(f"   Total excess       : {total_excess:>16,.2f} RIZE")
 if overbroken:
     print(f"   {'nftId':>8}  {'totalDeposited':>16}  {'totalBreaks':>16}  {'excess':>14}")
-    for nid, td, brk, exc in overbroken[:20]:
+    for nid, td, brk, exc in overbroken[:10]:
         print(f"   {nid:>8}  {td:>16,.2f}  {brk:>16,.2f}  {exc:>+14,.2f}")
 else:
     print("   None found.")
 
-# ── 8. Stale totalDeposited ──
+# ── 9. Stale totalDeposited ──
 sep()
-print("8. BONDS WHERE events gross != bonds[].totalDeposited (stale)")
+print("9. STALE totalDeposited (events gross != bonds[])")
 mismatches = []
-for nid in {str(b.get("nftId") or b.get("id", "")) for b in bonds_list}:
-    created_amt  = sum(pf(e["amount"]) for e in created_events  if str(e["nftId"]) == nid)
-    increase_amt = sum(pf(e["amount"]) for e in increase_events if str(e["nftId"]) == nid)
-    ev_gross = created_amt + increase_amt
-    td = pf(bonds_by_nid.get(nid, {}).get("totalDeposited", 0))
+for nid in {str(b.get("nftId") or b.get("id","")) for b in bonds_list}:
+    ca = sum(pf(e["amount"]) for e in created_events  if str(e["nftId"])==nid)
+    ia = sum(pf(e["amount"]) for e in increase_events if str(e["nftId"])==nid)
+    ev_gross = ca + ia
+    td = pf(bonds_by_nid.get(nid,{}).get("totalDeposited",0))
     diff = ev_gross - td
     if abs(diff) > 0.01:
         mismatches.append((nid, td, ev_gross, diff))
 mismatches.sort(key=lambda x: -abs(x[3]))
 total_mismatch = sum(x[3] for x in mismatches)
-print(f"   Bonds with stale totalDeposited: {len(mismatches):,}")
-print(f"   Total RIZE difference          : {total_mismatch:>+16,.2f} RIZE")
+print(f"   Stale bonds        : {len(mismatches):,}")
+print(f"   Total delta        : {total_mismatch:>+16,.2f} RIZE")
 if mismatches:
     print(f"   {'nftId':>8}  {'bonds[]':>16}  {'events_gross':>16}  {'diff':>12}")
     for nid, td, ev, diff in mismatches[:10]:
         print(f"   {nid:>8}  {td:>16,.2f}  {ev:>16,.2f}  {diff:>+12,.2f}")
 
-# ── 9. Summary ──
+# ── 10. RPC reconciliation ──
 sep()
-print("9. SUMMARY")
-print(f"   bonds[].totalDeposited sum  : {total_deposited:>16,.2f} RIZE")
-print(f"   All breaks sum              : {total_breaks:>16,.2f} RIZE")
-print(f"   Net (deposited - breaks)    : {total_deposited - total_breaks:>16,.2f} RIZE")
-print(f"   bond-states.json total      : {bs_total:>16,.2f} RIZE  (delta: {(total_deposited-total_breaks)-bs_total:+,.0f})")
-print(f"   Event-based recalc total    : {event_total:>16,.2f} RIZE  (same as bond-states: {'YES' if abs(event_total-bs_total)<100 else 'NO'})")
-print(f"   Orphan breaks (no creation) : {orphan_total:>16,.2f} RIZE")
-print(f"   Excess breaks (brk > dep)   : {total_excess:>16,.2f} RIZE")
-print(f"   Stale totalDeposited delta  : {total_mismatch:>+16,.2f} RIZE")
-sep()
-
-# ── 11. Breaks vs Releases — queue non retirée ──
-sep()
-print("11. BREAKS vs RELEASES — RIZE cassé mais pas encore sorti du contrat")
-print("    Théorie: le RPC totalBonded inclut le RIZE en queue de release")
-print("    Nous on le soustrait dès le break → on under-count de ce montant")
-lc = load("bond-lifecycle.json").get("data", {})
-release_events = lc.get("tokensReleasedEvents", [])
-total_released = sum(pf(e.get("amount", 0)) for e in release_events)
-queue_rize = total_breaks - total_released
-print(f"   Sum all breaks         : {total_breaks:>16,.2f} RIZE")
-print(f"   Sum all releases       : {total_released:>16,.2f} RIZE")
-print(f"   En queue (non releasé) : {queue_rize:>16,.2f} RIZE  ← clé")
-print(f"   Notre net balance      : {event_total:>16,.2f} RIZE")
-print(f"   Notre net + queue      : {event_total + queue_rize:>16,.2f} RIZE")
-print(f"   RPC live               :    ~927,000,000.00 RIZE")
-print(f"   Delta net+queue vs RPC : {event_total + queue_rize - 927_000_000:>+16,.2f} RIZE")
-if abs(event_total + queue_rize - 927_000_000) < 5_000_000:
-    print()
-    print("   ✓ THÉORIE CONFIRMÉE: le RPC compte le RIZE en queue de release")
-    print("     comme encore 'bondé'. Notre calcul est correct pour le VP")
-    print("     (RIZE cassé n'a plus de VP), mais le total affiché doit")
-    print("     inclure la queue pour matcher le RPC.")
+print("10. RPC RECONCILIATION")
+net_plus_queue = event_total + queue_rize
+delta_vs_rpc   = net_plus_queue - float(RPC_LIVE)
+print(f"   Event net balance  : {event_total:>16,.2f} RIZE")
+print(f"   + Queue (brk-rel)  : {queue_rize:>16,.2f} RIZE")
+print(f"   = Total in contract: {net_plus_queue:>16,.2f} RIZE")
+print(f"   RPC live           : {float(RPC_LIVE):>16,.2f} RIZE")
+print(f"   DELTA vs RPC       : {delta_vs_rpc:>+16,.2f} RIZE")
+if delta_vs_rpc > 1000:
+    print(f"\n   !! On compte {delta_vs_rpc:,.0f} RIZE DE PLUS que le RPC.")
+    print(f"      Cause probable: doublons dans les events (voir section 2).")
+elif delta_vs_rpc < -1000:
+    print(f"\n   !! On compte {abs(delta_vs_rpc):,.0f} RIZE DE MOINS que le RPC.")
+    print(f"      Cause probable: events manquants dans les JSONs source.")
 else:
-    print()
-    print("   Théorie non confirmée par les chiffres.")
+    print(f"\n   ✓ Delta < 1000 RIZE — données cohérentes avec le RPC.")
+
+# ── 11. Decimal precision ──
 sep()
-
-# ── 12. Floating point precision ──
-sep()
-print("12. PRÉCISION FLOATING POINT — float vs Decimal haute précision")
-from decimal import Decimal, getcontext
-getcontext().prec = 50
-
-total_breaks_dec   = sum(Decimal(str(e.get("amount","0"))) for e in break_events)
-total_released_dec = sum(Decimal(str(e.get("amount","0"))) for e in release_events)
-
-event_balance_dec = {}
+print("11. PRÉCISION FLOATING POINT")
+event_bal_dec = {}
 for e in created_events:
     nid = str(e["nftId"])
-    event_balance_dec[nid] = event_balance_dec.get(nid, Decimal("0")) + Decimal(str(e.get("amount","0")))
+    event_bal_dec[nid] = event_bal_dec.get(nid, Decimal("0")) + Decimal(str(e.get("amount","0")))
 for e in increase_events:
     nid = str(e["nftId"])
-    event_balance_dec[nid] = event_balance_dec.get(nid, Decimal("0")) + Decimal(str(e.get("amount","0")))
+    event_bal_dec[nid] = event_bal_dec.get(nid, Decimal("0")) + Decimal(str(e.get("amount","0")))
 for e in break_events:
     nid = str(e["nftId"])
-    event_balance_dec[nid] = event_balance_dec.get(nid, Decimal("0")) - Decimal(str(e.get("amount","0")))
+    event_bal_dec[nid] = event_bal_dec.get(nid, Decimal("0")) - Decimal(str(e.get("amount","0")))
 
-net_dec_total = sum(max(Decimal("0"), v) for v in event_balance_dec.values())
-queue_dec     = total_breaks_dec - total_released_dec
-total_in_contract_dec = net_dec_total + queue_dec
+net_dec   = sum(max(Decimal("0"), v) for v in event_bal_dec.values())
+queue_dec = sum(Decimal(str(e.get("amount","0"))) for e in break_events) - \
+            sum(Decimal(str(e.get("amount","0"))) for e in release_events)
+total_dec = net_dec + queue_dec
 
-delta_net   = float(net_dec_total) - event_total
-delta_queue = float(queue_dec) - (total_breaks - total_released)
+delta_fp_net   = float(net_dec)   - event_total
+delta_fp_queue = float(queue_dec) - queue_rize
+delta_dec_rpc  = float(total_dec) - float(RPC_LIVE)
 
-# Update this to the exact RPC value at time of running the audit
-rpc_live = Decimal("927550000")
-
-print(f"   Float  net balance       : {event_total:>20,.8f} RIZE")
-print(f"   Decimal net balance      : {float(net_dec_total):>20,.8f} RIZE")
-print(f"   Delta float vs Decimal   : {delta_net:>+20,.8f} RIZE")
-print()
-print(f"   Float  queue             : {total_breaks - total_released:>20,.8f} RIZE")
-print(f"   Decimal queue            : {float(queue_dec):>20,.8f} RIZE")
-print(f"   Delta float vs Decimal   : {delta_queue:>+20,.8f} RIZE")
-print()
-print(f"   Decimal total in contract: {float(total_in_contract_dec):>19,.8f} RIZE")
-print(f"   RPC live (approx)        :    927,550,000.00000000 RIZE")
-print(f"   Final delta vs RPC       : {float(total_in_contract_dec) - float(rpc_live):>+19,.8f} RIZE")
-print()
-if abs(delta_net) < 1.0 and abs(delta_queue) < 1.0:
-    print("   ✓ Floating point impact < 1 RIZE — négligeable.")
-    print("     Le delta résiduel vs RPC = uniquement du timing (transactions du jour).")
+print(f"   Float net          : {event_total:>20,.6f} RIZE")
+print(f"   Decimal net        : {float(net_dec):>20,.6f} RIZE")
+print(f"   Delta FP net       : {delta_fp_net:>+20,.8f} RIZE")
+print(f"   Delta FP queue     : {delta_fp_queue:>+20,.8f} RIZE")
+print(f"   Decimal total      : {float(total_dec):>20,.6f} RIZE")
+print(f"   Delta Decimal/RPC  : {delta_dec_rpc:>+20,.6f} RIZE")
+if abs(delta_fp_net) < 1.0:
+    print("   ✓ Floating point < 1 RIZE — négligeable.")
 else:
-    print(f"   !! Floating point introduit {delta_net:+,.4f} RIZE d'erreur sur le net.")
-    print("      Recommandation: passer compute_bond_states.py en Decimal.")
+    print(f"   !! FP impact = {delta_fp_net:+,.4f} RIZE — passer en Decimal.")
+
+# ── 12. Summary ──
 sep()
-
-# ── 10. Conclusion ──
-print("10. CONCLUSION")
-if total_excess > 1_000_000:
-    print(f"  !! EXCESS BREAKS = {total_excess:,.2f} RIZE")
-    print(f"     {len(overbroken)} bonds have more breaks than deposits.")
-    print(f"     These are the source of the missing RIZE.")
-    print(f"     Likely cause: subgraph counting breaks on wrong nftId,")
-    print(f"     or same break event indexed twice.")
-elif abs(event_total - bs_total) < 10_000:
-    print(f"  bond-states.json matches raw event recalc. JSON is correct.")
-    print(f"  Both methods give ~{event_total:,.0f} RIZE.")
-    print(f"  The gap vs RPC 927M is in the SOURCE DATA.")
-    print(f"  The subgraph bootstrap missed some bondCreatedEvents.")
-    print(f"  Those missing bonds have no creation event → not counted.")
-    print(f"  Solution: re-bootstrap bond-created.json from the live subgraph.")
-else:
-    print("  Inconclusive. Review sections 6 and 7 carefully.")
+print("12. SUMMARY")
+print(f"   bondCreatedEvents         : {len(created_events):>8,}")
+print(f"   bondBrokenEvents          : {len(break_events):>8,}  (doublons: {dupes_break})")
+print(f"   tokensReleasedEvents      : {len(release_events):>8,}  (doublons: {dupes_release})")
+print(f"   Sum totalDeposited        : {total_deposited:>16,.2f} RIZE")
+print(f"   Sum breaks                : {total_breaks:>16,.2f} RIZE")
+print(f"   Sum releases              : {total_released:>16,.2f} RIZE")
+print(f"   Queue (breaks-releases)   : {queue_rize:>16,.2f} RIZE")
+print(f"   Event net balance         : {event_total:>16,.2f} RIZE")
+print(f"   bond-states total         : {bs_total:>16,.2f} RIZE")
+print(f"   Event net + queue         : {net_plus_queue:>16,.2f} RIZE")
+print(f"   RPC live                  : {float(RPC_LIVE):>16,.2f} RIZE")
+print(f"   Delta vs RPC              : {delta_vs_rpc:>+16,.2f} RIZE  ({delta_vs_rpc/float(RPC_LIVE)*100:+.4f}%)")
 sep()
