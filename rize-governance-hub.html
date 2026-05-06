@@ -127,8 +127,8 @@
 
     /* ── CONV WHALE TABLE (data hub style) ── */
     .conv-whale-table{width:100%;border-collapse:collapse;margin-top:12px;}
-    .conv-whale-table th{background:rgba(126,224,255,0.06);color:var(--muted);font-size:15px;text-transform:uppercase;letter-spacing:1px;padding:10px 16px;text-align:left;font-family:"Trebuchet MS",sans-serif;border-bottom:1px solid rgba(255,255,255,0.08);}
-    .conv-whale-table td{padding:10px 16px;font-size:18px;font-family:'Rajdhani',sans-serif;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.04);color:#fff;}
+    .conv-whale-table th{background:rgba(126,224,255,0.06);color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:1px;padding:8px 12px;text-align:left;font-family:"Trebuchet MS",sans-serif;border-bottom:1px solid rgba(255,255,255,0.08);}
+    .conv-whale-table td{padding:10px 12px;font-size:18px;font-family:'Rajdhani',sans-serif;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.04);color:#fff;}
     .conv-whale-table td a{color:#fff;text-decoration:none;font-family:'DM Mono',monospace;font-size:14px;font-weight:400;}
     .conv-whale-table td a:hover{text-decoration:underline;}
 
@@ -191,8 +191,8 @@
     /* ── TOK TABLE ── */
     .tok-table{width:100%;border-collapse:collapse;margin-top:16px;}
     .tok-vest-short{display:none;}.tok-vest-full{display:inline;}
-    .tok-table th{background:rgba(126,224,255,0.06);color:var(--muted);font-size:14px;text-transform:uppercase;letter-spacing:1.2px;padding:10px 12px;text-align:left;font-family:"Trebuchet MS",sans-serif;border-bottom:1px solid rgba(255,255,255,0.08);}
-    .tok-table td{padding:10px 12px;font-size:18px;font-family:'Rajdhani',sans-serif;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.05);color:#fff;}
+    .tok-table th{background:rgba(126,224,255,0.06);color:var(--muted);font-size:14px;font-size:14px;text-transform:uppercase;letter-spacing:1.2px;padding:10px 12px;text-align:left;font-family:"Trebuchet MS",sans-serif;border-bottom:1px solid rgba(255,255,255,0.08);}
+    .tok-table td{padding:10px 12px;font-size:20px;font-family:'Rajdhani',sans-serif;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.05);color:#fff;}
     .tok-table tr:last-child td{font-weight:700;color:var(--cyan);border-top:1px solid rgba(126,224,255,0.2);border-bottom:none;}
     .tok-cat{color:var(--text);}
 
@@ -554,7 +554,7 @@
         <div id="hm-day-detail" style="margin-top:20px;border-top:1px solid rgba(255,255,255,0.07);padding-top:16px">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
             <div class="inner-title" id="hm-day-detail-title" style="margin:0">Governance Activity Details</div>
-            <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">Click on a square in the heatmap to display details</span>
+            <span style="font-family:'DM Mono',monospace;font-size:14px;color:var(--cyan);letter-spacing:1px;font-weight:500">↑ Click on a square in the heatmap to display activity details</span>
           </div>
           <div class="conv-toggle-row" style="margin-bottom:10px">
             <button class="conv-toggle active" onclick="hmDayFilter('all',this)">All</button>
@@ -620,6 +620,7 @@
         <div class="ctx-kpi-row" id="whale-kpi-row">
           <div class="ctx-kpi"><span class="ctx-kpi-label" id="whale-kpi-breaks-label">Whale Breaks &gt;5M</span><span class="ctx-kpi-value accent-pink" id="whale-count-breaks">—</span><span class="ctx-kpi-sub">all time</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label" id="whale-kpi-bonds-label">Whale Bonds &gt;5M</span><span class="ctx-kpi-value accent-green" id="whale-count-bonds">—</span><span class="ctx-kpi-sub">all time</span></div>
+          <div class="ctx-kpi"><span class="ctx-kpi-label" id="whale-kpi-releases-label">Whale Releases</span><span class="ctx-kpi-value accent-cyan" id="whale-count-releases">—</span><span class="ctx-kpi-sub" id="whale-volume-releases">—</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label" id="whale-kpi-vol-breaks-label">Volume Breaks &gt;5M</span><span class="ctx-kpi-value" id="whale-volume-breaks">—</span><span class="ctx-kpi-sub">RIZE total</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label" id="whale-kpi-vol-bonds-label">Volume Bonds &gt;5M</span><span class="ctx-kpi-value" id="whale-volume-bonds">—</span><span class="ctx-kpi-sub">RIZE total</span></div>
           <div class="ctx-kpi"><span class="ctx-kpi-label">Last Whale Event</span><span class="ctx-kpi-value accent-cyan" id="whale-last-date">—</span><span class="ctx-kpi-sub" id="whale-last-info">&nbsp;</span></div>
@@ -630,6 +631,7 @@
             <button class="conv-toggle active" onclick="whaleDir('all',this)">All</button>
             <button class="conv-toggle" onclick="whaleDir('break',this)">Breaks</button>
             <button class="conv-toggle" onclick="whaleDir('bond',this)">Bond / Increase</button>
+            <button class="conv-toggle" onclick="whaleDir('release',this)">Releases</button>
           </div>
           <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);margin-left:12px">Threshold:</span>
           <div class="conv-toggle-row" style="margin:0">
@@ -711,20 +713,21 @@
           </div>
           <div>
             <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)" onclick="momLearn('netflow')" style="cursor:pointer;text-decoration:underline dotted 1px">Net Flow 7d (40%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-netflow-7d">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted);cursor:pointer;text-decoration:underline dotted 1px" onclick="momLearn('ratio')">Bonds/Breaks Ratio 30d (25%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-ratio-30d">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted);cursor:pointer;text-decoration:underline dotted 1px" onclick="momLearn('maturity')">Avg Maturity Trend (20%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-mat-trend">—</span></div>
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted);cursor:pointer;text-decoration:underline dotted 1px" onclick="momLearn('internal')">New Bonders 30d (15%)</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-new-bonders">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)" onclick="momLearn('netflow')" style="cursor:pointer;text-decoration:underline dotted 1px">Net Flow RIZE 7d</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-netflow-7d">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><button onclick="momLearn('ratio')" style="background:rgba(126,224,255,0.06);border:1px solid rgba(126,224,255,0.15);color:var(--muted);font-family:'DM Mono',monospace;font-size:13px;padding:5px 10px;cursor:pointer;letter-spacing:0.5px;transition:all 0.2s" onmouseover="this.style.color='var(--cyan)';this.style.borderColor='var(--cyan)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='rgba(126,224,255,0.15)'">Conviction/Exit Ratio 30d</button><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-ratio-30d">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><button onclick="momLearn('maturity')" style="background:rgba(126,224,255,0.06);border:1px solid rgba(126,224,255,0.15);color:var(--muted);font-family:'DM Mono',monospace;font-size:13px;padding:5px 10px;cursor:pointer;letter-spacing:0.5px;transition:all 0.2s" onmouseover="this.style.color='var(--cyan)';this.style.borderColor='var(--cyan)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='rgba(126,224,255,0.15)'">Internal Conviction 30d</button><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-mat-trend">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><button onclick="momLearn('internal')" style="background:rgba(126,224,255,0.06);border:1px solid rgba(126,224,255,0.15);color:var(--muted);font-family:'DM Mono',monospace;font-size:13px;padding:5px 10px;cursor:pointer;letter-spacing:0.5px;transition:all 0.2s" onmouseover="this.style.color='var(--cyan)';this.style.borderColor='var(--cyan)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='rgba(126,224,255,0.15)'">Avg Maturity Anchor</button><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-new-bonders">—</span></div>
             </div>
+        <div id="mom-learn-box" style="margin:12px 0;padding:14px 16px;border:1px solid rgba(126,224,255,0.1);background:rgba(126,224,255,0.02);min-height:52px">
+          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">How is this score built?</div>
+          <div id="mom-learn-text" style="font-family:'DM Mono',monospace;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.65">Click on Net Flow, Conviction/Exit Ratio, Internal Conviction or Avg Maturity above to understand how each component is built.</div>
+        </div>
           </div>
           <div style="width:300px;height:300px;min-width:300px"><canvas id="mom-donut"></canvas></div>
         </div>
         <div class="sep"></div>
         <div class="inner-title">Historical Score</div>
-        <div id="mom-learn-box" style="margin:12px 0;padding:14px 16px;border:1px solid rgba(126,224,255,0.1);background:rgba(126,224,255,0.02);min-height:52px">
-          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">How is this score built?</div>
-          <div id="mom-learn-text" style="font-family:'DM Mono',monospace;font-size:13px;color:rgba(255,255,255,0.65);line-height:1.65">Click on Net Flow, Conviction/Exit Ratio, Internal Conviction or Avg Maturity above to understand how each component is built.</div>
-        </div>
+        
         <div class="conv-toggle-row">
           <button class="conv-toggle active" onclick="momHistView('90d',this)">Last 90d</button>
           <button class="conv-toggle" onclick="momHistView('all',this)">All Time</button>
@@ -985,7 +988,7 @@
   .tok-vest-short{display:none;} .tok-vest-full{display:inline;}
   @media(max-width:700px){.tok-title-desktop{display:none;}.tok-vest-full{display:none;}.tok-vest-short{display:inline;}}
   .tok-table th{background:rgba(126,224,255,0.06);color:var(--muted);font-size:14px;text-transform:uppercase;letter-spacing:1.2px;padding:10px 12px;text-align:left;font-family:"Trebuchet MS",sans-serif;border-bottom:1px solid rgba(255,255,255,0.08);}
-  .tok-table td{padding:10px 12px;font-size:18px;font-family:'Rajdhani',sans-serif;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.05);color:#fff;}
+  .tok-table td{padding:10px 12px;font-size:20px;font-family:'Rajdhani',sans-serif;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.05);color:#fff;}
   .tok-table tr:last-child td{font-weight:700;color:var(--cyan);border-top:1px solid rgba(126,224,255,0.2);border-bottom:none;}
   .tok-table .tok-cat{color:var(--text);}
   .metrics-panel{display:none;} .metrics-panel.active{display:block;}
@@ -996,7 +999,7 @@
   .conv-delta-sub{display:block;font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--muted);margin-top:4px;}
   .conv-whale-table{width:100%;border-collapse:collapse;}
   .conv-whale-table th{background:rgba(126,224,255,0.06);color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:1px;padding:8px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.08);}
-  .conv-whale-table td{padding:8px 12px;font-size:15px;font-family:'Rajdhani',sans-serif;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.04);color:#fff;}
+  .conv-whale-table td{padding:10px 12px;font-size:18px;font-family:'Rajdhani',sans-serif;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.04);color:#fff;}
   .footer-disclaimer{font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,0.55);margin-top:2px;}
   @media(max-width:700px){
     .calc-grid{grid-template-columns:1fr!important;}
@@ -1117,7 +1120,7 @@ function baseOpts(extra={}){
     interaction:{mode:'index',intersect:false},
     plugins:{
       legend:{display:false},
-      tooltip:{backgroundColor:'#060818',borderColor:'rgba(126,224,255,0.3)',borderWidth:1,
+      tooltip:{bodyFont:{size:15},titleFont:{size:14},padding:12,backgroundColor:'#060818',borderColor:'rgba(126,224,255,0.3)',borderWidth:1,
         titleColor:'#7ee0ff',bodyColor:'#f7f2e8',
         titleFont:{family:"'Rajdhani',sans-serif",size:isM?13:15,weight:'700'},
         bodyFont:{family:"'Trebuchet MS',sans-serif",size:isM?12:14},
@@ -1661,7 +1664,11 @@ async function initHeatmap(){
   if(!bbData){document.getElementById('hm-loading').textContent='Error loading data';return;}
   const allDays={};
   const ensureDay=d=>{if(!allDays[d])allDays[d]={breaks:0,created:0,increase:0,releases:0,breakEvents:[],createdEvents:[],increaseEvents:[],releaseEvents:[]};};
-  (bbData.bondBrokenEvents||[]).forEach(e=>{const d=e.date||tsToDate(e.timestamp);ensureDay(d);const a=parseAmt(e.amount);allDays[d].breaks+=a;allDays[d].breakEvents.push(e);});
+  // Build nftId→owner map from bondStates or bondCreated
+  const _nftOwner={};
+  if(bcData)(bcData.bondCreatedEvents||[]).forEach(e=>{if(e.nftId&&e.owner)_nftOwner[String(e.nftId)]=e.owner;});
+  if(_bs)Object.entries(_bs).forEach(([nid,s])=>{if(s.owner)_nftOwner[nid]=s.owner;});
+  (bbData.bondBrokenEvents||[]).forEach(e=>{const d=e.date||tsToDate(e.timestamp);ensureDay(d);const a=parseAmt(e.amount);allDays[d].breaks+=a;allDays[d].breakEvents.push({...e,owner:e.owner||_nftOwner[String(e.nftId)]||''});});
   if(bcData){
     (bcData.bondCreatedEvents||[]).forEach(e=>{const d=e.date||tsToDate(e.timestamp);ensureDay(d);const a=parseAmt(e.amount);allDays[d].created+=a;allDays[d].createdEvents.push(e);});
     (bcData.increaseBondEvents||[]).forEach(e=>{const d=e.date||tsToDate(e.timestamp);ensureDay(d);const a=parseAmt(e.amount);allDays[d].increase+=a;allDays[d].increaseEvents.push(e);});
@@ -1731,6 +1738,9 @@ function hmRender(){
       let col;
       if(hmMode_==='net')col=v>=0?`rgba(152,255,182,${0.1+intensity*0.9})`:`rgba(255,138,216,${0.1+intensity*0.9})`;
       else if(hmMode_==='breaks'){const r2=Math.round(150+intensity*105);const g2=Math.round((1-intensity)*80);col=`rgba(${r2},${g2},50,${0.1+intensity*0.9})`;}
+      else if(hmMode_==='created')col=`rgba(${Math.round(60+intensity*80)},${Math.round(180+intensity*60)},${Math.round(80+intensity*30)},${0.1+intensity*0.9})`;
+      else if(hmMode_==='releases')col=`rgba(${Math.round(30+intensity*80)},${Math.round(140+intensity*80)},${Math.round(200+intensity*55)},${0.1+intensity*0.9})`;
+      else if(hmMode_==='increase')col=`rgba(${Math.round(200+intensity*55)},${Math.round(150+intensity*60)},50,${0.1+intensity*0.9})`;
       else col=`rgba(126,224,255,${0.1+intensity*0.9})`;
       const dd=hmDailyData[day];
       const cnt=(dd.breakEvents.length+dd.createdEvents.length+dd.increaseEvents.length+dd.releaseEvents.length);
@@ -1785,7 +1795,7 @@ function hmRenderDayTable(day,filter){
     <td style="color:${e._color};font-weight:700">${e._type}</td>
     <td style="color:#fff">${e.nftId?'#'+e.nftId:e.tokenId?'#'+e.tokenId:'—'}</td>
     <td style="color:${e._color}">${fmt(parseAmt(e.amount),2)} RIZE</td>
-    <td>${addrTd(e.owner||e.from||'')}</td>
+    <td><span class="hhi-wallet-addr" style="cursor:pointer;font-family:'DM Mono',monospace;font-size:12px" onclick="const _wa=(e.owner||e.from||'');if(_wa&&_wa.startsWith('0x')){window._expReturnCatBtn='cat-btn-metrics';atxGoWallet(_wa);}">${fmtAddr(e.owner||e.from||'')}</span></td>
     <td>${txLink(e.txHash)}</td>
   </tr>`).join('');
 }
@@ -1933,15 +1943,16 @@ let whaleLoaded=false, allWhaleEvents=[], whaleMin=5_000_000, whaleDirFilter='al
 
 async function initWhale(){
   if(whaleLoaded)return;whaleLoaded=true;
-  const [bbData,bcData]=await Promise.all([loadJSON('bondBroken'),loadJSON('bondCreated')]);
+  const [bbData,bcData,lcDataW]=await Promise.all([loadJSON('bondBroken'),loadJSON('bondCreated'),loadJSON('bondLifecycle')]);
   if(!bbData)return;
   const nftOwnerMap={};(bcData?.bonds||[]).forEach(b=>{if(b.nftId&&b.owner)nftOwnerMap[b.nftId.toString()]=b.owner;});
   const breaks=(bbData.bondBrokenEvents||[]).map(e=>({...e,_rize:parseAmt(e.amount),_dir:'break',_ts:parseInt(e.timestamp),owner:nftOwnerMap[e.nftId?.toString()]||''}));
+  const releases=(lcDataW?.tokensReleasedEvents||[]).map(e=>({...e,_rize:parseAmt(e.amount),_dir:'release',_ts:parseInt(e.timestamp),owner:e.to||''}));
   const bonds=bcData?[
     ...(bcData.bondCreatedEvents||[]).map(e=>({...e,_rize:parseAmt(e.amount),_dir:'bond',_ts:parseInt(e.timestamp)})),
     ...(bcData.increaseBondEvents||[]).map(e=>({...e,_rize:parseAmt(e.amount),_dir:'increase',_ts:parseInt(e.timestamp)})),
   ]:[];
-  allWhaleEvents=[...breaks,...bonds].sort((a,b)=>b._ts-a._ts);
+  allWhaleEvents=[...breaks,...releases,...bonds].sort((a,b)=>b._ts-a._ts);
   whaleUpdateKPIs();
   whaleRender();
 }
@@ -1949,11 +1960,14 @@ async function initWhale(){
 function whaleUpdateKPIs(){
   const filtered=allWhaleEvents.filter(e=>e._rize>=whaleMin);
   const wBreaks=filtered.filter(e=>e._dir==='break');
-  const wBonds=filtered.filter(e=>e._dir!=='break');
+  const wBonds=filtered.filter(e=>e._dir==='bond'||e._dir==='increase');
+  const wReleases=filtered.filter(e=>e._dir==='release');
   document.getElementById('whale-count-breaks').textContent=wBreaks.length.toLocaleString();
   document.getElementById('whale-count-bonds').textContent=wBonds.length.toLocaleString();
   document.getElementById('whale-volume-breaks').textContent=fmt(wBreaks.reduce((s,e)=>s+e._rize,0),2)+' RIZE';
   document.getElementById('whale-volume-bonds').textContent=fmt(wBonds.reduce((s,e)=>s+e._rize,0),2)+' RIZE';
+  const wRelEl=document.getElementById('whale-count-releases');if(wRelEl)wRelEl.textContent=wReleases.length.toLocaleString();
+  const wRelVolEl=document.getElementById('whale-volume-releases');if(wRelVolEl)wRelVolEl.textContent=fmt(wReleases.reduce((s,e)=>s+e._rize,0),2)+' RIZE';
   const suffix='>'+fmt(whaleMin/1e6,0)+'M';
   ['whale-kpi-breaks-label','whale-kpi-bonds-label','whale-kpi-vol-breaks-label','whale-kpi-vol-bonds-label'].forEach((id,i)=>{
     const el=document.getElementById(id);if(el)el.textContent=['Whale Breaks','Whale Bonds','Volume Breaks','Volume Bonds'][i]+' '+suffix;
@@ -1963,7 +1977,7 @@ function whaleUpdateKPIs(){
   if(allAbove.length){
     const last=allAbove.reduce((m,e)=>e._ts>m._ts?e:m,allAbove[0]);
     document.getElementById('whale-last-date').textContent=last.date||tsToDate(last.timestamp);
-    const dirStr=last._dir==='break'?'Break':last._dir==='increase'?'IncreaseBond':'Bond';
+    const dirStr=last._dir==='break'?'Break':last._dir==='release'?'Release':last._dir==='increase'?'IncreaseBond':'Bond Created';
     document.getElementById('whale-last-info').textContent=fmt(last._rize,2)+' RIZE — '+dirStr;
   }
 }
@@ -1981,12 +1995,13 @@ function whaleFilter(min,btn){
 function whaleRender(){
   let f=allWhaleEvents.filter(e=>e._rize>=whaleMin);
   if(whaleDirFilter==='break')f=f.filter(e=>e._dir==='break');
-  else if(whaleDirFilter==='bond')f=f.filter(e=>e._dir!=='break');
+  else if(whaleDirFilter==='bond')f=f.filter(e=>e._dir==='bond'||e._dir==='increase');
+  else if(whaleDirFilter==='release')f=f.filter(e=>e._dir==='release');
   f=f.slice(0,200);
   const tbody=document.getElementById('whale-tbody');
   if(!f.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">No events at this threshold</td></tr>';return;}
   tbody.innerHTML=f.map((e,i)=>{
-    const dirHtml=e._dir==='break'?'<span style="color:var(--pink);font-weight:700">Break</span>':e._dir==='increase'?'<span style="color:var(--gold);font-weight:700">IncreaseBond</span>':'<span style="color:#98ffb6;font-weight:700">Bond</span>';
+    const dirHtml=e._dir==='break'?'<span style="color:var(--pink);font-weight:700">Break</span>':e._dir==='release'?'<span style="color:var(--cyan);font-weight:700">Release</span>':e._dir==='increase'?'<span style="color:var(--gold);font-weight:700">IncreaseBond</span>':'<span style="color:#98ffb6;font-weight:700">Bond Created</span>';
     const wallet=e.owner||e.from||'';
     const cex=wallet&&CEX_MAP[wallet.toLowerCase()]?` <span style="color:var(--gold);font-size:11px">[${CEX_MAP[wallet.toLowerCase()]}]</span>`:'';
     return `<tr>
@@ -1994,7 +2009,7 @@ function whaleRender(){
       <td style="color:var(--muted);font-size:15px">${e.date||tsToDate(e.timestamp)}</td>
       <td>${dirHtml}</td>
       <td style="color:#fff">${e.nftId?'#'+e.nftId:'—'}</td>
-      <td style="color:${e._dir==='break'?'var(--pink)':e._dir==='increase'?'var(--gold)':'#98ffb6'};font-weight:700">${fmt(e._rize,2)} RIZE</td>
+      <td style="color:${e._dir==='break'?'var(--pink)':e._dir==='release'?'var(--cyan)':e._dir==='increase'?'var(--gold)':'#98ffb6'};font-weight:700">${fmt(e._rize,2)} RIZE</td>
       <td><span class="hhi-wallet-addr" style="color:#fff;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;transition:color 0.15s" onclick="expGo('${wallet}','Key Metrics')">${fmtAddr(wallet)}</span>${cex}</td>
       <td>${txLink(e.txHash)}</td>
     </tr>`;
@@ -2151,12 +2166,12 @@ async function initMomentum(){
   const col=score>=5?'#98ffb6':score>=3?'var(--gold)':'var(--pink)';
   scoreEl.style.color=col;
   document.getElementById('momentum-score-label').textContent=score>=5?'CONVICTION':score>=3?'NEUTRAL':'DISTRIBUTION';
-  document.getElementById('mom-netflow-7d').textContent=(netFlow7>=0?'+':'')+fmt(netFlow7,2)+' RIZE (bonds+increases-breaks)';
+  document.getElementById('mom-netflow-7d').textContent=(netFlow7>=0?'+':'')+fmt(netFlow7,2)+' RIZE';
   document.getElementById('mom-netflow-7d').style.color=netFlow7>=0?'#98ffb6':'var(--pink)';
-  document.getElementById('mom-ratio-30d').textContent=ratio30.toFixed(2)+'× (RIZE weighted)';
+  document.getElementById('mom-ratio-30d').textContent=ratio30.toFixed(2)+'×';
   document.getElementById('mom-ratio-30d').style.color=ratio30>=1?'#98ffb6':'var(--pink)';
-  document.getElementById('mom-mat-trend').textContent=fmtPct(internalConv*100)+' of bonded increased 30d';
-  document.getElementById('mom-new-bonders').textContent=fmtPct(avgMat*100)+' avg maturity';
+  document.getElementById('mom-mat-trend').textContent=fmtPct(internalConv*100);
+  document.getElementById('mom-new-bonders').textContent=fmtPct(avgMat*100);
   if(rzCharts.momDonut)rzCharts.momDonut.destroy();
   rzCharts.momDonut=new Chart(document.getElementById('mom-donut').getContext('2d'),{type:'doughnut',data:{
     labels:['Net Flow RIZE 7d (40%)','Conviction/Exit RIZE 30d (30%)','Internal Conviction RIZE 30d (20%)','Avg Maturity (10%)'],
@@ -2196,6 +2211,18 @@ async function momBuildHistory(breaks,bonds,increases,latestSnap,fullMatS){
   momHistDraw(days,scoresByDay,momHistView_);
   // Store for view switching
   window._momHistDays=days;window._momHistScores=scoresByDay;
+  // Sync displayed score to today's chart value (last element)
+  if(scoresByDay.length>0){
+    const todayScore=scoresByDay[scoresByDay.length-1];
+    const scoreEl=document.getElementById('momentum-score-display');
+    if(scoreEl){
+      scoreEl.textContent=todayScore.toFixed(1);
+      scoreEl.style.color=todayScore>=5?'#98ffb6':todayScore>=3?'var(--gold)':'var(--pink)';
+    }
+    const labelEl=document.getElementById('momentum-score-label');
+    if(labelEl)labelEl.textContent=todayScore>=5?'CONVICTION':todayScore>=3?'NEUTRAL':'DISTRIBUTION';
+    if(labelEl)labelEl.style.color=todayScore>=5?'#98ffb6':todayScore>=3?'var(--gold)':'var(--pink)';
+  }
 }
 
 function momLearn(key){
@@ -2264,9 +2291,9 @@ async function initHHI(){
     datasets:[{data:[...top10w.map(w=>w.totalVP),restVP],backgroundColor:['#7ee0ff','#ffd36b','#98ffb6','#ff8ad8','#c77dff','#7ee0ff','#ffd36b','#98ffb6','#ff8ad8','#c77dff','rgba(255,255,255,0.12)'],borderColor:'#060818',borderWidth:2,hoverOffset:14}]
   },options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#060818',borderColor:'rgba(126,224,255,0.3)',borderWidth:1,titleColor:'#7ee0ff',bodyColor:'#f7f2e8',padding:12,callbacks:{label:c=>` ${c.label}: ${fmt(c.parsed,2)} VP (${totalVP>0?fmtPct(c.parsed/totalVP*100):'—'})`}}}}});
 
-  document.getElementById('hhi-tbody').innerHTML=sorted.slice(0,20).map((w,i)=>`<tr>
+  document.getElementById('hhi-tbody').innerHTML=sorted.slice(0,20).map((w,i)=>`<tr style="cursor:pointer" onclick="window._expReturnCatBtn='cat-btn-metrics';atxGoWallet('${w.owner}')">
     <td style="color:var(--muted)">${i+1}</td>
-    <td><span style="color:#fff;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer" onclick="expGo('${w.owner}','Key Metrics')">${fmtAddr(w.owner)}</span>${CEX_MAP[w.owner]?` <span style="color:var(--gold);font-size:11px">[${CEX_MAP[w.owner]}]</span>`:''}</td>
+    <td><span class="hhi-wallet-addr" style="font-family:'DM Mono',monospace;font-size:12px;cursor:pointer">${fmtAddr(w.owner)}</span>${CEX_MAP[w.owner]?` <span style="color:var(--gold);font-size:11px">[${CEX_MAP[w.owner]}]</span>`:''}</td>
     <td style="color:var(--cyan)">${fmt(w.totalVP,2)}</td>
     <td style="color:var(--muted)">${fmtPct(totalVP>0?w.totalVP/totalVP*100:0)}</td>
   </tr>`).join('');
@@ -2330,10 +2357,12 @@ async function initBondAge(){
   const opts=baseOpts();
   opts.plugins.tooltip.callbacks={label:c=>{const p=c.raw;return[`Bond #${p.nftId||'—'}`,`${fmt(p.y,2)} RIZE`,`Maturity: ${fmtPct(p.mat*100)}`,`VP: ${fmt(p.vp,2)}`];}};
   opts.scales.x={...opts.scales.x,title:{display:true,text:'Bond Age (months from creation)',color:'#b6c1d8',font:{size:12}}};
-  opts.scales.y={...opts.scales.y,type:'logarithmic',title:{display:true,text:'RIZE Amount (log scale)',color:'#b6c1d8',font:{size:12}},ticks:{color:'#b6c1d8',callback:v=>fmt(v,0)}};
+  const _initMinY=points.length>0?Math.max(0.01,Math.min(...points.map(p=>p.y))*0.5):0.01;
+  const _initMaxY=points.length>0?Math.max(...points.map(p=>p.y))*2:1e9;
+  opts.scales.y={type:'logarithmic',min:_initMinY,max:_initMaxY,title:{display:true,text:'RIZE Amount (log scale)',color:'#b6c1d8',font:{size:12}},grid:{color:'rgba(255,255,255,0.06)'},ticks:{color:'#b6c1d8',callback:v=>fmt(v,0)}};
   rzCharts.ba=new Chart(document.getElementById('ba-chart').getContext('2d'),{type:'bubble',data:{datasets:[{
-    data:points.slice(0,2000),
-    backgroundColor:points.slice(0,2000).map(p=>p.mat>0.75?'rgba(255,211,107,0.6)':p.mat>0.5?'rgba(126,224,255,0.6)':p.mat>0.25?'rgba(152,255,182,0.5)':'rgba(255,138,216,0.4)'),
+    data:points,
+    backgroundColor:points.map(p=>p.mat>0.75?'rgba(255,211,107,0.6)':p.mat>0.5?'rgba(126,224,255,0.6)':p.mat>0.25?'rgba(152,255,182,0.5)':'rgba(255,138,216,0.4)'),
     borderWidth:0,
   }]},options:opts});
 }
@@ -2359,10 +2388,12 @@ function baSetThreshold(thresh, btn){
   const opts=baseOpts();
   opts.plugins.tooltip.callbacks={label:c=>{const p=c.raw;return[`Bond #${p.nftId||'—'}`,`${fmt(p.y,2)} RIZE`,`Maturity: ${fmtPct(p.mat*100)}`,`VP: ${fmt(p.vp,2)}`];}};
   opts.scales.x={...opts.scales.x,title:{display:true,text:'Bond Age (months from creation)',color:'#b6c1d8',font:{size:13}}};
-  opts.scales.y={type:'logarithmic',min:0.01,title:{display:true,text:'RIZE Amount (log scale)',color:'#b6c1d8',font:{size:13}},grid:{color:'rgba(255,255,255,0.06)'},ticks:{color:'#b6c1d8',font:{size:11},callback:v=>fmt(v,0)}};
+  const _minY=filtered.length>0?Math.max(0.01,Math.min(...filtered.map(p=>p.y))*0.5):0.01;
+  const _maxY=filtered.length>0?Math.max(...filtered.map(p=>p.y))*2:1e9;
+  opts.scales.y={type:'logarithmic',min:_minY,max:_maxY,title:{display:true,text:'RIZE Amount (log scale)',color:'#b6c1d8',font:{size:13}},grid:{color:'rgba(255,255,255,0.06)'},ticks:{color:'#b6c1d8',font:{size:11},callback:v=>fmt(v,0)}};
   rzCharts.ba=new Chart(document.getElementById('ba-chart').getContext('2d'),{type:'bubble',data:{datasets:[{
-    data:filtered.slice(0,3000),
-    backgroundColor:filtered.slice(0,3000).map(p=>p.mat>0.75?'rgba(255,211,107,0.7)':p.mat>0.5?'rgba(126,224,255,0.7)':p.mat>0.25?'rgba(152,255,182,0.6)':'rgba(255,138,216,0.5)'),
+    data:filtered,
+    backgroundColor:filtered.map(p=>p.mat>0.75?'rgba(255,211,107,0.7)':p.mat>0.5?'rgba(126,224,255,0.7)':p.mat>0.25?'rgba(152,255,182,0.6)':'rgba(255,138,216,0.5)'),
     borderWidth:0,
   }]},options:opts});
 }
@@ -2578,10 +2609,10 @@ function expRenderBond(nftId,bdData,bbData,ntData,lcData,bs,fullMatS){
         <div class="ctx-kpi"><span class="ctx-kpi-label">First Bond</span><span style="display:block;font-family:'Rajdhani',sans-serif;font-size:18px;color:#fff;font-weight:700;margin-top:4px">${created.length>0?created[0].date||tsToDate(created[0].timestamp):'—'}</span></div>
       </div>
     </div>
-    ${snaps.length?`<div class="inner-title">TimeMarker Snapshots (${snaps.length})</div>
+    ${(snaps||[]).length?`<div class="inner-title">TimeMarker Snapshots (${(snaps||[]).length})</div>
     <div class="table-wrap" style="max-height:240px;overflow-y:auto"><table>
       <thead><tr><th>Block</th><th>Date</th><th>TimeMarker</th><th>Amount</th><th>Maturity at Block</th></tr></thead>
-      <tbody>${snaps.map(s=>`<tr>
+      <tbody>${(snaps||[]).map(s=>`<tr>
         <td style="color:#fff">${s.blockNumber}</td>
         <td style="color:var(--muted)">${tsToDate(s.timestamp)}</td>
         <td style="color:#fff;font-family:'DM Mono',monospace;font-size:12px">${tsToDate(s.timeMarker)}</td>
@@ -2711,7 +2742,7 @@ function expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS){
   if(!bondRows.length&&!allBondCreated.length){results.innerHTML=`<div class="error-box">No governance activity found for ${fmtAddr(addr)}. Please verify the address.</div>`;return;}
 
   // Back to leaderboard button if arrived from there
-  const backBtn=(_lbCameFrom||_expReturnModule)?`<button class="search-btn secondary" style="margin-bottom:12px" onclick="if(_lbCameFrom){document.getElementById('cat-btn-leaderboard').click();setTimeout(()=>{lbPage=${_lbFromPage};lbRender();window.scrollTo(0,${_lbScrollY});_lbCameFrom=false;},120);}else{document.getElementById('cat-btn-metrics').click();}">Back${_expReturnModule?' to '+_expReturnModule:' to Leaderboard'}</button>`:'';
+  const backBtn=(_lbCameFrom||_expReturnModule)?`<button class="search-btn secondary" style="margin-bottom:12px" onclick="if(_lbCameFrom){document.getElementById('cat-btn-leaderboard').click();setTimeout(()=>{lbPage=${_lbFromPage};lbRender();window.scrollTo(0,${_lbScrollY});_lbCameFrom=false;},120);}else{document.getElementById(window._expReturnCatBtn||'cat-btn-alltx').click();}">Back${_expReturnModule?' to '+_expReturnModule:' to Leaderboard'}</button>`:'';
 
   const timeline=[
     ...allBondCreated.map(e=>({...e,_type:'Bond Created',_color:'#98ffb6',_amt:parseAmt(e.amount)})),
@@ -2752,7 +2783,12 @@ function expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS){
         <div class="ctx-kpi"><span class="ctx-kpi-label">In 24 months</span><span class="ctx-kpi-value">${fmt(proj(24),2)}</span></div>
         <div class="ctx-kpi"><span class="ctx-kpi-label">VP at Full Maturity</span><span class="ctx-kpi-value" style="color:#98ffb6">${fmt(vpFull,2)}</span><span class="ctx-kpi-sub">${fullMatDate}</span></div>
       </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <button id="exp-toggle-vp" class="conv-toggle active" onclick="expChartToggle('vp',this)" style="font-size:13px;padding:7px 16px">VP Projection</button>
+        <button id="exp-toggle-loyalty" class="conv-toggle" onclick="expChartToggle('loyalty',this)" style="font-size:13px;padding:7px 16px">Loyalty Score History</button>
+      </div>
       <div style="position:relative;width:100%;height:220px"><canvas id="exp-vp-chart"></canvas></div>
+      <div style="position:relative;width:100%;height:220px;display:none" id="exp-loyalty-wrap"><canvas id="exp-loyalty-chart2"></canvas></div>
     </div>
     <div class="sep"></div>
 
@@ -2884,8 +2920,23 @@ function expRenderVesting(vestingEvents,bondIds){
   container.innerHTML=html;container.style.display='block';
 }
 
+function expChartToggle(mode,btn){
+  document.querySelectorAll('#exp-toggle-vp,#exp-toggle-loyalty').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const vpC=document.getElementById('exp-vp-chart');
+  const lyW=document.getElementById('exp-loyalty-wrap');
+  if(mode==='vp'){
+    if(vpC)vpC.closest('[style*="height:220px"]').style.display='block';
+    if(lyW)lyW.style.display='none';
+  } else {
+    if(vpC)vpC.closest('[style*="height:220px"]').style.display='none';
+    if(lyW)lyW.style.display='block';
+    // Render loyalty chart in exp-loyalty-chart2 if not already done
+    if(window._loyaltyChartPending){const f=window._loyaltyChartPending;window._loyaltyChartPending=null;f();}
+  }
+}
 function expRenderLoyaltyChart(nftIds,bs,walletReleases,myIncreases,bondIds,lcData,fullMatS){
-  const canvas=document.getElementById('exp-loyalty-chart');
+  const canvas=document.getElementById('exp-loyalty-chart2')||document.getElementById('exp-loyalty-chart');
   if(!canvas||!bs)return;
   // Build chronological events affecting loyalty
   const allEvs=[];
