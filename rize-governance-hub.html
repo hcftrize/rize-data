@@ -3017,17 +3017,17 @@ function expRenderLoyaltyChart(nftIds,bs,walletReleases,myIncreases,bondIds,lcDa
   opts.scales.y={min:0,max:10,ticks:{color:'#b6c1d8',stepSize:2},grid:{color:'rgba(255,255,255,0.06)'}};
   opts.plugins.tooltip.callbacks={label:c=>`Loyalty: ${c.parsed.y}/10`};
   // Color: >=7 green, >=4 gold, else pink
-  const pointColors=scores.map(s=>s>=7?'#98ffb6':s>=4?'var(--gold)':'var(--pink)');
+  const pointColors=scores.map(s=>s>=7?'#98ffb6':s>=4?'#ffd36b':'#ff8ad8');
   rzCharts.loyalty=new Chart(canvas.getContext('2d'),{
     type:'line',
     data:{labels,datasets:[{
       label:'Loyalty Score',
       data:scores,
-      borderColor:'var(--gold)',
+      borderColor:'#ffd36b',
       backgroundColor:'rgba(255,211,107,0.06)',
       fill:true,tension:0.3,
       pointRadius:4,pointBackgroundColor:pointColors,borderWidth:2,
-      segment:{borderColor:ctx=>{const v=ctx.p1.parsed.y;return v>=7?'#98ffb6':v>=4?'var(--gold)':'var(--pink)';},borderWidth:()=>2},
+      segment:{borderColor:ctx=>{const v=ctx.p1.parsed.y;return v>=7?'#98ffb6':v>=4?'#ffd36b':'#ff8ad8';},borderWidth:()=>2},
     }]},
     options:opts
   });
