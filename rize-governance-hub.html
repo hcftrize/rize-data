@@ -2921,34 +2921,82 @@ function expSortBonds(key,th){
 
 function expRenderVesting(vestingEvents,bondIds){
   const container=document.getElementById('exp-vesting-section');
-  if(!container)return;
+  if(!container||!vestingEvents.length)return;
   const now=Date.now()/1000;
-  let html='<div style="margin-top:24px"><div style="font-family:\'Rajdhani\',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold);margin-bottom:12px">Vesting Schedule</div>';
-  html+='<div class="table-wrap"><table><thead><tr><th>Bond #</th><th>Total Vested</th><th>Cliff</th><th>Duration</th><th>Start</th><th>Unlocked</th><th>Remaining</th></tr></thead><tbody>';
+  // Deduplicate: keep only the latest vestingUpdatedEvent per nftId
+  const latestByNft={};
   vestingEvents.forEach(e=>{
+    const nid=String(e.nftId);
+    if(!latestByNft[nid]||parseInt(e.timestamp)>parseInt(latestByNft[nid].timestamp))
+      latestByNft[nid]=e;
+  });
+  const events=Object.values(latestByNft);
+  let html='<div style="margin-top:28px;padding:20px 0 0">'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
+    +'<div style="width:3px;height:22px;background:#ffd36b;border-radius:2px"></div>'
+    +'<div style="font-family:\'Rajdhani\',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#ffd36b">Vesting Schedule</div>'
+    +'</div>';
+  events.forEach(function(e){
     const start=parseInt(e.start||0);
     const cliff=parseInt(e.cliff||0);
     const vesting=parseInt(e.vesting||0);
     const amount=parseAmt(e.amount);
+    if(!amount||!vesting)return;
     const cliffEnd=start+cliff;
     const vestEnd=start+vesting;
     const cliffPassed=now>=cliffEnd;
-    const elapsed=Math.max(0,now-start);
-    const pct=vesting>0?Math.min(1,elapsed/vesting):0;
-    const unlocked=cliffPassed?amount*pct:0;
-    const remaining=amount-unlocked;
-    html+=`<tr>
-      <td style="color:var(--cyan)">#${e.nftId}</td>
-      <td style="color:var(--gold);font-weight:700">${fmt(amount,2)} RIZE</td>
-      <td style="color:var(--muted)">${Math.round(cliff/86400)}d</td>
-      <td style="color:var(--muted)">${Math.round(vesting/86400)}d</td>
-      <td style="color:var(--muted)">${tsToDate(start)}</td>
-      <td style="color:#98ffb6;font-weight:700">${fmt(unlocked,2)} RIZE (${fmtPct(pct*100)})</td>
-      <td style="color:var(--pink)">${fmt(remaining,2)} RIZE</td>
-    </tr>`;
+    const elapsed=cliffPassed?Math.max(0,now-start):0;
+    const pct=Math.min(1,elapsed/vesting);
+    const unlocked=amount*pct;
+    const locked=amount-unlocked;
+    const ratePerDay=amount/(vesting/86400);
+    const cliffMonths=Math.round(cliff/2592000);
+    const vestMonths=Math.round(vesting/2592000);
+    const vestYears=vesting>86400*365?'a year':vestMonths+' months';
+    const cliffDateStr=new Date(cliffEnd*1000).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    const vestEndDateStr=new Date(vestEnd*1000).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    const cliffLabel=cliffMonths>0?cliffMonths+' month'+(cliffMonths>1?'s':'')+' ('+cliffDateStr+')':'None';
+    const pctStr=fmtPct(pct*100);
+    const progressBar=pct<1
+      ?'<div style="margin-top:12px">'
+        +'<div style="display:flex;justify-content:space-between;font-family:\'DM Mono\',monospace;font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:5px"><span>Vesting Progress</span><span>'+pctStr+'</span></div>'
+        +'<div style="height:4px;background:rgba(255,255,255,0.08);border-radius:2px"><div style="height:4px;width:'+pctStr+';background:#ffd36b;border-radius:2px"></div></div>'
+        +'</div>'
+      :'<div style="margin-top:10px;font-family:\'DM Mono\',monospace;font-size:12px;color:#98ffb6">&#10003; Fully vested</div>';
+    html+='<div style="background:rgba(255,211,107,0.03);border:1px solid rgba(255,211,107,0.1);padding:18px 20px;margin-bottom:12px">'
+      +'<div style="font-family:\'DM Mono\',monospace;font-size:12px;color:rgba(255,255,255,0.35);margin-bottom:14px;letter-spacing:1px">BOND #'+e.nftId+' \u2014 VESTING SCHEDULE</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:0">'
+        +'<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">'
+          +'<div style="font-family:\'DM Mono\',monospace;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px">Locked Tokens</div>'
+          +'<div style="font-family:\'Rajdhani\',sans-serif;font-size:20px;font-weight:700;color:#ff8ad8">'+fmt(locked,2)+' RIZE</div>'
+        +'</div>'
+        +'<div style="padding:10px 0 10px 20px;border-bottom:1px solid rgba(255,255,255,0.05)">'
+          +'<div style="font-family:\'DM Mono\',monospace;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px">Unlock Rate</div>'
+          +'<div style="font-family:\'Rajdhani\',sans-serif;font-size:20px;font-weight:700;color:#fff">'+fmt(ratePerDay,2)+' RIZE/day</div>'
+        +'</div>'
+        +'<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">'
+          +'<div style="font-family:\'DM Mono\',monospace;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px">Unlocked to Date</div>'
+          +'<div style="font-family:\'Rajdhani\',sans-serif;font-size:20px;font-weight:700;color:#98ffb6">'+fmt(unlocked,2)+' RIZE <span style="font-size:14px;font-weight:400;color:rgba(255,255,255,0.4)">('+pctStr+')</span></div>'
+        +'</div>'
+        +'<div style="padding:10px 0 10px 20px;border-bottom:1px solid rgba(255,255,255,0.05)">'
+          +'<div style="font-family:\'DM Mono\',monospace;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px">Cliff Duration</div>'
+          +'<div style="font-family:\'Rajdhani\',sans-serif;font-size:18px;font-weight:600;color:#fff">'+cliffLabel+'</div>'
+        +'</div>'
+        +'<div style="padding:10px 0">'
+          +'<div style="font-family:\'DM Mono\',monospace;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px">Total Vested</div>'
+          +'<div style="font-family:\'Rajdhani\',sans-serif;font-size:20px;font-weight:700;color:#ffd36b">'+fmt(amount,2)+' RIZE</div>'
+        +'</div>'
+        +'<div style="padding:10px 0 10px 20px">'
+          +'<div style="font-family:\'DM Mono\',monospace;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:4px">Vesting Duration</div>'
+          +'<div style="font-family:\'Rajdhani\',sans-serif;font-size:18px;font-weight:600;color:#fff">'+vestYears+' ('+vestEndDateStr+')</div>'
+        +'</div>'
+      +'</div>'
+      +progressBar
+    +'</div>';
   });
-  html+='</tbody></table></div></div>';
-  container.innerHTML=html;container.style.display='block';
+  html+='</div>';
+  container.innerHTML=html;
+  container.style.display='block';
 }
 
 function expChartToggle(mode,btn){
