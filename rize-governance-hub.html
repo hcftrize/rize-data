@@ -2868,7 +2868,10 @@ function expRenderWallet(addr,bdData,bbData,ntData,lcData,bs,fullMatS){
   window._expWalletFilterBond='all';
   setTimeout(()=>expRenderVPChart(bondRows,uniqueNftIds,bs,fullMatS),50);
   setTimeout(()=>expRenderLoyaltyChart(uniqueNftIds,bs,walletReleases,myIncreases,bondIds,lcData,fullMatS),80);
-  const _vestEvts=(lcData?.vestingUpdatedEvents||[]).filter(e=>bondIds.has(String(e.nftId)));
+  // For vesting: also check vestingUpdatedEvents directly — vested bonds may use
+  // different address format (checksummed vs lowercase) in ownerIndex
+  const _allVestNftIds=new Set([...uniqueNftIds,...allBondCreated.map(e=>e.nftId?.toString())].filter(Boolean));
+  const _vestEvts=(lcData?.vestingUpdatedEvents||[]).filter(e=>_allVestNftIds.has(String(e.nftId)));
   if(_vestEvts.length)setTimeout(()=>expRenderVesting(_vestEvts,bondIds),100);
 }
 
