@@ -63,7 +63,7 @@
     .live-badge-pink{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--pink);}
 
     /* ── CATEGORY NAV ── */
-    .cat-nav{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-bottom:1px solid rgba(255,255,255,0.08);background:var(--black);}
+    .cat-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid rgba(255,255,255,0.08);background:var(--black);}
     .cat-btn{display:flex;align-items:center;justify-content:center;padding:28px 20px;cursor:pointer;border:none;background:transparent;color:rgba(255,255,255,0.55);font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;transition:all 0.2s;border-right:1px solid rgba(255,255,255,0.06);border-bottom:3px solid transparent;}
     .cat-btn:last-child{border-right:none;}
     .cat-btn:hover{color:#fff;background:rgba(255,255,255,0.03);}
@@ -243,7 +243,7 @@
       .hub-right{display:none;}
       .hub-title{font-size:clamp(22px,6vw,36px);}
       .hub-sub{font-size:13px;}
-      .cat-nav{grid-template-columns:1fr 1fr 1fr;}
+      .cat-nav{grid-template-columns:repeat(4,1fr);}
       .cat-btn{padding:16px 6px;font-size:11px;letter-spacing:1.5px;}
       .hub-wrap{padding:16px 12px;}
       .section{padding:16px 14px;}
@@ -713,7 +713,7 @@
           </div>
           <div>
             <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><span style="font-family:'DM Mono',monospace;font-size:15px;color:var(--muted)" onclick="momLearn('netflow')" style="cursor:pointer;text-decoration:underline dotted 1px">Net Flow RIZE 7d</span><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-netflow-7d">—</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><button onclick="momLearn('netflow')" style="background:rgba(126,224,255,0.06);border:1px solid rgba(126,224,255,0.15);color:var(--muted);font-family:'DM Mono',monospace;font-size:13px;padding:5px 10px;cursor:pointer;letter-spacing:0.5px;transition:all 0.2s" onmouseover="this.style.color='var(--cyan)';this.style.borderColor='var(--cyan)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='rgba(126,224,255,0.15)'">Net Flow RIZE 7d</button><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-netflow-7d">—</span></div>
               <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><button onclick="momLearn('ratio')" style="background:rgba(126,224,255,0.06);border:1px solid rgba(126,224,255,0.15);color:var(--muted);font-family:'DM Mono',monospace;font-size:13px;padding:5px 10px;cursor:pointer;letter-spacing:0.5px;transition:all 0.2s" onmouseover="this.style.color='var(--cyan)';this.style.borderColor='var(--cyan)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='rgba(126,224,255,0.15)'">Conviction/Exit Ratio 30d</button><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-ratio-30d">—</span></div>
               <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><button onclick="momLearn('maturity')" style="background:rgba(126,224,255,0.06);border:1px solid rgba(126,224,255,0.15);color:var(--muted);font-family:'DM Mono',monospace;font-size:13px;padding:5px 10px;cursor:pointer;letter-spacing:0.5px;transition:all 0.2s" onmouseover="this.style.color='var(--cyan)';this.style.borderColor='var(--cyan)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='rgba(126,224,255,0.15)'">Internal Conviction 30d</button><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-mat-trend">—</span></div>
               <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.015)"><button onclick="momLearn('internal')" style="background:rgba(126,224,255,0.06);border:1px solid rgba(126,224,255,0.15);color:var(--muted);font-family:'DM Mono',monospace;font-size:13px;padding:5px 10px;cursor:pointer;letter-spacing:0.5px;transition:all 0.2s" onmouseover="this.style.color='var(--cyan)';this.style.borderColor='var(--cyan)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='rgba(126,224,255,0.15)'">Avg Maturity Anchor</button><span style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff" style="font-size:16px" id="mom-new-bonders">—</span></div>
@@ -1159,7 +1159,11 @@ function metricsSwitch(val) {
 let _expReturnModule=null;
 function expGo(query,fromModule) {
   _expReturnModule=fromModule||null;
-  if(fromModule==='leaderboard'){_lbCameFrom=true;}
+  if(fromModule==='leaderboard'){_lbCameFrom=true;window._expReturnCatBtn='cat-btn-leaderboard';}
+  else if(fromModule==='Key Metrics'||fromModule==='Key Metrics & Tools'){window._expReturnCatBtn='cat-btn-metrics';}
+  else if(fromModule==='Explorer'){window._expReturnCatBtn='cat-btn-alltx';}
+  else if(fromModule==='Heatmap'){window._expReturnCatBtn='cat-btn-metrics';}
+  else{window._expReturnCatBtn='cat-btn-metrics';}
   document.getElementById('cat-btn-explorer').click();
   setTimeout(()=>{ document.getElementById('exp-input').value=query; expSearch(); }, 80);
 }
@@ -1215,23 +1219,42 @@ function getLatestSnaps(snapshots) {
 ═══════════════════════════════════════════════════════ */
 async function govScreenshot(sectionId, filename) {
   const el=document.getElementById(sectionId);
-  if(!el||!window.html2canvas) return;
+  if(!el){console.warn('govScreenshot: element not found',sectionId);return;}
+  if(!window.html2canvas){
+    await new Promise((resolve,reject)=>{
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      s.onload=resolve;s.onerror=reject;
+      document.head.appendChild(s);
+    });
+  }
+  // Add watermark
+  const wm=document.createElement('div');
+  wm.style.cssText='position:absolute;bottom:10px;right:12px;font-family:"Trebuchet MS",sans-serif;font-size:13px;color:rgba(255,255,255,0.45);letter-spacing:1px;pointer-events:none;z-index:9999';
+  wm.textContent='TOKERIZE.TOP';
+  el.style.position='relative';
+  el.appendChild(wm);
   el.classList.add('screenshot-mode');
   try {
-    const canvas=await html2canvas(el,{backgroundColor:'#000000',scale:2,useCORS:true,logging:false});
-    el.classList.remove('screenshot-mode');
-    const isMobile=/Mobi|Android/i.test(navigator.userAgent);
-    if(!isMobile&&navigator.clipboard?.write) {
-      canvas.toBlob(async blob=>{
-        try {
+    await new Promise(r=>setTimeout(r,60));
+    const canvas=await html2canvas(el,{backgroundColor:'#060818',scale:2,useCORS:true,logging:false,width:el.scrollWidth,windowWidth:el.scrollWidth});
+    const isMobile=/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    canvas.toBlob(async blob=>{
+      if(!isMobile&&navigator.clipboard?.write){
+        try{
           await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-          showToast('Screenshot copied to clipboard');
-        } catch(e) { _downloadScreenshot(canvas,filename); }
-      },'image/png');
-    } else {
-      _downloadScreenshot(canvas,filename);
-    }
-  } catch(e){ el.classList.remove('screenshot-mode'); }
+          showToast('📋 Screenshot copied to clipboard!');
+        }catch(e){
+          const a=document.createElement('a');a.download=`tokerize-${filename}-${Date.now()}.png`;a.href=URL.createObjectURL(blob);a.click();
+          showToast('💾 Screenshot downloaded!');
+        }
+      } else {
+        const a=document.createElement('a');a.download=`tokerize-${filename}-${Date.now()}.png`;a.href=URL.createObjectURL(blob);a.click();
+        showToast('💾 Screenshot downloaded!');
+      }
+    },'image/png');
+  } catch(e){console.error('Screenshot error:',e);}
+  finally{el.classList.remove('screenshot-mode');el.removeChild(wm);}
 }
 function _downloadScreenshot(canvas,filename) {
   const a=document.createElement('a');
@@ -1671,9 +1694,9 @@ async function initHeatmap(){
   (bbData.bondBrokenEvents||[]).forEach(e=>{const d=e.date||tsToDate(e.timestamp);ensureDay(d);const a=parseAmt(e.amount);allDays[d].breaks+=a;allDays[d].breakEvents.push({...e,owner:e.owner||_nftOwner[String(e.nftId)]||''});});
   if(bcData){
     (bcData.bondCreatedEvents||[]).forEach(e=>{const d=e.date||tsToDate(e.timestamp);ensureDay(d);const a=parseAmt(e.amount);allDays[d].created+=a;allDays[d].createdEvents.push(e);});
-    (bcData.increaseBondEvents||[]).forEach(e=>{const d=e.date||tsToDate(e.timestamp);ensureDay(d);const a=parseAmt(e.amount);allDays[d].increase+=a;allDays[d].increaseEvents.push(e);});
+    (bcData.increaseBondEvents||[]).forEach(e=>{const d=e.date||tsToDate(e.timestamp);ensureDay(d);const a=parseAmt(e.amount);allDays[d].increase+=a;allDays[d].increaseEvents.push({...e,owner:_nftOwner[String(e.nftId)]||''});});
   }
-  if(lcData)(lcData.tokensReleasedEvents||[]).forEach(e=>{const d=e.date||tsToDate(e.timestamp);ensureDay(d);const a=parseAmt(e.amount);allDays[d].releases+=a;allDays[d].releaseEvents.push(e);});
+  if(lcData)(lcData.tokensReleasedEvents||[]).forEach(e=>{const d=e.date||tsToDate(e.timestamp);ensureDay(d);const a=parseAmt(e.amount);allDays[d].releases+=a;allDays[d].releaseEvents.push({...e,owner:e.to||''});});
   hmDailyData=allDays;
   hmRender();
 }
@@ -1738,9 +1761,9 @@ function hmRender(){
       let col;
       if(hmMode_==='net')col=v>=0?`rgba(152,255,182,${0.1+intensity*0.9})`:`rgba(255,138,216,${0.1+intensity*0.9})`;
       else if(hmMode_==='breaks'){const r2=Math.round(150+intensity*105);const g2=Math.round((1-intensity)*80);col=`rgba(${r2},${g2},50,${0.1+intensity*0.9})`;}
-      else if(hmMode_==='created')col=`rgba(${Math.round(60+intensity*80)},${Math.round(180+intensity*60)},${Math.round(80+intensity*30)},${0.1+intensity*0.9})`;
-      else if(hmMode_==='releases')col=`rgba(${Math.round(30+intensity*80)},${Math.round(140+intensity*80)},${Math.round(200+intensity*55)},${0.1+intensity*0.9})`;
-      else if(hmMode_==='increase')col=`rgba(${Math.round(200+intensity*55)},${Math.round(150+intensity*60)},50,${0.1+intensity*0.9})`;
+      else if(hmMode_==='created')col=`rgba(${Math.round(40+intensity*60)},${Math.round(160+intensity*40)},${Math.round(60+intensity*20)},${0.15+intensity*0.85})`;
+      else if(hmMode_==='releases')col=`rgba(${Math.round(20+intensity*60)},${Math.round(100+intensity*70)},${Math.round(180+intensity*50)},${0.15+intensity*0.85})`;
+      else if(hmMode_==='increase')col=`rgba(${Math.round(160+intensity*50)},${Math.round(120+intensity*50)},20,${0.15+intensity*0.85})`;
       else col=`rgba(126,224,255,${0.1+intensity*0.9})`;
       const dd=hmDailyData[day];
       const cnt=(dd.breakEvents.length+dd.createdEvents.length+dd.increaseEvents.length+dd.releaseEvents.length);
@@ -1795,7 +1818,7 @@ function hmRenderDayTable(day,filter){
     <td style="color:${e._color};font-weight:700">${e._type}</td>
     <td style="color:#fff">${e.nftId?'#'+e.nftId:e.tokenId?'#'+e.tokenId:'—'}</td>
     <td style="color:${e._color}">${fmt(parseAmt(e.amount),2)} RIZE</td>
-    <td><span class="hhi-wallet-addr" style="cursor:pointer;font-family:'DM Mono',monospace;font-size:12px" onclick="const _wa=(e.owner||e.from||'');if(_wa&&_wa.startsWith('0x')){window._expReturnCatBtn='cat-btn-metrics';atxGoWallet(_wa);}">${fmtAddr(e.owner||e.from||'')}</span></td>
+    <td><span class="hhi-wallet-addr" style="cursor:pointer;font-family:'DM Mono',monospace;font-size:12px" onclick="const _wa=(e.owner||e.from||e.to||'');if(_wa&&_wa.startsWith('0x')){_expReturnModule='Key Metrics & Tools';window._expReturnCatBtn='cat-btn-metrics';document.getElementById('cat-btn-explorer').click();setTimeout(()=>{document.getElementById('exp-input').value=_wa;expSearch();},80);}">${fmtAddr(e.owner||e.from||e.to||'')}</span></td>
     <td>${txLink(e.txHash)}</td>
   </tr>`).join('');
 }
@@ -2010,7 +2033,7 @@ function whaleRender(){
       <td>${dirHtml}</td>
       <td style="color:#fff">${e.nftId?'#'+e.nftId:'—'}</td>
       <td style="color:${e._dir==='break'?'var(--pink)':e._dir==='release'?'var(--cyan)':e._dir==='increase'?'var(--gold)':'#98ffb6'};font-weight:700">${fmt(e._rize,2)} RIZE</td>
-      <td><span class="hhi-wallet-addr" style="color:#fff;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;transition:color 0.15s" onclick="expGo('${wallet}','Key Metrics')">${fmtAddr(wallet)}</span>${cex}</td>
+      <td><span class="hhi-wallet-addr" style="color:#fff;font-family:'DM Mono',monospace;font-size:12px;cursor:pointer;transition:color 0.15s" onclick="expGo('${wallet}','Key Metrics & Tools')">${fmtAddr(wallet)}</span>${cex}</td>
       <td>${txLink(e.txHash)}</td>
     </tr>`;
   }).join('');
@@ -2562,6 +2585,7 @@ async function expSearch(){
 
 function expRenderBond(nftId,bdData,bbData,ntData,lcData,bs,fullMatS){
   const results=document.getElementById('exp-results');
+  const snaps=[]; // TimeMarker snapshots not loaded in this view (use bond-states.json instead)
   const state=bs?bs[String(nftId)]:null;
   const cur=state?.current||null;
   const created=(bdData?.bondCreatedEvents||[]).filter(e=>e.nftId.toString()===nftId);
@@ -2970,7 +2994,10 @@ function expRenderLoyaltyChart(nftIds,bs,walletReleases,myIncreases,bondIds,lcDa
     const bonusFidelity=Math.min(2,Math.max(0,ageMonths/18));
     const incPct=totalEverBonded>0?totalIncreased/totalEverBonded:0;
     const bonusIncrease=Math.min(2,incPct*4);
-    const score=Math.max(0,Math.min(10,5-penalty+bonusFidelity+bonusIncrease));
+    // Bonus 3: significant bond count (match static formula)
+    const _sigBonds=Object.values(balByNft).filter(v=>v>0&&_peakBal>0&&v>_peakBal*0.01).length;
+    const bonusBonds=Math.min(1,Math.max(0,(_sigBonds-1)*0.5));
+    const score=Math.max(0,Math.min(10,5-penalty+bonusFidelity+bonusIncrease+bonusBonds));
     labels.push(ev.date);
     scores.push(parseFloat(score.toFixed(2)));
   });
@@ -2989,11 +3016,11 @@ function expRenderLoyaltyChart(nftIds,bs,walletReleases,myIncreases,bondIds,lcDa
     data:{labels,datasets:[{
       label:'Loyalty Score',
       data:scores,
-      borderColor:'var(--cyan)',
-      backgroundColor:'rgba(126,224,255,0.06)',
+      borderColor:'var(--gold)',
+      backgroundColor:'rgba(255,211,107,0.06)',
       fill:true,tension:0.3,
       pointRadius:4,pointBackgroundColor:pointColors,borderWidth:2,
-      segment:{borderColor:ctx=>{const v=ctx.p1.parsed.y;return v>=7?'#98ffb6':v>=4?'var(--gold)':'var(--pink)';}},
+      segment:{borderColor:ctx=>{const v=ctx.p1.parsed.y;return v>=7?'#98ffb6':v>=4?'var(--gold)':'var(--pink)';},borderWidth:()=>2},
     }]},
     options:opts
   });
@@ -3205,6 +3232,7 @@ function atxRender(){
 
 function atxGoWallet(addr){
   _lbCameFrom=false; _expReturnModule='Explorer'; window._expReturnCatBtn='cat-btn-alltx';
+  // Note: callers should set _expReturnModule and _expReturnCatBtn BEFORE calling atxGoWallet
   document.getElementById('cat-btn-explorer').click();
   setTimeout(()=>{document.getElementById('exp-input').value=addr;expSearch();},80);
 }
