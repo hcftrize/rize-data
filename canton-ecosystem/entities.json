@@ -925,6 +925,18 @@
     "logo_local": "logos\\chainsafe.png"
   },
   {
+    "name": "Chata",
+    "slug": "chata",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69fa378cc0eb8d73709ef6c4_a414b0a5-2a71-4fe6-93dd-c777e3ae2bcf.png",
+    "short_desc": "Validator and Data Integration Platform for Canton",
+    "tags": [
+      "VALIDATOR",
+      "DATA & ANALYTICS"
+    ],
+    "detail_text": "Validator and Data Integration Platform for Canton",
+    "logo_local": "logos\\chata.png"
+  },
+  {
     "name": "Chata - Sync Insights",
     "slug": "chata---sync-insights",
     "logo_cdn": "https://cdn.prod.website-files.com/696805252243366e13a64c82/697a4b2e91c884840963f200_yellow-arrow-right.svg",
@@ -3398,6 +3410,21 @@
     ],
     "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nProof Group\nhttps://proofgroup.xyz/\n\nProof Group is a team of former crypto founders and venture investors, backing the next generation. Proof Group supports firms in connecting to Canton.\n\nNetwork Utilities\nNAAS\nRoles\nSUPER VALIDATORCANTON FOUNDATION MEMBERSERVICE PROVIDER\nSUPER VALIDATORCANTON FOUNDATION MEMBERSERVICE PROVIDER",
     "logo_local": "logos\\proof-group.png"
+  },
+  {
+    "name": "PT Askardex Digital Indonesia",
+    "slug": "pt-askardex-digital-indonesia",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69fb46b87b5196af15e227c6_bfbd7b03-cf3c-4d94-ab77-a7cfe949a015.jpeg",
+    "short_desc": "On-chain DEX on Canton Network with built-in non-custodial wallet for Canton Coin and CIP-0056 token",
+    "tags": [
+      "APPS (ALL)",
+      "APPS (FEATURED)",
+      "MARKET INFRASTRUCTURE",
+      "EXCHANGES",
+      "WALLETS"
+    ],
+    "detail_text": "On-chain DEX on Canton Network with built-in non-custodial wallet for Canton Coin and CIP-0056 token",
+    "logo_local": "logos\\pt-askardex-digital-indonesia.jpeg"
   },
   {
     "name": "Puro.earth",
