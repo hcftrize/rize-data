@@ -2934,7 +2934,13 @@ function expRenderVesting(vestingEvents,bondIds){
     if(!latestByNft[nid]||parseInt(e.timestamp)>parseInt(latestByNft[nid].timestamp))
       latestByNft[nid]=e;
   });
-  const events=Object.values(latestByNft);
+  const events=Object.values(latestByNft).filter(function(e){
+    const start=parseInt(e.start||0),cliff=parseInt(e.cliff||0),vesting=parseInt(e.vesting||0);
+    const now=Date.now()/1000;
+    const cliffEnd=start+cliff,vestEnd=cliffEnd+vesting;
+    return now<vestEnd; // hide fully vested schedules
+  });
+  if(!events.length){container.style.display='none';return;}
   let html='<div style="margin-top:28px;padding:20px 0 0">'
     +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
     +'<div style="width:3px;height:22px;background:#ffd36b;border-radius:2px"></div>'
