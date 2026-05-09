@@ -1267,7 +1267,7 @@ function _downloadScreenshot(canvas,filename) {
 /* ═══════════════════════════════════════════════════════
    LEADERBOARD
 ═══════════════════════════════════════════════════════ */
-// ── 7th JSON: bond-states global ──────────────────────────────────
+// ── Coming Soon: bond-states global ──────────────────────────────────
 let _bs=null; // bondStates object from bond-states.json
 let _bsOwner=null; // ownerIndex: owner→[nftId,...]
 let _bsFull=94608000; // fullMaturity in seconds
@@ -1622,20 +1622,119 @@ function convToggleUnbqueueHistory(){convUnbqueueShowFull=!convUnbqueueShowFull;
 let tokLoaded=false;
 async function initTokenomics(){
   if(tokLoaded)return;tokLoaded=true;
+
+  // ── Donut chart (unchanged) ──
   if(rzCharts.govAlloc)rzCharts.govAlloc.destroy();
-  const ctx=document.getElementById('gov-chart-alloc').getContext('2d');
-  rzCharts.govAlloc=new Chart(ctx,{type:'doughnut',data:{
-    labels:['Seed','Partnerships','Marketing','Private Sale','Strat. Reserve','Liquidity','Airdrop','Governance','Treasury','Team'],
-    datasets:[{data:[5,7,3,7,10,10,4,30,10,14],
-      backgroundColor:['#98ffb6','#98ffb6','#7ee0ff','#7ee0ff','#ffd36b','#ffd36b','#ff8ad8','#ff8ad8','#c77dff','#c77dff'],
-      borderColor:'#060818',borderWidth:2}]
-  },options:{responsive:true,maintainAspectRatio:false,plugins:{
-    legend:{display:false},
-    tooltip:{backgroundColor:'#060818',borderColor:'rgba(126,224,255,0.3)',borderWidth:1,titleColor:'#7ee0ff',bodyColor:'#f7f2e8',
-      titleFont:{size:15,weight:'700'},bodyFont:{size:13},padding:12,
-      callbacks:{label:c=>` ${c.label}: ${c.parsed}% (${(c.parsed*50).toFixed(0)}M RIZE)`}}
-  }}});
-  govPopulateUnlocks();
+  const ctx=document.getElementById('gov-chart-alloc');
+  if(ctx){
+    rzCharts.govAlloc=new Chart(ctx.getContext('2d'),{type:'doughnut',data:{
+      labels:['Seed','Partnerships','Marketing','Private Sale','Strat. Reserve','Liquidity','Airdrop','Governance','Treasury','Team'],
+      datasets:[{data:[5,7,3,7,10,10,4,30,10,14],
+        backgroundColor:['#98ffb6','rgba(152,255,182,0.65)','rgba(152,255,182,0.4)','#7ee0ff','rgba(126,224,255,0.55)','#ffd36b','#ff8ad8','#c77dff','rgba(199,125,255,0.5)','rgba(255,211,107,0.6)'],
+        borderWidth:2,hoverOffset:8}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'55%',
+        plugins:{legend:{display:false},tooltip:{backgroundColor:'#060818',borderColor:'rgba(126,224,255,0.25)',borderWidth:1,titleColor:'#7ee0ff',bodyColor:'#f7f2e8',
+          callbacks:{label:c=>` ${c.label}: ${c.parsed}%`}}}}});
+  }
+
+  // ── Burn & Supply Unlock Events ──
+  const TGE=new Date('2025-05-15T00:00:00Z');
+  const today=new Date();
+  const TOTAL=5_000_000_000;
+
+  const categories=[
+    {name:'Seed',                alloc:0.05,cliff:6, vest:12,color:'#98ffb6'},
+    {name:'Partnerships & Growth',alloc:0.07,cliff:6, vest:12,color:'rgba(152,255,182,0.65)'},
+    {name:'Marketing & Incubation',alloc:0.03,cliff:3,vest:9, color:'rgba(152,255,182,0.4)'},
+    {name:'Private Sale',        alloc:0.07,cliff:0, vest:0, color:'#7ee0ff'},
+    {name:'Strategic Reserve',   alloc:0.10,cliff:0, vest:12,color:'rgba(126,224,255,0.55)'},
+    {name:'Liquidity',           alloc:0.10,cliff:0, vest:0, color:'#ffd36b'},
+    {name:'Airdrop',             alloc:0.04,cliff:1, vest:6, color:'#ff8ad8'},
+    {name:'Governance',          alloc:0.30,cliff:12,vest:36,color:'#c77dff'},
+    {name:'Treasury',            alloc:0.10,cliff:0, vest:0, color:'rgba(199,125,255,0.5)'},
+    {name:'T-RIZE Team',         alloc:0.14,cliff:24,vest:24,color:'rgba(255,211,107,0.6)'},
+  ];
+
+  const fmtTok=n=>n>=1e9?(n/1e9).toFixed(1)+'B':n>=1e6?(n/1e6).toFixed(0)+'M':n>=1e3?(n/1e3).toFixed(0)+'K':n.toFixed(0);
+  const fmtD=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+
+  const pendingEvts=[],ongoingEvts=[],doneEvts=[];
+
+  categories.forEach(function(cat){
+    const tokens=TOTAL*cat.alloc;
+    if(cat.vest===0){
+      doneEvts.push({date:new Date(TGE),label:cat.name,daily:0,tokens,cliff:'—',vesting:'—',vestEnd:new Date(TGE)});
+      return;
+    }
+    const cliffDate=new Date(TGE);
+    cliffDate.setUTCMonth(cliffDate.getUTCMonth()+cat.cliff);
+    const vestDays=cat.vest*30;
+    const dailyRelease=Math.round(tokens/vestDays);
+    const vestEndDate=new Date(cliffDate);
+    vestEndDate.setUTCDate(vestEndDate.getUTCDate()+vestDays);
+    const ev={date:cliffDate,label:cat.name,daily:dailyRelease,tokens,
+      cliff:cat.cliff===0?'0m':cat.cliff+'m',vesting:cat.vest+'m',vestEnd:vestEndDate};
+    if(vestEndDate<=today)doneEvts.push(ev);
+    else if(cliffDate>today)pendingEvts.push(ev);
+    else ongoingEvts.push(ev);
+  });
+
+  pendingEvts.sort((a,b)=>a.date-b.date);
+  ongoingEvts.sort((a,b)=>a.vestEnd-b.vestEnd);
+  doneEvts.sort((a,b)=>b.date-a.date);
+
+  function buildTable(events,type){
+    if(!events.length)return '<p style="color:var(--muted);font-size:13px;padding:12px 0">No events in this category.</p>';
+    const thDate=type==='pending'?'First Release Date':type==='ongoing'?'Vesting Started':'Completed';
+    const thTime=type==='pending'?'Starts In':type==='ongoing'?'Ends In':'Ended';
+    const rows=events.map(function(e){
+      let timeVal;
+      if(type==='pending')timeVal=Math.round((e.date-today)/86400000)+'d';
+      else if(type==='ongoing')timeVal=Math.round((e.vestEnd-today)/86400000)+'d';
+      else timeVal=Math.round((today-e.vestEnd)/86400000)+'d ago';
+      const dateColor=type==='pending'?'#ffd36b':type==='ongoing'?'#98ffb6':'var(--muted)';
+      const dailyStr=(type==='done'||e.daily===0)?'—':e.daily.toLocaleString()+' /day';
+      return '<tr>'
+        +'<td style="color:'+dateColor+';white-space:nowrap">'+fmtD(e.date)+'</td>'
+        +'<td style="color:var(--muted)">'+timeVal+'</td>'
+        +'<td style="font-weight:700;color:#fff">'+e.label+'</td>'
+        +'<td style="color:#fff">'+fmtTok(e.tokens)+'</td>'
+        +'<td style="color:var(--muted)">'+e.cliff+'</td>'
+        +'<td style="color:var(--muted)">'+e.vesting+'</td>'
+        +'<td style="color:#fff;text-align:right">'+dailyStr+'</td>'
+        +'<td style="color:var(--muted);white-space:nowrap">'+fmtD(e.vestEnd)+'</td>'
+        +'</tr>';
+    }).join('');
+    return '<div style="overflow-x:auto"><table class="tok-table" style="margin-top:0">'
+      +'<thead><tr><th>'+thDate+'</th><th>'+thTime+'</th><th>Category</th><th>Total RIZE</th><th>Cliff</th><th>Vesting</th><th style="text-align:right">Daily Release</th><th>Release End</th></tr></thead>'
+      +'<tbody>'+rows+'</tbody></table></div>';
+  }
+
+  // Burn events (hardcoded — single onchain burn Dec 22 2025)
+  const burnHtml='<div style="overflow-x:auto"><table class="tok-table" style="margin-top:0">'
+    +'<thead><tr><th>Date</th><th>Ago</th><th>Amount Burned</th><th>Transaction</th></tr></thead>'
+    +'<tbody><tr>'
+    +'<td style="color:#98ffb6;white-space:nowrap">Dec 22, 2025</td>'
+    +'<td style="color:var(--muted)">'+Math.round((today-new Date('2025-12-22'))/86400000)+'d ago</td>'
+    +'<td style="color:#fff;font-weight:700">50M RIZE</td>'
+    +'<td><a href="https://basescan.org/tx/0x0000000000000000000000000000000000000000000000000000000000000000" target="_blank" rel="noopener" style="color:#fff;font-family:\'DM Mono\',monospace;font-size:12px">View on Basescan ↗</a></td>'
+    +'</tr></tbody></table></div>';
+
+  const burnEl=document.getElementById('gov-unlock-burn');
+  const pendingEl=document.getElementById('gov-unlock-pending');
+  const ongoingEl=document.getElementById('gov-unlock-ongoing');
+  const doneEl=document.getElementById('gov-unlock-done');
+  if(burnEl)burnEl.innerHTML=burnHtml;
+  if(pendingEl)pendingEl.innerHTML=buildTable(pendingEvts,'pending');
+  if(ongoingEl)ongoingEl.innerHTML=buildTable(ongoingEvts,'ongoing');
+  if(doneEl)doneEl.innerHTML=buildTable(doneEvts,'done');
+
+  // Update tab labels with counts
+  const tabBtns=document.querySelectorAll('#gov-unlock-tabs .conv-toggle');
+  if(tabBtns[0])tabBtns[0].textContent='Burn Events (1)';
+  if(tabBtns[1])tabBtns[1].textContent='Next Unlocks ('+pendingEvts.length+')';
+  if(tabBtns[2])tabBtns[2].textContent='Ongoing Releases ('+ongoingEvts.length+')';
+  if(tabBtns[3])tabBtns[3].textContent='Past Unlocks ('+doneEvts.length+')';
 }
 
 function govUnlockSwitch(tab,btn){
@@ -2328,7 +2427,7 @@ async function initHHI(){
     <td style="color:var(--muted)">${fmtPct(totalVP>0?w.totalVP/totalVP*100:0)}</td>
   </tr>`).join('');
 
-  document.getElementById('hhi-hist-loading').innerHTML='<div style="text-align:center;padding:32px;border:1px dashed rgba(126,224,255,0.15)"><div style="font-family:\'Rajdhani\',sans-serif;font-size:18px;font-weight:700;color:rgba(126,224,255,0.4);letter-spacing:2px;margin-bottom:8px">COMING SOON</div><div style="font-family:\'DM Mono\',monospace;font-size:12px;color:var(--muted)">Historical concentration trend requires a dedicated computed dataset (7th JSON). Available in a future update.</div></div>';
+  document.getElementById('hhi-hist-loading').innerHTML='<div style="text-align:center;padding:32px;border:1px dashed rgba(126,224,255,0.15)"><div style="font-family:\'Rajdhani\',sans-serif;font-size:18px;font-weight:700;color:rgba(126,224,255,0.4);letter-spacing:2px;margin-bottom:8px">COMING SOON</div><div style="font-family:\'DM Mono\',monospace;font-size:12px;color:var(--muted)">Historical concentration trend requires a dedicated computed dataset (Coming Soon). Available in a future update.</div></div>';
 }
 
 function hhiHistView(view,btn){
