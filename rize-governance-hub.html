@@ -2947,16 +2947,16 @@ function expRenderVesting(vestingEvents,bondIds){
     const amount=parseAmt(e.amount);
     if(!amount||!vesting)return;
     const cliffEnd=start+cliff;
-    const vestEnd=start+vesting;
+    const vestEnd=cliffEnd+vesting;   // contract: vestingEnd = cliffEnd + vesting
     const cliffPassed=now>=cliffEnd;
-    const elapsed=cliffPassed?Math.max(0,now-start):0;
+    const elapsed=cliffPassed?Math.max(0,now-cliffEnd):0;  // elapsed since cliff end
     const pct=Math.min(1,elapsed/vesting);
     const unlocked=amount*pct;
     const locked=amount-unlocked;
     const ratePerDay=amount/(vesting/86400);
     const cliffMonths=Math.round(cliff/2592000);
-    const vestMonths=Math.round(vesting/2592000);
-    const vestYears=vesting>86400*365?'a year':vestMonths+' months';
+    const totalDays=Math.round((cliff+vesting)/86400);
+    const vestYears=(cliff+vesting)>86400*365?'a year':Math.round((cliff+vesting)/2592000)+' months';
     const cliffDateStr=new Date(cliffEnd*1000).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
     const vestEndDateStr=new Date(vestEnd*1000).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
     const cliffLabel=cliffMonths>0?cliffMonths+' month'+(cliffMonths>1?'s':'')+' ('+cliffDateStr+')':'None';
