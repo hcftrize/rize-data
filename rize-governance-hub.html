@@ -1900,7 +1900,7 @@ function hmDayFilter(type,btn){
   document.querySelectorAll('#hm-day-detail .conv-toggle').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   const titleEl=document.getElementById('hm-day-detail-title');
-  const day=titleEl.textContent.replace('Activity — ','');
+  const day=titleEl.textContent.replace('Governance Activity - ','').replace('Activity — ','').trim();
   hmRenderDayTable(day,type);
 }
 function hmGoWallet(addr){
