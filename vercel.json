@@ -1,14 +1,48 @@
 {
   "routes": [
-    { "src": "/", "dest": "/index.html" },
-    { "src": "/about", "dest": "/about.html" },
-    { "src": "/article", "dest": "/article.html" },
-    { "src": "/rize-data-hub", "dest": "/rize-data-hub.html" },
-    { "src": "/cc-data-hub", "dest": "/cc-data-hub.html" },
-    { "src": "/hub", "dest": "/hub.html" },
-    { "src": "/rize-ecosystem", "dest": "/rize-ecosystem.html" },
-    { "src": "/canton-ecosystem", "dest": "/canton-ecosystem.html" },
-    { "src": "/asset-tokenization-learn", "dest": "/asset-tokenization-learn.html" },
-    { "src": "/admin", "dest": "/admin.html" }
+    {
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/about",
+      "dest": "/about.html"
+    },
+    {
+      "src": "/article",
+      "dest": "/article.html"
+    },
+    {
+      "src": "/rize-data-hub",
+      "dest": "/rize-data-hub.html"
+    },
+    {
+      "src": "/rize-governance-hub",
+      "dest": "/rize-governance-hub.html"
+    },
+    {
+      "src": "/cc-data-hub",
+      "dest": "/cc-data-hub.html"
+    },
+    {
+      "src": "/hub",
+      "dest": "/hub.html"
+    },
+    {
+      "src": "/rize-ecosystem",
+      "dest": "/rize-ecosystem.html"
+    },
+    {
+      "src": "/canton-ecosystem",
+      "dest": "/canton-ecosystem.html"
+    },
+    {
+      "src": "/asset-tokenization-learn",
+      "dest": "/asset-tokenization-learn.html"
+    },
+    {
+      "src": "/admin",
+      "dest": "/admin.html"
+    }
   ]
 }

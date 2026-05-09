@@ -142,11 +142,9 @@ def main():
         print('No JSON found — creating fresh')
         history = {'bonded': [], 'cex': [], 'whales': [], 'metadata': {}}
 
-    # Check if today already recorded
-    existing_dates = {e['date'] for e in history.get('bonded', [])}
-    if today in existing_dates:
-        print(f'Today ({today}) already recorded — nothing to do')
-        return
+    # Remove today's point if it already exists — we'll overwrite with fresher data
+    history['bonded'] = [e for e in history.get('bonded', []) if e['date'] != today]
+    history['cex']    = [e for e in history.get('cex',    []) if e['date'] != today]
 
     print(f'Fetching snapshot for {today}...')
 
