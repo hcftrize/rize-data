@@ -53,7 +53,7 @@ async def cmd_unbond(args: list[str]) -> str:
     if not events:
         return "📭 *Unbonding Queue*\n\nNo breaks in the last 7 days. Queue is empty."
 
-    total_rize = sum(int(e.get("amount", 0)) / DECIMALS for e in events)
+    total_rize = sum(float(str(e.get("amount", 0)).replace(",","")) / DECIMALS for e in events)
     count = len(events)
 
     lines = [
@@ -71,7 +71,7 @@ async def cmd_unbond(args: list[str]) -> str:
 
     for e in events[:5]:
         nft_id = e.get("nftId", "?")
-        amount = int(e.get("amount", 0)) / DECIMALS
+        amount = float(str(e.get("amount", 0)).replace(",","")) / DECIMALS
         date   = e.get("date", "—")
         lines.append(f"{date:<12} #{nft_id:>6} {fmt_rize(amount):>12}")
 
