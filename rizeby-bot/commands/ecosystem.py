@@ -189,3 +189,4 @@ async def cmd_vision60(args: list) -> str:
 async def cmd_kairos(args: list) -> str:
     d = next((x for x in RWA_DEALS if x["id"] == "kairos"), None)
     return _fmt_deal(d) if d else "Not found."
+
