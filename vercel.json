@@ -1,5 +1,11 @@
 {
-"routes": [
+  "functions": {
+    "rizeby-bot/api/telegram.py": {
+      "runtime": "vercel-python@4.3.1",
+      "maxDuration": 30
+    }
+  },
+  "routes": [
     {
       "src": "/api/rizeby/telegram",
       "dest": "/rizeby-bot/api/telegram.py"
