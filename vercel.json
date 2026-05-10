@@ -1,8 +1,8 @@
 {
-"routes": [
+  "routes": [
     {
       "src": "/api/rizeby/telegram",
-      "dest": "/rizeby-bot/api/telegram.py"
+      "dest": "/api/rizeby/telegram.py"
     },
     {
       "src": "/",
