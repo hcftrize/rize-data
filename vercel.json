@@ -1,5 +1,15 @@
 {
+  "functions": {
+    "rizeby-bot/api/telegram.py": {
+      "runtime": "python3.12",
+      "maxDuration": 30
+    }
+  },
   "routes": [
+    {
+      "src": "/api/rizeby/telegram",
+      "dest": "/rizeby-bot/api/telegram.py"
+    },
     {
       "src": "/",
       "dest": "/index.html"
