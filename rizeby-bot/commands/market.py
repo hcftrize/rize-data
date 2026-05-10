@@ -364,10 +364,16 @@ async def cmd_market(args: list) -> str:
         dominance  = gd.get("market_cap_percentage", {})
         btc_d   = dominance.get("btc", 0)
         eth_d   = dominance.get("eth", 0)
-        link_d  = dominance.get("link", 0)
+        # LINK not in market_cap_percentage — compute from chainlink mcap like the hub
+        link_d  = 0.0  # computed below after fetching chainlink
         rize_data = await cg_get("/simple/price", {"ids": "rize", "vs_currencies": "usd", "include_market_cap": "true"})
         rize_mcap = rize_data.get("rize", {}).get("usd_market_cap", 0) if rize_data else 0
         rize_d    = (rize_mcap / total_mcap * 100) if (rize_mcap and total_mcap) else 0
+
+        # Fetch LINK mcap for dominance (not in CG global API)
+        link_data = await cg_get("/simple/price", {"ids": "chainlink", "vs_currencies": "usd", "include_market_cap": "true"})
+        link_mcap = link_data.get("chainlink", {}).get("usd_market_cap", 0) if link_data else 0
+        link_d = (link_mcap / total_mcap * 100) if (link_mcap and total_mcap) else 0
 
         lines += [
             f"BTC.D: {btc_d:.2f}%",

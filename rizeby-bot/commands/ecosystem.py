@@ -81,7 +81,8 @@ async def cmd_canton(args: list) -> str:
             "`/canton franklin templeton`\n"
             "`/canton deutsche bank`\n"
             "`/canton cumberland`\n"
-            "`/canton bnp`"
+            "`/canton bnp`\n\n"
+            "Type `/cantonlist` to browse all entities."
         )
     query    = " ".join(args)
     entities = await get_entities()
@@ -89,39 +90,53 @@ async def cmd_canton(args: list) -> str:
         return "Could not load Canton entities data."
     entity = find_entity(query, entities)
     if not entity:
-        return f"No entity found for *{query}*.\n\nTry: `/canton bnp` `/canton societe` `/canton jp morgan`"
+        return f"No entity found for *{query}*.\n\nTry: `/canton bnp` `/canton societe` `/canton frax`"
 
-    name = entity.get("name") or entity.get("id", "Unknown")
+    name = entity.get("name", "Unknown")
 
-    # Deduplicate tags from all possible fields
-    seen = set()
-    tags = []
-    for field in ["tags", "categories", "roles", "category", "type", "tag"]:
-        val = entity.get(field)
-        items = val if isinstance(val, list) else ([val] if val else [])
-        for t in items:
-            t_up = str(t).strip().upper()
-            if t_up and t_up not in seen:
-                seen.add(t_up)
-                tags.append(str(t).strip())
-    tag_str = " · ".join(tags)
+    # Clean tags — entities.json has messy tags with duplicates and embedded text
+    raw_tags = entity.get("tags", [])
+    clean_tags = set()
+    for t in raw_tags:
+        t = str(t).strip()
+        # Skip tags that are multi-line garbage from scraping
+        if "\n" in t or len(t) > 40 or "Roles" in t or "Network Utilities" in t or "items found" in t:
+            continue
+        clean_tags.add(t.upper())
+    tag_str = " · ".join(sorted(clean_tags)) if clean_tags else ""
 
-    text = (entity.get("longDesc") or entity.get("text") or
-            entity.get("description") or entity.get("shortDesc") or "")
-    subtitle = entity.get("subtitle") or ""
-    trimmed = text[:700] + ("..." if len(text) > 700 else "")
+    # Description: prefer short_desc (clean), fall back to detail_text (extract first clean paragraph)
+    short_desc = entity.get("short_desc", "")
+    detail_text = entity.get("detail_text", "")
+
+    if short_desc:
+        desc = short_desc
+    elif detail_text:
+        # Extract the first real paragraph from detail_text (skip nav boilerplate)
+        lines_dt = [l.strip() for l in detail_text.split("\n") if l.strip()]
+        # Skip lines that are navigation/boilerplate
+        skip = {"canton network", "developers", "use cases", "resources", "speak to an expert",
+                "network utilities", "roles", "apps (all)", "apps (featured)"}
+        real_lines = []
+        for l in lines_dt:
+            if l.lower() in skip or l.startswith("http") or l == name:
+                continue
+            if any(x in l.upper() for x in ["VALIDATOR", "FINANCIAL", "MARKET INFRA", "SERVICE"]) and len(l) < 60:
+                continue
+            real_lines.append(l)
+        desc = " ".join(real_lines[:3])[:600]
+    else:
+        desc = ""
 
     lines = [f"*{name}*"]
     if tag_str:
         lines.append(f"_{tag_str}_")
-    if subtitle:
-        lines.append(f"\n{subtitle}")
-    if trimmed:
-        lines.append(f"\n{trimmed}")
+    lines.append("")
+    if desc:
+        lines.append(desc)
+
     return "\n".join(lines)
 
-
-# ── /cantonboard ──────────────────────────────────────────────────────────────
 
 async def cmd_cantonboard(args: list) -> str:
     if args:

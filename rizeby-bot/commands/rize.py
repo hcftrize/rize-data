@@ -109,3 +109,4 @@ async def cmd_totalbonded(args: list) -> str:
         "",
         "_Live data_",
     ])
+  
