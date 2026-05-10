@@ -1,51 +1,63 @@
-"""Load JSON files from the TOKERIZE GitHub repo — same data as the web app."""
+"""
+Load JSON files from the TOKERIZE GitHub repo.
+Exact URLs from rize-governance-hub.html:
+  RAW = https://raw.githubusercontent.com/hcftrize/TOKERIZE/main/rize-governance-hub
+"""
 import httpx
+import time
 
-RAW_BASE = "https://raw.githubusercontent.com/hcftrize/TOKERIZE/main"
+# Base URLs exactly as in the governance hub
+RAW_GOV  = "https://raw.githubusercontent.com/hcftrize/TOKERIZE/main/rize-governance-hub"
+RAW_DEV  = "https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev"
+RAW_MAIN = "https://raw.githubusercontent.com/hcftrize/TOKERIZE/main"
 
-MCAP_HISTORY_URL  = f"{RAW_BASE}/rize-data-hub/mcap-history.json"
-BOND_CREATED_URL  = f"{RAW_BASE}/bond-created.json"
-BOND_BROKEN_URL   = f"{RAW_BASE}/bond-broken.json"
-BOND_LIFECYCLE_URL = f"{RAW_BASE}/bond-lifecycle.json"
-BOND_STATES_URL   = f"{RAW_BASE}/bond-states.json"
-CIPS_URL          = f"{RAW_BASE}/canton-ecosystem/cips.json"
-ENTITIES_URL      = "https://raw.githubusercontent.com/hcftrize/TOKERIZE/dev/canton-ecosystem/entities.json"
+URLS = {
+    "bondBroken":    f"{RAW_GOV}/bond-broken.json",
+    "bondCreated":   f"{RAW_GOV}/bond-created.json",
+    "bondLifecycle": f"{RAW_GOV}/bond-lifecycle.json",
+    "bondTimemarker":f"{RAW_GOV}/bond-timemarker.json",
+    "bondStates":    f"{RAW_GOV}/bond-states.json",
+    "poolConfig":    f"{RAW_GOV}/pool-config.json",
+    "mcapHistory":   f"{RAW_MAIN}/rize-data-hub/mcap-history.json",
+    "unbondingQueue":f"{RAW_MAIN}/rize-data-hub/unbonding-queue.json",
+    "cips":          f"{RAW_MAIN}/canton-ecosystem/cips.json",
+    "entities":      f"{RAW_DEV}/canton-ecosystem/entities.json",
+}
 
-_cache: dict = {}
+# ── Simple TTL cache ──────────────────────────────────────────────────────────
+_cache: dict = {}   # key → {"data": ..., "ts": float}
+CACHE_TTL = 300     # 5 minutes
 
 
-async def load_json(url: str, cache_key: str = None) -> dict | list | None:
-    key = cache_key or url
-    if key in _cache:
-        return _cache[key]
+def _is_fresh(key: str) -> bool:
+    entry = _cache.get(key)
+    return entry is not None and (time.time() - entry["ts"]) < CACHE_TTL
+
+
+async def load_json(key: str) -> dict | list | None:
+    if _is_fresh(key):
+        return _cache[key]["data"]
+
+    url = URLS.get(key, key)  # fallback: key is a full URL
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             r = await client.get(url)
             r.raise_for_status()
-            data = r.json()
-            _cache[key] = data
+            raw = r.json()
+            # Governance hub uses: j.data || j
+            data = raw.get("data", raw) if isinstance(raw, dict) and "data" in raw else raw
+            _cache[key] = {"data": data, "ts": time.time()}
             return data
-    except Exception:
+    except Exception as e:
         return None
 
 
-async def get_mcap_history():
-    return await load_json(MCAP_HISTORY_URL, "mcap")
-
-async def get_bond_created():
-    return await load_json(BOND_CREATED_URL, "bond_created")
-
-async def get_bond_broken():
-    return await load_json(BOND_BROKEN_URL, "bond_broken")
-
-async def get_bond_lifecycle():
-    return await load_json(BOND_LIFECYCLE_URL, "bond_lifecycle")
-
-async def get_bond_states():
-    return await load_json(BOND_STATES_URL, "bond_states")
-
-async def get_cips():
-    return await load_json(CIPS_URL, "cips")
-
-async def get_entities():
-    return await load_json(ENTITIES_URL, "entities")
+# Convenience functions
+async def get_bond_broken():    return await load_json("bondBroken")
+async def get_bond_created():   return await load_json("bondCreated")
+async def get_bond_lifecycle(): return await load_json("bondLifecycle")
+async def get_bond_states():    return await load_json("bondStates")
+async def get_mcap_history():   return await load_json("mcapHistory")
+async def get_unbonding_queue():return await load_json("unbondingQueue")
+async def get_cips():           return await load_json("cips")
+async def get_entities():       return await load_json("entities")
