@@ -11,7 +11,7 @@ LIGHTHOUSE_BASE = "https://lighthouse.cantonloop.com/api"
 CIP_GITHUB_URL  = "https://github.com/canton-foundation/cips"
 
 
-async def cmd_cip(args: list) -> str:
+async def cmd_cip(args: list, page: int = 0) -> str:
     cips = await get_cips()
     if not cips:
         return "Could not load CIPs data."
@@ -49,10 +49,18 @@ async def cmd_cip(args: list) -> str:
             f"Read more: {CIP_GITHUB_URL}",
         ])
 
-    # List latest 5 — plain text status, no emojis
-    latest = cips_sorted[:5]
-    lines  = ["*Latest Canton CIPs*", ""]
-    for c in latest:
+    # Paginated list — 5 per page, text status
+    per_page = 5
+    start = page * per_page
+    page_cips = cips_sorted[start:start + per_page]
+    total = len(cips_sorted)
+    total_pages = (total - 1) // per_page + 1
+
+    if not page_cips:
+        return "No more CIPs to display."
+
+    lines = [f"*Latest Canton CIPs* — Page {page+1}/{total_pages}", ""]
+    for c in page_cips:
         cip_id   = c.get("id", f"CIP-{c.get('number','?')}")
         title    = c.get("title", "—")
         status   = c.get("status", "—")
@@ -61,7 +69,7 @@ async def cmd_cip(args: list) -> str:
 
     lines += [
         "─────────────────────",
-        "Type `/cip {number}` to read details (e.g. `/cip 0116`)",
+        "Type `/cip {number}` for details · Reply *next* for more",
         f"{CIP_GITHUB_URL}",
     ]
     return "\n".join(lines)
