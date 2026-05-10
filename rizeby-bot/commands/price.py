@@ -1,33 +1,23 @@
 """
-Commands: /price, /chart, /tvl, /traderize, /tradecc
-Any coin supported for /price and /chart — RIZE by default.
+Commands: /price, /chart, /tvl, /traderize, /trade{ticker}
+Any coin supported.
 """
 import httpx
 from utils.coingecko import (
     get_coin_detail, get_tickers, cg_get, get_kraken_pair,
-    parse_base_and_compare, display_name, RIZE_ID, RIZE_SUPPLY
+    parse_base_and_compare, display_name, RIZE_ID, COIN_MAP
 )
 from utils.github_data import get_mcap_history
-from utils.formatters import fmt_usd, fmt_pct, fmt_num, fmt_price
+from utils.formatters import fmt_usd, fmt_pct, fmt_price, fmt_num
 
 
-# ── /rizeby price [coin] ──────────────────────────────────────────────────────
-
-async def cmd_price(args: list[str]) -> tuple[str, dict]:
-    """
-    Price for any coin — default RIZE.
-    /rizeby price → RIZE
-    /rizeby cc price → CC
-    /rizeby eth price → ETH
-    """
+async def cmd_price(args: list) -> tuple:
     base_id, _ = parse_base_and_compare(args)
-    coin_name   = display_name(base_id)
-
+    coin_name = display_name(base_id)
     data = await get_coin_detail(base_id)
     if not data:
         return f"❌ Could not fetch {coin_name} price.", {}
-
-    md        = data.get("market_data", {})
+    md = data.get("market_data", {})
     price_usd = md.get("current_price", {}).get("usd", 0)
     price_btc = md.get("current_price", {}).get("btc", 0)
     price_eth = md.get("current_price", {}).get("eth", 0)
@@ -41,12 +31,12 @@ async def cmd_price(args: list[str]) -> tuple[str, dict]:
     ath_pct   = md.get("ath_change_percentage", {}).get("usd", 0)
     vol_24h   = md.get("total_volume", {}).get("usd", 0)
     mcap      = md.get("market_cap", {}).get("usd", 0)
+    sym = data.get("symbol", "").upper() or coin_name
 
-    # TVL only for RIZE
     tvl_str = None
     if base_id == RIZE_ID:
         history = await get_mcap_history()
-        if history:
+        if history and isinstance(history, dict):
             series = history.get("series", [])
             if series:
                 tvl = series[-1].get("tvl")
@@ -59,17 +49,18 @@ async def cmd_price(args: list[str]) -> tuple[str, dict]:
         if v is None: return "—"
         return f"{'📈' if v > 0 else '📉'} {fmt_pct(v)}"
 
-    sym = data.get("symbol", "").upper() or coin_name
     lines = [
         f"*{coin_name}* — ${sym}",
         "",
         f"💰 Price: {fmt_price(price_usd)}",
         f"⤷ ₿ {price_btc:.10f} | Ξ {price_eth:.8f}",
         f"⚖ H/L: {fmt_price(high_24h)} | {fmt_price(low_24h)}",
+        "",
         f"1h: {arrow(ch_1h)}",
         f"24h: {arrow(ch_24h)}",
         f"7d: {arrow(ch_7d)}",
         f"30d: {arrow(ch_30d)}",
+        "",
         f"ATH: {fmt_price(ath)} ({fmt_pct(ath_pct)})",
         f"% to ATH: {fmt_pct(pct_to_ath) if pct_to_ath else '—'}",
         f"24h Vol: {fmt_usd(vol_24h)}",
@@ -78,26 +69,34 @@ async def cmd_price(args: list[str]) -> tuple[str, dict]:
     if tvl_str:
         lines.append(f"TVL: {tvl_str}")
 
-    markup = {"inline_keyboard": [[{"text": "🔄 Refresh", "callback_data": f"refresh_price_{base_id}"}]]}
+    markup = {"inline_keyboard": [[
+        {"text": "🔄 Refresh", "callback_data": f"price_{base_id}"}
+    ]]}
     return "\n".join(lines), markup
 
 
-# ── /rizeby tvl ───────────────────────────────────────────────────────────────
-
-async def cmd_tvl(args: list[str]) -> str:
+async def cmd_tvl(args: list) -> str:
     history = await get_mcap_history()
     if not history:
         return "❌ Could not fetch TVL data."
-    series = history.get("series", [])
+
+    # Handle both {series:[...]} and direct list formats
+    if isinstance(history, dict):
+        series = history.get("series", [])
+    elif isinstance(history, list):
+        series = history
+    else:
+        return "❌ Unexpected TVL data format."
+
     if not series:
         return "❌ No TVL data available."
 
     latest   = series[-1]
-    mcap     = latest.get("mcap")
+    mcap     = latest.get("mcap") or latest.get("market_cap")
     fdv      = latest.get("fdv")
     tvl      = latest.get("tvl")
-    mcap_tvl = latest.get("mcap_tvl")
-    fdv_tvl  = latest.get("fdv_tvl")
+    mcap_tvl = latest.get("mcap_tvl") or (mcap / tvl if mcap and tvl else None)
+    fdv_tvl  = latest.get("fdv_tvl") or (fdv / tvl if fdv and tvl else None)
     date     = latest.get("date", "")
 
     price_data = await get_coin_detail(RIZE_ID)
@@ -108,7 +107,7 @@ async def cmd_tvl(args: list[str]) -> str:
         live_price = md.get("current_price", {}).get("usd")
 
     def valuation(ratio):
-        if ratio is None: return "—"
+        if ratio is None: return ""
         if ratio < 0.5:   return "🟢 Undervalued"
         if ratio < 1.0:   return "🟡 Fair"
         if ratio < 2.0:   return "🟠 Overvalued"
@@ -116,55 +115,36 @@ async def cmd_tvl(args: list[str]) -> str:
 
     lines = [
         "📊 *RIZE MCap & TVL*",
-        f"_Data as of {date}_",
+        f"_Data as of {date}_" if date else "",
         "",
-        f"💰 Live Price: {fmt_price(live_price) if live_price else '—'}",
-        f"📈 Live MCap: {fmt_usd(live_mcap) if live_mcap else '—'}",
-        "",
-        f"TVL: {fmt_usd(tvl)}",
-        f"MCap: {fmt_usd(mcap)}",
-        f"FDV: {fmt_usd(fdv)}",
+        f"💰 Price: {fmt_price(live_price) if live_price else '—'}",
+        f"MCap: {fmt_usd(live_mcap) if live_mcap else fmt_usd(mcap)}",
+        f"FDV: {fmt_usd(fdv) if fdv else '—'}",
+        f"TVL: {fmt_usd(tvl) if tvl else '—'}",
         "",
         f"MCap/TVL: {f'{mcap_tvl:.2f}×' if mcap_tvl else '—'} {valuation(mcap_tvl)}",
         f"FDV/TVL: {f'{fdv_tvl:.2f}×' if fdv_tvl else '—'} {valuation(fdv_tvl)}",
     ]
-    return "\n".join(lines)
+    return "\n".join(l for l in lines if l != "")
 
 
-# ── /rizeby chart [coin] [interval] ──────────────────────────────────────────
+KRAKEN_INTERVALS = {"15m": 15, "1h": 60, "4h": 240, "1d": 1440, "1w": 10080, "1M": 43200}
 
-KRAKEN_INTERVALS = {
-    "15m":60*15//60 or 15,"1h":60,"4h":240,"1d":1440,"1w":10080,"1M":43200,
-}
-
-async def cmd_chart(args: list[str]) -> tuple[bytes | None, str]:
-    """
-    OHLC chart for any coin on Kraken.
-    /rizeby chart        → RIZE daily
-    /rizeby chart 1h     → RIZE 1h
-    /rizeby cc chart 4h  → CC 4h
-    /rizeby eth chart 1w → ETH weekly
-    """
+async def cmd_chart(args: list) -> tuple:
     base_id, remaining = parse_base_and_compare(args)
     coin_name = display_name(base_id)
 
-    # Interval from remaining args
     interval_key = "1d"
     for a in remaining:
         al = a.lower()
-        if al in KRAKEN_INTERVALS or al in ("daily","weekly","monthly","15m","1h","4h","1d","1w","1M"):
+        if al in KRAKEN_INTERVALS:
             interval_key = al
             break
-    if interval_key == "monthly": interval_key = "1M"
-    if interval_key == "daily":   interval_key = "1d"
-    if interval_key == "weekly":  interval_key = "1w"
-
     interval_min = KRAKEN_INTERVALS.get(interval_key, 1440)
 
-    # Get Kraken pair
     pair = get_kraken_pair(base_id)
     if not pair:
-        return None, f"❌ No Kraken pair found for {coin_name}. Try RIZE, ETH, BTC, LINK, SOL…"
+        return None, f"❌ No Kraken chart available for {coin_name}."
 
     url = f"https://api.kraken.com/0/public/OHLC?pair={pair}&interval={interval_min}"
     try:
@@ -174,8 +154,8 @@ async def cmd_chart(args: list[str]) -> tuple[bytes | None, str]:
     except Exception:
         return None, "❌ Could not fetch chart data from Kraken."
 
-    if data.get("error"):
-        return None, f"❌ Kraken error: {data['error']}"
+    if data.get("error") and data["error"]:
+        return None, f"❌ Kraken: {data['error']}"
 
     result   = data.get("result", {})
     ohlc_key = next((k for k in result if k != "last"), None)
@@ -194,21 +174,13 @@ async def cmd_chart(args: list[str]) -> tuple[bytes | None, str]:
                 "data": closes,
                 "borderColor": "#7ee0ff",
                 "backgroundColor": "rgba(126,224,255,0.08)",
-                "borderWidth": 2,
-                "pointRadius": 0,
-                "fill": True,
-                "tension": 0.3,
+                "borderWidth": 2, "pointRadius": 0, "fill": True, "tension": 0.3,
             }]
         },
         "options": {
             "plugins": {
                 "legend": {"labels": {"color": "#ffffff"}},
-                "title": {
-                    "display": True,
-                    "text": f"{coin_name}/USD — {interval_key} (Kraken)",
-                    "color": "#ffffff",
-                    "font": {"size": 16},
-                }
+                "title": {"display": True, "text": f"{coin_name}/USD — {interval_key} (Kraken)", "color": "#ffffff", "font": {"size": 16}}
             },
             "scales": {
                 "x": {"display": False},
@@ -216,7 +188,6 @@ async def cmd_chart(args: list[str]) -> tuple[bytes | None, str]:
             },
         },
     }
-
     try:
         async with httpx.AsyncClient(timeout=15) as client:
             r = await client.post(
@@ -228,28 +199,42 @@ async def cmd_chart(args: list[str]) -> tuple[bytes | None, str]:
                 return r.content, caption
     except Exception:
         pass
+    return None, "❌ Could not generate chart."
 
-    return None, "❌ Could not generate chart image."
 
-
-# ── /rizeby traderize / tradecc ───────────────────────────────────────────────
-
-async def cmd_traderize(args: list[str]) -> str:
+async def cmd_traderize(args: list) -> str:
     return await _cmd_trade(RIZE_ID, "RIZE")
 
-async def cmd_tradecc(args: list[str]) -> str:
+async def cmd_tradecc(args: list) -> str:
     return await _cmd_trade("canton-network", "CC")
+
+async def cmd_trade_any(ticker: str) -> str:
+    """Generic /trade{ticker} for any coin."""
+    ticker_lower = ticker.lower().strip()
+    from utils.coingecko import COIN_MAP, display_name as dn
+    coin_id = COIN_MAP.get(ticker_lower)
+    if not coin_id:
+        # Try search
+        data = await cg_get("/search", {"query": ticker_lower})
+        if data and data.get("coins"):
+            coin_id = data["coins"][0]["id"]
+        else:
+            return f"❌ Could not find trading pairs for `{ticker}`."
+    sym = dn(coin_id, ticker)
+    return await _cmd_trade(coin_id, sym)
 
 async def _cmd_trade(coin_id: str, symbol: str) -> str:
     tickers = await get_tickers(coin_id)
     if not tickers:
         return f"❌ Could not fetch trading pairs for {symbol}."
 
-    by_exchange: dict[str, list] = {}
+    by_exchange: dict = {}
     for t in tickers:
-        ex  = t.get("market", {}).get("name", "Unknown")
-        vol = t.get("converted_volume", {}).get("usd", 0) or 0
-        pair = f"{t.get('base','')}/{t.get('target','')}"
+        ex   = t.get("market", {}).get("name", "Unknown")
+        vol  = t.get("converted_volume", {}).get("usd", 0) or 0
+        base = t.get("base", "")
+        tgt  = t.get("target", "")
+        pair = f"{base}/{tgt}"
         by_exchange.setdefault(ex, []).append({"pair": pair, "vol": vol})
 
     ex_ranked = sorted(by_exchange.items(), key=lambda x: sum(p["vol"] for p in x[1]), reverse=True)
