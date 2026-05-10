@@ -3,7 +3,7 @@ Commands: /cc price, /cc burnmint [1d|1w], /cc allocation
 CC Data Hub — identical to the web module.
 """
 import httpx
-from utils.coingecko import get_rize_price, get_tickers, cg_get
+from utils.coingecko import get_coin_detail, get_tickers, cg_get
 from utils.formatters import fmt_usd, fmt_price, fmt_pct, fmt_num
 
 CANTONSCAN_BASE = "https://fossil-outlook-levitate-gloomy.cantonscan.com/api"
