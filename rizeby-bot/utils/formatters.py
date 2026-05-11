@@ -57,14 +57,35 @@ def fmt_pct(v: float, show_plus: bool = True) -> str:
 
 
 def fmt_price(v: float) -> str:
-    """Smart price formatting — keeps significant digits."""
+    """Smart price formatting — 2 decimals >= $1, then 4 significant figures."""
     if v is None:
         return "—"
     if v >= 1000:
         return f"${v:,.2f}"
     if v >= 1:
+        return f"${v:.2f}"
+    if v >= 0.1:
         return f"${v:.4f}"
     if v >= 0.01:
+        return f"${v:.4f}"
+    if v >= 0.001:
+        return f"${v:.6f}"
+    if v >= 0.0001:
+        return f"${v:.6f}"
+    return f"${v:.8f}"
+
+
+def fmt_sim_price(v: float) -> str:
+    """Price formatting for simulations — 2 decimals for >= 0.01, else significant digits."""
+    if v is None:
+        return "—"
+    if v >= 1000:
+        return f"${v:,.0f}"
+    if v >= 1:
+        return f"${v:.2f}"
+    if v >= 0.01:
+        return f"${v:.2f}"
+    if v >= 0.0001:
         return f"${v:.6f}"
     return f"${v:.8f}"
 
