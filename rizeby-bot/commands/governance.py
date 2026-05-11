@@ -594,7 +594,7 @@ async def cmd_govwallet(args: list) -> str:
         for b in sorted(active_bonds, key=lambda x: x["vp"], reverse=True)[:5]:
             lines.append(
                 f"  #{b['nftId']} — {fmt_rize(b['amount'])} "
-                f"· Mat {b['mat']*100:.1f}% · VP {fmt_rize(b['vp'])}"
+                f"· Mat {b['mat']*100:.2f}% · VP {fmt_rize(b['vp'])}"
             )
         if len(active_bonds) > 5:
             lines.append(f"  _…and {len(active_bonds)-5} more_")
