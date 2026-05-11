@@ -4,37 +4,49 @@
 def fmt_usd(v: float, decimals: int = 2) -> str:
     if v is None:
         return "—"
-    if v >= 1_000_000_000:
-        return f"${v/1_000_000_000:.2f}B"
-    if v >= 1_000_000:
-        return f"${v/1_000_000:.2f}M"
-    if v >= 1_000:
-        return f"${v/1_000:.2f}K"
-    return f"${v:.{decimals}f}"
+    neg = v < 0
+    a = abs(v)
+    if a >= 1_000_000_000:
+        s = f"${a/1_000_000_000:.2f}B"
+    elif a >= 1_000_000:
+        s = f"${a/1_000_000:.2f}M"
+    elif a >= 1_000:
+        s = f"${a/1_000:.2f}K"
+    else:
+        s = f"${a:.{decimals}f}"
+    return f"-{s}" if neg else s
 
 
 def fmt_rize(v: float) -> str:
     if v is None:
         return "—"
-    if v >= 1_000_000_000:
-        return f"{v/1_000_000_000:.2f}B RIZE"
-    if v >= 1_000_000:
-        return f"{v/1_000_000:.2f}M RIZE"
-    if v >= 1_000:
-        return f"{v/1_000:.2f}K RIZE"
-    return f"{v:.2f} RIZE"
+    neg = v < 0
+    a = abs(v)
+    if a >= 1_000_000_000:
+        s = f"{a/1_000_000_000:.2f}B RIZE"
+    elif a >= 1_000_000:
+        s = f"{a/1_000_000:.2f}M RIZE"
+    elif a >= 1_000:
+        s = f"{a/1_000:.2f}K RIZE"
+    else:
+        s = f"{a:.2f} RIZE"
+    return f"-{s}" if neg else s
 
 
 def fmt_num(v: float, decimals: int = 2) -> str:
     if v is None:
         return "—"
-    if v >= 1_000_000_000:
-        return f"{v/1_000_000_000:.2f}B"
-    if v >= 1_000_000:
-        return f"{v/1_000_000:.2f}M"
-    if v >= 1_000:
-        return f"{v/1_000:.2f}K"
-    return f"{v:.{decimals}f}"
+    neg = v < 0
+    a = abs(v)
+    if a >= 1_000_000_000:
+        s = f"{a/1_000_000_000:.2f}B"
+    elif a >= 1_000_000:
+        s = f"{a/1_000_000:.2f}M"
+    elif a >= 1_000:
+        s = f"{a/1_000:.2f}K"
+    else:
+        s = f"{a:.{decimals}f}"
+    return f"-{s}" if neg else s
 
 
 def fmt_pct(v: float, show_plus: bool = True) -> str:
@@ -65,24 +77,27 @@ def pct_arrow(v: float) -> str:
 
 
 def parse_amount(s: str) -> float | None:
-    """Parse user amount: '1000000', '1 000 000', '1.000.000', '1,000,000', '1M', '1m rize'."""
+    """Parse user amount: '1000000', '1M', '-1.3M' etc."""
     if not s:
         return None
     s = s.lower().replace("rize", "").replace(" ", "").strip()
-    # Handle European dot-as-thousand: 1.000.000
+    neg = s.startswith("-")
+    if neg:
+        s = s[1:]
     if s.count(".") > 1:
         s = s.replace(".", "")
     s = s.replace(",", "")
-    # Handle shorthand
     multipliers = {"k": 1_000, "m": 1_000_000, "b": 1_000_000_000}
     for suffix, mult in multipliers.items():
         if s.endswith(suffix):
             try:
-                return float(s[:-1]) * mult
+                val = float(s[:-1]) * mult
+                return -val if neg else val
             except ValueError:
                 return None
     try:
-        return float(s)
+        val = float(s)
+        return -val if neg else val
     except ValueError:
         return None
 
@@ -94,7 +109,6 @@ def escape_md(text: str) -> str:
 
 
 def build_table(headers: list[str], rows: list[list[str]], col_widths: list[int] = None) -> str:
-    """Build a fixed-width monospace table for Telegram (use inside code block)."""
     if not col_widths:
         col_widths = [max(len(h), max((len(str(r[i])) for r in rows if i < len(r)), default=0)) + 1
                       for i, h in enumerate(headers)]
