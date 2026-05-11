@@ -23,7 +23,7 @@ def parse_amt(v) -> float:
         return 0.0
 
 
-async def cmd_unbond(args: list) -> str:
+async def cmd_unbond(args: list, page: int = 0) -> str:
     """
     Unbonding queue from bond-broken.json — last 7 days.
     Identical to convFetchUnbondingQueue in governance hub.
@@ -51,25 +51,33 @@ async def cmd_unbond(args: list) -> str:
 
     lines = [
         "🔓 *Unbonding Queue — Live*",
-        "_Bonds broken in the last 7 days (7-day warmup, not yet released)_",
+        "_Bonds broken in the last 7 days (warmup period, not yet released)_",
         "",
         f"Queue total: *{fmt_rize(total_rize)}*",
         f"Active breaks: {count}",
         "",
-        "```",
-        f"{'Date':<12} {'Bond':>7} {'Amount':>12}",
-        "─" * 34,
     ]
 
-    for e in recent_sorted[:5]:
+    per_page = 5
+    start = page * per_page
+    page_events = recent_sorted[start:start + per_page]
+    total_pages = (count - 1) // per_page + 1
+
+    lines.append(f"_Page {page+1}/{total_pages}_")
+    lines.append("")
+
+    for e in page_events:
         nft_id = e.get("nftId", "?")
         amount = parse_amt(e.get("amount", 0))
         date   = e.get("date") or str(e.get("timestamp", "—"))[:10]
-        lines.append(f"{date:<12} #{str(nft_id):>5} {fmt_rize(amount):>12}")
+        lines += [
+            f"🔴 Bond #{nft_id} — {fmt_rize(amount)}",
+            f"  {date}",
+            "",
+        ]
 
-    lines.append("```")
-    if count > 5:
-        lines.append(f"_…and {count - 5} more_")
+    if start + per_page < count:
+        lines.append(f"_Reply *next* to see more._")
 
     return "\n".join(lines)
 
@@ -99,14 +107,26 @@ async def cmd_totalbonded(args: list) -> str:
     rize_price = price_data.get("rize", {}).get("usd", 0) if price_data else 0
     usd_value  = total_rize * rize_price
 
+    # Circ supply from CoinGecko
+    circ_supply = 5_000_000_000  # fallback
+    try:
+        from utils.coingecko import cg_get as _cg
+        circ_data = await _cg("/coins/rize", {"localization":"false","tickers":"false","market_data":"true","community_data":"false","developer_data":"false"})
+        if circ_data:
+            cs = circ_data.get("market_data",{}).get("circulating_supply")
+            if cs: circ_supply = float(cs)
+    except Exception:
+        pass
+    pct_circ = (total_rize / circ_supply * 100) if circ_supply else 0
+
     return "\n".join([
         "🏦 *Total RIZE Bonded*",
         "",
         f"Total bonded: *{fmt_rize(total_rize)}*",
-        f"% of 5B supply: {pct_supply:.2f}%",
+        f"% of max supply (5B): {pct_supply:.2f}%",
+        f"% of circ supply: {pct_circ:.2f}%",
         f"USD value: {fmt_usd(usd_value)}",
         f"RIZE price: {fmt_price(rize_price)}",
         "",
         "_Live data_",
     ])
-  
