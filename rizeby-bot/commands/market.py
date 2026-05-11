@@ -1,24 +1,26 @@
 """
 Commands: /perf, /pricesim, /portfoliosim, /arbitrage, /market
-Mobile-friendly text format (no ASCII tables).
+Mobile-friendly text format. Cache TTL 5min.
 """
 import httpx
 from utils.coingecko import (
     get_markets, get_market_chart, get_global, get_simple_price,
     resolve_coin_ids, get_coin_detail, parse_base_and_compare,
-    display_name, RIZE_ID, RIZE_SUPPLY, cg_get,
+    display_name, RIZE_ID, RIZE_SUPPLY, cg_get, COIN_MAP,
 )
 from utils.formatters import fmt_usd, fmt_pct, fmt_price, fmt_num, parse_amount
+import time
 
-# Simple in-memory cache for API responses (TTL not enforced, resets per cold start)
 _cache: dict = {}
+CACHE_TTL = 300
 
 async def _cached(key: str, coro):
-    if key in _cache:
-        return _cache[key]
+    entry = _cache.get(key)
+    if entry and (time.time() - entry["ts"]) < CACHE_TTL:
+        return entry["data"]
     result = await coro
-    if result:
-        _cache[key] = result
+    if result is not None:
+        _cache[key] = {"data": result, "ts": time.time()}
     return result
 
 
@@ -28,12 +30,11 @@ async def cmd_perf(args: list) -> str:
     all_ids   = list(set([base_id] + list(token_map.values())))
     base_name = display_name(base_id)
 
-    markets_data = await _cached(f"markets_{','.join(sorted(all_ids))}", get_markets(all_ids))
+    markets_data = await _cached(f"mkts_{','.join(sorted(all_ids))}", get_markets(all_ids))
     if not markets_data:
-        return "❌ Could not fetch performance data."
+        return "Could not fetch performance data."
     by_id = {c["id"]: c for c in markets_data}
 
-    # Fetch 90d charts
     perf_90d = {}
     for cid in all_ids:
         chart = await _cached(f"chart90_{cid}", get_market_chart(cid, 90))
@@ -45,12 +46,10 @@ async def cmd_perf(args: list) -> str:
 
     def make_row(cid, label):
         c = by_id.get(cid, {})
-        return {
-            "label": label,
-            "p7":  c.get("price_change_percentage_7d_in_currency"),
-            "p30": c.get("price_change_percentage_30d_in_currency"),
-            "p90": perf_90d.get(cid),
-        }
+        return {"label": label,
+                "p7":  c.get("price_change_percentage_7d_in_currency"),
+                "p30": c.get("price_change_percentage_30d_in_currency"),
+                "p90": perf_90d.get(cid)}
 
     rows = [make_row(base_id, base_name)]
     for orig, cid in token_map.items():
@@ -60,19 +59,17 @@ async def cmd_perf(args: list) -> str:
 
     def fc(v):
         if v is None: return "—"
-        sign = "+" if v > 0 else ""
-        return f"{sign}{v:.1f}%"
+        return f"+{v:.1f}%" if v > 0 else f"{v:.1f}%"
 
-    # Mobile-friendly: 2 per line per period
-    def period_block(period_key, period_label):
-        lines = [f"*{period_label}*"]
-        row_pairs = [rows[i:i+2] for i in range(0, len(rows), 2)]
-        for pair in row_pairs:
-            parts = [f"{r['label']}: {fc(r[period_key])}" for r in pair]
+    def period_block(key, label):
+        lines = [f"*{label}*"]
+        pairs = [rows[i:i+2] for i in range(0, len(rows), 2)]
+        for pair in pairs:
+            parts = [f"{r['label']}: {fc(r[key])}" for r in pair]
             lines.append("  ".join(parts))
         return "\n".join(lines)
 
-    text = [
+    return "\n".join([
         "📊 *Performance Comparison*",
         "_7D, 30D and 90D price performance against USD_",
         "",
@@ -81,22 +78,19 @@ async def cmd_perf(args: list) -> str:
         period_block("p30", "30 Days"),
         "",
         period_block("p90", "90 Days"),
-    ]
-    return "\n".join(text)
+    ])
 
 
 async def cmd_pricesim(args: list) -> str:
     base_id, compare_tokens = parse_base_and_compare(args)
     token_map = await resolve_coin_ids(compare_tokens)
     base_name = display_name(base_id)
-
-    all_ids      = list(set([base_id] + list(token_map.values())))
-    markets_data = await _cached(f"markets_{','.join(sorted(all_ids))}", get_markets(all_ids))
+    all_ids = list(set([base_id] + list(token_map.values())))
+    markets_data = await _cached(f"mkts_{','.join(sorted(all_ids))}", get_markets(all_ids))
     if not markets_data:
-        return "❌ Could not fetch market data."
-
-    by_id       = {c["id"]: c for c in markets_data}
-    base        = by_id.get(base_id, {})
+        return "Could not fetch market data."
+    by_id = {c["id"]: c for c in markets_data}
+    base = by_id.get(base_id, {})
     base_price  = base.get("current_price", 0)
     base_supply = base.get("circulating_supply") or (RIZE_SUPPLY if base_id == RIZE_ID else 1)
     base_mcap   = base.get("market_cap", 0)
@@ -108,122 +102,95 @@ async def cmd_pricesim(args: list) -> str:
         f"Current: {fmt_price(base_price)} · Supply: {fmt_num(base_supply)}",
         "",
     ]
-
     for orig, cid in token_map.items():
-        if cid == base_id:
-            continue
+        if cid == base_id: continue
         c = by_id.get(cid, {})
         target_mcap = c.get("market_cap", 0)
-        if not target_mcap:
-            continue
-        hyp_price   = target_mcap / base_supply
-        pct_change  = ((hyp_price / base_price) - 1) * 100 if base_price else 0
+        if not target_mcap: continue
+        hyp_price  = target_mcap / base_supply
+        pct_change = ((hyp_price / base_price) - 1) * 100 if base_price else 0
         pct_of_mcap = (base_mcap / target_mcap) * 100 if target_mcap else 0
-        label       = display_name(cid, orig)
-        sign        = "+" if pct_change > 0 else ""
-
-        lines.append(f"*{label}* MCap: {fmt_usd(target_mcap)}")
-        lines.append(f"  → {base_name} price: {fmt_price(hyp_price)} ({sign}{pct_change:.0f}%)")
-        lines.append(f"  → {base_name} is {pct_of_mcap:.3f}% of {label} MCap")
-        lines.append("")
-
+        label = display_name(cid, orig)
+        sign = "+" if pct_change > 0 else ""
+        lines += [
+            f"*{label}* MCap: {fmt_usd(target_mcap)}",
+            f"  Price: {fmt_price(hyp_price)} ({sign}{pct_change:.0f}%)",
+            f"  {base_name} = {pct_of_mcap:.3f}% of {label}",
+            "",
+        ]
     return "\n".join(lines)
 
 
 async def cmd_portfoliosim(args: list) -> str:
-    """
-    /portfoliosim {amount} {base} to {compare assets}
-    or /portfoliosim {base} {compare assets} {amount}
-    """
-    # Parse "X base to compare1 compare2"
     tokens = list(args)
     amount = None
     base_id = RIZE_ID
     compare_tokens = []
 
-    # Check for "to" separator
     if "to" in [t.lower() for t in tokens]:
         to_idx = [t.lower() for t in tokens].index("to")
         left   = tokens[:to_idx]
         right  = tokens[to_idx+1:]
-
-        # Left: amount + base
         for t in left:
             parsed = parse_amount(t)
-            if parsed is not None:
-                amount = parsed
+            if parsed is not None: amount = parsed
             else:
-                from utils.coingecko import COIN_MAP
                 tl = t.lower()
-                if tl in COIN_MAP:
-                    base_id = COIN_MAP[tl]
+                if tl in COIN_MAP: base_id = COIN_MAP[tl]
         compare_tokens = right
     else:
         base_id, remaining = parse_base_and_compare(tokens)
         for t in remaining:
             parsed = parse_amount(t)
-            if parsed is not None:
-                amount = parsed
-            else:
-                compare_tokens.append(t)
+            if parsed is not None and amount is None: amount = parsed
+            elif parse_amount(t) is None: compare_tokens.append(t)
 
     base_name = display_name(base_id)
-
     if amount is None:
         return (
-            f"❌ Please include your {base_name} amount.\n\n"
-            f"Format: `/portfoliosim {{amount}} {{coin}} to {{compare assets}}`\n"
+            f"Please include your {base_name} amount.\n\n"
+            f"Format: `/portfoliosim {{amount}} {{coin}} to {{assets}}`\n"
             f"Example: `/portfoliosim 1000000 rize to eth link mantra`"
         )
 
-    token_map    = await resolve_coin_ids(compare_tokens)
-    all_ids      = list(set([base_id] + list(token_map.values())))
-    markets_data = await _cached(f"markets_{','.join(sorted(all_ids))}", get_markets(all_ids))
+    token_map = await resolve_coin_ids(compare_tokens)
+    all_ids = list(set([base_id] + list(token_map.values())))
+    markets_data = await _cached(f"mkts_{','.join(sorted(all_ids))}", get_markets(all_ids))
     if not markets_data:
-        return "❌ Could not fetch market data."
-
-    by_id       = {c["id"]: c for c in markets_data}
-    base        = by_id.get(base_id, {})
+        return "Could not fetch market data."
+    by_id = {c["id"]: c for c in markets_data}
+    base = by_id.get(base_id, {})
     base_price  = base.get("current_price", 0)
     base_supply = base.get("circulating_supply") or (RIZE_SUPPLY if base_id == RIZE_ID else 1)
     current_bag = amount * base_price
 
     lines = [
-        f"💼 *Portfolio Simulation*",
+        "💼 *Portfolio Simulation*",
         f"_Estimated value of {fmt_num(amount)} {base_name} at each simulated target price_",
         "",
-        f"Current {base_name} price: {fmt_price(base_price)}",
-        f"Current bag value: {fmt_usd(current_bag)}",
+        f"Current {base_name}: {fmt_price(base_price)}",
+        f"Current bag: {fmt_usd(current_bag)}",
         "",
     ]
-
     for orig, cid in token_map.items():
-        if cid == base_id:
-            continue
+        if cid == base_id: continue
         c = by_id.get(cid, {})
         target_mcap = c.get("market_cap", 0)
-        if not target_mcap:
-            continue
+        if not target_mcap: continue
         hyp_price = target_mcap / base_supply
         bag_value = amount * hyp_price
-        pct       = ((bag_value / current_bag) - 1) * 100 if current_bag else 0
-        sign      = "+" if pct > 0 else ""
-        label     = display_name(cid, orig)
-
-        lines.append(f"*{label}* MCap → {base_name} @ {fmt_price(hyp_price)}")
-        lines.append(f"  Bag value: {fmt_usd(bag_value)} ({sign}{pct:.0f}%)")
-        lines.append("")
-
+        pct = ((bag_value / current_bag) - 1) * 100 if current_bag else 0
+        sign = "+" if pct > 0 else ""
+        label = display_name(cid, orig)
+        lines += [
+            f"*{label}* mcap → {base_name} @ {fmt_price(hyp_price)}",
+            f"  Bag: {fmt_usd(bag_value)} ({sign}{pct:.0f}%)",
+            "",
+        ]
     return "\n".join(lines)
 
 
 async def cmd_arbitrage(args: list) -> str:
-    """
-    Ratio Analysis — identical to RIZE Data Hub.
-    Shows for 7d, 30d, 90d: how much of compared asset you'd gain/lose
-    by swapping base into it compared to X days ago.
-    /arbitrage {amount} {base} to {compare}
-    """
     tokens = list(args)
     amount = None
     base_id = RIZE_ID
@@ -235,71 +202,67 @@ async def cmd_arbitrage(args: list) -> str:
         right  = tokens[to_idx+1:]
         for t in left:
             parsed = parse_amount(t)
-            if parsed is not None:
-                amount = parsed
+            if parsed is not None: amount = parsed
             else:
-                from utils.coingecko import COIN_MAP
                 tl = t.lower()
-                if tl in COIN_MAP:
-                    base_id = COIN_MAP[tl]
+                if tl in COIN_MAP: base_id = COIN_MAP[tl]
         compare_tokens = right
     else:
         base_id, remaining = parse_base_and_compare(tokens)
         for t in remaining:
             parsed = parse_amount(t)
-            if parsed is not None:
-                amount = parsed
-            else:
-                compare_tokens.append(t)
+            if parsed is not None and amount is None: amount = parsed
+            elif parse_amount(t) is None: compare_tokens.append(t)
 
-    base_name  = display_name(base_id)
-    token_map  = await resolve_coin_ids(compare_tokens)
-    all_ids    = list(set([base_id] + list(token_map.values())))
+    base_name = display_name(base_id)
+    token_map = await resolve_coin_ids(compare_tokens)
+    all_ids   = list(set([base_id] + list(token_map.values())))
 
-    # Need price history for 7d, 30d, 90d
-    # Fetch 90d chart for each coin
+    # Fetch 90d charts for all coins
     charts = {}
     for cid in all_ids:
         chart = await _cached(f"chart90_{cid}", get_market_chart(cid, 90))
         if chart and chart.get("prices"):
             prices = chart["prices"]
-            # prices is list of [timestamp_ms, price]
-            def get_price_at(days_ago):
-                target_idx = max(0, len(prices) - 1 - days_ago)
-                return prices[target_idx][1] if prices else None
+
+            def get_price_at(days_ago, p=prices):
+                idx = max(0, len(p) - 1 - days_ago)
+                return p[idx][1] if p else None
 
             charts[cid] = {
-                "now":  prices[-1][1] if prices else None,
-                "7d":   get_price_at(7),
-                "30d":  get_price_at(30),
-                "90d":  get_price_at(90),
+                "now": prices[-1][1] if prices else None,
+                "7d":  get_price_at(7),
+                "30d": get_price_at(30),
+                "90d": get_price_at(min(90, len(prices)-1)),
             }
 
+    # Build output — no apostrophes in plain strings to avoid Markdown issues
+    intro = (
+        "Compare gains and losses in compared asset units. "
+        "A positive value means you gain that asset by swapping today vs X days ago."
+    )
     lines = [
-        f"⚖️ *Ratio Analysis — {base_name}*",
-        "_Compare gains/losses expressed in compared asset units._",
-        "_+1.5 ETH means you'd have gained 1.5 ETH by swapping {base_name} to ETH X days ago._",
+        f"*Ratio Analysis — {base_name}*",
+        f"_{intro}_",
         "",
     ]
 
     if amount:
-        base_now = charts.get(base_id, {}).get("now", 0)
-        lines.append(f"Bag: {fmt_num(amount)} {base_name} = {fmt_usd(amount * (base_now or 0))}")
+        base_now = charts.get(base_id, {}).get("now") or 0
+        lines.append(f"Bag: {fmt_num(amount)} {base_name} = {fmt_usd(amount * base_now)}")
         lines.append("")
 
     for orig, cid in token_map.items():
-        if cid == base_id:
-            continue
-        label    = display_name(cid, orig)
-        bc       = charts.get(base_id, {})
-        cc       = charts.get(cid, {})
+        if cid == base_id: continue
+        label = display_name(cid, orig)
+        bc = charts.get(base_id, {})
+        cc = charts.get(cid, {})
 
         if not bc.get("now") or not cc.get("now"):
-            lines.append(f"*{label}*: data unavailable")
-            lines.append("")
+            lines += [f"*{base_name} to {label}*: data unavailable", ""]
             continue
 
-        lines.append(f"*{base_name} → {label}*")
+        lines.append(f"*{base_name} to {label}*")
 
         for period in ["7d", "30d", "90d"]:
             b_now  = bc.get("now", 0)
@@ -308,25 +271,28 @@ async def cmd_arbitrage(args: list) -> str:
             c_past = cc.get(period, 0)
 
             if not all([b_now, b_past, c_now, c_past]):
-                lines.append(f"  {period.upper()}: —")
+                lines.append(f"  {period.upper()}: no data")
                 continue
 
-            # How many of compared asset you'd get now vs X days ago
-            ratio_now  = b_now  / c_now   # 1 base = X compared now
-            ratio_past = b_past / c_past  # 1 base = X compared X days ago
-            delta      = ratio_now - ratio_past  # gain/loss in compared units per 1 base
+            ratio_now  = b_now  / c_now
+            ratio_past = b_past / c_past
+            delta      = ratio_now - ratio_past
 
             if amount:
                 total_delta = delta * amount
-                sign = "+" if total_delta >= 0 else ""
-                pct  = ((ratio_now / ratio_past) - 1) * 100 if ratio_past else 0
-                psign = "+" if pct >= 0 else ""
-                lines.append(f"  {period.upper()}: {sign}{fmt_num(total_delta, 4)} {label} ({psign}{pct:.1f}%)")
+                pct = ((ratio_now / ratio_past) - 1) * 100 if ratio_past else 0
+                sign_d = "+" if total_delta >= 0 else ""
+                sign_p = "+" if pct >= 0 else ""
+                lines.append(
+                    f"  {period.upper()}: {sign_d}{fmt_num(total_delta, 4)} {label} ({sign_p}{pct:.1f}%)"
+                )
             else:
-                sign = "+" if delta >= 0 else ""
-                pct  = ((ratio_now / ratio_past) - 1) * 100 if ratio_past else 0
-                psign = "+" if pct >= 0 else ""
-                lines.append(f"  {period.upper()}: {sign}{delta:.6f} {label}/unit ({psign}{pct:.1f}%)")
+                pct = ((ratio_now / ratio_past) - 1) * 100 if ratio_past else 0
+                sign_d = "+" if delta >= 0 else ""
+                sign_p = "+" if pct >= 0 else ""
+                lines.append(
+                    f"  {period.upper()}: {sign_d}{delta:.6f} {label}/unit ({sign_p}{pct:.1f}%)"
+                )
 
         lines.append("")
 
@@ -362,18 +328,17 @@ async def cmd_market(args: list) -> str:
         gd = global_data.get("data", {})
         total_mcap = gd.get("total_market_cap", {}).get("usd", 0)
         dominance  = gd.get("market_cap_percentage", {})
-        btc_d   = dominance.get("btc", 0)
-        eth_d   = dominance.get("eth", 0)
-        # LINK not in market_cap_percentage — compute from chainlink mcap like the hub
-        link_d  = 0.0  # computed below after fetching chainlink
-        rize_data = await cg_get("/simple/price", {"ids": "rize", "vs_currencies": "usd", "include_market_cap": "true"})
-        rize_mcap = rize_data.get("rize", {}).get("usd_market_cap", 0) if rize_data else 0
-        rize_d    = (rize_mcap / total_mcap * 100) if (rize_mcap and total_mcap) else 0
+        btc_d = dominance.get("btc", 0)
+        eth_d = dominance.get("eth", 0)
 
-        # Fetch LINK mcap for dominance (not in CG global API)
-        link_data = await cg_get("/simple/price", {"ids": "chainlink", "vs_currencies": "usd", "include_market_cap": "true"})
-        link_mcap = link_data.get("chainlink", {}).get("usd_market_cap", 0) if link_data else 0
+        # LINK.D — compute from chainlink mcap (not in market_cap_percentage)
+        link_rize = await cg_get("/simple/price", {
+            "ids": "chainlink,rize", "vs_currencies": "usd", "include_market_cap": "true"
+        })
+        link_mcap = link_rize.get("chainlink", {}).get("usd_market_cap", 0) if link_rize else 0
+        rize_mcap = link_rize.get("rize", {}).get("usd_market_cap", 0) if link_rize else 0
         link_d = (link_mcap / total_mcap * 100) if (link_mcap and total_mcap) else 0
+        rize_d = (rize_mcap / total_mcap * 100) if (rize_mcap and total_mcap) else 0
 
         lines += [
             f"BTC.D: {btc_d:.2f}%",
@@ -385,10 +350,8 @@ async def cmd_market(args: list) -> str:
         ]
 
     if fng_data:
-        fng     = fng_data.get("data", [{}])[0]
-        fng_val = fng.get("value", "—")
-        fng_cls = fng.get("value_classification", "—")
-        lines.append(f"Fear & Greed: {fng_val} ({fng_cls})")
+        fng = fng_data.get("data", [{}])[0]
+        lines.append(f"Fear & Greed: {fng.get('value','—')} ({fng.get('value_classification','—')})")
 
     if altszn_data:
         vals = altszn_data if isinstance(altszn_data, list) else altszn_data.get("data", [])
@@ -396,7 +359,6 @@ async def cmd_market(args: list) -> str:
             last  = vals[-1]
             score = int(last.get("value", 0) if isinstance(last, dict) else last)
             season = "Altcoin Season 🟢" if score >= 75 else "Neutral ⚪" if score >= 50 else "Bitcoin Season 🟠"
-            lines.append(f"BTC/Alt Season: {season}")
-            lines.append(f"ALTSZN Score: {score}/100")
+            lines += [f"BTC/Alt Season: {season}", f"ALTSZN Score: {score}/100"]
 
     return "\n".join(lines)
