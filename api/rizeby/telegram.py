@@ -325,52 +325,76 @@ async def handle_callback(callback: dict) -> None:
 
 
 HELP_TEXT = """
-🤖 *RizeBy — Tokerize Intelligence Bot*
+🤖 RizeBy — Tokerize Intelligence Bot
 
-*Prices & Charts*
-`/price` or `/p` — RIZE price · `/p cc` `/p eth` for any coin
-`/chart [15m|1h|4h|1d|1w|1M]` — OHLC chart (any coin first)
-`/tvl` — TVL & MCap/TVL · FDV/TVL ratios
-`/market` — BTC.D, Fear & Greed, Altcoin Season
+━━ PRICES & CHARTS ━━
 
-*Analysis* — put any coin first to use it as base asset
-`/perf {assets}` — Performance 7D/30D/90D vs USD
-`/pricesim {assets}` — Price sim vs other mcaps
-`/portfoliosim {amount} {coin} to {assets}` — Bag simulation
-`/arbitrage {amount} {coin} to {assets}` — Ratio analysis
+/price — RIZE price, MCap, ATH, Vol, TVL
+/price cc · /price eth · /price ondo — any coin
+/chart — RIZE/USD daily chart
+/chart 1h · /chart 4h · /chart 1w — any timeframe
+/tvl — TVL, MCap/TVL, FDV/TVL
+/market — BTC dominance, Fear & Greed, AltSzn
 
-*On-Chain RIZE*
-`/unbond` — Live unbonding queue
-`/totalbonded` — Live total RIZE bonded
+━━ ANALYSIS ━━
 
-*Trading Pairs*
-`/traderize` · `/tradecc` · `/trade{ticker}` (any coin)
+Put any coin first to change the base asset.
 
-*Canton Coin (CC)*
-`/ccprice` · `/ccburnmint [1d|1w]` · `/ccallocation`
+/perf eth link mantra — Performance 7D / 30D / 90D
+/pricesim eth btc cc — Price sim vs other mcaps
+/portfoliosim 1M rize to eth link — Bag simulation
+/arbitrage 1M rize to eth cc — Ratio analysis
 
-*T-RIZE Ecosystem*
-`/ecosystem` · `/ecosystem {name}` — T-RIZE partners
-`/canton {entity}` — Search 290+ Canton entities
-`/cantonlist` — Browse all Canton entities
-`/cantonboard` · `/cantonboard {name}` — Board members
-`/rwa` · `/vision87` · `/vision60` · `/kairos`
+━━ ON-CHAIN RIZE ━━
 
-*Canton Governance*
-`/cip` · `/cip {number}` — CIP list & detail
-`/cantongov` — Active governance proposals
+/unbond — Live unbonding queue (last 7 days)
+/totalbonded — Total RIZE bonded live
+/govflows — Monthly bond flows
+/govwhalealert — Whale moves >5M RIZE
+/govwhalealert breaks · bond+increase · releases
+/govwhalealert 1M — Custom RIZE threshold
+/govwallet 0x... — Full wallet governance profile
+/govbond 1234 — Bond profile · reply see wallet for owner
 
-*Governance Hub*
-`/govflows` — Monthly bond flows
-`/govwhalealert [breaks|bond+increase|releases]`
-`/govwallet {0x}` · `/govbond {#}` — Wallet & bond profile
+━━ TRADING PAIRS ━━
 
-*Fun*
-`/sayhello` · `/insult`
+/traderize — RIZE pairs & volumes
+/tradecc — CC pairs & volumes
+/tradebtc · /tradeeth · /tradelink — any coin
 
-*Navigation*
-Reply *next* after any paginated list to see more
-Reply *page 7* to jump to any page
+━━ CANTON COIN ━━
+
+/ccprice — Canton Coin price & stats
+/ccburnmint · /ccburnmint 1w — Burn/mint ratio
+/ccallocation — Mint allocation by role
+
+━━ T-RIZE ECOSYSTEM ━━
+
+/cantonlist — Browse all 290+ Canton entities
+/canton entity — Search any Canton entity
+/ecosystem — All 21 T-RIZE partners
+/ecosystem name — Partner deep-dive
+/cantonboard — Canton Foundation board (17 members)
+/cantonboard name — Member background
+/rwa — T-RIZE RWA deals overview
+/vision87 · /vision60 · /kairos — Deal details
+
+━━ CANTON GOVERNANCE ━━
+
+/cip — Latest CIPs · reply next for more
+/cip 0116 — Specific CIP deep-dive
+/cantongov — Active governance proposals
+
+━━ FUN ━━
+
+/sayhello — GM
+/insult — Get roasted
+
+━━ NAVIGATION ━━
+
+Reply next — next page of any list
+Reply page 7 — jump to page 7
+Reply a name — search within active list
 """.strip()
 
 
