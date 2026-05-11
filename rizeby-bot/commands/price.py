@@ -76,59 +76,60 @@ async def cmd_price(args: list) -> tuple:
 
 
 async def cmd_tvl(args: list) -> str:
-    history = await get_mcap_history()
-    if not history:
-        return "❌ Could not fetch TVL data."
+    import asyncio as _asyncio
+    # Parallel fetch: mcap-history for TVL + CoinGecko for live price/mcap/fdv
+    history_coro = get_mcap_history()
+    cg_coro      = get_coin_detail(RIZE_ID)
+    history, price_data = await _asyncio.gather(history_coro, cg_coro)
 
-    # Handle both {series:[...]} and direct list formats
-    if isinstance(history, dict):
-        series = history.get("series", [])
-    elif isinstance(history, list):
-        series = history
-    else:
-        return "❌ Unexpected TVL data format."
+    # TVL from mcap-history.json
+    tvl  = None
+    date = ""
+    if history:
+        if isinstance(history, dict):
+            series = history.get("series", [])
+        elif isinstance(history, list):
+            series = history
+        else:
+            series = []
+        if series:
+            latest = series[-1]
+            tvl  = latest.get("tvl") or latest.get("TVL")
+            date = latest.get("date", "")
 
-    if not series:
-        return "❌ No TVL data available."
-
-    latest   = series[-1]
-    mcap     = latest.get("mcap") or latest.get("market_cap")
-    fdv      = latest.get("fdv")
-    tvl      = latest.get("tvl")
-    mcap_tvl = latest.get("mcap_tvl") or (mcap / tvl if mcap and tvl else None)
-    fdv_tvl  = latest.get("fdv_tvl") or (fdv / tvl if fdv and tvl else None)
-    date     = latest.get("date", "")
-
-    price_data = await get_coin_detail(RIZE_ID)
-    live_mcap = live_price = None
+    # Live price, mcap, fdv from CoinGecko
+    live_price = live_mcap = live_fdv = None
     if price_data:
         md = price_data.get("market_data", {})
-        live_mcap  = md.get("market_cap", {}).get("usd")
         live_price = md.get("current_price", {}).get("usd")
+        live_mcap  = md.get("market_cap", {}).get("usd")
+        live_fdv   = md.get("fully_diluted_valuation", {}).get("usd")
+
+    # Compute ratios locally
+    mcap_tvl = (live_mcap / tvl) if (live_mcap and tvl and tvl > 0) else None
+    fdv_tvl  = (live_fdv  / tvl) if (live_fdv  and tvl and tvl > 0) else None
 
     def valuation(ratio):
-        if ratio is None: return ""
-        if ratio < 0.5:   return "🟢 Undervalued"
-        if ratio < 1.0:   return "🟡 Fair"
-        if ratio < 2.0:   return "🟠 Overvalued"
+        if not ratio: return ""
+        if ratio < 0.5:  return "🟢 Undervalued"
+        if ratio < 1.0:  return "🟡 Fair"
+        if ratio < 2.0:  return "🟠 Overvalued"
         return "🔴 Highly Overvalued"
 
     lines = [
         "📊 *RIZE MCap & TVL*",
-        f"_Data as of {date}_" if date else "",
+        f"_TVL as of {date}_" if date else "_TVL data_",
         "",
-        f"💰 Price: {fmt_price(live_price) if live_price else '—'}",
-        f"MCap: {fmt_usd(live_mcap) if live_mcap else fmt_usd(mcap)}",
-        f"FDV: {fmt_usd(fdv) if fdv else '—'}",
-        f"TVL: {fmt_usd(tvl) if tvl else '—'}",
+        f"💰 Price:    {fmt_price(live_price) if live_price else '—'}",
+        f"MCap:        {fmt_usd(live_mcap) if live_mcap else '—'}",
+        f"FDV:         {fmt_usd(live_fdv) if live_fdv else '—'}",
+        f"TVL:         {fmt_usd(tvl) if tvl else '—'}",
         "",
-        f"MCap/TVL: {f'{mcap_tvl:.2f}×' if mcap_tvl else '—'} {valuation(mcap_tvl)}",
-        f"FDV/TVL: {f'{fdv_tvl:.2f}×' if fdv_tvl else '—'} {valuation(fdv_tvl)}",
+        f"MCap/TVL:    {f'{mcap_tvl:.2f}x' if mcap_tvl else '—'} {valuation(mcap_tvl)}",
+        f"FDV/TVL:     {f'{fdv_tvl:.2f}x' if fdv_tvl else '—'} {valuation(fdv_tvl)}",
     ]
-    return "\n".join(l for l in lines if l != "")
+    return "\n".join(lines)
 
-
-KRAKEN_INTERVALS = {"15m": 15, "1h": 60, "4h": 240, "1d": 1440, "1w": 10080, "1M": 43200}
 
 async def cmd_chart(args: list) -> tuple:
     base_id, remaining = parse_base_and_compare(args)
