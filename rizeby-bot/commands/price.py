@@ -177,7 +177,9 @@ async def cmd_chart(args: list) -> tuple:
     if not api_key:
         return None, "Chart API key not configured."
 
-    params = {
+    # Build params — chart-img v1 supports multiple studies via repeated key
+    # Max 3 studies on free plan (studies[] + drawings[])
+    base_params = {
         "symbol":   tv_symbol,
         "interval": tv_interval,
         "theme":    "dark",
@@ -187,9 +189,14 @@ async def cmd_chart(args: list) -> tuple:
     }
     try:
         async with httpx.AsyncClient(timeout=30) as client:
+            # Pass studies as repeated query params (chart-img v1 format)
+            from urllib.parse import urlencode
+            query = urlencode(list(base_params.items()) + [
+                ("studies", "BB"),      # Bollinger Bands
+                ("studies", "Volume"),  # Volume
+            ])
             r = await client.get(
-                "https://api.chart-img.com/v1/tradingview/advanced-chart",
-                params=params,
+                f"https://api.chart-img.com/v1/tradingview/advanced-chart?{query}",
                 headers={"Authorization": f"Bearer {api_key}"},
             )
             if r.status_code == 200 and r.headers.get("content-type", "").startswith("image"):
