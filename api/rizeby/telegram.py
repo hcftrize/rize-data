@@ -329,21 +329,21 @@ HELP_TEXT = """
 
 ━━ PRICES & CHARTS ━━
 
-/price — RIZE price, MCap, ATH, Vol, TVL
-/price cc · /price eth · /price ondo — any coin
+/p — RIZE price, MCap, ATH, Vol, TVL
+/p cc · /p eth · /p ondo — any coin
 /chart — RIZE/USD daily chart
 /chart 1h · /chart 4h · /chart 1w — any timeframe
 /tvl — TVL, MCap/TVL, FDV/TVL
-/market — BTC dominance, Fear & Greed, AltSzn
+/market — Assets dominance, Fear&Greed, AltSzn
 
 ━━ ANALYSIS ━━
 
-Put any coin first to change the base asset.
+Put any token first to change the base asset.
 
-/perf eth link mantra — Performance 7D / 30D / 90D
-/pricesim eth btc cc — Price sim vs other mcaps
-/portfoliosim 1M rize to eth link — Bag simulation
-/arbitrage 1M rize to eth cc — Ratio analysis
+/perf (tokens list) — Performance 7D / 30D / 90D
+/pricesim (tickers) — Price sim vs other mcaps
+/portfoliosim (qty) (token) to (tickers) — Bag simulation
+/arbitrage (qty) (token) to (tickers) — Ratio analysis
 
 ━━ ON-CHAIN RIZE ━━
 
@@ -360,7 +360,7 @@ Put any coin first to change the base asset.
 
 /traderize — RIZE pairs & volumes
 /tradecc — CC pairs & volumes
-/tradebtc · /tradeeth · /tradelink — any coin
+/tradebtc · /tradeeth · /tradelink — any ticker
 
 ━━ CANTON COIN ━━
 
@@ -372,10 +372,10 @@ Put any coin first to change the base asset.
 
 /cantonlist — Browse all 290+ Canton entities
 /canton entity — Search any Canton entity
-/ecosystem — All 21 T-RIZE partners
+/ecosystem — All T-RIZE partners
 /ecosystem name — Partner deep-dive
-/cantonboard — Canton Foundation board (17 members)
-/cantonboard name — Member background
+/cantonboard — Canton Foundation board members
+/cantonboard (name) — Member background
 /rwa — T-RIZE RWA deals overview
 /vision87 · /vision60 · /kairos — Deal details
 
