@@ -299,7 +299,7 @@ async def _cmd_cantonlist(chat_id: int, page: int, thread_id: int = None):
         "_Reply with a name to learn more, or type `/canton {name}`_",
         "_Reply *next* for more · Reply *page N* to jump to page N_",
     ]
-    await send_message(chat_id, "\n".join(lines, thread_id=thread_id), thread_id=thread_id)
+    await send_message(chat_id, "\n".join(lines), thread_id=thread_id)
     _set_page(chat_id, "cantonlist", page, [])
 
 
