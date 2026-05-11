@@ -600,19 +600,47 @@ async def cmd_govwallet(args: list, page: int = 0) -> str:
             lines.append(f"  _…and {len(active_bonds)-5} more_")
         lines.append("")
 
-    # Recent timeline
-    if all_events:
-        lines.append("*Full Activity Timeline:*")
-        for e in all_events[:5]:
-            delta = e.get("delta", 0)
+    all_sorted = sorted(all_events, key=lambda e: e.get("ts", 0), reverse=True)
+
+    if page == 0:
+        # First page: full wallet profile + first 5 timeline entries
+        if all_sorted:
+            lines.append("*Full Activity Timeline:*")
+            for e in all_sorted[:5]:
+                delta = e.get("delta", 0) or 0
+                amt   = abs(parse_amt(delta))
+                sign  = "+" if delta > 0 else ""
+                lines.append(
+                    f"  {e.get('date','—')}  {e.get('type','—')}  "
+                    f"#{e.get('_nftId','?')}"
+                    f"{'  ' + sign + fmt_rize(amt) if amt else ''}"
+                )
+            if len(all_sorted) > 5:
+                lines.append("_Reply *next* to see full activity timeline._")
+    else:
+        # Next pages: short header + 30 timeline entries per page
+        per_page = 30
+        start = (page - 1) * per_page  # page 1 = events 0-29, page 2 = 30-59...
+        page_ev = all_sorted[start:start + per_page]
+        total   = len(all_sorted)
+
+        lines = [
+            f"👛 *{short_addr(addr)}*",
+            f"Rank #{rank}" if rank else "",
+            "",
+            f"*Full Activity Timeline* — {start+1}–{min(start+per_page, total)} of {total}",
+            "",
+        ]
+        for e in page_ev:
+            delta = e.get("delta", 0) or 0
             amt   = abs(parse_amt(delta))
-            sign  = "+" if (delta or 0) > 0 else ""
+            sign  = "+" if delta > 0 else ""
             lines.append(
                 f"  {e.get('date','—')}  {e.get('type','—')}  "
                 f"#{e.get('_nftId','?')}"
                 f"{'  ' + sign + fmt_rize(amt) if amt else ''}"
             )
-        if len(all_events) > 5:
-            lines.append("_Reply *next* to see more activity._")
+        if start + per_page < total:
+            lines.append(f"_Reply *next* for more._")
 
-    return "\n".join(lines)
+    return "\n".join(l for l in lines if l is not None)
