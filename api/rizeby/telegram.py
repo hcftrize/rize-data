@@ -60,7 +60,7 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0,
                 state_data = (bond_states or {}).get(str(nft_id), {})
                 owner = state_data.get("owner", "")
                 if owner:
-                    await send_message(chat_id, await cmd_govwallet([owner]), thread_id=thread_id)
+                    await send_message(chat_id, await cmd_govwallet([owner], page=0), thread_id=thread_id)
                 else:
                     await send_message(chat_id, f"Owner not found for bond #{nft_id}. Try `/govwallet 0x...`", thread_id=thread_id)
             except Exception:
@@ -245,9 +245,9 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0,
         query = cmd_lower.replace("govwallet", "").strip()
         combined = ([query] if query else []) + args
         page = _get_page(chat_id)
-        p = page["page"] if page and page["cmd"] == "govwallet_timeline" else 0
-        _set_page(chat_id, "govwallet_timeline", p, combined)
-        await send_message(chat_id, await cmd_govwallet(combined), thread_id=thread_id)
+        p = page["page"] if page and page["cmd"] == "govwallet" else 0
+        _set_page(chat_id, "govwallet", p, combined)
+        await send_message(chat_id, await cmd_govwallet(combined, page=p), thread_id=thread_id)
 
     # ── Fun ───────────────────────────────────────────────────────────────
     elif cmd_lower in ("sayhello", "hello", "hi", "start"):
@@ -325,25 +325,25 @@ async def handle_callback(callback: dict) -> None:
 
 
 HELP_TEXT = """
-🤖 RIZEBY — Tokerize Intelligence Bot
+🤖 RizeBy — Tokerize Intelligence Bot
 
 ━━ PRICES & CHARTS ━━
 
-/p — RIZE price, MCap, ATH, Vol, TVL
-/p cc · /p eth · /p ondo — any coin
+/price — RIZE price, MCap, ATH, Vol, TVL
+/price cc · /price eth · /price ondo — any coin
 /chart — RIZE/USD daily chart
 /chart 1h · /chart 4h · /chart 1w — any timeframe
 /tvl — TVL, MCap/TVL, FDV/TVL
-/market — Assets dominance, Fear&Greed, AltSzn
+/market — BTC dominance, Fear & Greed, AltSzn
 
 ━━ ANALYSIS ━━
 
-Put any token first to change the base asset.
+Put any coin first to change the base asset.
 
-/perf (tickers) — Performance 7D / 30D / 90D
-/pricesim (tickers) — Price sim vs other mcaps
-/portfoliosim (qty) (token) to (tickers) — Bag simulation
-/arbitrage (qty) (token) to (tickers) — Ratio analysis
+/perf eth link mantra — Performance 7D / 30D / 90D
+/pricesim eth btc cc — Price sim vs other mcaps
+/portfoliosim 1M rize to eth link — Bag simulation
+/arbitrage 1M rize to eth cc — Ratio analysis
 
 ━━ ON-CHAIN RIZE ━━
 
@@ -360,7 +360,7 @@ Put any token first to change the base asset.
 
 /traderize — RIZE pairs & volumes
 /tradecc — CC pairs & volumes
-/tradebtc · /tradeeth · /tradelink — any ticker
+/tradebtc · /tradeeth · /tradelink — any coin
 
 ━━ CANTON COIN ━━
 
@@ -372,10 +372,10 @@ Put any token first to change the base asset.
 
 /cantonlist — Browse all 290+ Canton entities
 /canton entity — Search any Canton entity
-/ecosystem — All T-RIZE partners
+/ecosystem — All 21 T-RIZE partners
 /ecosystem name — Partner deep-dive
-/cantonboard — Canton Foundation board members
-/cantonboard (name) — Member background
+/cantonboard — Canton Foundation board (17 members)
+/cantonboard name — Member background
 /rwa — T-RIZE RWA deals overview
 /vision87 · /vision60 · /kairos — Deal details
 
