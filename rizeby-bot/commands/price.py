@@ -132,75 +132,79 @@ async def cmd_tvl(args: list) -> str:
 
 
 async def cmd_chart(args: list) -> tuple:
+    import os
     base_id, remaining = parse_base_and_compare(args)
     coin_name = display_name(base_id)
 
+    CHARTIMG_INTERVALS = {
+        "15m": "15m", "1h": "1h", "4h": "4h",
+        "1d": "1D", "1w": "1W", "1m": "1M",
+    }
     interval_key = "1d"
     for a in remaining:
         al = a.lower()
-        if al in KRAKEN_INTERVALS:
+        if al in CHARTIMG_INTERVALS or al in ("3m", "5m", "30m", "45m", "2h", "3h"):
             interval_key = al
             break
-    interval_min = KRAKEN_INTERVALS.get(interval_key, 1440)
+    tv_interval = CHARTIMG_INTERVALS.get(interval_key, "1D")
 
-    pair = get_kraken_pair(base_id)
-    if not pair:
-        return None, f"❌ No Kraken chart available for {coin_name}."
+    TV_SYMBOLS = {
+        "rize":           "KRAKEN:RIZEUSD",
+        "bitcoin":        "BINANCE:BTCUSDT",
+        "ethereum":       "BINANCE:ETHUSDT",
+        "chainlink":      "BINANCE:LINKUSDT",
+        "ondo-finance":   "BINANCE:ONDOUSDT",
+        "mantra-dao":     "BINANCE:OMNIUSDT",
+        "ripple":         "BINANCE:XRPUSDT",
+        "solana":         "BINANCE:SOLUSDT",
+        "cardano":        "BINANCE:ADAUSDT",
+        "avalanche-2":    "BINANCE:AVAXUSDT",
+        "polkadot":       "BINANCE:DOTUSDT",
+        "uniswap":        "BINANCE:UNIUSDT",
+        "aave":           "BINANCE:AAVEUSDT",
+    }
+    tv_symbol = TV_SYMBOLS.get(base_id)
+    if not tv_symbol:
+        pair = get_kraken_pair(base_id)
+        if pair:
+            tv_symbol = f"KRAKEN:{pair}"
+        else:
+            from utils.coingecko import DISPLAY_MAP
+            sym = DISPLAY_MAP.get(base_id, base_id.upper())
+            tv_symbol = f"BINANCE:{sym}USDT"
 
-    url = f"https://api.kraken.com/0/public/OHLC?pair={pair}&interval={interval_min}"
-    try:
-        async with httpx.AsyncClient(timeout=10) as client:
-            r = await client.get(url)
-            data = r.json()
-    except Exception:
-        return None, "❌ Could not fetch chart data from Kraken."
+    api_key = os.environ.get("CHARTIMG_KEY", "")
+    if not api_key:
+        return None, "Chart API key not configured."
 
-    if data.get("error") and data["error"]:
-        return None, f"❌ Kraken: {data['error']}"
-
-    result   = data.get("result", {})
-    ohlc_key = next((k for k in result if k != "last"), None)
-    if not ohlc_key:
-        return None, "❌ No OHLC data returned."
-
-    candles = result[ohlc_key][-60:]
-    closes  = [float(c[4]) for c in candles]
-
-    chart_cfg = {
-        "type": "line",
-        "data": {
-            "labels": [str(c[0]) for c in candles],
-            "datasets": [{
-                "label": f"{coin_name}/USD {interval_key}",
-                "data": closes,
-                "borderColor": "#7ee0ff",
-                "backgroundColor": "rgba(126,224,255,0.08)",
-                "borderWidth": 2, "pointRadius": 0, "fill": True, "tension": 0.3,
-            }]
-        },
-        "options": {
-            "plugins": {
-                "legend": {"labels": {"color": "#ffffff"}},
-                "title": {"display": True, "text": f"{coin_name}/USD — {interval_key} (Kraken)", "color": "#ffffff", "font": {"size": 16}}
-            },
-            "scales": {
-                "x": {"display": False},
-                "y": {"ticks": {"color": "#b6c1d8"}, "grid": {"color": "rgba(255,255,255,0.06)"}},
-            },
-        },
+    params = {
+        "symbol":   tv_symbol,
+        "interval": tv_interval,
+        "theme":    "dark",
+        "style":    "candle",
+        "width":    800,
+        "height":   500,
     }
     try:
-        async with httpx.AsyncClient(timeout=15) as client:
-            r = await client.post(
-                "https://quickchart.io/chart",
-                json={"c": chart_cfg, "backgroundColor": "#060818", "width": 800, "height": 400},
+        async with httpx.AsyncClient(timeout=30) as client:
+            r = await client.get(
+                "https://api.chart-img.com/v1/tradingview/advanced-chart",
+                params=params,
+                headers={"Authorization": f"Bearer {api_key}"},
             )
-            if r.status_code == 200:
-                caption = f"📊 {coin_name}/USD — {interval_key} (Kraken)\nLast: {fmt_price(closes[-1]) if closes else '—'}"
+            if r.status_code == 200 and r.headers.get("content-type", "").startswith("image"):
+                caption = f"📊 {coin_name} — {interval_key.upper()} (TradingView)"
                 return r.content, caption
-    except Exception:
-        pass
-    return None, "❌ Could not generate chart."
+            else:
+                try:
+                    err = r.json()
+                    msg = err.get("error") or err.get("message") or str(r.status_code)
+                except Exception:
+                    msg = str(r.status_code)
+                return None, f"Chart error: {msg}"
+    except Exception as e:
+        return None, f"Could not generate chart: {e}"
+
 
 
 async def cmd_traderize(args: list) -> str:
