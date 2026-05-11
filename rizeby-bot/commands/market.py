@@ -8,7 +8,7 @@ from utils.coingecko import (
     resolve_coin_ids, get_coin_detail, parse_base_and_compare,
     display_name, RIZE_ID, RIZE_SUPPLY, cg_get, COIN_MAP,
 )
-from utils.formatters import fmt_usd, fmt_pct, fmt_price, fmt_num, parse_amount
+from utils.formatters import fmt_usd, fmt_pct, fmt_price, fmt_sim_price, fmt_num, parse_amount
 import time
 
 _cache: dict = {}
@@ -114,7 +114,7 @@ async def cmd_pricesim(args: list) -> str:
         sign = "+" if pct_change > 0 else ""
         lines += [
             f"*{label}* MCap: {fmt_usd(target_mcap)}",
-            f"  Price: {fmt_price(hyp_price)} ({sign}{pct_change:.0f}%)",
+            f"  {base_name} price: {fmt_sim_price(hyp_price)} ({sign}{pct_change:.0f}%)",
             f"  {base_name} = {pct_of_mcap:.3f}% of {label}",
             "",
         ]
