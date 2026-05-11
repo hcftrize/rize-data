@@ -48,13 +48,25 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0,
         return
 
     # ── "see wallet" reply after /govbond ────────────────────────────────
-    if " ".join([cmd_lower] + args).lower().strip() in ("see wallet", "seewallet", "wallet"):
+    if cmd_lower in ("see wallet", "seewallet") or " ".join([cmd_lower] + args).lower() == "see wallet":
         state = _get_page(chat_id)
-        if state and state["cmd"] == "govbond_owner":
-            from commands.governance import cmd_govwallet
-            await send_message(chat_id, await cmd_govwallet([state["args"][0]], thread_id=thread_id), thread_id=thread_id)
+        if state and state["cmd"] == "govbond_owner" and state["args"]:
+            nft_id = state["args"][0].lstrip("#").strip()
+            try:
+                from utils.github_data import get_bond_states
+                from commands.governance import _load_bs_parts, cmd_govwallet
+                bs_raw = await get_bond_states()
+                bond_states, _, _ = _load_bs_parts(bs_raw)
+                state_data = (bond_states or {}).get(str(nft_id), {})
+                owner = state_data.get("owner", "")
+                if owner:
+                    await send_message(chat_id, await cmd_govwallet([owner]), thread_id=thread_id)
+                else:
+                    await send_message(chat_id, f"Owner not found for bond #{nft_id}. Try `/govwallet 0x...`", thread_id=thread_id)
+            except Exception:
+                await send_message(chat_id, "Could not load wallet. Try `/govwallet 0x...` directly.", thread_id=thread_id)
         else:
-            await send_message(chat_id, "Reply *see wallet* after a `/govbond` result.", thread_id=thread_id)
+            await send_message(chat_id, "Reply *see wallet* right after a `/govbond` result.", thread_id=thread_id)
         return
 
     # ── "page N" reply ────────────────────────────────────────────────────
@@ -72,15 +84,15 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0,
     # ── CC sub-commands ───────────────────────────────────────────────────
     if cmd_lower in ("cc", "ccprice"):
         from commands.cc import cmd_cc_price
-        await send_message(chat_id, await cmd_cc_price(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_cc_price(args), thread_id=thread_id)
         return
     if cmd_lower in ("ccburnmint", "ccburn", "ccmint"):
         from commands.cc import cmd_cc_burnmint
-        await send_message(chat_id, await cmd_cc_burnmint(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_cc_burnmint(args), thread_id=thread_id)
         return
     if cmd_lower in ("ccallocation", "ccalloc"):
         from commands.cc import cmd_cc_allocation
-        await send_message(chat_id, await cmd_cc_allocation(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_cc_allocation(args), thread_id=thread_id)
         return
 
     # ── Price & market ────────────────────────────────────────────────────
@@ -97,71 +109,71 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0,
 
     elif cmd_lower == "tvl":
         from commands.price import cmd_tvl
-        await send_message(chat_id, await cmd_tvl(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_tvl(args), thread_id=thread_id)
 
     elif cmd_lower in ("perf", "performance"):
         from commands.market import cmd_perf
-        await send_message(chat_id, await cmd_perf(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_perf(args), thread_id=thread_id)
 
     elif cmd_lower in ("pricesim", "ps"):
         from commands.market import cmd_pricesim
-        await send_message(chat_id, await cmd_pricesim(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_pricesim(args), thread_id=thread_id)
 
     elif cmd_lower in ("portfoliosim", "portfolio", "bag"):
         from commands.market import cmd_portfoliosim
-        await send_message(chat_id, await cmd_portfoliosim(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_portfoliosim(args), thread_id=thread_id)
 
     elif cmd_lower in ("arbitrage", "ratio", "arb"):
         from commands.market import cmd_arbitrage
-        await send_message(chat_id, await cmd_arbitrage(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_arbitrage(args), thread_id=thread_id)
 
     elif cmd_lower in ("market", "mkt"):
         from commands.market import cmd_market
-        await send_message(chat_id, await cmd_market(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_market(args), thread_id=thread_id)
 
     elif cmd_lower in ("unbond", "queue"):
         from commands.rize import cmd_unbond
         page = _get_page(chat_id)
         p = page["page"] if page and page["cmd"] == "unbond" else 0
         _set_page(chat_id, "unbond", p, args)
-        await send_message(chat_id, await cmd_unbond(args, page=p, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_unbond(args, page=p), thread_id=thread_id)
 
     elif cmd_lower in ("totalbonded", "bonded"):
         from commands.rize import cmd_totalbonded
-        await send_message(chat_id, await cmd_totalbonded(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_totalbonded(args), thread_id=thread_id)
 
     elif cmd_lower in ("traderize",):
         from commands.price import cmd_traderize
-        await send_message(chat_id, await cmd_traderize(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_traderize(args), thread_id=thread_id)
 
     elif cmd_lower in ("tradecc",):
         from commands.price import cmd_tradecc
-        await send_message(chat_id, await cmd_tradecc(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_tradecc(args), thread_id=thread_id)
 
     elif cmd_lower.startswith("trade") and len(cmd_lower) > 5:
         from commands.price import cmd_trade_any
-        await send_message(chat_id, await cmd_trade_any(cmd_lower[5:], thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_trade_any(cmd_lower[5:]), thread_id=thread_id)
 
     # ── Ecosystem ─────────────────────────────────────────────────────────
     elif cmd_lower == "rwa":
         from commands.ecosystem import cmd_rwa
-        await send_message(chat_id, await cmd_rwa(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_rwa(args), thread_id=thread_id)
 
     elif cmd_lower in ("vision87", "v87"):
         from commands.ecosystem import cmd_vision87
-        await send_message(chat_id, await cmd_vision87(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_vision87(args), thread_id=thread_id)
 
     elif cmd_lower in ("vision60", "v60"):
         from commands.ecosystem import cmd_vision60
-        await send_message(chat_id, await cmd_vision60(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_vision60(args), thread_id=thread_id)
 
     elif cmd_lower == "kairos":
         from commands.ecosystem import cmd_kairos
-        await send_message(chat_id, await cmd_kairos(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_kairos(args), thread_id=thread_id)
 
     elif cmd_lower == "cantonboard":
         from commands.ecosystem import cmd_cantonboard
-        await send_message(chat_id, await cmd_cantonboard(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_cantonboard(args), thread_id=thread_id)
 
     elif cmd_lower == "cantonlist":
         page = _get_page(chat_id)
@@ -172,12 +184,12 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0,
     elif cmd_lower.startswith("ecosystem"):
         from commands.ecosystem import cmd_ecosystem
         parts = cmd_lower[len("ecosystem"):].strip().split() + args
-        await send_message(chat_id, await cmd_ecosystem([a for a in parts if a], thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_ecosystem([a for a in parts if a]), thread_id=thread_id)
 
     elif cmd_lower.startswith("canton") and cmd_lower not in ("cantongov", "cantonboard", "cantonlist"):
         from commands.ecosystem import cmd_canton
         parts = cmd_lower[len("canton"):].strip().split() + args
-        await send_message(chat_id, await cmd_canton([a for a in parts if a], thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_canton([a for a in parts if a]), thread_id=thread_id)
 
     # ── Canton governance ─────────────────────────────────────────────────
     elif cmd_lower.startswith("cip"):
@@ -188,16 +200,16 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0,
             page = _get_page(chat_id)
             p = page["page"] if page and page["cmd"] == "cip" else 0
             _set_page(chat_id, "cip", p, [])
-            await send_message(chat_id, await cmd_cip([], page=p, thread_id=thread_id), thread_id=thread_id)
+            await send_message(chat_id, await cmd_cip([], page=p), thread_id=thread_id)
         else:
-            await send_message(chat_id, await cmd_cip(cip_args, thread_id=thread_id), thread_id=thread_id)
+            await send_message(chat_id, await cmd_cip(cip_args), thread_id=thread_id)
 
     elif cmd_lower in ("cantongov", "cgov"):
         from commands.canton_gov import cmd_cantongov
         page = _get_page(chat_id)
         p = page["page"] if page and page["cmd"] == "cantongov" else 0
         _set_page(chat_id, "cantongov", p, args)
-        await send_message(chat_id, await cmd_cantongov(args, page=p, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_cantongov(args, page=p), thread_id=thread_id)
 
     # ── Governance hub ────────────────────────────────────────────────────
     elif cmd_lower in ("govflows", "flows"):
@@ -205,14 +217,14 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0,
         page = _get_page(chat_id)
         p = page["page"] if page and page["cmd"] == "govflows" else 0
         _set_page(chat_id, "govflows", p, args)
-        await send_message(chat_id, await cmd_govflows(args, page=p, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_govflows(args, page=p), thread_id=thread_id)
 
     elif cmd_lower in ("govwhalealert", "whales", "whale"):
         from commands.governance import cmd_govwhalealert
         page = _get_page(chat_id)
         p = page["page"] if page and page["cmd"] == "govwhalealert" else 0
         _set_page(chat_id, "govwhalealert", p, args)
-        await send_message(chat_id, await cmd_govwhalealert(args, page=p, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_govwhalealert(args, page=p), thread_id=thread_id)
 
     elif cmd_lower.startswith("govbond"):
         from commands.governance import cmd_govbond
@@ -231,16 +243,16 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0,
         page = _get_page(chat_id)
         p = page["page"] if page and page["cmd"] == "govwallet_timeline" else 0
         _set_page(chat_id, "govwallet_timeline", p, combined)
-        await send_message(chat_id, await cmd_govwallet(combined, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_govwallet(combined), thread_id=thread_id)
 
     # ── Fun ───────────────────────────────────────────────────────────────
     elif cmd_lower in ("sayhello", "hello", "hi", "start"):
         from commands.fun import cmd_sayhello
-        await send_message(chat_id, await cmd_sayhello(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_sayhello(args), thread_id=thread_id)
 
     elif cmd_lower in ("insult", "roast"):
         from commands.fun import cmd_insult
-        await send_message(chat_id, await cmd_insult(args, thread_id=thread_id), thread_id=thread_id)
+        await send_message(chat_id, await cmd_insult(args), thread_id=thread_id)
 
     elif cmd_lower in ("help", "commands", ""):
         await send_message(chat_id, HELP_TEXT, thread_id=thread_id)
