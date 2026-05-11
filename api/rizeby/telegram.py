@@ -340,7 +340,7 @@ HELP_TEXT = """
 
 Put any token first to change the base asset.
 
-/perf (tokens list) — Performance 7D / 30D / 90D
+/perf (tickers) — Performance 7D / 30D / 90D
 /pricesim (tickers) — Price sim vs other mcaps
 /portfoliosim (qty) (token) to (tickers) — Bag simulation
 /arbitrage (qty) (token) to (tickers) — Ratio analysis
