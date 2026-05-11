@@ -937,21 +937,6 @@
     "logo_local": "logos\\chata.png"
   },
   {
-    "name": "Chata - Sync Insights",
-    "slug": "chata---sync-insights",
-    "logo_cdn": "https://cdn.prod.website-files.com/696805252243366e13a64c82/697a4b2e91c884840963f200_yellow-arrow-right.svg",
-    "short_desc": "Provider of AI powered application for data analytics and monitoring on Canton.",
-    "tags": [
-      "APPS (FEATURED)",
-      "VALIDATOR",
-      "APPS (ALL)",
-      "Network UtilitiesNo items found.",
-      "Roles\nAPPS (FEATURED)VALIDATORAPPS (ALL)\nAPPS (FEATURED)VALIDATORAPPS (ALL)"
-    ],
-    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nChata - Sync Insights\nhttps://chata.ai/SyncInsightsapp:https://syncinsights.io/\n\nProvider of Sync Insights, an AI-powered data analytics and monitoring featured app on Canton Network.\n\nRoles\nAPPS (FEATURED)VALIDATORAPPS (ALL)\nAPPS (FEATURED)VALIDATORAPPS (ALL)",
-    "logo_local": "logos\\chata---sync-insights.svg"
-  },
-  {
     "name": "Checker Finance",
     "slug": "checker-finance",
     "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69a515ddb9cd6b5f70e7fb1e_checker-finance-white-icon.png",
