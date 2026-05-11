@@ -111,8 +111,8 @@ async def cmd_tvl(args: list) -> str:
 
     def valuation(ratio):
         if not ratio: return ""
-        if ratio < 0.5:  return "🟢 Undervalued"
-        if ratio < 1.0:  return "🟡 Fair"
+        if ratio < 0.95: return "🟢 Undervalued"
+        if ratio <= 1.05: return "🟡 Fair"
         if ratio < 2.0:  return "🟠 Overvalued"
         return "🔴 Highly Overvalued"
 
