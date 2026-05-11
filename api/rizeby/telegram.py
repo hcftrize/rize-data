@@ -44,7 +44,10 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0,
         if not state:
             await send_message(chat_id, "No active list to navigate. Run a command first.", thread_id=thread_id)
             return
-        await route_command(state["cmd"], state["args"], chat_id, message_id, thread_id)
+        # Map internal state keys to actual commands
+        cmd_map = {"govbond_owner": "govbond", "govwallet_timeline": "govwallet"}
+        effective_cmd = cmd_map.get(state["cmd"], state["cmd"])
+        await route_command(effective_cmd, state["args"], chat_id, message_id, thread_id)
         return
 
     # ── "see wallet" reply after /govbond ────────────────────────────────
@@ -60,6 +63,7 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0,
                 state_data = (bond_states or {}).get(str(nft_id), {})
                 owner = state_data.get("owner", "")
                 if owner:
+                    _set_page(chat_id, "govwallet", 0, [owner])
                     await send_message(chat_id, await cmd_govwallet([owner], page=0), thread_id=thread_id)
                 else:
                     await send_message(chat_id, f"Owner not found for bond #{nft_id}. Try `/govwallet 0x...`", thread_id=thread_id)
