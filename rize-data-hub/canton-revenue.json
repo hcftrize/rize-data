@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-10T02:00:51.000Z",
+  "updatedAt": "2026-05-11T02:00:57.000Z",
   "validator_rewards": [
     {
       "time": "2024-09-05T00:00:00Z",
@@ -2954,7 +2954,7 @@
     {
       "time": "2026-04-27T00:00:00Z",
       "app_rewards": "0.0",
-      "validator_rewards": "503.1574696233"
+      "validator_rewards": "459.2196989377"
     },
     {
       "time": "2026-04-28T00:00:00Z",
@@ -2970,6 +2970,11 @@
       "time": "2026-04-30T00:00:00Z",
       "app_rewards": "11.8436236696",
       "validator_rewards": "232.7592027073"
+    },
+    {
+      "time": "2026-05-10T00:00:00Z",
+      "app_rewards": "0.0",
+      "validator_rewards": "0.323176725"
     }
   ],
   "score_rewards": [
@@ -3819,6 +3824,10 @@
     {
       "time": "2026-04-11T00:00:00Z",
       "total_burned": "1.6920427333"
+    },
+    {
+      "time": "2026-05-10T00:00:00Z",
+      "total_burned": "1.6158836249"
     }
   ],
   "score_burns": []
