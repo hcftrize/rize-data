@@ -496,9 +496,12 @@ def parse_update(body: dict):
         active_state = _pagination.get(chat_id)
         if active_state and (time.time() - active_state.get("ts", 0)) < PAGE_TTL:
             active_cmd = active_state.get("cmd", "")
-            if active_cmd in ("cantonlist", "ecosystem"):
-                # Treat plain text as /canton or /ecosystem lookup
+            if active_cmd == "cantonlist":
+                # Plain text reply to cantonlist = canton entity lookup
                 return "cmd", (chat_id, "canton", parts, msg_id, thread_id)
+            if active_cmd == "ecosystem":
+                # Plain text reply to ecosystem = ecosystem entity lookup
+                return "cmd", (chat_id, "ecosystem", parts, msg_id, thread_id)
             if active_cmd == "cantonboard":
                 return "cmd", (chat_id, "cantonboard", parts, msg_id, thread_id)
         # In groups: ignore plain text — don't spam error messages
