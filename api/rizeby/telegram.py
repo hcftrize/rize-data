@@ -325,7 +325,7 @@ async def handle_callback(callback: dict) -> None:
 
 
 HELP_TEXT = """
-🤖 RizeBy — Tokerize Intelligence Bot
+🤖 RIZEBY — Tokerize Intelligence Bot
 
 ━━ PRICES & CHARTS ━━
 
