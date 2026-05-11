@@ -407,7 +407,7 @@ async def cmd_govbond(args: list) -> str:
 
 # ── /govwallet ────────────────────────────────────────────────────────────────
 
-async def cmd_govwallet(args: list) -> str:
+async def cmd_govwallet(args: list, page: int = 0) -> str:
     """Wallet explorer — mirrors expRenderWallet exactly."""
     if not args:
         return (
