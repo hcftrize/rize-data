@@ -10,10 +10,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'rizeby-b
 TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN", "")
 TG_API = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}"
 
-# ── Pagination state (in-memory, per cold start) ──────────────────────────────
-# Maps chat_id → {cmd, page, args, ts}
+# ── Pagination state ──────────────────────────────────────────────────────────
 _pagination: dict = {}
-PAGE_TTL = 300  # 5 min
+PAGE_TTL = 600  # 10 min
 
 
 def _set_page(chat_id: int, cmd: str, page: int, args: list):
@@ -27,21 +26,50 @@ def _get_page(chat_id: int):
     return None
 
 
+def _next_page(chat_id: int):
+    state = _get_page(chat_id)
+    if state:
+        state["page"] += 1
+        state["ts"] = time.time()
+        return state
+    return None
+
+
 async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0) -> None:
     cmd_lower = cmd.lower().strip()
 
-    # ── "next" reply — advance pagination ─────────────────────────────────
-    if cmd_lower in ("next", "/next"):
-        state = _get_page(chat_id)
+    # ── "next" reply ──────────────────────────────────────────────────────
+    if cmd_lower in ("next",):
+        state = _next_page(chat_id)
         if not state:
-            await send_message(chat_id, "No active list to paginate. Run a command first.")
+            await send_message(chat_id, "No active list to navigate. Run a command first.")
             return
-        next_page = state["page"] + 1
-        _set_page(chat_id, state["cmd"], next_page, state["args"])
         await route_command(state["cmd"], state["args"], chat_id, message_id)
         return
 
-    # ── CC sub-commands ────────────────────────────────────────────────────
+    # ── "see wallet" reply after /govbond ────────────────────────────────
+    if " ".join([cmd_lower] + args).lower().strip() in ("see wallet", "seewallet", "wallet"):
+        state = _get_page(chat_id)
+        if state and state["cmd"] == "govbond_owner":
+            from commands.governance import cmd_govwallet
+            await send_message(chat_id, await cmd_govwallet([state["args"][0]]))
+        else:
+            await send_message(chat_id, "Reply *see wallet* after a `/govbond` result.")
+        return
+
+    # ── "page N" reply ────────────────────────────────────────────────────
+    if cmd_lower.startswith("page") and args and args[0].isdigit():
+        target = int(args[0]) - 1  # 0-indexed
+        state = _get_page(chat_id)
+        if state:
+            state["page"] = target
+            state["ts"] = time.time()
+            await route_command(state["cmd"], state["args"], chat_id, message_id)
+        else:
+            await send_message(chat_id, "No active list to navigate.")
+        return
+
+    # ── CC sub-commands ───────────────────────────────────────────────────
     if cmd_lower in ("cc", "ccprice"):
         from commands.cc import cmd_cc_price
         await send_message(chat_id, await cmd_cc_price(args))
@@ -55,7 +83,7 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0)
         await send_message(chat_id, await cmd_cc_allocation(args))
         return
 
-    # ── Price & market ─────────────────────────────────────────────────────
+    # ── Price & market ────────────────────────────────────────────────────
     if cmd_lower in ("price", "p"):
         from commands.price import cmd_price
         text, markup = await cmd_price(args)
@@ -64,10 +92,8 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0)
     elif cmd_lower in ("chart", "c"):
         from commands.price import cmd_chart
         img, caption = await cmd_chart(args)
-        if img:
-            await send_photo(chat_id, img, caption)
-        else:
-            await send_message(chat_id, caption)
+        if img: await send_photo(chat_id, img, caption)
+        else:   await send_message(chat_id, caption)
 
     elif cmd_lower == "tvl":
         from commands.price import cmd_tvl
@@ -95,13 +121,16 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0)
 
     elif cmd_lower in ("unbond", "queue"):
         from commands.rize import cmd_unbond
-        await send_message(chat_id, await cmd_unbond(args))
+        page = _get_page(chat_id)
+        p = page["page"] if page and page["cmd"] == "unbond" else 0
+        _set_page(chat_id, "unbond", p, args)
+        await send_message(chat_id, await cmd_unbond(args, page=p))
 
     elif cmd_lower in ("totalbonded", "bonded"):
         from commands.rize import cmd_totalbonded
         await send_message(chat_id, await cmd_totalbonded(args))
 
-    elif cmd_lower in ("traderize", "trade"):
+    elif cmd_lower in ("traderize",):
         from commands.price import cmd_traderize
         await send_message(chat_id, await cmd_traderize(args))
 
@@ -113,7 +142,7 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0)
         from commands.price import cmd_trade_any
         await send_message(chat_id, await cmd_trade_any(cmd_lower[5:]))
 
-    # ── Ecosystem ──────────────────────────────────────────────────────────
+    # ── Ecosystem ─────────────────────────────────────────────────────────
     elif cmd_lower == "rwa":
         from commands.ecosystem import cmd_rwa
         await send_message(chat_id, await cmd_rwa(args))
@@ -136,7 +165,7 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0)
 
     elif cmd_lower == "cantonlist":
         page = _get_page(chat_id)
-        p = (page["page"] if page and page["cmd"] == "cantonlist" else 0)
+        p = page["page"] if page and page["cmd"] == "cantonlist" else 0
         _set_page(chat_id, "cantonlist", p, args)
         await _cmd_cantonlist(chat_id, p)
 
@@ -150,15 +179,14 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0)
         parts = cmd_lower[len("canton"):].strip().split() + args
         await send_message(chat_id, await cmd_canton([a for a in parts if a]))
 
-    # ── Canton governance ──────────────────────────────────────────────────
+    # ── Canton governance ─────────────────────────────────────────────────
     elif cmd_lower.startswith("cip"):
         from commands.canton_gov import cmd_cip
         cip_args = cmd_lower[3:].strip().split() + args
         cip_args = [a for a in cip_args if a]
         if not cip_args:
-            # Paginated list
             page = _get_page(chat_id)
-            p = (page["page"] if page and page["cmd"] == "cip" else 0)
+            p = page["page"] if page and page["cmd"] == "cip" else 0
             _set_page(chat_id, "cip", p, [])
             await send_message(chat_id, await cmd_cip([], page=p))
         else:
@@ -167,32 +195,44 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0)
     elif cmd_lower in ("cantongov", "cgov"):
         from commands.canton_gov import cmd_cantongov
         page = _get_page(chat_id)
-        p = (page["page"] if page and page["cmd"] == "cantongov" else 0)
+        p = page["page"] if page and page["cmd"] == "cantongov" else 0
         _set_page(chat_id, "cantongov", p, args)
         await send_message(chat_id, await cmd_cantongov(args, page=p))
 
-    # ── Governance hub ─────────────────────────────────────────────────────
+    # ── Governance hub ────────────────────────────────────────────────────
     elif cmd_lower in ("govflows", "flows"):
         from commands.governance import cmd_govflows
         page = _get_page(chat_id)
-        p = (page["page"] if page and page["cmd"] == "govflows" else 0)
+        p = page["page"] if page and page["cmd"] == "govflows" else 0
         _set_page(chat_id, "govflows", p, args)
         await send_message(chat_id, await cmd_govflows(args, page=p))
 
     elif cmd_lower in ("govwhalealert", "whales", "whale"):
         from commands.governance import cmd_govwhalealert
         page = _get_page(chat_id)
-        p = (page["page"] if page and page["cmd"] == "govwhalealert" else 0)
+        p = page["page"] if page and page["cmd"] == "govwhalealert" else 0
         _set_page(chat_id, "govwhalealert", p, args)
         await send_message(chat_id, await cmd_govwhalealert(args, page=p))
 
-    elif cmd_lower.startswith("govbond") or cmd_lower.startswith("govwallet"):
-        from commands.governance import cmd_govwallet
-        query = cmd_lower.replace("govbond","").replace("govwallet","").strip()
+    elif cmd_lower.startswith("govbond"):
+        from commands.governance import cmd_govbond
+        query = cmd_lower.replace("govbond", "").strip()
         combined = ([query] if query else []) + args
+        if combined:
+            _set_page(chat_id, "govbond_owner", 0, combined)
+        result = await cmd_govbond(combined)
+        await send_message(chat_id, result)
+
+    elif cmd_lower.startswith("govwallet"):
+        from commands.governance import cmd_govwallet
+        query = cmd_lower.replace("govwallet", "").strip()
+        combined = ([query] if query else []) + args
+        page = _get_page(chat_id)
+        p = page["page"] if page and page["cmd"] == "govwallet_timeline" else 0
+        _set_page(chat_id, "govwallet_timeline", p, combined)
         await send_message(chat_id, await cmd_govwallet(combined))
 
-    # ── Fun ────────────────────────────────────────────────────────────────
+    # ── Fun ───────────────────────────────────────────────────────────────
     elif cmd_lower in ("sayhello", "hello", "hi", "start"):
         from commands.fun import cmd_sayhello
         await send_message(chat_id, await cmd_sayhello(args))
@@ -205,17 +245,15 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0)
         await send_message(chat_id, HELP_TEXT)
 
     else:
-        # Bonus hidden: /name or /entity lookups
+        # Bonus hidden: try lookup by name/entity
         from commands.ecosystem import lookup_any
         result = await lookup_any(cmd_lower + (" " + " ".join(args) if args else ""))
         if result:
             await send_message(chat_id, result)
-        else:
-            await send_message(chat_id, f"Unknown command: `{cmd}`\n\nType `/help` to see all commands.")
+        # If nothing found — silently ignore (no error in groups)
 
 
 async def _cmd_cantonlist(chat_id: int, page: int):
-    """Paginated list of all Canton entities."""
     from utils.github_data import get_entities
     entities = await get_entities()
     if not entities:
@@ -227,96 +265,95 @@ async def _cmd_cantonlist(chat_id: int, page: int):
     total = len(entities)
     total_pages = (total - 1) // per_page + 1
 
-    lines = [
-        f"🏛 *Canton Network — All Entities*",
-        f"_Page {page+1}/{total_pages} · {total} entities_",
-        "",
-    ]
+    lines = [f"🏛 *Canton Network — All Entities*",
+             f"_Page {page+1}/{total_pages} · {total} entities_", ""]
+
     for e in page_ents:
         name = e.get("name", "?")
-        tags = e.get("tags", [])
-        clean = [t for t in tags if isinstance(t, str) and len(t) < 40 and "\n" not in t and "Roles" not in t and "Network" not in t]
+        raw_tags = e.get("tags", [])
+        clean = [t for t in raw_tags if isinstance(t, str) and len(t) < 40
+                 and "\n" not in t and "Roles" not in t and "Network" not in t
+                 and "items found" not in t]
         tag_str = clean[0] if clean else ""
         lines.append(f"• *{name}*" + (f" — {tag_str}" if tag_str else ""))
 
-    if start + per_page < total:
-        lines += ["", "_Reply *next* to see more._"]
-
+    lines += [
+        "",
+        "_Reply with a name to learn more, or type `/canton {name}`_",
+        "_Reply *next* for more · Reply *page N* to jump to page N_",
+    ]
     await send_message(chat_id, "\n".join(lines))
     _set_page(chat_id, "cantonlist", page, [])
 
 
-# ── Callback query handler (refresh button) ───────────────────────────────────
+# ── Callback query handler (Refresh button) ───────────────────────────────────
 
 async def handle_callback(callback: dict) -> None:
     data    = callback.get("data", "")
     chat_id = callback["message"]["chat"]["id"]
     msg_id  = callback["message"]["message_id"]
-
     if data.startswith("price_"):
         coin_id = data[6:]
         from commands.price import cmd_price
-        from utils.coingecko import COIN_MAP
-        # Find the token key for this coin_id
-        token = next((k for k, v in COIN_MAP.items() if v == coin_id), coin_id)
+        from utils.coingecko import DISPLAY_MAP
+        token = next((k for k, v in DISPLAY_MAP.items() if k == coin_id), coin_id)
         text, markup = await cmd_price([token])
         await edit_message(chat_id, msg_id, text, markup)
-
-    # Answer callback to remove loading state
-    async with httpx.AsyncClient(timeout=5) as client:
-        await client.post(f"{TG_API}/answerCallbackQuery",
-                         json={"callback_query_id": callback["id"]})
+    try:
+        async with httpx.AsyncClient(timeout=5) as client:
+            await client.post(f"{TG_API}/answerCallbackQuery",
+                             json={"callback_query_id": callback["id"]})
+    except Exception:
+        pass
 
 
 HELP_TEXT = """
 🤖 *RizeBy — Tokerize Intelligence Bot*
 
 *Prices & Charts*
-`/price` — RIZE price · `/price cc` `/price eth` — any coin
-`/chart [15m|1h|4h|1d|1w|1M]` — OHLC chart
-`/tvl` — TVL & MCap/TVL ratios
-`/market` — BTC.D, Fear&Greed, Altcoin Season
+`/price` or `/p` — RIZE price · `/p cc` `/p eth` for any coin
+`/chart [15m|1h|4h|1d|1w|1M]` — OHLC chart (any coin first)
+`/tvl` — TVL & MCap/TVL · FDV/TVL ratios
+`/market` — BTC.D, Fear & Greed, Altcoin Season
 
-*Analysis* — put coin first to change base asset
+*Analysis* — put any coin first to use it as base asset
 `/perf {assets}` — Performance 7D/30D/90D vs USD
-`/pricesim {assets}` — If RIZE had each asset's mcap
-`/portfoliosim {amount} {coin} to {assets}` — Bag sim
+`/pricesim {assets}` — Price sim vs other mcaps
+`/portfoliosim {amount} {coin} to {assets}` — Bag simulation
 `/arbitrage {amount} {coin} to {assets}` — Ratio analysis
 
 *On-Chain RIZE*
-`/unbond` — Live unbonding queue (last 7 days)
+`/unbond` — Live unbonding queue
 `/totalbonded` — Live total RIZE bonded
 
 *Trading Pairs*
-`/traderize` · `/tradecc` · `/tradebtc` `/tradeeth` etc
+`/traderize` · `/tradecc` · `/trade{ticker}` (any coin)
 
 *Canton Coin (CC)*
 `/ccprice` · `/ccburnmint [1d|1w]` · `/ccallocation`
 
 *T-RIZE Ecosystem*
-`/ecosystem` — 21 T-RIZE partners
-`/ecosystem {name}` — Partner deep-dive
-`/canton {entity}` — Any of 290+ Canton entities
-`/cantonlist` — Browse all 290+ Canton entities
-`/cantonboard` — Canton Foundation board (17 members)
-`/rwa` — T-RIZE RWA deals
-`/vision87` · `/vision60` · `/kairos` — Deal details
+`/ecosystem` · `/ecosystem {name}` — T-RIZE partners
+`/canton {entity}` — Search 290+ Canton entities
+`/cantonlist` — Browse all Canton entities
+`/cantonboard` · `/cantonboard {name}` — Board members
+`/rwa` · `/vision87` · `/vision60` · `/kairos`
 
 *Canton Governance*
-`/cip` — Latest CIPs (reply *next* for more)
-`/cip {number}` — CIP detail (e.g. `/cip 0116`)
+`/cip` · `/cip {number}` — CIP list & detail
 `/cantongov` — Active governance proposals
 
 *Governance Hub*
 `/govflows` — Monthly bond flows
 `/govwhalealert [breaks|bond+increase|releases]`
-`/govwallet {0x...}` — Wallet governance profile
-`/govbond {#}` — Bond profile
+`/govwallet {0x}` · `/govbond {#}` — Wallet & bond profile
 
 *Fun*
 `/sayhello` · `/insult`
 
-_Reply *next* after any paginated list to see more._
+*Navigation*
+Reply *next* after any paginated list to see more
+Reply *page 7* to jump to any page
 """.strip()
 
 
@@ -358,28 +395,90 @@ async def send_photo(chat_id: int, photo_bytes: bytes, caption: str = "") -> Non
         pass
 
 
+async def register_commands() -> None:
+    """Register bot commands for the Telegram command list dropdown."""
+    commands = [
+        {"command": "help",         "description": "All commands & how to use RizeBy"},
+        {"command": "price",        "description": "RIZE price — /price or /price cc /price eth"},
+        {"command": "chart",        "description": "OHLC chart — /chart 1h /chart 1d etc"},
+        {"command": "tvl",          "description": "TVL, MCap/TVL, FDV/TVL"},
+        {"command": "perf",         "description": "Performance 7D/30D/90D — /perf eth link"},
+        {"command": "pricesim",     "description": "Price simulation — /pricesim eth btc"},
+        {"command": "portfoliosim", "description": "Portfolio sim — /portfoliosim 1M rize to eth"},
+        {"command": "arbitrage",    "description": "Ratio analysis — /arbitrage 1M rize to eth"},
+        {"command": "market",       "description": "BTC.D, Fear & Greed, Altcoin Season"},
+        {"command": "unbond",       "description": "Live unbonding queue"},
+        {"command": "totalbonded",  "description": "Total RIZE bonded live"},
+        {"command": "traderize",    "description": "RIZE trading pairs"},
+        {"command": "tradecc",      "description": "CC trading pairs"},
+        {"command": "ccprice",      "description": "Canton Coin price"},
+        {"command": "ccburnmint",   "description": "CC burn/mint ratio — /ccburnmint 1d or 1w"},
+        {"command": "ccallocation", "description": "CC mint allocation by role"},
+        {"command": "canton",       "description": "Canton entity — /canton franklin templeton"},
+        {"command": "cantonlist",   "description": "Browse all 290+ Canton entities"},
+        {"command": "cantonboard",  "description": "Canton Foundation board members"},
+        {"command": "ecosystem",    "description": "T-RIZE ecosystem partners"},
+        {"command": "rwa",          "description": "T-RIZE RWA deals overview"},
+        {"command": "vision87",     "description": "Vision 87 by Champfleury deal"},
+        {"command": "vision60",     "description": "Vision 60 by Ste-Rose deal"},
+        {"command": "kairos",       "description": "Kairos Digital Loan Notes"},
+        {"command": "cip",          "description": "Canton CIPs — /cip or /cip 0116"},
+        {"command": "cantongov",    "description": "Active Canton governance proposals"},
+        {"command": "govflows",     "description": "Monthly governance bond flows"},
+        {"command": "govwhalealert","description": "Whale alerts — /govwhalealert breaks"},
+        {"command": "govwallet",    "description": "Wallet profile — /govwallet 0x..."},
+        {"command": "govbond",      "description": "Bond profile — /govbond 10034"},
+        {"command": "sayhello",     "description": "GM from RizeBy"},
+        {"command": "insult",       "description": "Get roasted"},
+    ]
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            await client.post(f"{TG_API}/setMyCommands", json={"commands": commands})
+    except Exception:
+        pass
+
+
 def parse_update(body: dict):
-    # Handle callback queries (button presses)
     if body.get("callback_query"):
         return "callback", body["callback_query"]
 
     msg = body.get("message") or body.get("edited_message")
     if not msg:
         return None, None
+
+    # CRITICAL: use the message's own chat id, not the update-level id
+    # This fixes the multi-channel group bug
     chat_id = msg["chat"]["id"]
     msg_id  = msg.get("message_id", 0)
     text    = (msg.get("text") or "").strip()
     if not text:
         return None, None
-    text  = text.split("@")[0] if "@" in text else text
+
+    # Strip bot @mention
+    if "@" in text:
+        text = text.split("@")[0].strip()
+
     parts = text.split()
     if not parts:
         return None, None
+
     first = parts[0].lstrip("/").lower()
 
-    # "next" as standalone reply
+    # Only process if it's a command (starts with /) or known keywords
+    is_command = parts[0].startswith("/")
+    known_keywords = {"next", "page"}
+
+    if not is_command and first not in known_keywords:
+        # In groups: ignore plain text replies — don't spam error messages
+        return None, None
+
+    # "next" as standalone
     if first == "next":
-        return "cmd", (msg["chat"]["id"], "next", [], msg_id)
+        return "cmd", (chat_id, "next", [], msg_id)
+
+    # "page N"
+    if first == "page" and len(parts) > 1 and parts[1].isdigit():
+        return "cmd", (chat_id, "page", [parts[1]], msg_id)
 
     if first == "rizeby":
         cmd  = parts[1].lower() if len(parts) > 1 else "help"
@@ -402,6 +501,7 @@ class handler(BaseHTTPRequestHandler):
             elif kind == "cmd":
                 chat_id, cmd, args, msg_id = payload
                 asyncio.run(route_command(cmd, args, chat_id, msg_id))
+            # else: plain text in group — silently ignore
         except Exception:
             pass
         self.send_response(200)
@@ -412,6 +512,8 @@ class handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-type", "text/plain")
         self.end_headers()
+        # Register commands on GET (called once when checking webhook)
+        asyncio.run(register_commands())
         self.wfile.write(b"RizeBy bot is running.")
 
     def log_message(self, format, *args):

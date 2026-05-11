@@ -239,21 +239,35 @@ async def _cmd_trade(coin_id: str, symbol: str) -> str:
 
     ex_ranked = sorted(by_exchange.items(), key=lambda x: sum(p["vol"] for p in x[1]), reverse=True)
 
+    # Filter out DEX contract addresses (0x...) from exchange names
+    DEX_SKIP = {"0x", "pancake", "aerodrome", "uniswap v", "curve", "balancer"}
+
     lines = [f"🔄 *{symbol} Trading Pairs*", ""]
-    for ex_name, pairs in ex_ranked[:8]:
+    shown = 0
+    for ex_name, pairs in ex_ranked:
+        if shown >= 8: break
+        # Skip DEX exchanges with contract-style names
+        name_lower = ex_name.lower()
+        if ex_name.startswith("0x") or any(s in name_lower for s in DEX_SKIP):
+            continue
         pairs_sorted = sorted(pairs, key=lambda p: p["vol"], reverse=True)
         pairs_str    = " · ".join(p["pair"] for p in pairs_sorted[:4])
         top_vol      = fmt_usd(pairs_sorted[0]["vol"])
         lines.append(f"*{ex_name}*: {pairs_str}")
         lines.append(f"  Vol: {top_vol}/24h")
+        shown += 1
 
     all_pairs = sorted(
         [{"ex": ex, **p} for ex, pairs in by_exchange.items() for p in pairs],
         key=lambda x: x["vol"], reverse=True,
     )
     if all_pairs:
-        lines += ["", "🏆 *Top volume pairs:*"]
-        for p in all_pairs[:2]:
-            lines.append(f"  {p['ex']} — {p['pair']} · {fmt_usd(p['vol'])}/24h")
+        # Filter top 2 from non-DEX exchanges
+        filtered_top = [p for p in all_pairs if not p["ex"].startswith("0x") and
+                        not any(s in p["ex"].lower() for s in DEX_SKIP)]
+        if filtered_top:
+            lines += ["", "🏆 *Top volume pairs:*"]
+            for p in filtered_top[:2]:
+                lines.append(f"  {p['ex']} — {p['pair']} · {fmt_usd(p['vol'])}/24h")
 
     return "\n".join(lines)
