@@ -102,15 +102,20 @@ async def cmd_pricesim(args: list) -> str:
         f"Current: {fmt_price(base_price)} · Supply: {fmt_num(base_supply)}",
         "",
     ]
+    rows = []
     for orig, cid in token_map.items():
         if cid == base_id: continue
         c = by_id.get(cid, {})
         target_mcap = c.get("market_cap", 0)
         if not target_mcap: continue
-        hyp_price  = target_mcap / base_supply
-        pct_change = ((hyp_price / base_price) - 1) * 100 if base_price else 0
+        hyp_price   = target_mcap / base_supply
+        pct_change  = ((hyp_price / base_price) - 1) * 100 if base_price else 0
         pct_of_mcap = (base_mcap / target_mcap) * 100 if target_mcap else 0
-        label = display_name(cid, orig)
+        rows.append((hyp_price, display_name(cid, orig), target_mcap, pct_change, pct_of_mcap))
+
+    rows.sort(key=lambda r: r[0], reverse=True)
+
+    for hyp_price, label, target_mcap, pct_change, pct_of_mcap in rows:
         sign = "+" if pct_change > 0 else ""
         lines += [
             f"*{label}* MCap: {fmt_usd(target_mcap)}",
