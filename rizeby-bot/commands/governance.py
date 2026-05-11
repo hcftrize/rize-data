@@ -193,6 +193,7 @@ async def cmd_govflows(args: list, page: int = 0) -> str:
 async def cmd_govwhalealert(args: list, page: int = 0) -> str:
     dir_filter = "all"
     whale_min  = WHALE_MIN
+    from utils.formatters import parse_amount
     for a in args:
         al = a.lower()
         if al in ("breaks", "break"):               dir_filter = "break"
@@ -200,6 +201,11 @@ async def cmd_govwhalealert(args: list, page: int = 0) -> str:
         elif al in ("increase", "increases"):       dir_filter = "increase"
         elif al in ("bond+increase", "bondinc"):    dir_filter = "bond+increase"
         elif al in ("releases", "release"):         dir_filter = "release"
+        else:
+            # Try to parse as custom threshold e.g. "1M", "5m", "10000000"
+            parsed = parse_amount(al)
+            if parsed and parsed >= 100_000:
+                whale_min = parsed
 
     bb = await get_bond_broken()
     bc = await get_bond_created()
@@ -280,10 +286,12 @@ async def cmd_govwhalealert(args: list, page: int = 0) -> str:
 
     for e in page_ev:
         icon = dir_icon.get(e["dir"], "⚪")
+        owner_full = e['owner']
+        owner_disp = short_addr(owner_full)
         lines += [
             f"{icon} *{e['dir'].capitalize()}* — Bond #{e['nft']}",
             f"  {e['date']} · {fmt_rize(e['rize'])}",
-            f"  {short_addr(e['owner'])}",
+            f"  `{owner_full}`",
             "",
         ]
 
@@ -354,11 +362,13 @@ async def cmd_govbond(args: list) -> str:
     active_owner_bonds = [n for n in owner_nfts
                           if parse_amt(bond_states.get(str(n), {}).get("current", {}).get("balance", 0)) > 0]
 
+    # Store full owner address for "see wallet" reply
+    # Display truncated but full address in backtick is copyable
     lines = [
         f"🔗 *Bond #{nft_id}*",
         f"{'Active' if is_active else 'Inactive'}{' · Rank #' + str(rank) if rank else ''}",
         "",
-        f"Owner: `{short_addr(owner)}`",
+        f"Owner: `{owner}`",
         f"RIZE Bonded: *{fmt_rize(balance)}*",
         f"Maturity: {mat*100:.2f}%",
         f"Boost: {boost:.3f}×",
@@ -553,7 +563,7 @@ async def cmd_govwallet(args: list) -> str:
 
     lines = [
         f"👛 *Wallet Profile*",
-        f"`{addr}`",
+        f"`{addr}`",  # Full address - copyable
         f"{'Rank #' + str(rank) if rank else 'Unranked'}",
         "",
         f"Total VP: *{fmt_rize(total_vp)}* ({vp_pct:.3f}% of total)",
