@@ -184,7 +184,11 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0,
     elif cmd_lower.startswith("ecosystem"):
         from commands.ecosystem import cmd_ecosystem
         parts = cmd_lower[len("ecosystem"):].strip().split() + args
-        await send_message(chat_id, await cmd_ecosystem([a for a in parts if a]), thread_id=thread_id)
+        entity_args = [a for a in parts if a]
+        if not entity_args:
+            # List view - set pagination context so replies work
+            _set_page(chat_id, "ecosystem", 0, [])
+        await send_message(chat_id, await cmd_ecosystem(entity_args), thread_id=thread_id)
 
     elif cmd_lower.startswith("canton") and cmd_lower not in ("cantongov", "cantonboard", "cantonlist"):
         from commands.ecosystem import cmd_canton
