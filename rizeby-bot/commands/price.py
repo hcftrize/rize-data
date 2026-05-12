@@ -192,8 +192,7 @@ async def cmd_chart(args: list) -> tuple:
             # Pass studies as repeated query params (chart-img v1 format)
             from urllib.parse import urlencode
             query = urlencode(list(base_params.items()) + [
-                ("studies", "BB"),      # Bollinger Bands
-                ("studies", "Volume"),  # Volume
+                ("studies", "BB"),      # Bollinger Bands (Volume already shown by default)
             ])
             r = await client.get(
                 f"https://api.chart-img.com/v1/tradingview/advanced-chart?{query}",

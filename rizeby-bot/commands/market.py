@@ -177,6 +177,7 @@ async def cmd_portfoliosim(args: list) -> str:
         f"Current bag: {fmt_usd(current_bag)}",
         "",
     ]
+    rows = []
     for orig, cid in token_map.items():
         if cid == base_id: continue
         c = by_id.get(cid, {})
@@ -185,8 +186,13 @@ async def cmd_portfoliosim(args: list) -> str:
         hyp_price = target_mcap / base_supply
         bag_value = amount * hyp_price
         pct = ((bag_value / current_bag) - 1) * 100 if current_bag else 0
-        sign = "+" if pct > 0 else ""
         label = display_name(cid, orig)
+        rows.append((hyp_price, label, bag_value, pct))
+
+    rows.sort(key=lambda r: r[0], reverse=True)
+
+    for hyp_price, label, bag_value, pct in rows:
+        sign = "+" if pct > 0 else ""
         lines += [
             f"*{label}* mcap → {base_name} @ {fmt_price(hyp_price)}",
             f"  Bag: {fmt_usd(bag_value)} ({sign}{pct:.0f}%)",
