@@ -283,4 +283,3 @@ async def _cmd_trade(coin_id: str, symbol: str) -> str:
                 lines.append(f"  {p['ex']} — {p['pair']} · {fmt_usd(p['vol'])}/24h")
 
     return "\n".join(lines)
-    
