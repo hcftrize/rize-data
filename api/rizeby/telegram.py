@@ -316,9 +316,11 @@ async def handle_callback(callback: dict) -> None:
     if data.startswith("price_"):
         coin_id = data[6:]
         from commands.price import cmd_price
-        from utils.coingecko import DISPLAY_MAP
-        token = next((k for k, v in DISPLAY_MAP.items() if k == coin_id), coin_id)
-        text, markup = await cmd_price([token])
+        # coin_id is the CoinGecko id stored when /price was called
+        # Find the short ticker key that maps to this coin_id
+        from utils.coingecko import COIN_MAP
+        ticker = next((k for k, v in COIN_MAP.items() if v == coin_id), coin_id)
+        text, markup = await cmd_price([ticker])
         await edit_message(chat_id, msg_id, text, markup)
     try:
         async with httpx.AsyncClient(timeout=5) as client:
@@ -329,7 +331,7 @@ async def handle_callback(callback: dict) -> None:
 
 
 HELP_TEXT = """
-🤖 RizeBy — Tokerize Intelligence Bot
+🤖 RIZEBY — Tokerize Intelligence Bot
 
 ━━ PRICES & CHARTS ━━
 
@@ -338,16 +340,16 @@ HELP_TEXT = """
 /chart — RIZE/USD daily chart
 /chart 1h · /chart 4h · /chart 1w — any timeframe
 /tvl — TVL, MCap/TVL, FDV/TVL
-/market — BTC dominance, Fear & Greed, AltSzn
+/market — Assets dominance, Fear&Greed, AltSzn
 
 ━━ ANALYSIS ━━
 
 Put any coin first to change the base asset.
 
-/perf eth link mantra — Performance 7D / 30D / 90D
-/pricesim eth btc cc — Price sim vs other mcaps
-/portfoliosim 1M rize to eth link — Bag simulation
-/arbitrage 1M rize to eth cc — Ratio analysis
+/perf (tickers) — Performance 7D / 30D / 90D
+/pricesim (tickers) — Price sim vs other mcaps
+/portfoliosim (qty) (token) to (tickers) — Bag simulation
+/arbitrage (qty) (token) to (tickers) — Ratio analysis
 
 ━━ ON-CHAIN RIZE ━━
 
@@ -376,9 +378,9 @@ Put any coin first to change the base asset.
 
 /cantonlist — Browse all 290+ Canton entities
 /canton entity — Search any Canton entity
-/ecosystem — All 21 T-RIZE partners
+/ecosystem — All T-RIZE partners
 /ecosystem name — Partner deep-dive
-/cantonboard — Canton Foundation board (17 members)
+/cantonboard — Canton Foundation board
 /cantonboard name — Member background
 /rwa — T-RIZE RWA deals overview
 /vision87 · /vision60 · /kairos — Deal details
