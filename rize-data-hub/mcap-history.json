@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-11T04:54:13Z",
+  "updatedAt": "2026-05-12T08:12:44Z",
   "source": "DefiLlama \u2014 FDV = price \u00d7 totalSupply",
   "series": [
     {
@@ -3052,6 +3052,10 @@
     },
     {
       "date": "2026-05-11",
+      "tvl": 23000000.0
+    },
+    {
+      "date": "2026-05-12",
       "tvl": 23000000.0
     }
   ]
