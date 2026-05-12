@@ -210,12 +210,23 @@ async def cmd_govwhalealert(args: list, page: int = 0) -> str:
     bb = await get_bond_broken()
     bc = await get_bond_created()
     lc = await get_bond_lifecycle()
+    bs = await get_bond_states()
     if not bb:
         return "Could not load whale alert data."
 
     bb_data = bb if isinstance(bb, dict) else {}
     bc_data = bc if isinstance(bc, dict) else {}
     lc_data = lc if isinstance(lc, dict) else {}
+    # bond_states used to resolve missing owner on breaks
+    bond_states_data, _, _ = _load_bs_parts(bs) if bs else (None, {}, FULL_MATURITY_S)
+
+    def resolve_owner(e: dict, nft_key: str = "nftId") -> str:
+        """Return owner from event, falling back to bond_states lookup."""
+        owner = e.get("owner", "") or ""
+        if not owner and bond_states_data:
+            nft_id = str(e.get(nft_key, ""))
+            owner = (bond_states_data.get(nft_id) or {}).get("owner", "") or ""
+        return owner
 
     all_events = []
 
@@ -225,7 +236,7 @@ async def cmd_govwhalealert(args: list, page: int = 0) -> str:
             all_events.append({"ts": int(e.get("timestamp", 0)),
                 "date": e.get("date") or ts_to_date(e.get("timestamp", 0)),
                 "dir": "break", "nft": e.get("nftId", "?"),
-                "rize": rize, "owner": e.get("owner", "")})
+                "rize": rize, "owner": resolve_owner(e)})
 
     for e in bc_data.get("bondCreatedEvents", []):
         rize = parse_amt(e.get("amount", 0))
@@ -233,7 +244,7 @@ async def cmd_govwhalealert(args: list, page: int = 0) -> str:
             all_events.append({"ts": int(e.get("timestamp", 0)),
                 "date": e.get("date") or ts_to_date(e.get("timestamp", 0)),
                 "dir": "bond", "nft": e.get("nftId", "?"),
-                "rize": rize, "owner": e.get("owner", "")})
+                "rize": rize, "owner": resolve_owner(e)})
 
     for e in bc_data.get("increaseBondEvents", []):
         rize = parse_amt(e.get("amount", 0))
@@ -241,7 +252,7 @@ async def cmd_govwhalealert(args: list, page: int = 0) -> str:
             all_events.append({"ts": int(e.get("timestamp", 0)),
                 "date": e.get("date") or ts_to_date(e.get("timestamp", 0)),
                 "dir": "increase", "nft": e.get("nftId", "?"),
-                "rize": rize, "owner": e.get("owner", "")})
+                "rize": rize, "owner": resolve_owner(e)})
 
     for e in lc_data.get("tokensReleasedEvents", []):
         rize = parse_amt(e.get("amount", 0))
@@ -249,7 +260,7 @@ async def cmd_govwhalealert(args: list, page: int = 0) -> str:
             all_events.append({"ts": int(e.get("timestamp", 0)),
                 "date": e.get("date") or ts_to_date(e.get("timestamp", 0)),
                 "dir": "release", "nft": e.get("nftId", "?"),
-                "rize": rize, "owner": e.get("to") or e.get("owner", "")})
+                "rize": rize, "owner": (e.get("to") or resolve_owner(e))})
 
     if dir_filter == "break":
         all_events = [e for e in all_events if e["dir"] == "break"]
@@ -562,7 +573,7 @@ async def cmd_govwallet(args: list, page: int = 0) -> str:
     all_events.sort(key=lambda e: e.get("ts", 0), reverse=True)
 
     lines = [
-        f"👛 *Wallet Profile*",
+        f"🔗 *Wallet Profile*",
         f"`{addr}`",  # Full address - copyable
         f"{'Rank #' + str(rank) if rank else 'Unranked'}",
         "",
@@ -594,7 +605,7 @@ async def cmd_govwallet(args: list, page: int = 0) -> str:
         for b in sorted(active_bonds, key=lambda x: x["vp"], reverse=True)[:5]:
             lines.append(
                 f"  #{b['nftId']} — {fmt_rize(b['amount'])} "
-                f"· Mat {b['mat']*100:.2f}% · VP {fmt_rize(b['vp'])}"
+                f"· Mat {b['mat']*100:.2f}% · Boost {b['boost']:.3f}× · VP {fmt_rize(b['vp'])}"
             )
         if len(active_bonds) > 5:
             lines.append(f"  _…and {len(active_bonds)-5} more_")
