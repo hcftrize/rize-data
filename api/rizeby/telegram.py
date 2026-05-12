@@ -449,7 +449,7 @@ async def send_photo(chat_id: int, photo_bytes: bytes, caption: str = "", thread
 
 async def register_commands() -> None:
     """Register bot commands for the Telegram command list dropdown."""
- commands = [
+    commands = [
     {"command": "help",         "description": "All commands & how to use RIZEBY"},
     {"command": "p",            "description": "RIZE price, MCap, ATH, Vol, TVL — /p cc /p eth /p ondo for any coin"},
     {"command": "chart",        "description": "RIZE/USD daily chart — /chart 1h /chart 4h /chart 1w any timeframe"},
