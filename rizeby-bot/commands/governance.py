@@ -636,7 +636,8 @@ async def cmd_govwallet(args: list, page: int = 0) -> str:
         total   = len(all_sorted)
 
         lines = [
-            f"👛 *{short_addr(addr)}*",
+            f"🔗 *Wallet Profile*",
+            f"`{addr}`",
             f"Rank #{rank}" if rank else "",
             "",
             f"*Full Activity Timeline* — {start+1}–{min(start+per_page, total)} of {total}",
