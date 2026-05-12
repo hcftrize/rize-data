@@ -339,6 +339,7 @@ HELP_TEXT = """
 /price cc · /price eth · /price ondo — any coin
 /chart — RIZE/USD daily chart
 /chart 1h · /chart 4h · /chart 1w — any timeframe
+/chart cc · /chart eth 4h — any coin, any timeframe
 /tvl — TVL, MCap/TVL, FDV/TVL
 /market — Assets dominance, Fear&Greed, AltSzn
 
