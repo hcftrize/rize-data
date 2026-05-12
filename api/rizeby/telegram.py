@@ -485,7 +485,13 @@ async def register_commands() -> None:
 ]
     try:
         async with httpx.AsyncClient(timeout=10) as client:
+            # Global commands (DMs)
             await client.post(f"{TG_API}/setMyCommands", json={"commands": commands})
+            # Group commands — no @BOT suffix
+            await client.post(f"{TG_API}/setMyCommands", json={
+                "commands": commands,
+                "scope": {"type": "all_group_chats"},
+            })
     except Exception:
         pass
 
