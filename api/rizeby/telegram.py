@@ -324,7 +324,8 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0,
         query = cmd_lower.replace("govwallet", "").strip()
         combined = ([query] if query else []) + args
         page = _get_page(reply_chat_id)
-        p = page["page"] if page and page["cmd"] == "govwallet" else 0
+        # Only keep existing page if navigating the exact same wallet address
+        p = page["page"] if (page and page["cmd"] == "govwallet" and page["args"] == combined) else 0
         _set_page(reply_chat_id, "govwallet", p, combined)
         bot_mid = await send_message(reply_chat_id, await cmd_govwallet(combined, page=p), thread_id=reply_thread_id)
         if bot_mid: _cache_bot_msg(bot_mid, "govwallet", p, combined, reply_chat_id, reply_thread_id)
