@@ -3269,6 +3269,14 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3/dist/chartjs-plugin-annotation.min.js"></script>
+  <script>
+    // Register annotation plugin globally for Chart.js 4.x
+    if (window.ChartjsPluginAnnotation) {
+      Chart.register(window.ChartjsPluginAnnotation);
+    } else if (window.chartjsPluginAnnotation) {
+      Chart.register(window.chartjsPluginAnnotation);
+    }
+  </script>
 
   <script>
   /* ═══════════════════════════════════════════════════════════
@@ -3371,8 +3379,9 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   }
 
   async function cbbiInit() {
-    if (_cbbiChart) { cbbiRender(); return; }
     const loading = document.getElementById('cbbi-loading');
+    // If data already loaded, just re-render (cbbiRender handles canvas destruction)
+    if (_cbbiData) { cbbiRender(); return; }
     loading.style.display = 'flex';
     try {
       const resp = await fetch(CBBI_URL);
@@ -3441,7 +3450,6 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     if (_cbbiActive.has(key)) { _cbbiActive.delete(key); tile.classList.remove('active'); }
     else                      { _cbbiActive.add(key);    tile.classList.add('active'); }
     _cbbiAllOn = (_cbbiActive.size === CBBI_METRICS.length);
-    if (_cbbiChart) { _cbbiChart.destroy(); _cbbiChart = null; }
     cbbiRender();
   }
 
@@ -3452,7 +3460,6 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     document.querySelectorAll('.cbbi-indicator-tile').forEach(t => {
       t.classList.toggle('active', _cbbiActive.has(t.dataset.key));
     });
-    if (_cbbiChart) { _cbbiChart.destroy(); _cbbiChart = null; }
     cbbiRender();
   }
 
@@ -3460,7 +3467,6 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     _cbbiZoom = z;
     document.querySelectorAll('.cbbi-zoom-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
-    if (_cbbiChart) { _cbbiChart.destroy(); _cbbiChart = null; }
     cbbiRender();
   }
 
@@ -3475,6 +3481,11 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     const canvas  = document.getElementById('cbbi-chart');
     const loading = document.getElementById('cbbi-loading');
     const cutoff  = cbbiGetCutoff();
+
+    // Always destroy any existing chart on this canvas before creating a new one
+    const existing = Chart.getChart(canvas);
+    if (existing) { existing.destroy(); }
+    _cbbiChart = null;
 
     const priceRaw = _cbbiData['Price'] || {};
     const confRaw  = _cbbiData['Confidence'] || {};
