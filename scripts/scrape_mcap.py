@@ -30,7 +30,7 @@ from pathlib import Path
 CHARTS_URL   = "https://defillama.com/api/charts/coingecko/rize?fullChart=true"
 TVL_URL      = "https://api.llama.fi/protocol/t-rize"
 CG_BASE      = "https://api.coingecko.com/api/v3"
-CG_CHART_URL = f"{CG_BASE}/coins/rize/market_chart?vs_currency=usd&days=max&interval=daily"
+CG_CHART_URL = f"{CG_BASE}/coins/rize/market_chart?vs_currency=usd&days=10&interval=daily"
 CG_COIN_URL  = f"{CG_BASE}/coins/rize?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false"
 CG_KEY       = os.environ.get("COINGECKO_API_KEY", "")
 
@@ -156,11 +156,14 @@ def main():
         print(f"  Warning: DefiLlama TVL failed ({e})")
 
     # ── Detect gaps — dates where DefiLlama gave 0 ────────────────────────────
-    # A gap = date present in TVL (date exists) but missing from mcap or price.
+    # Only look at the last 10 days — no point checking pre-genesis dates
+    # (RIZE didn't exist before 2025-05-15, CoinGecko has nothing there anyway)
+    cutoff_fallback = (datetime.now(timezone.utc) - timedelta(days=10)).strftime("%Y-%m-%d")
     all_dl_dates = sorted(set(
         list(dl_mcap.keys()) + list(dl_price.keys()) + list(tvl_by_date.keys())
     ))
-    gaps = [d for d in all_dl_dates if d not in dl_mcap or d not in dl_price]
+    gaps = [d for d in all_dl_dates
+            if d >= cutoff_fallback and (d not in dl_mcap or d not in dl_price)]
 
     # ── CoinGecko fallback if needed ──────────────────────────────────────────
     cg_price: dict[str, float] = {}
