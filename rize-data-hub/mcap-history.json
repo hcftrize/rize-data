@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-05-13T12:09:10Z",
-  "source": "DefiLlama \u2014 FDV = price \u00d7 totalSupply",
+  "updatedAt": "2026-05-13T12:43:52Z",
+  "source": "DefiLlama (primary) + CoinGecko (fallback) \u2014 FDV = price x totalSupply",
   "series": [
     {
       "date": "2025-04-02",
