@@ -1805,18 +1805,15 @@ html, body { overflow-x: hidden; max-width: 100%; }
       </div>
       <p class="section-sub">Broader market positioning, relative performance, and valuation signal.</p>
 
-      <!-- Mobile: native select -->
-      <div class="ctx-tabs-mobile-wrap" id="mktctx-mobile-wrap">
+      <!-- Dropdown select — same pattern as RIZE Context -->
+      <div class="ctx-tabs-mobile-wrap" id="mktctx-mobile-wrap" style="display:block">
         <select class="ctx-tabs-select" id="mktctx-select" onchange="mktCtxSelectChange(this)">
           <option value="metrics">Key Market Metrics</option>
           <option value="cbbi">Bitcoin Cycle — CBBI</option>
         </select>
       </div>
-      <!-- Desktop: tab buttons -->
-      <div class="ctx-tabs" id="mktctx-tabs-desktop">
-        <button class="ctx-tab active" onclick="mktCtxSwitch('metrics',this)">Key Market Metrics</button>
-        <button class="ctx-tab"        onclick="mktCtxSwitch('cbbi',this)">Bitcoin Cycle — CBBI</button>
-      </div>
+      <!-- Desktop tab buttons hidden (using select everywhere like RIZE Context) -->
+      <div class="ctx-tabs ctx-tabs-desktop" id="mktctx-tabs-desktop" style="display:none">
 
       <!-- Panel: Key Market Metrics -->
       <div class="ctx-panel active" id="mktctx-panel-metrics">
@@ -1853,7 +1850,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
         <!-- Toggle all -->
         <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
-          <button id="cbbi-toggle-all-btn" onclick="cbbíToggleAll()" style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);padding:6px 16px;cursor:pointer;transition:background 0.15s,color 0.15s">Toggle All Metrics</button>
+          <button id="cbbi-toggle-all-btn" onclick="cbbiToggleAll()" style="font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);padding:6px 16px;cursor:pointer;transition:background 0.15s,color 0.15s">Toggle All Metrics</button>
         </div>
 
         <!-- Chart area -->
@@ -3268,8 +3265,10 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
   </script>
 
-  <!-- Chart.js for RIZE Context -->
+  <!-- Chart.js for RIZE Context + CBBI -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3/dist/chartjs-plugin-annotation.min.js"></script>
 
   <script>
   /* ═══════════════════════════════════════════════════════════
@@ -3305,54 +3304,66 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   ═══════════════════════════════════════════════════════════ */
   const CBBI_URL = 'https://colintalkscrypto.com/cbbi/data/latest.json';
   const CBBI_METRICS = [
-    { key: 'Pi',        label: 'Pi Cycle Top' },
-    { key: 'RUPL',      label: 'RUPL / NUPL' },
-    { key: 'RHODL',     label: 'RHODL Ratio' },
+    { key: 'Pi',        label: 'Pi Cycle Top'   },
+    { key: 'RUPL',      label: 'RUPL / NUPL'    },
+    { key: 'RHODL',     label: 'RHODL Ratio'    },
     { key: 'Puell',     label: 'Puell Multiple' },
-    { key: 'MA2',       label: '2Y Moving Avg' },
-    { key: 'Trolololo', label: 'BTC Trolololo' },
-    { key: 'MVRV',      label: 'MVRV Z-Score' },
-    { key: 'RR',        label: 'Reserve Risk' },
-    { key: 'Woobull',   label: 'Woobull CVDD' },
+    { key: 'MA2',       label: '2Y Moving Avg'  },
+    { key: 'Trolololo', label: 'BTC Trolololo'  },
+    { key: 'MVRV',      label: 'MVRV Z-Score'   },
+    { key: 'RR',        label: 'Reserve Risk'   },
+    { key: 'Woobull',   label: 'Woobull CVDD'   },
   ];
-  // Halvings (unix timestamps)
+  // Known Bitcoin halving timestamps (unix seconds)
   const CBBI_HALVINGS = [1354320000, 1462060800, 1589760000, 1719878400];
 
-  let _cbbiData = null;
-  let _cbbiChart = null;
-  let _cbbiZoom = '6M';
-  let _cbbiActive = new Set(CBBI_METRICS.map(m => m.key)); // all on by default
-  let _cbbiAllOn = true;
+  let _cbbiData     = null;
+  let _cbbiChart    = null;
+  let _cbbiZoom     = '6M';
+  let _cbbiActive   = new Set(CBBI_METRICS.map(m => m.key));
+  let _cbbiShowPrice= true;
+  let _cbbiShowHL   = true;
+  let _cbbiShowHalv = true;
+  let _cbbiAllOn    = true;
 
-  function cbbiScoreColor(v) {
-    // v: 0-100
-    if (v < 20)  return '#00cc44';
-    if (v < 35)  return '#66dd00';
-    if (v < 50)  return '#ccee00';
-    if (v < 65)  return '#ffaa00';
-    if (v < 80)  return '#ff5500';
-    return '#cc0000';
+  // Last non-null value for a metric dict
+  function cbbiLastVal(dict) {
+    if (!dict) return null;
+    const ts = Object.keys(dict).map(Number).sort((a,b) => a-b);
+    for (let i = ts.length-1; i >= 0; i--) {
+      if (dict[ts[i]] !== null && dict[ts[i]] !== undefined) return dict[ts[i]];
+    }
+    return null;
   }
 
-  function cbbiRainbowColor(v) {
-    // v: 0-1 → green→yellow→orange→red
+  // Score 0-1 → color using Tokerize palette anchors
+  function cbbiScoreColor(v01) {
+    const v = v01 * 100;
+    if (v < 20)  return 'var(--green)';
+    if (v < 40)  return '#aaee00';
+    if (v < 55)  return 'var(--gold)';
+    if (v < 70)  return '#ff8800';
+    if (v < 85)  return '#ff4400';
+    return 'var(--pink)';
+  }
+
+  function cbbiRainbowColor(v01) {
     const stops = [
-      [0,    [0,   80,  20]],
-      [0.25, [50,  200, 0]],
-      [0.5,  [200, 220, 0]],
-      [0.7,  [255, 140, 0]],
-      [0.85, [220, 50,  0]],
-      [1.0,  [120, 0,   0]],
+      [0,    [0,   160, 60]],
+      [0.25, [80,  220, 0]],
+      [0.50, [200, 220, 0]],
+      [0.65, [255, 170, 0]],
+      [0.80, [255, 80,  0]],
+      [1.0,  [180, 0,   0]],
     ];
     let r=0,g=0,b=0;
     for (let i=0; i<stops.length-1; i++) {
-      const [t0,c0] = stops[i];
-      const [t1,c1] = stops[i+1];
-      if (v >= t0 && v <= t1) {
-        const f = (v-t0)/(t1-t0);
-        r = Math.round(c0[0] + (c1[0]-c0[0])*f);
-        g = Math.round(c0[1] + (c1[1]-c0[1])*f);
-        b = Math.round(c0[2] + (c1[2]-c0[2])*f);
+      const [t0,c0] = stops[i], [t1,c1] = stops[i+1];
+      if (v01 >= t0 && v01 <= t1) {
+        const f = (v01-t0)/(t1-t0);
+        r = Math.round(c0[0]+(c1[0]-c0[0])*f);
+        g = Math.round(c0[1]+(c1[1]-c0[1])*f);
+        b = Math.round(c0[2]+(c1[2]-c0[2])*f);
         break;
       }
     }
@@ -3361,6 +3372,8 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
   async function cbbiInit() {
     if (_cbbiChart) { cbbiRender(); return; }
+    const loading = document.getElementById('cbbi-loading');
+    loading.style.display = 'flex';
     try {
       const resp = await fetch(CBBI_URL);
       _cbbiData = await resp.json();
@@ -3368,30 +3381,38 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       cbbiRenderTiles();
       cbbiRender();
     } catch(e) {
-      document.getElementById('cbbi-loading').textContent = 'Could not load CBBI data.';
+      loading.textContent = 'Could not load CBBI data: ' + e.message;
     }
   }
 
   function cbbiRenderKpi() {
     if (!_cbbiData) return;
     const conf = _cbbiData['Confidence'] || {};
-    const ts = Object.keys(conf).sort((a,b)=>+a-+b);
-    if (!ts.length) return;
-    const last = ts[ts.length-1];
-    const val  = Math.round(conf[last] * 100);
-    const date = new Date(+last * 1000);
-    const dateStr = date.toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+    const ts   = Object.keys(conf).map(Number).sort((a,b)=>a-b);
+    // Last non-null confidence
+    let lastTs = null, lastVal = null;
+    for (let i = ts.length-1; i >= 0; i--) {
+      if (conf[ts[i]] !== null) { lastTs = ts[i]; lastVal = conf[ts[i]]; break; }
+    }
+    if (lastVal === null) return;
+    const pct = Math.round(lastVal * 100);
+    const col = cbbiScoreColor(lastVal);
+    const date = new Date(lastTs * 1000);
+    const dateStr = date.toLocaleDateString('en-US', {month:'long',day:'numeric',year:'numeric'});
 
-    document.getElementById('cbbi-score-val').textContent = val;
-    document.getElementById('cbbi-score-val').style.color = cbbiScoreColor(val);
+    document.getElementById('cbbi-score-val').textContent  = pct;
+    document.getElementById('cbbi-score-val').style.color  = col;
     document.getElementById('cbbi-score-date').textContent = dateStr;
 
-    // Signal bar
-    document.getElementById('cbbi-signal-bar').style.width = val + '%';
-    document.getElementById('cbbi-signal-bar').style.background = cbbiScoreColor(val);
-    let label = val < 25 ? '🟢 Accumulation Zone' : val < 50 ? '🟡 Mid Cycle' : val < 75 ? '🟠 Late Bull' : '🔴 Peak Territory';
-    document.getElementById('cbbi-signal-label').textContent = label;
-    document.getElementById('cbbi-signal-label').style.color = cbbiScoreColor(val);
+    document.getElementById('cbbi-signal-bar').style.width      = pct + '%';
+    document.getElementById('cbbi-signal-bar').style.background = col;
+
+    const label = pct < 25 ? 'Accumulation Zone'
+                : pct < 50 ? 'Mid Cycle'
+                : pct < 75 ? 'Late Bull'
+                : 'Peak Territory';
+    document.getElementById('cbbi-signal-label').textContent  = label;
+    document.getElementById('cbbi-signal-label').style.color  = col;
   }
 
   function cbbiRenderTiles() {
@@ -3399,16 +3420,15 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     const row = document.getElementById('cbbi-indicators-row');
     row.innerHTML = '';
     CBBI_METRICS.forEach(m => {
-      const mdata = _cbbiData[m.key] || {};
-      const ts = Object.keys(mdata).sort((a,b)=>+a-+b);
-      const last = ts[ts.length-1];
-      const val = last ? Math.round(mdata[last] * 100) : '—';
+      const raw = cbbiLastVal(_cbbiData[m.key]);
+      const pct  = raw !== null ? Math.round(raw * 100) : null;
+      const col  = pct !== null ? cbbiScoreColor(raw) : 'var(--muted)';
       const isActive = _cbbiActive.has(m.key);
       const tile = document.createElement('div');
       tile.className = 'cbbi-indicator-tile' + (isActive ? ' active' : '');
       tile.dataset.key = m.key;
       tile.innerHTML = `
-        <span class="cbbi-tile-pct" style="color:${typeof val==='number'?cbbiScoreColor(val):'var(--muted)'}">${typeof val==='number'?val+'%':'—'}</span>
+        <span class="cbbi-tile-pct" style="color:${col}">${pct !== null ? pct+'%' : '—'}</span>
         <span class="cbbi-tile-name">${m.label}</span>
         <span class="cbbi-tile-check"></span>
       `;
@@ -3418,28 +3438,21 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   }
 
   function cbbiToggleTile(key, tile) {
-    if (_cbbiActive.has(key)) {
-      _cbbiActive.delete(key);
-      tile.classList.remove('active');
-    } else {
-      _cbbiActive.add(key);
-      tile.classList.add('active');
-    }
+    if (_cbbiActive.has(key)) { _cbbiActive.delete(key); tile.classList.remove('active'); }
+    else                      { _cbbiActive.add(key);    tile.classList.add('active'); }
     _cbbiAllOn = (_cbbiActive.size === CBBI_METRICS.length);
+    if (_cbbiChart) { _cbbiChart.destroy(); _cbbiChart = null; }
     cbbiRender();
   }
 
-  function cbbíToggleAll() {
+  function cbbiToggleAll() {
     _cbbiAllOn = !_cbbiAllOn;
-    if (_cbbiAllOn) {
-      CBBI_METRICS.forEach(m => _cbbiActive.add(m.key));
-    } else {
-      _cbbiActive.clear();
-    }
-    // Re-render tiles
+    if (_cbbiAllOn) CBBI_METRICS.forEach(m => _cbbiActive.add(m.key));
+    else            _cbbiActive.clear();
     document.querySelectorAll('.cbbi-indicator-tile').forEach(t => {
       t.classList.toggle('active', _cbbiActive.has(t.dataset.key));
     });
+    if (_cbbiChart) { _cbbiChart.destroy(); _cbbiChart = null; }
     cbbiRender();
   }
 
@@ -3447,135 +3460,205 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     _cbbiZoom = z;
     document.querySelectorAll('.cbbi-zoom-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
+    if (_cbbiChart) { _cbbiChart.destroy(); _cbbiChart = null; }
     cbbiRender();
   }
 
-  function cbbiGetDateRange() {
-    const now = Date.now() / 1000;
-    const ranges = { '6M': 180, '1Y': 365, '3Y': 1095, 'ALL': 99999 };
-    const days = ranges[_cbbiZoom] || 99999;
-    return now - days * 86400;
+  function cbbiGetCutoff() {
+    const now  = Date.now() / 1000;
+    const days = { '6M': 182, '1Y': 365, '3Y': 1095, 'ALL': 99999 };
+    return now - (days[_cbbiZoom] || 99999) * 86400;
   }
 
   function cbbiRender() {
     if (!_cbbiData) return;
-    const canvas = document.getElementById('cbbi-chart');
+    const canvas  = document.getElementById('cbbi-chart');
     const loading = document.getElementById('cbbi-loading');
+    const cutoff  = cbbiGetCutoff();
 
-    const priceData = _cbbiData['Price'] || {};
-    const confData  = _cbbiData['Confidence'] || {};
+    const priceRaw = _cbbiData['Price'] || {};
+    const confRaw  = _cbbiData['Confidence'] || {};
 
-    // Get all timestamps, sorted
-    const allTs = Object.keys(priceData).map(Number).sort((a,b)=>a-b);
-    const cutoff = cbbiGetDateRange();
-    const ts = allTs.filter(t => t >= cutoff);
+    // All timestamps present in Price data, filtered by zoom
+    const allTs = Object.keys(priceRaw).map(Number).sort((a,b)=>a-b).filter(t => t >= cutoff);
+    if (!allTs.length) return;
 
-    if (!ts.length) return;
+    // Price points for area
+    const pricePoints = allTs
+      .map(t => ({ x: t * 1000, y: priceRaw[t] }))
+      .filter(p => p.y && p.y > 0);
 
-    // Build price points (log scale via manual log mapping)
-    const prices  = ts.map(t => priceData[t] || null);
-    const confs   = ts.map(t => confData[t]  || null);
-
-    // Compute active metric average if metrics selected
-    // For the rainbow line: use Confidence if "all" or blend of active metrics
-    let rainbowVals;
-    if (_cbbiActive.size === 0) {
-      rainbowVals = ts.map(() => null);
-    } else if (_cbbiActive.size === CBBI_METRICS.length) {
-      rainbowVals = confs;
-    } else {
-      rainbowVals = ts.map(t => {
+    // Rainbow: blend of active metrics, fallback to Confidence
+    const rainbowPoints = [];
+    allTs.forEach(t => {
+      const price = priceRaw[t];
+      if (!price || price <= 0) return;
+      let score;
+      if (_cbbiActive.size === 0) {
+        score = null;
+      } else if (_cbbiActive.size === CBBI_METRICS.length) {
+        score = confRaw[t] ?? null;
+      } else {
         const vals = [];
         _cbbiActive.forEach(k => {
           const v = (_cbbiData[k] || {})[t];
-          if (v != null) vals.push(v);
+          if (v !== null && v !== undefined) vals.push(v);
         });
-        return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
-      });
-    }
+        score = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+      }
+      if (score !== null) rainbowPoints.push({ x: t*1000, y: score*100, price });
+    });
 
-    // Build rainbow point segments for Chart.js scatter
-    const rainbowPoints = ts.map((t, i) => ({
-      x: t * 1000,
-      y: prices[i],
-      v: rainbowVals[i],
-    })).filter(p => p.y && p.v !== null);
+    // Price High / Price Low markers from CBBI data
+    const phData = _cbbiData['PriceHigh'] || {};
+    const plData = _cbbiData['PriceLow']  || {};
+    const phPoints = Object.keys(phData).map(Number).filter(t=>t>=cutoff&&phData[t])
+      .map(t=>({ x:t*1000, y:phData[t] }));
+    const plPoints = Object.keys(plData).map(Number).filter(t=>t>=cutoff&&plData[t])
+      .map(t=>({ x:t*1000, y:plData[t] }));
 
     // Halving annotations
-    const halvingLines = CBBI_HALVINGS
-      .filter(h => h >= cutoff)
-      .map(h => ({
+    const halvingAnnotations = {};
+    CBBI_HALVINGS.filter(h=>h>=cutoff).forEach((h,i)=>{
+      halvingAnnotations['halving'+i] = {
         type: 'line',
-        xMin: h * 1000, xMax: h * 1000,
-        borderColor: 'rgba(126,224,255,0.3)',
+        xMin: h*1000, xMax: h*1000,
+        borderColor: 'rgba(126,224,255,0.25)',
         borderWidth: 1,
         borderDash: [4,4],
-        label: { content: 'H', display: true, color: 'rgba(126,224,255,0.6)',
-                 font: { size: 10, family: 'DM Mono' }, position: 'end' }
-      }));
-
-    if (_cbbiChart) {
-      _cbbiChart.destroy();
-      _cbbiChart = null;
-    }
+        display: () => _cbbiShowHalv,
+        label: {
+          content: 'H', display: true,
+          color: 'rgba(126,224,255,0.5)',
+          font: { size: 9, family: 'DM Mono' },
+          position: 'end', yAdjust: -2,
+        }
+      };
+    });
 
     loading.style.display = 'none';
     canvas.style.display  = 'block';
 
     const ctx2 = canvas.getContext('2d');
 
-    // Price dataset: area fill, semi-transparent
-    const pricePoints = ts.map((t,i) => ({ x: t*1000, y: prices[i] })).filter(p=>p.y);
-
     _cbbiChart = new Chart(ctx2, {
       type: 'scatter',
       data: {
         datasets: [
-          // Price area (filled line)
+          // 0 — BTC Price area
           {
             label: 'Bitcoin Price',
             data: pricePoints,
             type: 'line',
-            borderColor: 'rgba(180,210,230,0.3)',
-            backgroundColor: 'rgba(140,180,210,0.08)',
+            borderColor: 'rgba(180,210,230,0.35)',
+            backgroundColor: 'rgba(140,180,210,0.07)',
             borderWidth: 1,
             pointRadius: 0,
             fill: true,
-            tension: 0.2,
+            tension: 0.15,
             yAxisID: 'yPrice',
-            order: 2,
+            order: 3,
+            hidden: !_cbbiShowPrice,
           },
-          // Rainbow scatter — each point colored by CBBI score
+          // 1 — CBBI Rainbow scatter
           {
             label: 'CBBI Confidence',
-            data: rainbowPoints,
+            data: rainbowPoints.map(p=>({ x:p.x, y:p.price })),
             type: 'scatter',
-            pointRadius: pricePoints.length > 500 ? 2 : 3,
+            pointRadius: pricePoints.length > 600 ? 2 : 2.5,
             pointHoverRadius: 5,
-            backgroundColor: rainbowPoints.map(p => cbbiRainbowColor(p.v)),
+            backgroundColor: rainbowPoints.map(p=>cbbiRainbowColor(p.y/100)),
             borderColor: 'transparent',
-            yAxisID: 'yScore',
+            yAxisID: 'yPrice',
+            order: 2,
+            hidden: _cbbiActive.size === 0,
+          },
+          // 2 — Price High markers
+          {
+            label: 'Price High',
+            data: phPoints,
+            type: 'scatter',
+            pointStyle: 'triangle',
+            pointRadius: 8,
+            rotation: 0,
+            backgroundColor: '#00dd66',
+            borderColor: '#00dd66',
+            yAxisID: 'yPrice',
             order: 1,
+            hidden: !_cbbiShowHL,
+          },
+          // 3 — Price Low markers
+          {
+            label: 'Price Low',
+            data: plPoints,
+            type: 'scatter',
+            pointStyle: 'triangle',
+            pointRadius: 8,
+            rotation: 180,
+            backgroundColor: '#ff4444',
+            borderColor: '#ff4444',
+            yAxisID: 'yPrice',
+            order: 1,
+            hidden: !_cbbiShowHL,
           },
         ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        animation: { duration: 300 },
-        interaction: { mode: 'index', intersect: false },
+        animation: { duration: 250 },
+        interaction: { mode: 'nearest', intersect: false, axis: 'x' },
+        onClick(e, items) {
+          // Legend click handled by Chart.js built-in via onClick on legend
+        },
         plugins: {
-          legend: { display: false },
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: {
+              color: 'rgba(182,193,216,0.8)',
+              font: { family: 'DM Mono', size: 11 },
+              boxWidth: 14, boxHeight: 8,
+              padding: 16,
+              usePointStyle: true,
+              generateLabels(chart) {
+                return [
+                  { text: 'Bitcoin Price',    hidden: chart.data.datasets[0].hidden, datasetIndex: 0, fillStyle: 'rgba(180,210,230,0.5)', strokeStyle: 'rgba(180,210,230,0.5)', lineWidth: 1 },
+                  { text: 'CBBI Rainbow Line',hidden: chart.data.datasets[1].hidden, datasetIndex: 1, fillStyle: '#ffaa00',                strokeStyle: 'transparent',          lineWidth: 0, pointStyle: 'circle' },
+                  { text: 'Halving',          hidden: !_cbbiShowHalv,               datasetIndex: -1, fillStyle: 'rgba(126,224,255,0.35)', strokeStyle: 'transparent',          lineWidth: 0 },
+                  { text: 'Price High',       hidden: chart.data.datasets[2].hidden, datasetIndex: 2, fillStyle: '#00dd66',                strokeStyle: 'transparent',          lineWidth: 0, pointStyle: 'triangle' },
+                  { text: 'Price Low',        hidden: chart.data.datasets[3].hidden, datasetIndex: 3, fillStyle: '#ff4444',                strokeStyle: 'transparent',          lineWidth: 0, pointStyle: 'triangle' },
+                ];
+              }
+            },
+            onClick(e, legendItem, legend) {
+              const idx = legendItem.datasetIndex;
+              if (idx === -1) {
+                // Halving toggle
+                _cbbiShowHalv = !_cbbiShowHalv;
+                legend.chart.update();
+                return;
+              }
+              const ds = legend.chart.data.datasets[idx];
+              ds.hidden = !ds.hidden;
+              legend.chart.update();
+            }
+          },
           tooltip: {
             callbacks: {
               title: items => {
                 const d = new Date(items[0].parsed.x);
-                return d.toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'});
+                return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
               },
               label: item => {
                 if (item.datasetIndex === 0) return ' BTC: $' + Number(item.parsed.y).toLocaleString();
-                const p = rainbowPoints[item.dataIndex];
-                return p ? ' CBBI: ' + Math.round(p.v*100) + '%' : '';
+                if (item.datasetIndex === 1) {
+                  const p = rainbowPoints[item.dataIndex];
+                  return p ? ' CBBI: ' + Math.round(p.y) + '%' : '';
+                }
+                if (item.datasetIndex === 2) return ' Price High: $' + Number(item.parsed.y).toLocaleString();
+                if (item.datasetIndex === 3) return ' Price Low: $'  + Number(item.parsed.y).toLocaleString();
+                return '';
               }
             },
             backgroundColor: 'rgba(6,8,24,0.95)',
@@ -3586,34 +3669,29 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
             titleFont: { family: 'DM Mono', size: 11 },
             bodyFont:  { family: 'Rajdhani', size: 14, weight: '700' },
           },
-          annotation: { annotations: halvingLines },
+          annotation: { annotations: halvingAnnotations },
         },
         scales: {
           x: {
             type: 'time',
-            time: { unit: ts.length > 700 ? 'year' : 'month',
-                    displayFormats: { month: 'MMM yy', year: 'yyyy' } },
-            grid: { color: 'rgba(255,255,255,0.04)' },
-            ticks: { color: 'var(--muted)', font: { family: 'DM Mono', size: 10 },
-                     maxRotation: 0 },
-          },
-          yScore: {
-            position: 'left',
-            min: 0, max: 100,
-            grid: { color: 'rgba(255,255,255,0.04)' },
-            ticks: { color: 'var(--muted)', font: { family: 'DM Mono', size: 10 },
-                     callback: v => v },
+            time: {
+              unit: allTs.length > 800 ? 'year' : 'month',
+              displayFormats: { month: 'MMM yy', year: 'yyyy' }
+            },
+            grid:  { color: 'rgba(255,255,255,0.04)' },
+            ticks: { color: 'var(--muted)', font: { family: 'DM Mono', size: 10 }, maxRotation: 0 },
           },
           yPrice: {
             position: 'right',
             type: 'logarithmic',
-            grid: { display: false },
+            grid: { color: 'rgba(255,255,255,0.04)' },
             ticks: {
               color: 'rgba(180,210,230,0.5)',
               font: { family: 'DM Mono', size: 10 },
               callback: v => {
-                const vals = [1,10,100,1000,10000,100000,200000];
-                return vals.includes(v) ? '$' + v.toLocaleString() : '';
+                const marks = [1,10,100,1000,10000,100000,200000];
+                if (marks.includes(v)) return '$' + v.toLocaleString();
+                return null;
               }
             },
           },
