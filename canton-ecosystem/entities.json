@@ -3103,6 +3103,20 @@
     "logo_local": "logos\\node-monster.png"
   },
   {
+    "name": "NodeOps",
+    "slug": "nodeops",
+    "logo_cdn": "https://cdn.prod.website-files.com/696805252243366e13a64c82/697a4b2e91c884840963f200_yellow-arrow-right.svg",
+    "short_desc": "Institutional-grade Validator & NaaS provider. 102 protocols. 83.2k+ nodes. Built for serious infra.",
+    "tags": [
+      "VALIDATOR",
+      "NAAS",
+      "Network Utilities\nNAAS",
+      "Roles\nVALIDATOR\nVALIDATOR"
+    ],
+    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nNodeOps\nhttps://nodeops.network/\nNodeOps is a battle-tested Node-as-a-Service provider and Validator operator trusted by leading institutional crypto firms including Maven 11, The Spartan Group, and Bankless Ventures. With 160M+ in assets under management, 83.2k+ nodes deployed, 102 protocols supported, and 70.7k+ monthly active users, NodeOps brings proven infrastructure precision to the Canton Network ecosystem. Our one-click NodeOps Console has made enterprise-grade node deployment accessible at scale across the Web3 stack. Joining Canton as a Validator and NaaS provider is a natural extension of that mission - bringing the same SLA standards our institutional clients rely on to the only public blockchain built for serious finance. Canton is where finance flows. NodeOps is the infrastructure that keeps it running.\nNetwork Utilities\nNAAS\nRoles\nVALIDATOR\nVALIDATOR",
+    "logo_local": "logos\\nodeops.svg"
+  },
+  {
     "name": "Noders",
     "slug": "noders",
     "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69bdda4357d52104c1ab434d_noders.jpg",
@@ -4130,6 +4144,20 @@
     ],
     "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nUtila\nhttps://utila.io/\n\nUtila is the digital asset and stablecoin infrastructure platform for fintechs and enterprises. Utila enables organizations of all sizes to securely build, manage, and scale digital asset operations across payments, trading, treasury, tokenization, and beyond. The Utila platform combines institutional-grade MPC wallets, granular policy controls, robust APIs, multi-chain support, and deep integrations with banking, compliance, exchanges, DeFi, and more. Trusted by over 250 industry leaders, Utila processes more than $15B in monthly volume and has secured over $100B in transactions to date.\n\nNetwork Utilities\nWALLETS\nRoles\nVALIDATOR\nVALIDATOR",
     "logo_local": "logos\\utila.png"
+  },
+  {
+    "name": "Vala Wallet",
+    "slug": "vala-wallet",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/6a0474eb96c421205bbe1202_ae999ac5-448d-4772-a5cb-b3f18bd2a7e3.png",
+    "short_desc": "A non-custodial AllFi wallet built for the Canton Network.",
+    "tags": [
+      "APPS (FEATURED)",
+      "WALLETS",
+      "Network Utilities\nWALLETS",
+      "Roles\nAPPS (FEATURED)\nAPPS (FEATURED)"
+    ],
+    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nVala Wallet\nhttps://vala-wallet.cc/\nVala is a non-custodial web wallet and your primary gateway to Canton apps & CIP-56 Tokens. Keys are generated locally and remain on your device. Sign in using passkeys (Face ID, Touch ID or password), with no app download required. Built natively for Canton, Vala is your access point to AllFi.\nNetwork Utilities\nWALLETS\nRoles\nAPPS (FEATURED)\nAPPS (FEATURED)",
+    "logo_local": "logos\\vala-wallet.png"
   },
   {
     "name": "Vigil Markets",
