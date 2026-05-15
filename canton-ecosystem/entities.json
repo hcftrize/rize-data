@@ -3448,6 +3448,21 @@
     "logo_local": "logos\\pyth.png"
   },
   {
+    "name": "QCP Group",
+    "slug": "qcp-group",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/6a057946e748679cd0122db5_10854d45-a0d3-4e65-8b0b-9e87776b0e9c.jpeg",
+    "short_desc": "Asia's leading digital asset partner",
+    "tags": [
+      "SUPER VALIDATOR",
+      "INTEROPERABILITY",
+      "LIQUIDITY",
+      "Network Utilities\nINTEROPERABILITYLIQUIDITY",
+      "Roles\nSUPER VALIDATOR\nSUPER VALIDATOR"
+    ],
+    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nQCP Group\nhttps://www.qcpgroup.com/\nEstablished in 2017, QCP Group is Asia's leading digital asset partner, operating specialized entities to address the dynamic needs of the digital economy. We provide tailored solutions across derivatives, spot trading, and structured products to institutional, professional, and accredited investors. Each QCP entity brings industry-leading knowledge and operational excellence, supported by a team of experts in trading, business development, risk, and compliance. QCP is regulated in two of the world's leading financial centres, holding a Major Payment Institution (MPI) License from the Monetary Authority of Singapore (MAS) and a Financial Services Permission (FSP) from the Abu Dhabi Global Market (ADGM). Headquartered in Singapore, QCP has a global presence spanning Abu Dhabi, New York, London, Kuala Lumpur, Ho Chi Minh City, and Tokyo.\nNetwork Utilities\nINTEROPERABILITYLIQUIDITY\nRoles\nSUPER VALIDATOR\nSUPER VALIDATOR",
+    "logo_local": "logos\\qcp-group.jpeg"
+  },
+  {
     "name": "QCP Trading",
     "slug": "qcp-trading",
     "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69a515c9920bdd6882deedb1_logo_qcp.jpeg",
