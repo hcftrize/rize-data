@@ -5633,15 +5633,15 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
 
   // 9 metrics with distinct colors (Tokerize palette)
   const _CM = [
-    {k:'Pi',        n:'Pi Cycle Top',    c:'#7edfff'},
-    {k:'RUPL',      n:'RUPL / NUPL',     c:'#f7c043'},
-    {k:'RHODL',     n:'RHODL Ratio',     c:'#ff6ec7'},
-    {k:'Puell',     n:'Puell Multiple',  c:'#98ffb6'},
-    {k:'MA2',       n:'2Y Moving Avg',   c:'#c77dff'},
-    {k:'Trolololo', n:'BTC Trolololo',   c:'#ff9f43'},
-    {k:'MVRV',      n:'MVRV Z-Score',    c:'#48dbfb'},
-    {k:'RR',        n:'Reserve Risk',    c:'#ff6b81'},
-    {k:'Woobull',   n:'Woobull CVDD',    c:'#badc58'},
+    {k:'PiCycle',    n:'Pi Cycle Top',    c:'#7edfff'},
+    {k:'RUPL',       n:'RUPL / NUPL',     c:'#f7c043'},
+    {k:'RHODL',      n:'RHODL Ratio',     c:'#ff6ec7'},
+    {k:'Puell',      n:'Puell Multiple',  c:'#98ffb6'},
+    {k:'2YMA',       n:'2Y Moving Avg',   c:'#c77dff'},
+    {k:'Trolololo',  n:'BTC Trolololo',   c:'#ff9f43'},
+    {k:'MVRV',       n:'MVRV Z-Score',    c:'#48dbfb'},
+    {k:'ReserveRisk',n:'Reserve Risk',    c:'#ff6b81'},
+    {k:'Woobull',    n:'Woobull CVDD',    c:'#badc58'},
   ];
 
   // Halvings (unix s)
@@ -5651,7 +5651,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   let _cZoom = '6M';
   let _cOn   = new Set(_CM.map(m => m.k));
   // Legend visibility
-  let _cVis  = {price:true, halving:true, high:true, low:true};
+  let _cVis  = {price:true, cbbi:true, halving:true, high:true, low:true};
 
   // Score 0-1 → color
   function _cCol(v) {
@@ -5703,12 +5703,35 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     }
   }
 
+  // Compute the "active confidence" score at a given timestamp
+  // = mean of all active metrics at that ts (or null if none available)
+  function _cActiveScore(ts) {
+    if (_cOn.size === 0) return null;
+    if (_cOn.size === _CM.length) {
+      const v = (_cRaw['Confidence'] || {})[ts];
+      return (v !== null && v !== undefined) ? v : null;
+    }
+    const vals = [];
+    _cOn.forEach(k => {
+      const v = (_cRaw[k] || {})[ts];
+      if (v !== null && v !== undefined) vals.push(v);
+    });
+    return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+  }
+
   function _cKpi() {
-    const {val, ts} = _cLast(_cRaw['Confidence']);
+    // Find last timestamp with Price data, compute active score there
+    const priceObj = _cRaw['Price'] || {};
+    const allTs = Object.keys(priceObj).map(Number).sort((a,b)=>a-b);
+    let val = null, lastTs = null;
+    for (let i = allTs.length-1; i >= 0; i--) {
+      const s = _cActiveScore(allTs[i]);
+      if (s !== null) { val = s; lastTs = allTs[i]; break; }
+    }
     if (val === null) return;
-    const pct = Math.round(val * 100);
+    const pct = Math.ceil(val * 100);
     const col = _cCol(val);
-    const dateStr = new Date(ts * 1000).toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+    const dateStr = new Date(lastTs * 1000).toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
     const sv = document.getElementById('cbbi-score-val');
     const sd = document.getElementById('cbbi-score-date');
     const sb = document.getElementById('cbbi-signal-bar');
@@ -5728,7 +5751,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     wrap.innerHTML = '';
     _CM.forEach(m => {
       const {val} = _cLast(_cRaw[m.k]);
-      const pct = val !== null ? Math.round(val * 100) : null;
+      const pct = val !== null ? Math.ceil(val * 100) : null;
       const col = pct !== null ? _cCol(val) : 'var(--muted)';
       const on  = _cOn.has(m.k);
       const d   = document.createElement('div');
@@ -5738,6 +5761,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       d.addEventListener('click', () => {
         if (_cOn.has(m.k)) _cOn.delete(m.k); else _cOn.add(m.k);
         d.classList.toggle('on', _cOn.has(m.k));
+        _cKpi();
         _cDraw();
       });
       wrap.appendChild(d);
@@ -5748,6 +5772,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     const allOn = _cOn.size === _CM.length;
     _cOn = allOn ? new Set() : new Set(_CM.map(m => m.k));
     document.querySelectorAll('.cbbi-tile').forEach(t => t.classList.toggle('on', _cOn.has(t.dataset.k)));
+    _cKpi();
     _cDraw();
   }
 
@@ -5768,15 +5793,12 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     if (!wrap) return;
     wrap.innerHTML = '';
     const items = [
-      {id:'price',   swatch:true,  color:'rgba(160,195,220,0.6)', label:'Bitcoin Price'},
-      {id:'halving', swatch:true,  color:'rgba(126,224,255,0.55)',label:'Halving'},
-      {id:'high',    swatch:true,  color:'rgba(0,210,90,0.8)',    label:'Price High'},
-      {id:'low',     swatch:true,  color:'rgba(255,60,60,0.8)',   label:'Price Low'},
+      {id:'price',   color:'rgba(160,195,220,0.6)', label:'Bitcoin Price'},
+      {id:'cbbi',    color:'#ff6ec7',               label:'CBBI Confidence'},
+      {id:'halving', color:'rgba(126,224,255,0.55)',label:'Halving'},
+      {id:'high',    color:'rgba(0,210,90,0.8)',    label:'Price High'},
+      {id:'low',     color:'rgba(255,60,60,0.8)',   label:'Price Low'},
     ];
-    // Add one entry per metric
-    _CM.forEach(m => {
-      items.push({id:'m_'+m.k, swatch:true, color:m.c, label:m.n, metricKey:m.k});
-    });
     items.forEach(item => {
       const isMetric = !!item.metricKey;
       // For metric items, visible only if metric is active
@@ -5786,17 +5808,9 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       d.dataset.id = item.id;
       d.innerHTML = `<span class="cbbi-leg-swatch" style="background:${item.color}"></span><span class="cbbi-leg-txt">${item.label}</span>`;
       d.addEventListener('click', () => {
-        if (isMetric) {
-          // Toggle metric tile
-          const tile = document.querySelector(`.cbbi-tile[data-k="${item.metricKey}"]`);
-          if (tile) tile.click();
-          // Sync leg visibility
-          d.classList.toggle('off', !_cOn.has(item.metricKey));
-        } else {
-          _cVis[item.id] = !_cVis[item.id];
-          d.classList.toggle('off', !_cVis[item.id]);
-          _cDraw();
-        }
+        _cVis[item.id] = !_cVis[item.id];
+        d.classList.toggle('off', !_cVis[item.id]);
+        _cDraw();
       });
       wrap.appendChild(d);
     });
@@ -5847,29 +5861,12 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       rainbowPts.push({x: t*1000, y: price, score});
     });
 
-    // ── Datasets 2+: individual metric lines on yScore (0-100) ──
-    const metricDatasets = [];
-    _CM.forEach(m => {
-      if (!_cOn.has(m.k)) return;
-      const mObj = _cRaw[m.k] || {};
-      const pts = allTs.map(t => {
-        const v = mObj[t];
-        return (v !== null && v !== undefined) ? {x: t*1000, y: v*100} : null;
-      }).filter(Boolean);
-      if (!pts.length) return;
-      metricDatasets.push({
-        label: m.n,
-        data: pts,
-        type: 'line',
-        borderColor: m.c,
-        backgroundColor: 'transparent',
-        borderWidth: 1.5,
-        pointRadius: 0,
-        fill: false,
-        tension: 0.3,
-        yAxisID: 'yScore',
-        order: 2,
-      });
+    // ── Dataset 2: Single CBBI Confidence line on yScore (0-100) ──
+    // Score = mean of active metrics (or Confidence composite if all on)
+    const confidencePts = [];
+    allTs.forEach(t => {
+      const s = _cActiveScore(t);
+      if (s !== null) confidencePts.push({x: t*1000, y: s*100});
     });
 
     // ── Halving vertical lines as paired datasets ──────────────
@@ -5969,8 +5966,20 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
             yAxisID: 'yPrice',
             order: 3,
           },
-          // 2+ — individual metric lines on yScore
-          ...metricDatasets,
+          // 2 — CBBI Confidence line on yScore
+          {
+            label: 'CBBI Confidence',
+            data: (_cOn.size > 0 && _cVis.cbbi) ? confidencePts : [],
+            type: 'line',
+            borderColor: '#ff6ec7',
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            pointRadius: 0,
+            fill: false,
+            tension: 0.3,
+            yAxisID: 'yScore',
+            order: 2,
+          },
           // halving / high / low vertical lines
           ...halvDs, ...highDs, ...lowDs,
         ]
@@ -5991,7 +6000,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
                 if (lbl === 'Bitcoin Price')  return ' BTC: $' + Number(item.parsed.y).toLocaleString();
                 if (lbl === 'CBBI Rainbow') {
                   const p = rainbowPts[item.dataIndex];
-                  return p ? ' CBBI: ' + Math.round(p.score*100) + '%' : '';
+                  return p ? ' CBBI: ' + Math.ceil(p.score*100) + '%' : '';
                 }
                 if (lbl === 'Halving') return ' Halving Event';
                 // Metric lines
@@ -6040,11 +6049,6 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       }
     });
 
-    // Sync legend metric items visibility
-    document.querySelectorAll('.cbbi-leg[data-id^="m_"]').forEach(el => {
-      const k = el.dataset.id.replace('m_','');
-      el.classList.toggle('off', !_cOn.has(k));
-    });
   }
 
   </script>
