@@ -5651,7 +5651,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   let _cZoom = 'ALL';
   let _cOn   = new Set(_CM.map(m => m.k));
   // Legend visibility
-  let _cVis  = {price:true, cbbi:true, halving:true, high:true, low:true};
+  let _cVis  = {price:true, cbbi:true, halving:true};
 
   // Score 0-1 → color
   function _cCol(v) {
@@ -5796,8 +5796,6 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       {id:'price',   color:'rgba(160,195,220,0.6)', label:'Bitcoin Price'},
       {id:'cbbi',    color:'#ff6ec7',               label:'CBBI Confidence'},
       {id:'halving', color:'rgba(126,224,255,0.55)',label:'Halving'},
-      {id:'high',    color:'rgba(0,210,90,0.8)',    label:'Price High'},
-      {id:'low',     color:'rgba(255,60,60,0.8)',   label:'Price Low'},
     ];
     items.forEach(item => {
       const isMetric = !!item.metricKey;
@@ -5889,42 +5887,6 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       });
     }
 
-    // ── Price High vertical lines ──────────────────────────────
-    const highDs = [];
-    if (_cVis.high && _cRaw['PriceHigh']) {
-      Object.entries(_cRaw['PriceHigh']).forEach(([ts, val]) => {
-        if (!val || +ts < cutoff) return;
-        highDs.push({
-          label: '_ph',
-          data: [{x:+ts*1000, y:yLogMin}, {x:+ts*1000, y:yLogMax}],
-          type: 'line',
-          borderColor: 'rgba(0,210,90,0.85)',
-          borderWidth: 2,
-          segment: { borderDash: () => [5,5] },
-          pointRadius: 0, fill: false, tension: 0,
-          yAxisID: 'yPrice', order: 5,
-        });
-      });
-    }
-
-    // ── Price Low vertical lines ───────────────────────────────
-    const lowDs = [];
-    if (_cVis.low && _cRaw['PriceLow']) {
-      Object.entries(_cRaw['PriceLow']).forEach(([ts, val]) => {
-        if (!val || +ts < cutoff) return;
-        lowDs.push({
-          label: '_pl',
-          data: [{x:+ts*1000, y:yLogMin}, {x:+ts*1000, y:yLogMax}],
-          type: 'line',
-          borderColor: 'rgba(255,60,60,0.85)',
-          borderWidth: 2,
-          segment: { borderDash: () => [5,5] },
-          pointRadius: 0, fill: false, tension: 0,
-          yAxisID: 'yPrice', order: 5,
-        });
-      });
-    }
-
     if (loading) loading.style.display = 'none';
     canvas.style.display = 'block';
 
@@ -5973,7 +5935,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
             order: 2,
           },
           // halving / high / low vertical lines
-          ...halvDs, ...highDs, ...lowDs,
+          ...halvDs,
         ]
       },
       options: {
