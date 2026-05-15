@@ -1076,7 +1076,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
     .cbbi-leg.off{opacity:.3;}
     .cbbi-leg-swatch{width:18px;height:3px;border-radius:2px;flex-shrink:0;}
     .cbbi-leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
-    .cbbi-leg-txt{font-family:'DM Mono',monospace;font-size:10px;color:rgba(182,193,216,0.8);}
+    .cbbi-leg-txt{font-family:'DM Mono',monospace;font-size:12px;color:rgba(200,210,230,0.9);letter-spacing:.3px;}
     @media(max-width:700px){.cbbi-tile{flex:1 1 30%;}.cbbi-tile-val{font-size:19px;}}
   </style>
 </head>
@@ -1799,10 +1799,10 @@ html, body { overflow-x: hidden; max-width: 100%; }
         <!-- Zoom + toggle -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
           <div style="display:flex;gap:0">
-            <button class="cbbi-zoom active" onclick="cbbiZoom('6M',this)">6M</button>
-            <button class="cbbi-zoom" onclick="cbbiZoom('1Y',this)">1Y</button>
+            <button class="cbbi-zoom active" onclick="cbbiZoom('ALL',this)">ALL</button>
             <button class="cbbi-zoom" onclick="cbbiZoom('3Y',this)">3Y</button>
-            <button class="cbbi-zoom" onclick="cbbiZoom('ALL',this)">ALL</button>
+            <button class="cbbi-zoom" onclick="cbbiZoom('1Y',this)">1Y</button>
+            <button class="cbbi-zoom" onclick="cbbiZoom('6M',this)">6M</button>
           </div>
           <button onclick="cbbiToggleAll()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);padding:6px 14px;cursor:pointer">Toggle All</button>
         </div>
@@ -5648,7 +5648,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   const _CH = [1354320000, 1462060800, 1589760000, 1719878400];
 
   let _cRaw  = null;
-  let _cZoom = '6M';
+  let _cZoom = 'ALL';
   let _cOn   = new Set(_CM.map(m => m.k));
   // Legend visibility
   let _cVis  = {price:true, cbbi:true, halving:true, high:true, low:true};
@@ -5740,7 +5740,7 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     if (sd) sd.textContent = dateStr;
     if (sb) { sb.style.width = pct + '%'; sb.style.background = col; }
     if (sl) {
-      sl.textContent = pct < 25 ? 'Accumulation Zone' : pct < 50 ? 'Mid Cycle' : pct < 75 ? 'Late Bull' : 'Peak Territory';
+      sl.textContent = pct <= 20 ? 'Early Bull' : pct <= 40 ? 'Mid Bull' : pct <= 60 ? 'Late Bull' : pct <= 80 ? 'Distribution' : 'Peak Territory';
       sl.style.color = col;
     }
   }
@@ -5869,10 +5869,11 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
       if (s !== null) confidencePts.push({x: t*1000, y: s*100});
     });
 
-    // ── Halving vertical lines as paired datasets ──────────────
+    const yLogMin = pricePts.length ? Math.min(...pricePts.map(p=>p.y)) * 0.25 : 1;
+    const yLogMax = pricePts.length ? Math.max(...pricePts.map(p=>p.y)) * 4 : 1000000;
+
+    // ── Halving vertical lines ─────────────────────────────────
     const halvDs = [];
-    const yLogMin = Math.min(...pricePts.map(p=>p.y).filter(Boolean)) * 0.25;
-    const yLogMax = Math.max(...pricePts.map(p=>p.y).filter(Boolean)) * 4;
     if (_cVis.halving) {
       _CH.filter(h => h >= cutoff).forEach((h, i) => {
         halvDs.push({
@@ -5881,12 +5882,9 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           type: 'line',
           borderColor: 'rgba(126,224,255,0.55)',
           borderWidth: 2,
-          borderDash: [5,5],
-          pointRadius: 0,
-          fill: false,
-          tension: 0,
-          yAxisID: 'yPrice',
-          order: 5,
+          segment: { borderDash: () => [5,5] },
+          pointRadius: 0, fill: false, tension: 0,
+          yAxisID: 'yPrice', order: 5,
         });
       });
     }
@@ -5900,14 +5898,11 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           label: '_ph',
           data: [{x:+ts*1000, y:yLogMin}, {x:+ts*1000, y:yLogMax}],
           type: 'line',
-          borderColor: 'rgba(0,210,90,0.7)',
+          borderColor: 'rgba(0,210,90,0.85)',
           borderWidth: 2,
-          borderDash: [4,4],
-          pointRadius: 0,
-          fill: false,
-          tension: 0,
-          yAxisID: 'yPrice',
-          order: 5,
+          segment: { borderDash: () => [5,5] },
+          pointRadius: 0, fill: false, tension: 0,
+          yAxisID: 'yPrice', order: 5,
         });
       });
     }
@@ -5921,14 +5916,11 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
           label: '_pl',
           data: [{x:+ts*1000, y:yLogMin}, {x:+ts*1000, y:yLogMax}],
           type: 'line',
-          borderColor: 'rgba(255,60,60,0.7)',
+          borderColor: 'rgba(255,60,60,0.85)',
           borderWidth: 2,
-          borderDash: [4,4],
-          pointRadius: 0,
-          fill: false,
-          tension: 0,
-          yAxisID: 'yPrice',
-          order: 5,
+          segment: { borderDash: () => [5,5] },
+          pointRadius: 0, fill: false, tension: 0,
+          yAxisID: 'yPrice', order: 5,
         });
       });
     }
@@ -5992,19 +5984,20 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
         plugins: {
           legend: {display: false},
           tooltip: {
-            filter: item => !item.dataset.label?.startsWith('_'),
+            filter: item => {
+              const lbl = item.dataset.label || '';
+              return lbl === 'Bitcoin Price' || lbl === 'CBBI Confidence';
+            },
             callbacks: {
               title: items => new Date(items[0].parsed.x).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}),
               label: item => {
-                const lbl = item.dataset.label;
-                if (lbl === 'Bitcoin Price')  return ' BTC: $' + Number(item.parsed.y).toLocaleString();
-                if (lbl === 'CBBI Rainbow') {
-                  const p = rainbowPts[item.dataIndex];
-                  return p ? ' CBBI: ' + Math.ceil(p.score*100) + '%' : '';
+                if (item.dataset.label === 'Bitcoin Price') return ' BTC: $' + Number(item.parsed.y).toLocaleString();
+                if (item.dataset.label === 'CBBI Confidence') {
+                  const ts = item.parsed.x / 1000;
+                  const s = _cActiveScore(ts) ?? _cActiveScore(Math.round(ts/86400)*86400);
+                  return s !== null ? ' CBBI Confidence: ' + Math.ceil(s*100) + '%' : '';
                 }
-                if (lbl === 'Halving') return ' Halving Event';
-                // Metric lines
-                return ' ' + lbl + ': ' + Math.round(item.parsed.y) + '%';
+                return '';
               }
             },
             backgroundColor: 'rgba(6,8,24,0.95)',
