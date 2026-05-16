@@ -33,18 +33,19 @@ async def cmd_unbond(args: list, page: int = 0) -> str:
     cutoff_ts = time.time() - 7 * 86400
 
     bb = await get_bond_broken()
-    bs = await get_bond_states()
+    bs_raw = await get_bond_states()
     if not bb:
         return "Could not fetch unbonding queue data."
 
-    # Build owner lookup from bond_states
-    bond_states_map = {}
-    if bs:
-        raw = bs if isinstance(bs, dict) else {}
-        for nft_id, state in raw.items():
-            owner = state.get("owner", "") if isinstance(state, dict) else ""
-            if owner:
-                bond_states_map[str(nft_id)] = owner
+    # Parse bond_states exactly like governance.py
+    bond_states = {}
+    if bs_raw:
+        raw = bs_raw if isinstance(bs_raw, dict) else {}
+        bond_states = raw.get("bondStates", raw)
+
+    def resolve_owner(nft_id: str) -> str:
+        s = bond_states.get(str(nft_id), {})
+        return s.get("owner", "") if isinstance(s, dict) else ""
 
     events = bb.get("bondBrokenEvents", []) if isinstance(bb, dict) else bb
     # Filter last 7 days
@@ -80,7 +81,7 @@ async def cmd_unbond(args: list, page: int = 0) -> str:
         nft_id = e.get("nftId", "?")
         amount = parse_amt(e.get("amount", 0))
         date   = e.get("date") or str(e.get("timestamp", "—"))[:10]
-        owner  = e.get("owner", "") or bond_states_map.get(str(nft_id), "")
+        owner  = e.get("owner", "") or resolve_owner(str(nft_id))
         lines += [
             f"🔴 Bond #{nft_id} — {fmt_rize(amount)}",
             f"  {date}",
