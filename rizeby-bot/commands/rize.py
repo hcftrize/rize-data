@@ -9,7 +9,7 @@ import httpx
 from utils.github_data import get_bond_broken, get_unbonding_queue, get_bond_states
 from utils.formatters import fmt_rize, fmt_usd, fmt_price
 
-ALCHEMY_URL = f"https://base-mainnet.g.alchemy.com/v2/{os.environ.get('ALCHEMY_KEY', 'qS-QZnHMq-cqmoFkw-grY')}"
+ALCHEMY_URL = os.environ.get("ALCHEMY_RPC_URL", "")
 GOV_CONTRACT = "0x5a134098bDBEb05Da9eAc35439c5624547ed26eE"
 RIZE_TOKEN   = "0x9818B6c09f5ECc843060927E8587c427C7C93583"
 DECIMALS     = 10 ** 18
