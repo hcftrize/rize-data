@@ -250,7 +250,12 @@ async def route_command(cmd: str, args: list, chat_id: int, message_id: int = 0,
 
     elif cmd_lower == "cantonboard":
         from commands.ecosystem import cmd_cantonboard
-        await send_message(reply_chat_id, await cmd_cantonboard(args), thread_id=reply_thread_id)
+        bot_mid = await send_message(reply_chat_id, await cmd_cantonboard(args), thread_id=reply_thread_id)
+        if not args:
+            # Only set pagination context when showing the list (no args)
+            # so plain text replies trigger member lookup
+            _set_page(reply_chat_id, "cantonboard", 0, [])
+            if bot_mid: _cache_bot_msg(bot_mid, "cantonboard", 0, [], reply_chat_id, reply_thread_id)
 
     elif cmd_lower == "cantonlist":
         page = _get_page(reply_chat_id)
