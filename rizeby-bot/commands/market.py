@@ -100,7 +100,8 @@ async def cmd_pricesim(args: list) -> str:
         f"🎯 *{base_name} Price Simulation*",
         f"_What would {base_name} be worth if it had each asset's market cap?_",
         "",
-        f"Current: {fmt_price(base_price)} · Supply: {fmt_num(base_supply)}",
+        f"Current: {fmt_price(base_price)}",
+        f"Supply: {fmt_num(base_supply)}",
         f"MCap: {fmt_usd(base_mcap)}" + (f" · Rank #{base_rank}" if base_rank else ""),
         "",
     ]
@@ -120,10 +121,11 @@ async def cmd_pricesim(args: list) -> str:
 
     for hyp_price, label, target_mcap, target_rank, pct_change, pct_of_mcap in rows:
         sign = "+" if pct_change > 0 else ""
-        rank_str = f" · Rank #{target_rank}" if target_rank else ""
         lines += [
-            f"*{label}* MCap: {fmt_usd(target_mcap)}{rank_str}",
-            f"  {base_name} price: {fmt_sim_price(hyp_price)} ({sign}{pct_change:.0f}%)",
+            f"*{label}*",
+            f"  MCap: {fmt_usd(target_mcap)}" + (f"  ·  Rank #{target_rank}" if target_rank else ""),
+            f"  {base_name} price: {fmt_sim_price(hyp_price)}",
+            f"  Change: {sign}{pct_change:.0f}%",
             f"  {base_name} = {pct_of_mcap:.3f}% of {label}",
             "",
         ]
@@ -179,11 +181,16 @@ async def cmd_portfoliosim(args: list) -> str:
         "💼 *Portfolio Simulation*",
         f"_Estimated value of {fmt_num(amount)} {base_name} at each simulated target price_",
         "",
-        f"Current {base_name}: {fmt_price(base_price)}" + (f" · Rank #{base_rank}" if base_rank else ""),
+        f"Current: {fmt_price(base_price)}",
+        (f"Rank: #{base_rank}" if base_rank else ""),
         f"MCap: {fmt_usd(base_mcap)}",
         f"Current bag: {fmt_usd(current_bag)}",
         "",
     ]
+    # Remove empty strings from optional rank line
+    lines = [l for l in lines if l != ""]
+    lines.append("")
+
     rows = []
     for orig, cid in token_map.items():
         if cid == base_id: continue
@@ -201,10 +208,11 @@ async def cmd_portfoliosim(args: list) -> str:
 
     for hyp_price, label, target_mcap, target_rank, bag_value, pct in rows:
         sign = "+" if pct > 0 else ""
-        rank_str = f" · Rank #{target_rank}" if target_rank else ""
         lines += [
-            f"*{label}* MCap: {fmt_usd(target_mcap)}{rank_str}",
-            f"  {base_name} @ {fmt_price(hyp_price)} → Bag: {fmt_usd(bag_value)} ({sign}{pct:.0f}%)",
+            f"*{label}*",
+            f"  MCap: {fmt_usd(target_mcap)}" + (f"  ·  Rank #{target_rank}" if target_rank else ""),
+            f"  {base_name} @ {fmt_price(hyp_price)}",
+            f"  Bag: {fmt_usd(bag_value)} ({sign}{pct:.0f}%)",
             "",
         ]
     return "\n".join(lines)
