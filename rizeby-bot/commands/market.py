@@ -121,9 +121,10 @@ async def cmd_pricesim(args: list) -> str:
 
     for hyp_price, label, target_mcap, target_rank, pct_change, pct_of_mcap in rows:
         sign = "+" if pct_change > 0 else ""
+        rank_str = f" #{target_rank}" if target_rank else ""
         lines += [
-            f"*{label}*",
-            f"  MCap: {fmt_usd(target_mcap)}" + (f"  ·  Rank #{target_rank}" if target_rank else ""),
+            f"*{label}{rank_str}*",
+            f"  MCap: {fmt_usd(target_mcap)}",
             f"  {base_name} price: {fmt_sim_price(hyp_price)}",
             f"  Change: {sign}{pct_change:.0f}%",
             f"  {base_name} = {pct_of_mcap:.3f}% of {label}",
@@ -177,19 +178,20 @@ async def cmd_portfoliosim(args: list) -> str:
     base_rank   = base.get("market_cap_rank")
     current_bag = amount * base_price
 
-    lines = [
+    base_lines = [
         "💼 *Portfolio Simulation*",
         f"_Estimated value of {fmt_num(amount)} {base_name} at each simulated target price_",
         "",
         f"Current: {fmt_price(base_price)}",
-        (f"Rank: #{base_rank}" if base_rank else ""),
+    ]
+    if base_rank:
+        base_lines.append(f"Rank: #{base_rank}")
+    base_lines += [
         f"MCap: {fmt_usd(base_mcap)}",
         f"Current bag: {fmt_usd(current_bag)}",
         "",
     ]
-    # Remove empty strings from optional rank line
-    lines = [l for l in lines if l != ""]
-    lines.append("")
+    lines = base_lines
 
     rows = []
     for orig, cid in token_map.items():
@@ -208,9 +210,10 @@ async def cmd_portfoliosim(args: list) -> str:
 
     for hyp_price, label, target_mcap, target_rank, bag_value, pct in rows:
         sign = "+" if pct > 0 else ""
+        rank_str = f" #{target_rank}" if target_rank else ""
         lines += [
-            f"*{label}*",
-            f"  MCap: {fmt_usd(target_mcap)}" + (f"  ·  Rank #{target_rank}" if target_rank else ""),
+            f"*{label}{rank_str}*",
+            f"  MCap: {fmt_usd(target_mcap)}",
             f"  {base_name} @ {fmt_price(hyp_price)}",
             f"  Bag: {fmt_usd(bag_value)} ({sign}{pct:.0f}%)",
             "",
