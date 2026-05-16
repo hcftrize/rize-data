@@ -94,12 +94,14 @@ async def cmd_pricesim(args: list) -> str:
     base_price  = base.get("current_price", 0)
     base_supply = base.get("circulating_supply") or (RIZE_SUPPLY if base_id == RIZE_ID else 1)
     base_mcap   = base.get("market_cap", 0)
+    base_rank   = base.get("market_cap_rank")
 
     lines = [
         f"🎯 *{base_name} Price Simulation*",
         f"_What would {base_name} be worth if it had each asset's market cap?_",
         "",
         f"Current: {fmt_price(base_price)} · Supply: {fmt_num(base_supply)}",
+        f"MCap: {fmt_usd(base_mcap)}" + (f" · Rank #{base_rank}" if base_rank else ""),
         "",
     ]
     rows = []
@@ -108,17 +110,19 @@ async def cmd_pricesim(args: list) -> str:
         c = by_id.get(cid, {})
         target_mcap = c.get("market_cap", 0)
         if not target_mcap: continue
+        target_rank = c.get("market_cap_rank")
         hyp_price   = target_mcap / base_supply
         pct_change  = ((hyp_price / base_price) - 1) * 100 if base_price else 0
         pct_of_mcap = (base_mcap / target_mcap) * 100 if target_mcap else 0
-        rows.append((hyp_price, display_name(cid, orig), target_mcap, pct_change, pct_of_mcap))
+        rows.append((hyp_price, display_name(cid, orig), target_mcap, target_rank, pct_change, pct_of_mcap))
 
     rows.sort(key=lambda r: r[0], reverse=True)
 
-    for hyp_price, label, target_mcap, pct_change, pct_of_mcap in rows:
+    for hyp_price, label, target_mcap, target_rank, pct_change, pct_of_mcap in rows:
         sign = "+" if pct_change > 0 else ""
+        rank_str = f" · Rank #{target_rank}" if target_rank else ""
         lines += [
-            f"*{label}* MCap: {fmt_usd(target_mcap)}",
+            f"*{label}* MCap: {fmt_usd(target_mcap)}{rank_str}",
             f"  {base_name} price: {fmt_sim_price(hyp_price)} ({sign}{pct_change:.0f}%)",
             f"  {base_name} = {pct_of_mcap:.3f}% of {label}",
             "",
@@ -167,13 +171,16 @@ async def cmd_portfoliosim(args: list) -> str:
     base = by_id.get(base_id, {})
     base_price  = base.get("current_price", 0)
     base_supply = base.get("circulating_supply") or (RIZE_SUPPLY if base_id == RIZE_ID else 1)
+    base_mcap   = base.get("market_cap", 0)
+    base_rank   = base.get("market_cap_rank")
     current_bag = amount * base_price
 
     lines = [
         "💼 *Portfolio Simulation*",
         f"_Estimated value of {fmt_num(amount)} {base_name} at each simulated target price_",
         "",
-        f"Current {base_name}: {fmt_price(base_price)}",
+        f"Current {base_name}: {fmt_price(base_price)}" + (f" · Rank #{base_rank}" if base_rank else ""),
+        f"MCap: {fmt_usd(base_mcap)}",
         f"Current bag: {fmt_usd(current_bag)}",
         "",
     ]
@@ -183,19 +190,21 @@ async def cmd_portfoliosim(args: list) -> str:
         c = by_id.get(cid, {})
         target_mcap = c.get("market_cap", 0)
         if not target_mcap: continue
+        target_rank = c.get("market_cap_rank")
         hyp_price = target_mcap / base_supply
         bag_value = amount * hyp_price
         pct = ((bag_value / current_bag) - 1) * 100 if current_bag else 0
         label = display_name(cid, orig)
-        rows.append((hyp_price, label, bag_value, pct))
+        rows.append((hyp_price, label, target_mcap, target_rank, bag_value, pct))
 
     rows.sort(key=lambda r: r[0], reverse=True)
 
-    for hyp_price, label, bag_value, pct in rows:
+    for hyp_price, label, target_mcap, target_rank, bag_value, pct in rows:
         sign = "+" if pct > 0 else ""
+        rank_str = f" · Rank #{target_rank}" if target_rank else ""
         lines += [
-            f"*{label}* mcap → {base_name} @ {fmt_price(hyp_price)}",
-            f"  Bag: {fmt_usd(bag_value)} ({sign}{pct:.0f}%)",
+            f"*{label}* MCap: {fmt_usd(target_mcap)}{rank_str}",
+            f"  {base_name} @ {fmt_price(hyp_price)} → Bag: {fmt_usd(bag_value)} ({sign}{pct:.0f}%)",
             "",
         ]
     return "\n".join(lines)

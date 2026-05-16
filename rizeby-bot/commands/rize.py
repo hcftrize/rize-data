@@ -6,10 +6,10 @@ Commands: /unbond, /totalbonded
 """
 import os
 import httpx
-from utils.github_data import get_bond_broken, get_unbonding_queue
+from utils.github_data import get_bond_broken, get_unbonding_queue, get_bond_states
 from utils.formatters import fmt_rize, fmt_usd, fmt_price
 
-ALCHEMY_URL = f"https://base-mainnet.g.alchemy.com/v2/{os.environ.get('ALCHEMY_KEY', 'qS-QZnHMq-cqmoFkw-grY')}"
+ALCHEMY_URL = os.environ.get("ALCHEMY_RPC_URL", "")
 GOV_CONTRACT = "0x5a134098bDBEb05Da9eAc35439c5624547ed26eE"
 RIZE_TOKEN   = "0x9818B6c09f5ECc843060927E8587c427C7C93583"
 DECIMALS     = 10 ** 18
@@ -33,8 +33,18 @@ async def cmd_unbond(args: list, page: int = 0) -> str:
     cutoff_ts = time.time() - 7 * 86400
 
     bb = await get_bond_broken()
+    bs = await get_bond_states()
     if not bb:
         return "Could not fetch unbonding queue data."
+
+    # Build owner lookup from bond_states
+    bond_states_map = {}
+    if bs:
+        raw = bs if isinstance(bs, dict) else {}
+        for nft_id, state in raw.items():
+            owner = state.get("owner", "") if isinstance(state, dict) else ""
+            if owner:
+                bond_states_map[str(nft_id)] = owner
 
     events = bb.get("bondBrokenEvents", []) if isinstance(bb, dict) else bb
     # Filter last 7 days
@@ -70,11 +80,14 @@ async def cmd_unbond(args: list, page: int = 0) -> str:
         nft_id = e.get("nftId", "?")
         amount = parse_amt(e.get("amount", 0))
         date   = e.get("date") or str(e.get("timestamp", "—"))[:10]
+        owner  = e.get("owner", "") or bond_states_map.get(str(nft_id), "")
         lines += [
             f"🔴 Bond #{nft_id} — {fmt_rize(amount)}",
             f"  {date}",
-            "",
         ]
+        if owner:
+            lines.append(f"  `{owner}`")
+        lines.append("")
 
     if start + per_page < count:
         lines.append(f"_Reply *next* to see more._")

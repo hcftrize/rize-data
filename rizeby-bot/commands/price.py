@@ -31,6 +31,7 @@ async def cmd_price(args: list) -> tuple:
     ath_pct   = md.get("ath_change_percentage", {}).get("usd", 0)
     vol_24h   = md.get("total_volume", {}).get("usd", 0)
     mcap      = md.get("market_cap", {}).get("usd", 0)
+    rank      = data.get("market_cap_rank")
     sym = data.get("symbol", "").upper() or coin_name
 
     tvl_str = None
@@ -50,7 +51,7 @@ async def cmd_price(args: list) -> tuple:
         return f"{'📈' if v > 0 else '📉'} {fmt_pct(v)}"
 
     lines = [
-        f"*{coin_name}* — ${sym}",
+        f"*{coin_name}* — ${sym}" + (f" · Rank #{rank}" if rank else ""),
         "",
         f"💰 Price: {fmt_price(price_usd)}",
         f"⤷ ₿ {price_btc:.10f} | Ξ {price_eth:.8f}",
