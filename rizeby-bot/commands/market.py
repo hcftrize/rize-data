@@ -211,11 +211,13 @@ async def cmd_portfoliosim(args: list) -> str:
     for hyp_price, label, target_mcap, target_rank, bag_value, pct in rows:
         sign = "+" if pct > 0 else ""
         rank_str = f" #{target_rank}" if target_rank else ""
+        pct_of_mcap = (base_mcap / target_mcap) * 100 if target_mcap else 0
         lines += [
             f"*{label}{rank_str}*",
             f"  MCap: {fmt_usd(target_mcap)}",
             f"  {base_name} @ {fmt_price(hyp_price)}",
             f"  Bag: {fmt_usd(bag_value)} ({sign}{pct:.0f}%)",
+            f"  {base_name} = {pct_of_mcap:.3f}% of {label}",
             "",
         ]
     return "\n".join(lines)
