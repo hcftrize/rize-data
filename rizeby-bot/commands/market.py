@@ -395,3 +395,4 @@ async def cmd_market(args: list) -> str:
             lines += [f"BTC/Alt Season: {season}", f"ALTSZN Score: {score}/100"]
 
     return "\n".join(lines)
+
