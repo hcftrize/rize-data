@@ -5,8 +5,8 @@ Mobile-friendly text format. Cache TTL 5min.
 import httpx
 from utils.coingecko import (
     get_markets, get_market_chart, get_global, get_simple_price,
-    resolve_coin_ids, get_coin_detail, parse_base_and_compare,
-    display_name, RIZE_ID, RIZE_SUPPLY, cg_get, COIN_MAP,
+    resolve_coin_ids, resolve_coin_id, get_coin_detail, parse_base_and_compare,
+    display_name, RIZE_ID, RIZE_SUPPLY, cg_get,
 )
 from utils.formatters import fmt_usd, fmt_pct, fmt_price, fmt_sim_price, fmt_num, parse_amount
 import time
@@ -25,7 +25,7 @@ async def _cached(key: str, coro):
 
 
 async def cmd_perf(args: list) -> str:
-    base_id, compare_tokens = parse_base_and_compare(args)
+    base_id, compare_tokens = await parse_base_and_compare(args)
     token_map = await resolve_coin_ids(compare_tokens)
     all_ids   = list(set([base_id] + list(token_map.values())))
     base_name = display_name(base_id)
@@ -82,7 +82,7 @@ async def cmd_perf(args: list) -> str:
 
 
 async def cmd_pricesim(args: list) -> str:
-    base_id, compare_tokens = parse_base_and_compare(args)
+    base_id, compare_tokens = await parse_base_and_compare(args)
     token_map = await resolve_coin_ids(compare_tokens)
     base_name = display_name(base_id)
     all_ids = list(set([base_id] + list(token_map.values())))
@@ -147,11 +147,11 @@ async def cmd_portfoliosim(args: list) -> str:
             parsed = parse_amount(t)
             if parsed is not None: amount = parsed
             else:
-                tl = t.lower()
-                if tl in COIN_MAP: base_id = COIN_MAP[tl]
+                resolved = await resolve_coin_id(t)
+                if resolved: base_id = resolved
         compare_tokens = right
     else:
-        base_id, remaining = parse_base_and_compare(tokens)
+        base_id, remaining = await parse_base_and_compare(tokens)
         for t in remaining:
             parsed = parse_amount(t)
             if parsed is not None and amount is None: amount = parsed
@@ -237,11 +237,11 @@ async def cmd_arbitrage(args: list) -> str:
             parsed = parse_amount(t)
             if parsed is not None: amount = parsed
             else:
-                tl = t.lower()
-                if tl in COIN_MAP: base_id = COIN_MAP[tl]
+                resolved = await resolve_coin_id(t)
+                if resolved: base_id = resolved
         compare_tokens = right
     else:
-        base_id, remaining = parse_base_and_compare(tokens)
+        base_id, remaining = await parse_base_and_compare(tokens)
         for t in remaining:
             parsed = parse_amount(t)
             if parsed is not None and amount is None: amount = parsed
@@ -395,4 +395,3 @@ async def cmd_market(args: list) -> str:
             lines += [f"BTC/Alt Season: {season}", f"ALTSZN Score: {score}/100"]
 
     return "\n".join(lines)
-
