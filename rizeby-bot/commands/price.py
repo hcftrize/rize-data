@@ -1,23 +1,32 @@
 """
 Commands: /price, /chart, /tvl, /traderize, /trade{ticker}
-Any coin supported.
+Any coin supported — fully dynamic via CoinGecko search.
 """
 import httpx
 from utils.coingecko import (
-    get_coin_detail, get_tickers, cg_get, get_kraken_pair,
-    parse_base_and_compare, display_name, RIZE_ID, COIN_MAP
+    get_coin_detail, get_tickers, cg_get,
+    parse_base_and_compare, display_name, resolve_coin_id, search_coin,
+    RIZE_ID,
 )
 from utils.github_data import get_mcap_history
 from utils.formatters import fmt_usd, fmt_pct, fmt_price, fmt_num
 
 
 async def cmd_price(args: list) -> tuple:
-    base_id, _ = parse_base_and_compare(args)
-    coin_name = display_name(base_id)
-    data = await get_coin_detail(base_id)
+    if not args:
+        coin_id   = RIZE_ID
+        coin_name = "RIZE"
+    else:
+        coin_id = await resolve_coin_id(args[0])
+        if not coin_id:
+            return f"❌ Could not find coin `{args[0]}` on CoinGecko.", {}
+        coin_name = args[0].upper()
+
+    data = await get_coin_detail(coin_id)
     if not data:
-        return f"❌ Could not fetch {coin_name} price.", {}
-    md = data.get("market_data", {})
+        return f"❌ Could not fetch price for `{coin_name}`.", {}
+
+    md        = data.get("market_data", {})
     price_usd = md.get("current_price", {}).get("usd", 0)
     price_btc = md.get("current_price", {}).get("btc", 0)
     price_eth = md.get("current_price", {}).get("eth", 0)
@@ -32,10 +41,10 @@ async def cmd_price(args: list) -> tuple:
     vol_24h   = md.get("total_volume", {}).get("usd", 0)
     mcap      = md.get("market_cap", {}).get("usd", 0)
     rank      = data.get("market_cap_rank")
-    sym = data.get("symbol", "").upper() or coin_name
+    sym       = data.get("symbol", "").upper() or coin_name
 
     tvl_str = None
-    if base_id == RIZE_ID:
+    if coin_id == RIZE_ID:
         history = await get_mcap_history()
         if history and isinstance(history, dict):
             series = history.get("series", [])
@@ -51,7 +60,7 @@ async def cmd_price(args: list) -> tuple:
         return f"{'📈' if v > 0 else '📉'} {fmt_pct(v)}"
 
     lines = [
-        f"*{coin_name}* — ${sym}" + (f" · Rank #{rank}" if rank else ""),
+        f"*{data.get('name', coin_name)}* — ${sym}" + (f" · Rank #{rank}" if rank else ""),
         "",
         f"💰 Price: {fmt_price(price_usd)}",
         f"⤷ ₿ {price_btc:.10f} | Ξ {price_eth:.8f}",
@@ -71,34 +80,25 @@ async def cmd_price(args: list) -> tuple:
         lines.append(f"TVL: {tvl_str}")
 
     markup = {"inline_keyboard": [[
-        {"text": "🔄 Refresh", "callback_data": f"price_{base_id}"}
+        {"text": "🔄 Refresh", "callback_data": f"price_{coin_id}"}
     ]]}
     return "\n".join(lines), markup
 
 
 async def cmd_tvl(args: list) -> str:
     import asyncio as _asyncio
-    # Parallel fetch: mcap-history for TVL + CoinGecko for live price/mcap/fdv
     history_coro = get_mcap_history()
     cg_coro      = get_coin_detail(RIZE_ID)
     history, price_data = await _asyncio.gather(history_coro, cg_coro)
 
-    # TVL from mcap-history.json
-    tvl  = None
-    date = ""
+    tvl = None; date = ""
     if history:
-        if isinstance(history, dict):
-            series = history.get("series", [])
-        elif isinstance(history, list):
-            series = history
-        else:
-            series = []
+        series = history.get("series", []) if isinstance(history, dict) else history if isinstance(history, list) else []
         if series:
             latest = series[-1]
             tvl  = latest.get("tvl") or latest.get("TVL")
             date = latest.get("date", "")
 
-    # Live price, mcap, fdv from CoinGecko
     live_price = live_mcap = live_fdv = None
     if price_data:
         md = price_data.get("market_data", {})
@@ -106,7 +106,6 @@ async def cmd_tvl(args: list) -> str:
         live_mcap  = md.get("market_cap", {}).get("usd")
         live_fdv   = md.get("fully_diluted_valuation", {}).get("usd")
 
-    # Compute ratios locally
     mcap_tvl = (live_mcap / tvl) if (live_mcap and tvl and tvl > 0) else None
     fdv_tvl  = (live_fdv  / tvl) if (live_fdv  and tvl and tvl > 0) else None
 
@@ -117,7 +116,7 @@ async def cmd_tvl(args: list) -> str:
         if ratio < 2.0:  return "🟠 Overvalued"
         return "🔴 Highly Overvalued"
 
-    lines = [
+    return "\n".join([
         "📊 *RIZE MCap & TVL*",
         f"_TVL as of {date}_" if date else "_TVL data_",
         "",
@@ -128,111 +127,98 @@ async def cmd_tvl(args: list) -> str:
         "",
         f"MCap/TVL:    {f'{mcap_tvl:.2f}x' if mcap_tvl else '—'} {valuation(mcap_tvl)}",
         f"FDV/TVL:     {f'{fdv_tvl:.2f}x' if fdv_tvl else '—'} {valuation(fdv_tvl)}",
-    ]
-    return "\n".join(lines)
+    ])
 
 
 async def cmd_chart(args: list) -> tuple:
     import os
-    base_id, remaining = parse_base_and_compare(args)
-    coin_name = display_name(base_id)
+    if not args:
+        coin_id   = RIZE_ID
+        coin_name = "RIZE"
+        remaining = []
+    else:
+        INTERVALS = {"15m","1h","4h","1d","1w","1m","3m","5m","30m","45m","2h","3h"}
+        # First arg that is NOT an interval = ticker
+        ticker_arg = None
+        remaining  = []
+        for i, a in enumerate(args):
+            if a.lower() in INTERVALS:
+                remaining = args[i:]
+                break
+            elif ticker_arg is None:
+                ticker_arg = a
+            else:
+                remaining.append(a)
 
-    CHARTIMG_INTERVALS = {
-        "15m": "15m", "1h": "1h", "4h": "4h",
-        "1d": "1D", "1w": "1W", "1m": "1M",
-    }
+        if ticker_arg:
+            coin_id = await resolve_coin_id(ticker_arg)
+            if not coin_id:
+                return None, f"❌ Could not find `{ticker_arg}` on CoinGecko."
+            coin_name = ticker_arg.upper()
+        else:
+            coin_id   = RIZE_ID
+            coin_name = "RIZE"
+
+    CHARTIMG_INTERVALS = {"15m":"15m","1h":"1h","4h":"4h","1d":"1D","1w":"1W","1m":"1M"}
     interval_key = "1d"
     for a in remaining:
         al = a.lower()
-        if al in CHARTIMG_INTERVALS or al in ("3m", "5m", "30m", "45m", "2h", "3h"):
+        if al in CHARTIMG_INTERVALS:
             interval_key = al
             break
     tv_interval = CHARTIMG_INTERVALS.get(interval_key, "1D")
 
-    TV_SYMBOLS = {
-        "rize":           "KRAKEN:RIZEUSD",
-        "bitcoin":        "BINANCE:BTCUSDT",
-        "ethereum":       "BINANCE:ETHUSDT",
-        "chainlink":      "BINANCE:LINKUSDT",
-        "ondo-finance":   "BINANCE:ONDOUSDT",
-        "mantra-dao":     "BINANCE:OMNIUSDT",
-        "ripple":         "BINANCE:XRPUSDT",
-        "solana":         "BINANCE:SOLUSDT",
-        "cardano":        "BINANCE:ADAUSDT",
-        "avalanche-2":    "BINANCE:AVAXUSDT",
-        "polkadot":       "BINANCE:DOTUSDT",
-        "uniswap":        "BINANCE:UNIUSDT",
-        "aave":           "BINANCE:AAVEUSDT",
-    }
-    tv_symbol = TV_SYMBOLS.get(base_id)
-    if not tv_symbol:
-        pair = get_kraken_pair(base_id)
-        if pair:
-            tv_symbol = f"KRAKEN:{pair}"
-        else:
-            from utils.coingecko import DISPLAY_MAP
-            sym = DISPLAY_MAP.get(base_id, base_id.upper())
-            tv_symbol = f"BINANCE:{sym}USDT"
+    # Build TradingView symbol from coin data
+    detail = await get_coin_detail(coin_id)
+    sym = detail.get("symbol", "").upper() if detail else coin_name
+
+    # Special case for RIZE (Kraken only)
+    if coin_id == RIZE_ID:
+        tv_symbol = "KRAKEN:RIZEUSD"
+    else:
+        tv_symbol = f"BINANCE:{sym}USDT"
 
     api_key = os.environ.get("CHARTIMG_KEY", "")
     if not api_key:
         return None, "Chart API key not configured."
 
-    # Build params — chart-img v1 supports multiple studies via repeated key
-    # Max 3 studies on free plan (studies[] + drawings[])
-    base_params = {
-        "symbol":   tv_symbol,
-        "interval": tv_interval,
-        "theme":    "dark",
-        "style":    "candle",
-        "width":    800,
-        "height":   500,
-    }
     try:
+        from urllib.parse import urlencode
+        base_params = {
+            "symbol": tv_symbol, "interval": tv_interval,
+            "theme": "dark", "style": "candle", "width": 800, "height": 500,
+        }
+        query = urlencode(list(base_params.items()) + [("studies", "BB")])
         async with httpx.AsyncClient(timeout=30) as client:
-            # Pass studies as repeated query params (chart-img v1 format)
-            from urllib.parse import urlencode
-            query = urlencode(list(base_params.items()) + [
-                ("studies", "BB"),      # Bollinger Bands (Volume already shown by default)
-            ])
             r = await client.get(
                 f"https://api.chart-img.com/v1/tradingview/advanced-chart?{query}",
                 headers={"Authorization": f"Bearer {api_key}"},
             )
             if r.status_code == 200 and r.headers.get("content-type", "").startswith("image"):
-                caption = f"📊 {coin_name} — {interval_key.upper()} (TradingView)"
-                return r.content, caption
-            else:
-                try:
-                    err = r.json()
-                    msg = err.get("error") or err.get("message") or str(r.status_code)
-                except Exception:
-                    msg = str(r.status_code)
-                return None, f"Chart error: {msg}"
+                return r.content, f"📊 {coin_name} — {interval_key.upper()} (TradingView)"
+            try:
+                err = r.json()
+                msg = err.get("error") or err.get("message") or str(r.status_code)
+            except Exception:
+                msg = str(r.status_code)
+            return None, f"Chart error: {msg}"
     except Exception as e:
         return None, f"Could not generate chart: {e}"
-
 
 
 async def cmd_traderize(args: list) -> str:
     return await _cmd_trade(RIZE_ID, "RIZE")
 
 async def cmd_tradecc(args: list) -> str:
-    return await _cmd_trade("canton-network", "CC")
+    coin_id = await resolve_coin_id("canton-network")
+    return await _cmd_trade(coin_id or "canton-network", "CC")
 
 async def cmd_trade_any(ticker: str) -> str:
-    """Generic /trade{ticker} for any coin."""
-    ticker_lower = ticker.lower().strip()
-    from utils.coingecko import COIN_MAP, display_name as dn
-    coin_id = COIN_MAP.get(ticker_lower)
+    coin_id = await resolve_coin_id(ticker)
     if not coin_id:
-        # Try search
-        data = await cg_get("/search", {"query": ticker_lower})
-        if data and data.get("coins"):
-            coin_id = data["coins"][0]["id"]
-        else:
-            return f"❌ Could not find trading pairs for `{ticker}`."
-    sym = dn(coin_id, ticker)
+        return f"❌ Could not find trading pairs for `{ticker}`."
+    match = await search_coin(ticker)
+    sym = match["symbol"] if match else ticker.upper()
     return await _cmd_trade(coin_id, sym)
 
 async def _cmd_trade(coin_id: str, symbol: str) -> str:
@@ -246,40 +232,32 @@ async def _cmd_trade(coin_id: str, symbol: str) -> str:
         vol  = t.get("converted_volume", {}).get("usd", 0) or 0
         base = t.get("base", "")
         tgt  = t.get("target", "")
-        pair = f"{base}/{tgt}"
-        by_exchange.setdefault(ex, []).append({"pair": pair, "vol": vol})
+        by_exchange.setdefault(ex, []).append({"pair": f"{base}/{tgt}", "vol": vol})
 
     ex_ranked = sorted(by_exchange.items(), key=lambda x: sum(p["vol"] for p in x[1]), reverse=True)
-
-    # Filter out DEX contract addresses (0x...) from exchange names
-    DEX_SKIP = {"0x", "pancake", "aerodrome", "uniswap v", "curve", "balancer"}
+    DEX_SKIP  = {"0x", "pancake", "aerodrome", "uniswap v", "curve", "balancer"}
 
     lines = [f"🔄 *{symbol} Trading Pairs*", ""]
     shown = 0
     for ex_name, pairs in ex_ranked:
         if shown >= 8: break
-        # Skip DEX exchanges with contract-style names
         name_lower = ex_name.lower()
         if ex_name.startswith("0x") or any(s in name_lower for s in DEX_SKIP):
             continue
         pairs_sorted = sorted(pairs, key=lambda p: p["vol"], reverse=True)
-        pairs_str    = " · ".join(p["pair"] for p in pairs_sorted[:4])
-        top_vol      = fmt_usd(pairs_sorted[0]["vol"])
-        lines.append(f"*{ex_name}*: {pairs_str}")
-        lines.append(f"  Vol: {top_vol}/24h")
+        lines.append(f"*{ex_name}*: {' · '.join(p['pair'] for p in pairs_sorted[:4])}")
+        lines.append(f"  Vol: {fmt_usd(pairs_sorted[0]['vol'])}/24h")
         shown += 1
 
     all_pairs = sorted(
         [{"ex": ex, **p} for ex, pairs in by_exchange.items() for p in pairs],
         key=lambda x: x["vol"], reverse=True,
     )
-    if all_pairs:
-        # Filter top 2 from non-DEX exchanges
-        filtered_top = [p for p in all_pairs if not p["ex"].startswith("0x") and
-                        not any(s in p["ex"].lower() for s in DEX_SKIP)]
-        if filtered_top:
-            lines += ["", "🏆 *Top volume pairs:*"]
-            for p in filtered_top[:2]:
-                lines.append(f"  {p['ex']} — {p['pair']} · {fmt_usd(p['vol'])}/24h")
+    filtered = [p for p in all_pairs if not p["ex"].startswith("0x")
+                and not any(s in p["ex"].lower() for s in DEX_SKIP)]
+    if filtered:
+        lines += ["", "🏆 *Top volume pairs:*"]
+        for p in filtered[:2]:
+            lines.append(f"  {p['ex']} — {p['pair']} · {fmt_usd(p['vol'])}/24h")
 
     return "\n".join(lines)
