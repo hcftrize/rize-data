@@ -23,13 +23,13 @@ _ALL_ENTITIES = (
 
 def _fmt_eco(e: dict) -> str:
     text = e.get("text", "")
-    trimmed = text[:700] + ("..." if len(text) > 700 else "")
+    trimmed = text[:4095] + ("..." if len(text) > 4095 else "")
     return f"*{e['name']}*\n_{e['tag']}_\n\n{trimmed}"
 
 
 def _fmt_board(b: dict) -> str:
     text = b.get("text", "")
-    trimmed = text[:700] + ("..." if len(text) > 700 else "")
+    trimmed = text[:4095] + ("..." if len(text) > 4095 else "")
     return f"*{b['name']}*\n_{b['role']}_\n\n{trimmed}"
 
 
