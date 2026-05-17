@@ -16,6 +16,147 @@ RIZE_SUPPLY = 5_000_000_000
 # Small cache for search results to avoid redundant API calls within a request
 _search_cache: dict = {}
 
+# ── TradingView symbol resolution ─────────────────────────────────────────────
+
+CG_TO_TV_EXCHANGE = {
+    "binance":             "BINANCE",
+    "coinbase exchange":   "COINBASE",
+    "coinbase":            "COINBASE",
+    "gdax":                "COINBASE",
+    "kraken":              "KRAKEN",
+    "okex":                "OKX",
+    "okx":                 "OKX",
+    "bybit":               "BYBIT",
+    "bybit_spot":          "BYBIT",
+    "bitstamp":            "BITSTAMP",
+    "kucoin":              "KUCOIN",
+    "huobi":               "HUOBI",
+    "bitfinex":            "BITFINEX",
+    "gemini":              "GEMINI",
+    "mexc":                "MEXC",
+    "gate":                "GATEIO",
+    "gate.io":             "GATEIO",
+    "whitebit":            "WHITEBIT",
+    "bitget":              "BITGET",
+    "htx":                 "HTX",
+    "bingx":               "BINGX",
+    "lbank":               "LBANK",
+    "crypto.com exchange": "CRYPTO",
+    "crypto.com":          "CRYPTO",
+}
+
+EXCHANGE_PRIORITY = [
+    "BINANCE","COINBASE","KRAKEN","OKX","BYBIT",
+    "BITSTAMP","KUCOIN","BITFINEX","GEMINI","MEXC",
+    "WHITEBIT","GATEIO","BITGET","HTX","CRYPTO",
+]
+
+QUOTE_PRIORITY = ["USD","USDT","USDC","EUR","BTC"]
+
+_tv_symbol_cache: dict = {}
+
+
+def resolve_tv_symbol_from_tickers(tickers: list, coin_symbol: str) -> str | None:
+    """Method 1: resolve TradingView symbol from CoinGecko tickers (no extra API call)."""
+    if not tickers:
+        return None
+    base = coin_symbol.upper()
+    candidates = []
+    for t in tickers:
+        ticker_base  = (t.get("base",   "") or "").upper()
+        ticker_quote = (t.get("target", "") or "").upper()
+        exch_name    = (t.get("market", {}).get("name", "") or "").lower().strip()
+        tv_exch      = CG_TO_TV_EXCHANGE.get(exch_name)
+        if not tv_exch: continue
+        if ticker_base != base: continue
+        # Exclude futures/perp
+        identifier = t.get("market", {}).get("identifier", "") or ""
+        if "_futures" in identifier or "_perp" in identifier: continue
+        exch_score  = EXCHANGE_PRIORITY.index(tv_exch) if tv_exch in EXCHANGE_PRIORITY else 99
+        quote_score = QUOTE_PRIORITY.index(ticker_quote) if ticker_quote in QUOTE_PRIORITY else 99
+        volume      = (t.get("converted_volume") or {}).get("usd", 0) or 0
+        candidates.append({
+            "symbol":      f"{tv_exch}:{ticker_base}{ticker_quote}",
+            "exch_score":  exch_score,
+            "quote_score": quote_score,
+            "volume":      volume,
+        })
+    if not candidates:
+        return None
+    candidates.sort(key=lambda x: (x["exch_score"], x["quote_score"], -x["volume"]))
+    return candidates[0]["symbol"]
+
+
+async def resolve_tv_symbol_from_search(coin_symbol: str) -> str | None:
+    """Method 2: fallback via TradingView symbol search API."""
+    s = coin_symbol.upper()
+    try:
+        url = f"https://symbol-search.tradingview.com/symbol_search/v3/?text={s}&hl=false&exchange=&lang=en&type=crypto&domain=production"
+        async with httpx.AsyncClient(timeout=8) as client:
+            r = await client.get(url, headers={"Accept": "application/json"})
+            if not r.is_success:
+                return None
+            data = r.json()
+        symbols = data.get("symbols", []) if isinstance(data, dict) else []
+        # Filter exact base match
+        def get_base(sym):
+            for q in ["USDT","USDC","USD","BTC","ETH","EUR"]:
+                if sym.upper().endswith(q):
+                    return sym.upper()[:-len(q)]
+            return sym.upper()
+        exact = [item for item in symbols if get_base(item.get("symbol","")) == s]
+        pool  = exact if exact else symbols[:10]
+        pool  = [item for item in pool if not (item.get("symbol","").upper().endswith("_PERP") or item.get("symbol","").upper().endswith(".P"))] or pool
+        scored = []
+        for item in pool:
+            exch  = (item.get("exchange","") or "").upper()
+            sym   = (item.get("symbol",  "") or "").upper()
+            es    = EXCHANGE_PRIORITY.index(exch) if exch in EXCHANGE_PRIORITY else 99
+            qs    = next((i for i,q in enumerate(QUOTE_PRIORITY) if sym.endswith(q)), 99)
+            scored.append((es, qs, item))
+        scored.sort(key=lambda x: (x[0], x[1]))
+        if not scored:
+            return None
+        best = scored[0][2]
+        return f"{(best.get('exchange','') or '').upper()}:{(best.get('symbol','') or '').upper()}"
+    except Exception:
+        return None
+
+
+async def get_tv_symbol(coin_id: str, coin_symbol: str) -> str:
+    """
+    Resolve the best TradingView symbol for a coin.
+    1. Check cache
+    2. Try tickers from CoinGecko
+    3. Fallback to TV symbol search
+    4. Last resort: BINANCE:{SYM}USDT
+    """
+    cache_key = coin_id.lower()
+    if cache_key in _tv_symbol_cache:
+        return _tv_symbol_cache[cache_key]
+
+    # Special case: RIZE only on Kraken
+    if coin_id == RIZE_ID:
+        result = "KRAKEN:RIZEUSD"
+        _tv_symbol_cache[cache_key] = result
+        return result
+
+    # Method 1: from tickers
+    tickers = await get_tickers(coin_id)
+    symbol = resolve_tv_symbol_from_tickers(tickers or [], coin_symbol)
+
+    # Method 2: TV search fallback
+    if not symbol:
+        symbol = await resolve_tv_symbol_from_search(coin_symbol)
+
+    # Last resort
+    if not symbol:
+        symbol = f"BINANCE:{coin_symbol.upper()}USDT"
+
+    _tv_symbol_cache[cache_key] = symbol
+    return symbol
+
+
 
 async def cg_get(path: str, params: dict = None) -> dict | list | None:
     url = CG_BASE + path
