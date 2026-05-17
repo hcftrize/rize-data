@@ -6,7 +6,7 @@ import httpx
 from utils.coingecko import (
     get_coin_detail, get_tickers, cg_get,
     parse_base_and_compare, display_name, resolve_coin_id, search_coin,
-    RIZE_ID,
+    get_tv_symbol, RIZE_ID,
 )
 from utils.github_data import get_mcap_history
 from utils.formatters import fmt_usd, fmt_pct, fmt_price, fmt_num
@@ -168,15 +168,10 @@ async def cmd_chart(args: list) -> tuple:
             break
     tv_interval = CHARTIMG_INTERVALS.get(interval_key, "1D")
 
-    # Build TradingView symbol from coin data
+    # Resolve TradingView symbol dynamically (tickers → TV search → fallback)
     detail = await get_coin_detail(coin_id)
-    sym = detail.get("symbol", "").upper() if detail else coin_name
-
-    # Special case for RIZE (Kraken only)
-    if coin_id == RIZE_ID:
-        tv_symbol = "KRAKEN:RIZEUSD"
-    else:
-        tv_symbol = f"BINANCE:{sym}USDT"
+    sym = detail.get("symbol", coin_name).upper() if detail else coin_name.upper()
+    tv_symbol = await get_tv_symbol(coin_id, sym)
 
     api_key = os.environ.get("CHARTIMG_KEY", "")
     if not api_key:
