@@ -953,7 +953,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
     .ctx-iv-btn:hover{color:#fff;}
     .ctx-iv-btn.active{color:var(--cyan);border-color:var(--cyan);background:rgba(126,224,255,0.07);}
   
-      /* ── CBBI ── */
+    /* ── CBBI ── */
     .cbbi-zoom{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);border-right:none;padding:6px 16px;cursor:pointer;transition:color .15s,background .15s;}
     .cbbi-zoom:last-child{border-right:1px solid rgba(255,255,255,0.10);}
     .cbbi-zoom:hover{color:#fff;background:rgba(126,224,255,0.06);}
@@ -973,7 +973,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
     .cbbi-leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
     .cbbi-leg-txt{font-family:'DM Mono',monospace;font-size:12px;color:rgba(200,210,230,0.9);letter-spacing:.3px;}
     @media(max-width:700px){.cbbi-tile{flex:1 1 30%;}.cbbi-tile-val{font-size:19px;}}
-  </style>
   </style>
 </head>
 <body>
@@ -1133,7 +1132,6 @@ html, body { overflow-x: hidden; max-width: 100%; }
 
 
     <!-- ── SECTION 3 : MARKET CONTEXT ── -->
-    <!-- ── SECTION 3 : MARKET CONTEXT ── -->
     <section class="section" id="mktctx-section">
       <div class="section-titlebar-row">
         <div class="section-titlebar" style="margin:0">
@@ -1153,15 +1151,13 @@ html, body { overflow-x: hidden; max-width: 100%; }
         </select>
       </div>
 
-      <!-- Panel 1: existing Key Market Metrics -->
+      <!-- Panel 1: Key Market Metrics -->
       <div class="ctx-panel active" id="mktctx-panel-metrics">
         <div id="market-context"><div class="loading-text">Loading data&hellip;</div></div>
       </div>
 
       <!-- Panel 2: CBBI -->
       <div class="ctx-panel" id="mktctx-panel-cbbi">
-
-        <!-- KPI row -->
         <div style="display:flex;gap:16px;margin-bottom:22px;flex-wrap:wrap;align-items:stretch">
           <div style="flex:0 0 auto;min-width:186px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 26px;border:1px solid rgba(126,224,255,0.14);background:linear-gradient(180deg,rgba(126,224,255,0.04),transparent)">
             <span style="font-family:'Trebuchet MS',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;text-align:center">Confidence at the peak</span>
@@ -1178,11 +1174,7 @@ html, body { overflow-x: hidden; max-width: 100%; }
             <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">Source: CBBI — ColinTalksCrypto</span>
           </div>
         </div>
-
-        <!-- 9 tiles -->
         <div id="cbbi-tiles" style="display:flex;flex-wrap:wrap;gap:0;border:1px solid rgba(255,255,255,0.07);margin-bottom:14px"></div>
-
-        <!-- Zoom + toggle -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
           <div style="display:flex;gap:0">
             <button class="cbbi-zoom active" onclick="cbbiZoom('ALL',this)">ALL</button>
@@ -1192,33 +1184,18 @@ html, body { overflow-x: hidden; max-width: 100%; }
           </div>
           <button onclick="cbbiToggleAll()" style="font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);padding:6px 14px;cursor:pointer">Toggle All</button>
         </div>
-
-        <!-- Chart -->
         <div class="ctx-chart-wrap" style="height:420px;position:relative">
           <div class="ctx-loading" id="cbbi-loading">Loading CBBI data…</div>
           <canvas id="cbbi-chart" style="display:none;width:100%;height:100%"></canvas>
         </div>
-
-        <!-- Clickable legend -->
         <div id="cbbi-legend" style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06)"></div>
-
-        <!-- Gradient -->
         <div style="display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap">
           <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">0</span>
           <div style="flex:1;min-width:120px;height:5px;border-radius:3px;background:linear-gradient(to right,#004d1a,#33cc00,#ffee00,#ff8800,#cc2200)"></div>
           <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">100 — CBBI Confidence Score</span>
         </div>
-
-      </div><!-- /cbbi panel -->
+      </div>
     </section>
-
-
-    <!-- ── SECTION 4 : PERFORMANCE COMPARISON ── -->
-    <section class="section" id="perf-section">
-      <div class="section-titlebar-row">
-        <div class="section-titlebar" style="margin:0">
-          <span class="section-title">Performance Comparison</span>
-        </div>
 
 
     <!-- ── SECTION 4 : PERFORMANCE COMPARISON ── -->
@@ -3132,7 +3109,6 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
   });
 
 
-
   /* ═══════════════════════════════════════════════════
      MARKET CONTEXT — select navigation
   ═══════════════════════════════════════════════════ */
@@ -3521,8 +3497,6 @@ const altLabel = altScore !== null ? altScore + "/100" : "N/A";
     });
 
   }
-
-
   </script>
 
 
