@@ -80,7 +80,7 @@ async def cmd_price(args: list) -> tuple:
         lines.append(f"TVL: {tvl_str}")
 
     markup = {"inline_keyboard": [[
-        {"text": "🔄 Refresh", "callback_data": f"price_{coin_id}"}
+        {"text": "🔄 Refresh", "callback_data": f"price_{args[0] if args else RIZE_ID}"}
     ]]}
     return "\n".join(lines), markup
 
