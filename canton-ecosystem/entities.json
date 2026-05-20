@@ -3463,20 +3463,6 @@
     "logo_local": "logos\\qcp-group.jpeg"
   },
   {
-    "name": "QCP Trading",
-    "slug": "qcp-trading",
-    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69a515c9920bdd6882deedb1_logo_qcp.jpeg",
-    "short_desc": "A digital asset trading firm offering a range of tailored derivatives, spot trading and structured",
-    "tags": [
-      "VALIDATOR",
-      "LIQUIDITY",
-      "Network Utilities\nLIQUIDITY",
-      "Roles\nVALIDATOR\nVALIDATOR"
-    ],
-    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nQCP Trading\nhttps://www.qcp.capital\n\nQCP is a digital asset trading firm offering a range of tailored derivatives, spot trading and structured solutions to institutional, professional and accredited investors.\n\nNetwork Utilities\nLIQUIDITY\nRoles\nVALIDATOR\nVALIDATOR",
-    "logo_local": "logos\\qcp-trading.jpeg"
-  },
-  {
     "name": "Quantstamp",
     "slug": "quantstamp",
     "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69a515d73f0affd4776cbb92_Quantstamp%2520logo.jpeg",

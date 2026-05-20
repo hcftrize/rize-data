@@ -400,11 +400,8 @@ async def handle_callback(callback: dict) -> None:
     if data.startswith("price_"):
         coin_id = data[6:]
         from commands.price import cmd_price
-        # coin_id is the CoinGecko id stored when /price was called
-        # Find the short ticker key that maps to this coin_id
-        from utils.coingecko import COIN_MAP
-        ticker = next((k for k, v in COIN_MAP.items() if v == coin_id), coin_id)
-        text, markup = await cmd_price([ticker])
+        # coin_id is the CoinGecko id — pass directly, cmd_price resolves it
+        text, markup = await cmd_price([coin_id])
         await edit_message(chat_id, msg_id, text, markup)
     try:
         async with httpx.AsyncClient(timeout=5) as client:
