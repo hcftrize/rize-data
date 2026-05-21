@@ -43,6 +43,25 @@
     "logo_local": "logos\\4mgroup.png"
   },
   {
+    "name": "57Blocks",
+    "slug": "57blocks",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/6a0b1e185f2d76f0a930871d_77d8ec1f-3347-46cc-8f79-039121f91574.png",
+    "short_desc": "Web3 engineering partner for stablecoin, payments rails, private credit infra and dApps.",
+    "tags": [
+      "SERVICE PROVIDER",
+      "VALIDATOR",
+      "DEVELOPER TOOLS",
+      "INTEROPERABILITY",
+      "NAAS",
+      "Network Utilities\nDEVELOPER TOOLSINTEROPERABILITYNAASPAYMENTSSTABLECOINS",
+      "PAYMENTS",
+      "STABLECOINS",
+      "Roles\nSERVICE PROVIDERVALIDATOR\nSERVICE PROVIDERVALIDATOR"
+    ],
+    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\n57Blocks\nhttps://57blocks.com/\n57Blocks is a Web3 engineering firm building financial infrastructure for institutions moving money on-chain. With 200+ engineers across five global hubs, we partner with stablecoin issuers, payment networks, private credit platforms, and settlement operators to ship production systems, not prototypes. On Canton, we operate as both a validator and a service provider. Our engineering work spans smart contract and DAML development, tokenization, wallet infrastructure, and permissioned settlement integrations. We help clients design and deploy on Canton's privacy-preserving architecture, from asset issuance and registry delegation to 24/7 institutional settlement flows. What sets us apart is that we are an operator first and a vendor second. Through CapStack and 57Blocks Capital, we bring capital alongside engineering, aligning our incentives with the long-term success of the networks and clients we build for. Let's build institutional-grade infrastructure on Canton, together.\nNetwork Utilities\nDEVELOPER TOOLSINTEROPERABILITYNAASPAYMENTSSTABLECOINS\nRoles\nSERVICE PROVIDERVALIDATOR\nSERVICE PROVIDERVALIDATOR",
+    "logo_local": "logos\\57blocks.png"
+  },
+  {
     "name": "5N Loop Wallet",
     "slug": "5n-loop-wallet",
     "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69a515e1ce5a0f7503eed67b_5n-logo-v2-rIgPeMdZ.png",
@@ -290,6 +309,23 @@
     ],
     "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nArtichoke Capital\nhttps://www.artichoke.capital/\n\nA technology venture capital firm advancing the development of web3.\n\nRoles\nVALIDATOR\nVALIDATOR",
     "logo_local": "logos\\artichoke-capital.jpeg"
+  },
+  {
+    "name": "Askardex",
+    "slug": "askardex",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/6a0acbd144d25426f2383d9f_94be4f16-90ea-4cdf-bf46-c3d028f784a3.png",
+    "short_desc": "On-chain DEX on Canton Network with built-in non-custodial wallet for Canton Coin and CIP-0056 token",
+    "tags": [
+      "APPS (ALL)",
+      "APPS (FEATURED)",
+      "VALIDATOR",
+      "EXCHANGES",
+      "WALLETS",
+      "Network Utilities\nEXCHANGESWALLETS",
+      "Roles\nAPPS (ALL)APPS (FEATURED)VALIDATOR\nAPPS (ALL)APPS (FEATURED)VALIDATOR"
+    ],
+    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nAskardex\nhttps://askardex.com\nAskardex is a non-custodial decentralized exchange (DEX) built on the Canton Network the enterprise-grade blockchain powered by the Global Synchronizer. Operated by PT Askardex Digital Indonesia, a company legally registered in Indonesia, Askardex is committed to building transparent, compliant, and accessible decentralized finance infrastructure for the Indonesian market and beyond.\nNetwork Utilities\nEXCHANGESWALLETS\nRoles\nAPPS (ALL)APPS (FEATURED)VALIDATOR\nAPPS (ALL)APPS (FEATURED)VALIDATOR",
+    "logo_local": "logos\\askardex.png"
   },
   {
     "name": "Asterizm",
@@ -1456,6 +1492,20 @@
     ],
     "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nEA Finance\nhttps://ea.finance\n\nEA Finance is building an RWA-first lending market on the Canton Network, enabling compliant, institution-grade on-chain yield through a native credit layer.wCC, our 1:1 wrapped CC asset on EVM, expands liquidity access and DeFi composability for CC holders across major DeFi ecosystems.\n\nNetwork Utilities\nFINANCINGLIQUIDITYINTEROPERABILITY\nRoles\nAPPS (FEATURED)VALIDATORAPPS (ALL)\nAPPS (FEATURED)VALIDATORAPPS (ALL)",
     "logo_local": "logos\\ea-finance.svg"
+  },
+  {
+    "name": "Edel",
+    "slug": "edel",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/6a0dda67c8fff4edf559bcbe_f3c1d5d9-8f01-48e0-91e2-bceef6678b40.png",
+    "short_desc": "Edel builds DeFi infrastructure for tokenized equities. Lending, collateral and trading.",
+    "tags": [
+      "APPS (FEATURED)",
+      "EXCHANGES",
+      "Network Utilities\nEXCHANGES",
+      "Roles\nAPPS (FEATURED)\nAPPS (FEATURED)"
+    ],
+    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nEdel\nhttps://www.edel.finance/\nEdel is building DeFi infrastructure for tokenized equities, bringing the core functions of traditional capital markets onchain. The protocol enables holders of tokenized stocks to lend their assets, borrow stablecoins against them, access liquidity, and participate in equity credit markets without relying on legacy intermediaries. Instead of treating tokenized stocks like standard crypto tokens, Edel is purpose-built for the unique characteristics of equities, including market hours, trading halts, dividends, stock splits, corporate actions, and ticker-specific risk. Our goal is to become the native money market layer for tokenized equities, serving both retail users and institutions with transparent, efficient, and composable financial infrastructure. By moving lending, borrowing, and margin markets onchain, Edel unlocks new utility for stocks, improves capital efficiency, and gives asset holders access to opportunities that were previously captured by brokers and prime desks.\nNetwork Utilities\nEXCHANGES\nRoles\nAPPS (FEATURED)\nAPPS (FEATURED)",
+    "logo_local": "logos\\edel.png"
   },
   {
     "name": "Edgevana",
