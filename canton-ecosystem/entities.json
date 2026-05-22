@@ -3678,6 +3678,19 @@
     "logo_local": "logos\\sbi-digital-asset-holdings.png"
   },
   {
+    "name": "SBI Group",
+    "slug": "sbi-group",
+    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69a515c91bc2beafb5436d05_sbi_digital_asset_holdings1663340499376.png",
+    "short_desc": "SBI Group is a founding partner of the Canton Network and a Super Validator.",
+    "tags": [
+      "CANTON FOUNDATION MEMBER",
+      "SUPER VALIDATOR",
+      "FINANCIAL INSTITUTIONS"
+    ],
+    "detail_text": "SBI Group is a founding partner of the Canton Network and a Super Validator.",
+    "logo_local": "logos\\sbi-group.png"
+  },
+  {
     "name": "Sekoya Labs",
     "slug": "sekoya-labs",
     "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69a515d11354bb8698423a35_Sekoya-labs.jpeg",
