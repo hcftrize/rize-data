@@ -3461,21 +3461,6 @@
     "logo_local": "logos\\proof-group.png"
   },
   {
-    "name": "PT Askardex Digital Indonesia",
-    "slug": "pt-askardex-digital-indonesia",
-    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69fb46b87b5196af15e227c6_bfbd7b03-cf3c-4d94-ab77-a7cfe949a015.jpeg",
-    "short_desc": "On-chain DEX on Canton Network with built-in non-custodial wallet for Canton Coin and CIP-0056 token",
-    "tags": [
-      "APPS (ALL)",
-      "APPS (FEATURED)",
-      "MARKET INFRASTRUCTURE",
-      "EXCHANGES",
-      "WALLETS"
-    ],
-    "detail_text": "On-chain DEX on Canton Network with built-in non-custodial wallet for Canton Coin and CIP-0056 token",
-    "logo_local": "logos\\pt-askardex-digital-indonesia.jpeg"
-  },
-  {
     "name": "Puro.earth",
     "slug": "puroearth",
     "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69a515d655dc91c5993f9ff8_idB4vgAJNl_1738269506791.png",
@@ -3661,21 +3646,6 @@
     ],
     "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nSBC\nhttps://stablecoin.xyz/\n\nA stablecoin built for payments.SBC is the fiat-backed stablecoin unlocking seamless global payments for developers and businesses.\n\nNetwork Utilities\nPAYMENTSSTABLECOINSINTEROPERABILITY\nRoles\nAPPS (FEATURED)APPS (ALL)\nAPPS (FEATURED)APPS (ALL)",
     "logo_local": "logos\\sbc.svg"
-  },
-  {
-    "name": "SBI Digital Asset Holdings",
-    "slug": "sbi-digital-asset-holdings",
-    "logo_cdn": "https://cdn.prod.website-files.com/696a7c934170f11ec9d70eee/69a515c91bc2beafb5436d05_sbi_digital_asset_holdings1663340499376.png",
-    "short_desc": "SBIDAH is a founding partner of the Canton Network, and a super validator.",
-    "tags": [
-      "CANTON FOUNDATION MEMBER",
-      "SUPER VALIDATOR",
-      "FINANCIAL INSTITUTIONS",
-      "Network UtilitiesNo items found.",
-      "Roles\nCANTON FOUNDATION MEMBERSUPER VALIDATORFINANCIAL INSTITUTIONS\nCANTON FOUNDATION MEMBERSUPER VALIDATORFINANCIAL INSTITUTIONS"
-    ],
-    "detail_text": "Canton Network\nDevelopers\nUse Cases\nResources\nSpeak to an expert\nSBI Digital Asset Holdings\nhttps://www.sbidah.com/\n\nSBI Digital Asset Holdings (SBI DAH) oversees and operates digital asset-related businesses, under the umbrella of SBI Holdings. SBIDAH was a founding partner of the Canton Network, and is a super validator and Canton Foundation member.\n\nRoles\nCANTON FOUNDATION MEMBERSUPER VALIDATORFINANCIAL INSTITUTIONS\nCANTON FOUNDATION MEMBERSUPER VALIDATORFINANCIAL INSTITUTIONS",
-    "logo_local": "logos\\sbi-digital-asset-holdings.png"
   },
   {
     "name": "SBI Group",
